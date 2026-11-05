@@ -5,6 +5,7 @@ import './style.css';
 import { installCjkWrap } from './i18n/cjkWrap';
 import { BootScene } from './scenes/BootScene';
 import { PubScene } from './scenes/PubScene';
+import { MockScene } from './scenes/MockScene';
 import { PAL } from './data/palette';
 
 installCjkWrap();
@@ -19,6 +20,6 @@ const game = new Phaser.Game({
   roundPixels: true,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   input: { activePointers: 2 },
-  scene: [BootScene, PubScene],
+  scene: [BootScene, PubScene, MockScene],
 });
 (window as unknown as { game: Phaser.Game }).game = game;
