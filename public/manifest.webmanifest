@@ -1,0 +1,10 @@
+{
+  "name": "P.U.B. Idle – Pajzl Tycoon",
+  "short_name": "P.U.B. Idle",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#2e222f",
+  "theme_color": "#2e222f",
+  "icons": [{ "src": "icon.png", "sizes": "512x512", "type": "image/png" }]
+}
