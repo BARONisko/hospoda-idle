@@ -12,6 +12,10 @@ const W = 540;
 const H = 960;
 const TOP = 84; // horní lišta s penězi
 const CARD_H = 108;
+/** strop výdělku offline (s) */
+const OFFLINE_CAP = 8 * 3600;
+/** kratší nepřítomnost se nehlásí oknem (s) */
+const OFFLINE_MIN = 60;
 const col = (k: keyof typeof PAL) => Phaser.Display.Color.HexStringToColor(PAL[k]).color;
 
 interface Btn {
@@ -104,6 +108,7 @@ export class PubScene extends Phaser.Scene {
     // ťuknutí do hospody → spropitné od hosta
     this.input.on('pointerdown', (ptr: Phaser.Input.Pointer) => {
       sfx.init();
+      if (this.awayObjs.length) return; // otevřené okno offline
       for (const v of this.views) {
         const c = v.cam;
         if (!Phaser.Geom.Rectangle.Contains(new Phaser.Geom.Rectangle(c.x, c.y, c.width, c.height), ptr.x, ptr.y)) continue;
@@ -118,7 +123,14 @@ export class PubScene extends Phaser.Scene {
       }
     });
 
-    const save = () => store(this.d);
+    // ?away=<s> – ladění: předstírá nepřítomnost
+    const away = Number(new URLSearchParams(location.search).get('away'));
+    if (away) this.d.at = Date.now() - away * 1000;
+    this.offline();
+    const save = () => {
+      if (document.visibilityState === 'visible') this.offline();
+      else store(this.d);
+    };
     document.addEventListener('visibilitychange', save);
     window.addEventListener('pagehide', save);
     this.events.once('shutdown', () => {
@@ -126,6 +138,54 @@ export class PubScene extends Phaser.Scene {
       window.removeEventListener('pagehide', save);
     });
     this.refresh();
+  }
+
+  /** výdělek za dobu nepřítomnosti (běží jen stanice s kostlivcem), strop 8 h */
+  private offline() {
+    const raw = Math.max(0, (Date.now() - this.d.at) / 1000);
+    const secs = Math.min(OFFLINE_CAP, raw);
+    const rate = this.d.pubs.reduce((a, p) => a + this.rate(p), 0);
+    const g = Math.floor(rate * secs);
+    this.d.at = Date.now();
+    if (secs < OFFLINE_MIN || g < 1 || this.awayObjs.length) return;
+    this.gain(g);
+    store(this.d);
+    this.awayPopup(g, secs, raw > OFFLINE_CAP);
+  }
+
+  awayObjs: Phaser.GameObjects.GameObject[] = [];
+
+  private awayPopup(g: number, secs: number, capped: boolean) {
+    const D = 500;
+    const h = Math.floor(secs / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const dur = h ? t('{h} h {m} min', { h, m }) : t('{m} min', { m });
+    const shade = this.add.rectangle(0, 0, W, H, 0x000000, 0.65).setOrigin(0).setDepth(D).setInteractive();
+    const bx = 40, by = 270, bw = W - 80, bh = 380;
+    const g0 = this.add.graphics().setDepth(D + 1);
+    g0.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
+    g0.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
+    g0.lineStyle(4, col('gold')).strokeRoundedRect(bx, by, bw, bh, 16);
+    const objs: Phaser.GameObjects.GameObject[] = [shade, g0];
+    const tx = (y: number, s: string, size: number, c: string) =>
+      objs.push(this.add.text(W / 2, y, s, txt(size, c)).setOrigin(0.5).setAlign('center').setDepth(D + 2));
+    tx(by + 44, t('Zatímco jsi byl pryč…'), 30, PAL.gold);
+    tx(by + 96, t('kostlivci točili {d}', { d: dur }), 22, PAL.fog);
+    if (capped) tx(by + 126, t('(víc než 8 h se nepočítá)'), 18, PAL.fog);
+    const amt = this.add.text(0, by + 190, `+${big(g)}`, txt(44, PAL.gold)).setOrigin(0, 0.5).setDepth(D + 2);
+    const x0 = W / 2 - (amt.width + 46) / 2;
+    amt.setX(x0 + 46);
+    objs.push(this.add.image(x0 + 16, by + 190, 'obj', 'coin').setScale(5).setDepth(D + 2), amt);
+    tx(by + 236, 'coins', 22, PAL.mint);
+    const ok = this.btn(W / 2 - 110, by + bh - 90, 220, 64, () => {
+      this.awayObjs.forEach((o) => o.destroy());
+      this.awayObjs = [];
+      sfx.coin(1);
+    }, D + 3);
+    this.drawBtn(ok, t('Vybrat'), true, 'green');
+    objs.push(ok.bg, ok.label, ok.zone);
+    this.awayObjs = objs;
+    sfx.tip();
   }
 
   private drawMode() {

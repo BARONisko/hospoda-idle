@@ -17,7 +17,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
    velká čísla (K, M, B, T, aa…), 4 stanice s cyklem, nákup úrovní, obsluha (automatizace).
 2. **Hospoda ožije** ✅ – pípy, stoly, hosté chodí a sedí, hostinský točí, kostlivci u stanic, animace výdělku,
    ťuknutí do hospody = spropitné. Lepší tlačítka (×1 / ×10 / max), zvuky.
-3. **Offline výdělek** – okno „Zatímco jsi byl pryč…“ (strop 8 h), později ×2 za reklamu.
+3. **Offline výdělek** ✅ – okno „Zatímco jsi byl pryč…“ (běží jen stanice s kostlivcem, strop 8 h, hlásí se od 1 min,
+   i po návratu do karty; ladění `?away=<s>`). ×2 za reklamu až v části 9.
 4. **Milníky a vylepšení** – milníky úrovní (×2), obchod s jednorázovými vylepšeními, manažeři se schopnostmi.
 5. **Prestiž** – zavření hygienou → nové dějství (krčma, Žabák, Cthulhu), krígly = trvalé bonusy, nové stanice.
 6. **Události s ťukáním** – nájezd žab, banshee karaoke, upíří hodina, zlatý sud (krátké bonusy).
