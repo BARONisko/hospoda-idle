@@ -21,7 +21,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
    i po návratu do karty; ladění `?away=<s>`). ×2 za reklamu až v části 9.
 4. **Milníky a vylepšení** ✅ – milníky úrovní (×2 na 25/50/100…, oslava), obchod (×3 vylepšení stanic, 3 stupně),
    manažer každé hospody (Beran / Sudomor / Žabák) se schopností „hodina“ ×3 na 30 s, nabíjení 5 min. Ladění `?coins=N`.
-5. **Prestiž** – zavření hygienou → nové dějství (krčma, Žabák, Cthulhu), krígly = trvalé bonusy, nové stanice.
+5. **Prestiž** ✅ – „Zavolat hygienu“ v Obchodě (od 10 krígel): reset coins/úrovní/vylepšení/manažerů, krígly =
+   √(výdělek v běhu / 100 000), každý +2 % výdělek navždy; přibude další hospoda (max 3). Později: utrácení krígel, Cthulhu?
 6. **Události s ťukáním** – nájezd žab, banshee karaoke, upíří hodina, zlatý sud (krátké bonusy).
 7. **Sbírka a úkoly** – bestiář hostů-příšer, denní úkoly, úspěchy.
 8. **Zvuk, hudba, jazyky** – cs + en a dalších 10 jazyků (t() jako v P.U.B.).

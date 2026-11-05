@@ -100,3 +100,8 @@ export const mgrCost = (act: number) => 25000 * actMult(act);
 export const BOOST_MULT = 3;
 export const BOOST_S = 30;
 export const BOOST_CD = 300;
+
+/** prestiž: krígly za výdělek v běhu, každý +KRIGL_BONUS výdělku navždy */
+export const kriglyFor = (run: number) => Math.floor(Math.sqrt(run / 1e5));
+export const KRIGL_BONUS = 0.02;
+export const PRESTIGE_MIN = 10;

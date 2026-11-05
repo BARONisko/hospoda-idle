@@ -3,7 +3,7 @@ import { PAL } from '../data/palette';
 import { t } from '../i18n';
 import { txt } from '../ui/font';
 import { big } from '../core/num';
-import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD } from '../core/economy';
+import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { Save, PubState, load, store, newPub } from '../core/save';
 import { PubView } from '../game/PubView';
@@ -244,7 +244,7 @@ export class PubScene extends Phaser.Scene {
         cost: mgrCost(p.act),
         buy: () => this.hireMgr(p),
       }));
-    return [...mgrs, ...ups].sort((a, b) => a.cost - b.cost).slice(0, 6);
+    return [...mgrs, ...ups].sort((a, b) => a.cost - b.cost).slice(0, 5);
   }
 
   private openShop() {
@@ -252,7 +252,7 @@ export class PubScene extends Phaser.Scene {
     this.closeSheet();
     const D = 300, RH = 96;
     const offer = this.shopOffer();
-    const y0 = H - Math.max(2, offer.length) * RH - 74;
+    const y0 = H - (Math.max(1, offer.length) + 1) * RH - 74;
     const block = this.add.rectangle(0, TOP, W, H - TOP, 0x000000, 0.55).setOrigin(0).setDepth(D).setInteractive();
     block.on('pointerdown', (ptr: Phaser.Input.Pointer) => ptr.y < y0 && this.closeShop());
     const g = this.add.graphics().setDepth(D);
@@ -262,9 +262,23 @@ export class PubScene extends Phaser.Scene {
     const close = this.btn(W - 120, y0 + 10, 104, 40, () => this.closeShop(), D + 5);
     this.drawBtn(close, t('Zavřít'), true, 'red');
     this.shopObjs.push(block, g, title, close.bg, close.label, close.zone);
-    if (!offer.length) this.shopObjs.push(this.add.text(W / 2, y0 + 120, t('Teď tu nic není.\nOtevři další stanice.'), txt(22, PAL.fog)).setOrigin(0.5).setAlign('center').setDepth(D + 1));
+    if (!offer.length) this.shopObjs.push(this.add.text(W / 2, y0 + 200, t('Teď tu nic není.\nOtevři další stanice.'), txt(22, PAL.fog)).setOrigin(0.5).setAlign('center').setDepth(D + 1));
+    {
+      const y = y0 + 64;
+      const k = kriglyFor(this.d.run);
+      const box = this.add.graphics().setDepth(D + 1);
+      box.fillStyle(col('blood'), 0.7).fillRoundedRect(10, y, W - 20, RH - 8, 10);
+      const name = this.add.text(26, y + 10, t('Zavolat hygienu'), txt(26, PAL.sand)).setDepth(D + 1);
+      const sub = this.add
+        .text(26, y + 46, t('krígly: {k} (+{b} % výdělek)', { k: this.d.krigle, b: Math.round(this.d.krigle * KRIGL_BONUS * 100) }), txt(18, PAL.bone))
+        .setDepth(D + 1);
+      sub.setScale(Math.min(1, 280 / sub.width));
+      const b = this.btn(W - 212, y + 12, 190, 62, () => this.askPrestige(), D + 2);
+      this.drawBtn(b, k >= PRESTIGE_MIN ? t('+{k} krígel', { k }) : t('{k} / {m} krígel', { k, m: PRESTIGE_MIN }), k >= PRESTIGE_MIN, 'red');
+      this.shopObjs.push(box, name, sub, b.bg, b.label, b.zone);
+    }
     offer.forEach((o, k) => {
-      const y = y0 + 64 + k * RH;
+      const y = y0 + 64 + (k + 1) * RH;
       const box = this.add.graphics().setDepth(D + 1);
       box.fillStyle(col('ink'), 0.6).fillRoundedRect(10, y, W - 20, RH - 8, 10);
       const name = this.add.text(26, y + 10, o.title, txt(26, PAL.bone)).setDepth(D + 1);
@@ -338,6 +352,56 @@ export class PubScene extends Phaser.Scene {
     if (this.boosted(p)) this.drawBtn(b, `×${BOOST_MULT}  ${mmss(p.boostUntil! - now)}`, true, 'scarlet');
     else if ((p.boostReady ?? 0) > now) this.drawBtn(b, mmss(p.boostReady! - now), false, 'amber');
     else this.drawBtn(b, MANAGERS[p.act].skill, true, 'amber');
+  }
+
+  // ---------- prestiž: hygiena ----------
+  private askPrestige() {
+    const k = kriglyFor(this.d.run);
+    if (k < PRESTIGE_MIN) return sfx.error();
+    this.closeShop();
+    const D = 520;
+    const objs: Phaser.GameObjects.GameObject[] = [];
+    const shade = this.add.rectangle(0, 0, W, H, 0x000000, 0.7).setOrigin(0).setDepth(D).setInteractive();
+    const bx = 30, by = 220, bw = W - 60, bh = 470;
+    const g = this.add.graphics().setDepth(D + 1);
+    g.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
+    g.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
+    g.lineStyle(4, col('scarlet')).strokeRoundedRect(bx, by, bw, bh, 16);
+    objs.push(shade, g);
+    const tx = (y: number, s: string, size: number, c: string) => {
+      const o = this.add.text(W / 2, y, s, txt(size, c)).setOrigin(0.5, 0).setAlign('center').setDepth(D + 2).setWordWrapWidth(bw - 40);
+      objs.push(o);
+      return o;
+    };
+    const next = this.d.pubs.length < 3 ? PUB_NAMES[this.d.pubs.length + 1] : '';
+    tx(by + 24, t('Hygiena!'), 36, PAL.scarlet);
+    tx(by + 84, t('Hygienik hospodu zavře. Přijdeš o coins, úrovně, vylepšení i manažery.'), 20, PAL.bone);
+    tx(by + 170, t('Dostaneš +{k} krígel', { k }), 30, PAL.gold);
+    tx(by + 212, t('každý krígl = +{b} % výdělek navždy', { b: KRIGL_BONUS * 100 }), 18, PAL.fog);
+    if (next) tx(by + 252, t('a otevřeš novou hospodu: {n}', { n: next }), 22, PAL.mint);
+    const close = () => objs.forEach((o) => o.destroy());
+    const no = this.btn(bx + 24, by + bh - 88, 180, 64, () => close(), D + 3);
+    this.drawBtn(no, t('Ještě ne'), true, 'slate');
+    const yes = this.btn(bx + bw - 204, by + bh - 88, 180, 64, () => this.prestige(), D + 3);
+    this.drawBtn(yes, t('Zavřít hospodu'), true, 'red');
+    objs.push(no.bg, no.label, no.zone, yes.bg, yes.label, yes.zone);
+    yes.label.setScale(Math.min(1, 160 / yes.label.width));
+    this.awayObjs = objs; // blokuje ťukání do hospody
+    sfx.error();
+  }
+
+  private prestige() {
+    const k = kriglyFor(this.d.run);
+    const n = Math.min(3, this.d.pubs.length + 1);
+    this.d.krigle += k;
+    this.d.run = 0;
+    this.d.coins = 0;
+    this.d.up = [];
+    this.d.pubs = Array.from({ length: n }, (_, i) => newPub((i + 1) as 1 | 2 | 3));
+    store(this.d);
+    sfx.fanfare();
+    this.awayObjs = [];
+    this.scene.restart();
   }
 
   private drawMode() {
@@ -501,12 +565,13 @@ export class PubScene extends Phaser.Scene {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle);
   }
 
   private gain(n: number) {
     this.d.coins += n;
     this.d.earned += n;
+    this.d.run += n;
   }
 
   private rate(p: PubState) {
