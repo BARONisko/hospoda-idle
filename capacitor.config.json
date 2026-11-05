@@ -1,0 +1,6 @@
+{
+  "appId": "cz.baronisko.pubidle",
+  "appName": "P.U.B. Idle",
+  "webDir": "dist",
+  "android": { "backgroundColor": "#2e222f" }
+}

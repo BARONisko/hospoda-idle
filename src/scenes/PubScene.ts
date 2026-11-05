@@ -5,6 +5,7 @@ import { txt } from '../ui/font';
 import { big } from '../core/num';
 import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN } from '../core/economy';
 import { sfx } from '../core/sfx';
+import { ads } from '../core/ads';
 import { Save, PubState, load, store, newPub } from '../core/save';
 import { PubView } from '../game/PubView';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
@@ -240,13 +241,26 @@ export class PubScene extends Phaser.Scene {
     amt.setX(x0 + 46);
     objs.push(this.add.image(x0 + 16, by + 190, 'obj', 'coin').setScale(5).setDepth(D + 2), amt);
     tx(by + 236, 'coins', 22, PAL.mint);
-    const ok = this.btn(W / 2 - 110, by + bh - 90, 220, 64, () => {
+    const done = () => {
       this.awayObjs.forEach((o) => o.destroy());
       this.awayObjs = [];
       sfx.coin(1);
-    }, D + 3);
+    };
+    const two = ads.available;
+    const ok = this.btn(two ? bx + 24 : W / 2 - 110, by + bh - 90, two ? 190 : 220, 64, done, D + 3);
     this.drawBtn(ok, t('Vybrat'), true, 'green');
     objs.push(ok.bg, ok.label, ok.zone);
+    if (two) {
+      const x2 = this.btn(bx + bw - 214, by + bh - 90, 190, 64, async () => {
+        if (await ads.rewarded()) {
+          this.gain(g);
+          store(this.d);
+        }
+        done();
+      }, D + 3);
+      this.drawBtn(x2, t('×2 za reklamu'), true, 'amber');
+      objs.push(x2.bg, x2.label, x2.zone);
+    }
     this.awayObjs = objs;
     sfx.tip();
   }

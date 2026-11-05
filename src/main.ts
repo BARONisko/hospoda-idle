@@ -5,7 +5,6 @@ import './style.css';
 import { installCjkWrap } from './i18n/cjkWrap';
 import { BootScene } from './scenes/BootScene';
 import { PubScene } from './scenes/PubScene';
-import { MockScene } from './scenes/MockScene';
 import { PAL } from './data/palette';
 
 installCjkWrap();
@@ -20,6 +19,11 @@ const game = new Phaser.Game({
   roundPixels: true,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   input: { activePointers: 2 },
-  scene: [BootScene, PubScene, MockScene],
+  scene: [BootScene, PubScene],
 });
 (window as unknown as { game: Phaser.Game }).game = game;
+
+// PWA: hraní bez internetu (jen v sestavené verzi, ne ve vývoji)
+if (import.meta.env.PROD && 'serviceWorker' in navigator && location.protocol === 'https:') {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => undefined));
+}

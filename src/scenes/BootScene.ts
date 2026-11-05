@@ -18,9 +18,7 @@ export class BootScene extends Phaser.Scene {
       .finally(() => {
         generateAll(this);
         loading.destroy();
-        const mock = new URLSearchParams(location.search).get('mock');
-        if (mock) this.scene.start('Mock', { v: mock });
-        else this.scene.start('Pub');
+        this.scene.start('Pub');
       });
   }
 }
