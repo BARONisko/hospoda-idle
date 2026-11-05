@@ -78,3 +78,6 @@ export function plural(n: number, one: string, few: string, many: string): strin
 
 /** Čísla podle jazyka (oddělovač tisíců, desetinná čárka/tečka). */
 export const fmt = (n: number, digits = 0) => n.toLocaleString(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits });
+
+/** jazyky, které mají překlad (+ čeština) */
+export const AVAILABLE: Lang[] = ['cs', ...Object.keys(files).map((f) => f.replace(/^.*\/(\w+)\.json$/, '$1') as Lang).filter((l) => l in LANGS && l !== 'cs')];

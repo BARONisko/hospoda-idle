@@ -24,6 +24,49 @@ class Sfx {
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
   }
 
+  // ---------- hudba: jednoduchá hospodská polka (bas – akord, melodie z pentatoniky) ----------
+  musicOn = false;
+  private mTimer = 0;
+  private mStep = 0;
+  private mNext = 0;
+
+  setMusic(on: boolean) {
+    this.musicOn = on;
+    if (on && !this.mTimer) this.mTimer = window.setInterval(() => this.musicTick(), 50);
+    if (!on && this.mTimer) {
+      clearInterval(this.mTimer);
+      this.mTimer = 0;
+    }
+  }
+
+  private musicTick() {
+    const c = this.ctx;
+    if (!c || this.muted || c.state !== 'running') return;
+    const beat = 60 / 132 / 2; // osminy
+    if (this.mNext < c.currentTime) this.mNext = c.currentTime + 0.05;
+    // naplánuj noty na 0,2 s dopředu
+    while (this.mNext < c.currentTime + 0.2) {
+      const i = this.mStep % 32;
+      const bar = Math.floor(i / 8) % 4;
+      const roots = [196, 147, 196, 147]; // G – D – G – D
+      const chord = [
+        [392, 494, 587],
+        [370, 440, 587],
+        [392, 494, 587],
+        [370, 440, 523],
+      ][bar];
+      const d = this.mNext - c.currentTime;
+      if (i % 4 === 0) this.tone(roots[bar], 0.18, 'triangle', 0.05, undefined, d);
+      if (i % 4 === 2) this.tone(roots[bar] * 1.5, 0.18, 'triangle', 0.04, undefined, d);
+      if (i % 2 === 1) chord.forEach((f) => this.tone(f, 0.08, 'square', 0.008, undefined, d));
+      const mel = [0, 2, 4, 2, 0, -1, 0, -1, 4, 5, 4, 2, 4, -1, 2, -1, 0, 2, 4, 5, 7, 5, 4, 2, 1, 2, 3, 1, 0, -1, 0, -1][i];
+      const sc = [784, 880, 988, 1175, 1319, 1175, 988, 1568];
+      if (mel >= 0) this.tone(sc[mel] / 2, beat * 0.9, 'square', 0.015, undefined, d);
+      this.mNext += beat;
+      this.mStep++;
+    }
+  }
+
   setMuted(m: boolean) {
     this.muted = m;
     if (this.out) this.out.gain.value = m ? 0 : 0.8;

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { PAL } from '../data/palette';
-import { t } from '../i18n';
+import { t, lang, LANGS, AVAILABLE, setLang } from '../i18n';
 import { txt } from '../ui/font';
 import { big } from '../core/num';
 import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN } from '../core/economy';
@@ -24,6 +24,24 @@ interface Offer {
   sub: string;
   cost: number;
   buy: () => void;
+}
+/** nastavení zvuku (zvlášť od uložené hry) */
+const OPTS_KEY = 'pubidle_opts';
+function loadOpts() {
+  try {
+    const o = JSON.parse(localStorage.getItem(OPTS_KEY) ?? '{}') as { snd?: boolean; mus?: boolean };
+    sfx.setMuted(o.snd === false);
+    sfx.setMusic(o.mus !== false);
+  } catch {
+    sfx.setMusic(true);
+  }
+}
+function saveOpts() {
+  try {
+    localStorage.setItem(OPTS_KEY, JSON.stringify({ snd: !sfx.muted, mus: sfx.musicOn }));
+  } catch {
+    /* nic */
+  }
 }
 const col = (k: keyof typeof PAL) => Phaser.Display.Color.HexStringToColor(PAL[k]).color;
 
@@ -82,6 +100,7 @@ export class PubScene extends Phaser.Scene {
 
   create() {
     this.d = load();
+    loadOpts();
     // ladění: ?pubs=2|3 přidá hospody (než bude prestiž)
     const dbg = Number(new URLSearchParams(location.search).get('pubs'));
     while (dbg && this.d.pubs.length < Math.min(3, dbg)) {
@@ -279,7 +298,7 @@ export class PubScene extends Phaser.Scene {
     return [...mgrs, ...ups].sort((a, b) => a.cost - b.cost).slice(0, 5);
   }
 
-  tab: 'shop' | 'tasks' | 'book' = 'shop';
+  tab: 'shop' | 'tasks' | 'book' | 'opts' = 'shop';
 
   private openShop(tab = this.tab, toggle = true) {
     if (this.shopObjs.length && toggle) return this.closeShop();
@@ -298,9 +317,11 @@ export class PubScene extends Phaser.Scene {
       ['shop', t('Obchod')],
       ['tasks', t('Úkoly')],
       ['book', t('Sbírka')],
+      ['opts', ''],
     ];
     tabs.forEach(([id, label], i) => {
-      const b = this.btn(10 + i * 130, y0 + 10, 122, 42, () => this.openShop(id, false), D + 5);
+      const b = this.btn(10 + i * 118, y0 + 10, id === 'opts' ? 60 : 110, 42, () => this.openShop(id, false), D + 5);
+      if (id === 'opts') this.shopObjs.push(this.add.image(b.x + 30, b.y + 21, 'icons', 'gear').setScale(2).setDepth(D + 7));
       this.drawBtn(b, label, true, id === tab ? 'amber' : 'slate');
       if (id !== tab) b.label.setColor(PAL.bone);
       this.shopObjs.push(b.bg, b.label, b.zone);
@@ -315,7 +336,8 @@ export class PubScene extends Phaser.Scene {
     this.shopObjs.push(close.bg, close.label, close.zone);
     if (tab === 'shop') this.shopTab(y0 + 64, D, RH);
     else if (tab === 'tasks') this.tasksTab(y0 + 64, D);
-    else this.bookTab(y0 + 64, D);
+    else if (tab === 'book') this.bookTab(y0 + 64, D);
+    else this.optsTab(y0 + 64, D);
     sfx.click();
     this.refresh();
   }
@@ -412,6 +434,28 @@ export class PubScene extends Phaser.Scene {
       this.drawBtn(b, done ? t('+1 krígl') : '—', done, 'green');
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
+  }
+
+  // ---------- nastavení ----------
+  private optsTab(y0: number, D: number) {
+    const RH = 96;
+    const rows: [string, string, () => void][] = [
+      [t('Zvuky'), sfx.muted ? t('vypnuto') : t('zapnuto'), () => sfx.setMuted(!sfx.muted)],
+      [t('Hudba'), sfx.musicOn ? t('zapnuto') : t('vypnuto'), () => sfx.setMusic(!sfx.musicOn)],
+      [t('Jazyk / Language'), LANGS[lang], () => setLang(AVAILABLE[(AVAILABLE.indexOf(lang) + 1) % AVAILABLE.length])],
+    ];
+    rows.forEach(([title, val, fn], i) => {
+      const y = y0 + i * RH;
+      this.row(y, RH, D, title, '');
+      const b = this.btn(W - 232, y + 14, 210, 60, () => {
+        fn();
+        saveOpts();
+        this.openShop('opts', false);
+      }, D + 2);
+      this.drawBtn(b, val, true, 'plum');
+      this.shopObjs.push(b.bg, b.label, b.zone);
+    });
+    this.shopObjs.push(this.add.text(W / 2, y0 + 3 * RH + 30, 'P.U.B. Idle – Pajzl Tycoon', txt(18, PAL.slate)).setOrigin(0.5).setDepth(D + 1));
   }
 
   // ---------- bestiář ----------
