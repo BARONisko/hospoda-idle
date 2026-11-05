@@ -56,3 +56,36 @@ export const payout = (d: StationDef, lvl: number) => d.income * lvl * milestone
 
 /** výdělek za sekundu (když stanice běží sama) */
 export const perSec = (d: StationDef, lvl: number) => payout(d, lvl) / d.cycle;
+
+/** další milník (úroveň, kde se výdělek zdvojnásobí), nebo null */
+export const nextMilestone = (lvl: number) => MILESTONES.find((m) => lvl < m) ?? null;
+
+/** jednorázové vylepšení z obchodu: ×3 výdělek stanice v dané hospodě */
+export interface UpgradeDef {
+  id: string;
+  act: number;
+  station: string;
+  tier: number;
+  /** cena v coins (už včetně násobku hospody) */
+  cost: number;
+  mult: number;
+}
+
+export const UP_TIERS = 3;
+
+export const UPGRADES: UpgradeDef[] = [1, 2, 3].flatMap((act) =>
+  STATIONS.flatMap((d) =>
+    Array.from({ length: UP_TIERS }, (_, k) => ({
+      id: `${act}_${d.id}_${k + 1}`,
+      act,
+      station: d.id,
+      tier: k + 1,
+      cost: d.staff * 10 * 1000 ** k * actMult(act),
+      mult: 3,
+    })),
+  ),
+);
+
+/** násobek výdělku stanice z koupených vylepšení */
+export const upMult = (owned: string[], act: number, station: string) =>
+  UPGRADES.reduce((m, u) => (u.act === act && u.station === station && owned.includes(u.id) ? m * u.mult : m), 1);

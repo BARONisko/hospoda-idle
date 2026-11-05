@@ -87,6 +87,10 @@ class Sfx {
   pour() {
     this.hiss(0.35, 700, 0.05, 1600);
   }
+  /** milník / vylepšení */
+  fanfare() {
+    [523, 659, 784, 1046, 784, 1046].forEach((f, i) => this.tone(f, i > 3 ? 0.3 : 0.12, 'square', 0.07, undefined, i * 0.08));
+  }
   hire() {
     this.tone(220, 0.12, 'square', 0.07, 440);
     this.tone(330, 0.2, 'square', 0.06, 660, 0.1);

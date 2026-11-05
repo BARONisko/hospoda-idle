@@ -19,6 +19,8 @@ export interface Save {
   /** celkem vyděláno (statistika, později prestiž) */
   earned: number;
   pubs: PubState[];
+  /** koupená vylepšení z obchodu (id) */
+  up: string[];
   /** čas posledního uložení (ms) – pro výdělek offline */
   at: number;
 }
@@ -28,7 +30,7 @@ const KEY = 'pubidle_save_v1';
 export const newPub = (act: 1 | 2 | 3): PubState => ({ act, st: { tap: { lvl: act === 1 ? 1 : 0, auto: false, prog: 0 } } });
 
 export function fresh(): Save {
-  return { v: 2, coins: 0, earned: 0, pubs: [newPub(1)], at: Date.now() };
+  return { v: 2, coins: 0, earned: 0, pubs: [newPub(1)], up: [], at: Date.now() };
 }
 
 export function load(): Save {
@@ -37,8 +39,8 @@ export function load(): Save {
     if (raw) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const d = JSON.parse(raw) as any;
-      if (d?.v === 1) return { v: 2, coins: d.coins, earned: d.earned, pubs: [{ act: 1, st: d.st }], at: d.at };
-      if (d?.v === 2) return d as Save;
+      if (d?.v === 1) return { v: 2, coins: d.coins, earned: d.earned, pubs: [{ act: 1, st: d.st }], up: [], at: d.at };
+      if (d?.v === 2) return { up: [], ...d } as Save;
     }
   } catch {
     /* poškozené nebo nedostupné úložiště → nová hra */
