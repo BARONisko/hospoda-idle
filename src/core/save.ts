@@ -11,6 +11,12 @@ export interface StationState {
 export interface PubState {
   act: 1 | 2 | 3;
   st: Record<string, StationState>;
+  /** najatý manažer (schopnost „hodina“) */
+  mgr?: boolean;
+  /** schopnost běží do (ms) */
+  boostUntil?: number;
+  /** schopnost znovu připravena od (ms) */
+  boostReady?: number;
 }
 
 export interface Save {

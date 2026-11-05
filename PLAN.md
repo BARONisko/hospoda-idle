@@ -19,7 +19,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
    ťuknutí do hospody = spropitné. Lepší tlačítka (×1 / ×10 / max), zvuky.
 3. **Offline výdělek** ✅ – okno „Zatímco jsi byl pryč…“ (běží jen stanice s kostlivcem, strop 8 h, hlásí se od 1 min,
    i po návratu do karty; ladění `?away=<s>`). ×2 za reklamu až v části 9.
-4. **Milníky a vylepšení** – milníky úrovní (×2), obchod s jednorázovými vylepšeními, manažeři se schopnostmi.
+4. **Milníky a vylepšení** ✅ – milníky úrovní (×2 na 25/50/100…, oslava), obchod (×3 vylepšení stanic, 3 stupně),
+   manažer každé hospody (Beran / Sudomor / Žabák) se schopností „hodina“ ×3 na 30 s, nabíjení 5 min. Ladění `?coins=N`.
 5. **Prestiž** – zavření hygienou → nové dějství (krčma, Žabák, Cthulhu), krígly = trvalé bonusy, nové stanice.
 6. **Události s ťukáním** – nájezd žab, banshee karaoke, upíří hodina, zlatý sud (krátké bonusy).
 7. **Sbírka a úkoly** – bestiář hostů-příšer, denní úkoly, úspěchy.

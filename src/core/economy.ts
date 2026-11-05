@@ -89,3 +89,14 @@ export const UPGRADES: UpgradeDef[] = [1, 2, 3].flatMap((act) =>
 /** násobek výdělku stanice z koupených vylepšení */
 export const upMult = (owned: string[], act: number, station: string) =>
   UPGRADES.reduce((m, u) => (u.act === act && u.station === station && owned.includes(u.id) ? m * u.mult : m), 1);
+
+/** manažer hospody: schopnost „hodina“ = ×BOOST_MULT výdělek na BOOST_S, pak nabíjení BOOST_CD */
+export const MANAGERS: Record<number, { name: string; skill: string }> = {
+  1: { name: t('Hostinský Beran'), skill: t('Šťastná hodina') },
+  2: { name: t('Sudomor'), skill: t('Upíří hodina') },
+  3: { name: t('Žabák'), skill: t('Žabí hodina') },
+};
+export const mgrCost = (act: number) => 25000 * actMult(act);
+export const BOOST_MULT = 3;
+export const BOOST_S = 30;
+export const BOOST_CD = 300;

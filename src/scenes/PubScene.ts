@@ -3,7 +3,7 @@ import { PAL } from '../data/palette';
 import { t } from '../i18n';
 import { txt } from '../ui/font';
 import { big } from '../core/num';
-import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef } from '../core/economy';
+import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { Save, PubState, load, store, newPub } from '../core/save';
 import { PubView } from '../game/PubView';
@@ -16,6 +16,12 @@ const CARD_H = 108;
 const OFFLINE_CAP = 8 * 3600;
 /** kratší nepřítomnost se nehlásí oknem (s) */
 const OFFLINE_MIN = 60;
+interface Offer {
+  title: string;
+  sub: string;
+  cost: number;
+  buy: () => void;
+}
 const col = (k: keyof typeof PAL) => Phaser.Display.Color.HexStringToColor(PAL[k]).color;
 
 interface Btn {
@@ -80,6 +86,7 @@ export class PubScene extends Phaser.Scene {
     this.views = [];
     this.cards = [];
     this.stripRates = [];
+    this.skillBtns = [];
     this.sheet = -1;
     this.cameras.main.setBackgroundColor(PAL.ink);
     // hospody leží ve světě daleko vpravo (x ≥ 2000), aby je UI kamera neviděla; UI kamera je nad nimi
@@ -211,18 +218,33 @@ export class PubScene extends Phaser.Scene {
 
   // ---------- obchod s vylepšeními ----------
   shopObjs: Phaser.GameObjects.GameObject[] = [];
-  shopRows: { u: UpgradeDef; b: Btn }[] = [];
+  shopRows: { o: Offer; b: Btn }[] = [];
   shopBtn!: Btn;
   shopDot!: Phaser.GameObjects.Graphics;
 
   /** nabídka obchodu: nejlevnější nekoupená vylepšení pro otevřené hospody a stanice */
-  private shopOffer() {
+  private shopOffer(): Offer[] {
+    const many = this.d.pubs.length > 1;
+    const sub = (act: number, x: string) => (many ? PUB_NAMES[act] + ' · ' + x : x);
     const acts = this.d.pubs.map((p) => p.act as number);
-    return UPGRADES.filter((u) => acts.includes(u.act) && !this.d.up.includes(u.id))
+    const ups: Offer[] = UPGRADES.filter((u) => acts.includes(u.act) && !this.d.up.includes(u.id))
       .filter((u) => (this.d.pubs.find((p) => p.act === u.act)?.st[u.station]?.lvl ?? 0) > 0)
       .filter((u) => u.tier === 1 || this.d.up.includes(`${u.act}_${u.station}_${u.tier - 1}`))
-      .sort((a, b) => a.cost - b.cost)
-      .slice(0, 6);
+      .map((u) => ({
+        title: t('{s} ×{m}', { s: STATION_NAMES[u.act][u.station], m: u.mult }),
+        sub: sub(u.act, t('stupeň {n}', { n: u.tier })),
+        cost: u.cost,
+        buy: () => this.buyUp(u),
+      }));
+    const mgrs: Offer[] = this.d.pubs
+      .filter((p) => !p.mgr && (p.st.kitchen?.lvl ?? 0) > 0)
+      .map((p) => ({
+        title: t('Manažer: {n}', { n: MANAGERS[p.act].name }),
+        sub: sub(p.act, t('schopnost: {s}', { s: MANAGERS[p.act].skill })),
+        cost: mgrCost(p.act),
+        buy: () => this.hireMgr(p),
+      }));
+    return [...mgrs, ...ups].sort((a, b) => a.cost - b.cost).slice(0, 6);
   }
 
   private openShop() {
@@ -241,17 +263,16 @@ export class PubScene extends Phaser.Scene {
     this.drawBtn(close, t('Zavřít'), true, 'red');
     this.shopObjs.push(block, g, title, close.bg, close.label, close.zone);
     if (!offer.length) this.shopObjs.push(this.add.text(W / 2, y0 + 120, t('Teď tu nic není.\nOtevři další stanice.'), txt(22, PAL.fog)).setOrigin(0.5).setAlign('center').setDepth(D + 1));
-    offer.forEach((u, k) => {
+    offer.forEach((o, k) => {
       const y = y0 + 64 + k * RH;
-      const p = this.d.pubs.find((q) => q.act === u.act)!;
       const box = this.add.graphics().setDepth(D + 1);
       box.fillStyle(col('ink'), 0.6).fillRoundedRect(10, y, W - 20, RH - 8, 10);
-      const name = this.add.text(26, y + 10, t('{s} ×{m}', { s: STATION_NAMES[u.act][u.station], m: u.mult }), txt(26, PAL.bone)).setDepth(D + 1);
-      const sub = this.add
-        .text(26, y + 46, this.d.pubs.length > 1 ? PUB_NAMES[p.act] + ' · ' + t('stupeň {n}', { n: u.tier }) : t('stupeň {n}', { n: u.tier }), txt(18, PAL.fog))
-        .setDepth(D + 1);
-      const b = this.btn(W - 212, y + 12, 190, 62, () => this.buyUp(u), D + 2);
-      this.shopRows.push({ u, b });
+      const name = this.add.text(26, y + 10, o.title, txt(26, PAL.bone)).setDepth(D + 1);
+      name.setScale(Math.min(1, 280 / name.width));
+      const sub = this.add.text(26, y + 46, o.sub, txt(18, PAL.fog)).setDepth(D + 1);
+      sub.setScale(Math.min(1, 280 / sub.width));
+      const b = this.btn(W - 212, y + 12, 190, 62, () => o.buy(), D + 2);
+      this.shopRows.push({ o, b });
       this.shopObjs.push(box, name, sub, b.bg, b.label, b.zone);
     });
     sfx.click();
@@ -273,6 +294,50 @@ export class PubScene extends Phaser.Scene {
     this.openShop();
     this.banner(this.views[i].cam, t('{s}: výdělek ×{m}!', { s: STATION_NAMES[u.act][u.station], m: u.mult }));
     store(this.d);
+  }
+
+  private hireMgr(p: PubState) {
+    const c = mgrCost(p.act);
+    if (this.d.coins < c || p.mgr) return sfx.error();
+    this.d.coins -= c;
+    p.mgr = true;
+    const i = this.d.pubs.indexOf(p);
+    this.closeShop();
+    this.openShop();
+    this.banner(this.views[i].cam, t('{n} nastoupil!', { n: MANAGERS[p.act].name }));
+    this.skillBtns[i] && this.drawSkill(i);
+    store(this.d);
+  }
+
+  // ---------- schopnost manažera ----------
+  skillBtns: Btn[] = [];
+
+  private boosted(p: PubState) {
+    return (p.boostUntil ?? 0) > Date.now();
+  }
+
+  private useSkill(i: number) {
+    const p = this.d.pubs[i];
+    const now = Date.now();
+    if (!p.mgr || this.boosted(p) || (p.boostReady ?? 0) > now) return sfx.error();
+    p.boostUntil = now + BOOST_S * 1000;
+    p.boostReady = now + (BOOST_S + BOOST_CD) * 1000;
+    this.banner(this.views[i].cam, t('{s}! Výdělek ×{m}', { s: MANAGERS[p.act].skill, m: BOOST_MULT }));
+    store(this.d);
+  }
+
+  private drawSkill(i: number) {
+    const p = this.d.pubs[i];
+    const b = this.skillBtns[i];
+    if (!p.mgr) return this.drawBtn(b, '', false, 'amber', false);
+    const now = Date.now();
+    const mmss = (ms: number) => {
+      const s = Math.ceil(ms / 1000);
+      return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    };
+    if (this.boosted(p)) this.drawBtn(b, `×${BOOST_MULT}  ${mmss(p.boostUntil! - now)}`, true, 'scarlet');
+    else if ((p.boostReady ?? 0) > now) this.drawBtn(b, mmss(p.boostReady! - now), false, 'amber');
+    else this.drawBtn(b, MANAGERS[p.act].skill, true, 'amber');
   }
 
   private drawMode() {
@@ -297,6 +362,7 @@ export class PubScene extends Phaser.Scene {
     if (n === 1) {
       const viewH = 404;
       this.views[0].frame(0, TOP, W, viewH, 118);
+      this.skillBtns[0] = this.btn(14, TOP + viewH - 60, 200, 48, () => this.useSkill(0), 60);
       const g = this.add.graphics();
       g.fillStyle(col('dusk')).fillRect(0, TOP + viewH, W, H - TOP - viewH);
       g.fillStyle(col('gold')).fillRect(0, TOP + viewH, W, 3);
@@ -315,6 +381,7 @@ export class PubScene extends Phaser.Scene {
       this.stripRates.push(this.add.text(W - 18, y + 12, '', txt(22, PAL.mint)).setOrigin(1, 0).setDepth(51));
       const b = this.btn(W - 170, y + h - 64, 156, 48, () => this.openSheet(i), 60);
       this.drawBtn(b, t('▲ Stanice'), true, 'green');
+      this.skillBtns[i] = this.btn(14, y + h - 64, 200, 48, () => this.useSkill(i), 60);
     });
   }
 
@@ -434,7 +501,7 @@ export class PubScene extends Phaser.Scene {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1);
   }
 
   private gain(n: number) {
@@ -488,12 +555,13 @@ export class PubScene extends Phaser.Scene {
     this.coinsText.setText(`${big(this.d.coins)} coins`);
     this.coinsText.setScale(Math.min(1, 226 / this.coinsText.width));
     this.rateText.setText(t('+{n} / s', { n: big(total) }));
+    this.skillBtns.forEach((_, i) => this.drawSkill(i));
     this.stripRates.forEach((r, i) => r.setText(t('+{n} / s', { n: big(this.rate(this.d.pubs[i])) })));
 
     const cheap = this.shopOffer().some((u) => u.cost <= this.d.coins);
     this.shopDot.clear();
     if (cheap) this.shopDot.fillStyle(col('ink')).fillCircle(W - 126, 20, 11).fillStyle(col('scarlet')).fillCircle(W - 126, 20, 8);
-    for (const r of this.shopRows) this.drawBtn(r.b, big(r.u.cost), this.d.coins >= r.u.cost, 'green');
+    for (const r of this.shopRows) this.drawBtn(r.b, big(r.o.cost), this.d.coins >= r.o.cost, 'green');
 
     for (const c of this.cards) {
       const p = this.d.pubs[c.pub];
