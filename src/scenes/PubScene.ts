@@ -3,7 +3,8 @@ import { PAL } from '../data/palette';
 import { t } from '../i18n';
 import { txt } from '../ui/font';
 import { big } from '../core/num';
-import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, cost, payout, perSec, actMult } from '../core/economy';
+import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, perSec, actMult } from '../core/economy';
+import { sfx } from '../core/sfx';
 import { Save, PubState, load, store, newPub } from '../core/save';
 import { PubView } from '../game/PubView';
 
@@ -54,6 +55,10 @@ export class PubScene extends Phaser.Scene {
   sheetObjs: Phaser.GameObjects.GameObject[] = [];
   stripRates: Phaser.GameObjects.Text[] = [];
   saveT = 0;
+  /** kolik úrovní kupovat najednou: 1, 10, 100, 0 = max */
+  mode = 1;
+  coinT = 0;
+  modeBtn!: Btn;
 
   constructor() {
     super('Pub');
@@ -87,11 +92,18 @@ export class PubScene extends Phaser.Scene {
     this.add.image(40, TOP / 2 - 2, 'obj', 'coin').setScale(4).setDepth(101);
     this.coinsText = this.add.text(76, 12, '', txt(40, PAL.gold)).setDepth(101);
     this.rateText = this.add.text(78, 50, '', txt(22, PAL.mint)).setDepth(101);
+    this.modeBtn = this.btn(W - 112, 16, 96, 50, () => {
+      this.mode = ({ 1: 10, 10: 100, 100: 0, 0: 1 } as Record<number, number>)[this.mode];
+      sfx.click();
+      this.drawMode();
+    }, 102);
+    this.drawMode();
 
     this.layout();
 
     // ťuknutí do hospody → spropitné od hosta
     this.input.on('pointerdown', (ptr: Phaser.Input.Pointer) => {
+      sfx.init();
       for (const v of this.views) {
         const c = v.cam;
         if (!Phaser.Geom.Rectangle.Contains(new Phaser.Geom.Rectangle(c.x, c.y, c.width, c.height), ptr.x, ptr.y)) continue;
@@ -101,6 +113,7 @@ export class PubScene extends Phaser.Scene {
           const tip = Math.max(1, Math.round(this.rate(v.pub) * 2 + payout(STATIONS[0], v.pub.st.tap?.lvl ?? 1) * actMult(v.pub.act)));
           this.gain(tip);
           v.tipPop('+' + big(tip));
+          sfx.tip();
         }
       }
     });
@@ -113,6 +126,18 @@ export class PubScene extends Phaser.Scene {
       window.removeEventListener('pagehide', save);
     });
     this.refresh();
+  }
+
+  private drawMode() {
+    this.drawBtn(this.modeBtn, this.mode ? `×${this.mode}` : 'MAX', true, 'amber');
+  }
+
+  /** kolik úrovní a za kolik se koupí podle přepínače ×1/×10/×100/MAX */
+  private offer(p: PubState, def: StationDef) {
+    const lvl = this.st(p, def.id).lvl;
+    const m = actMult(p.act);
+    const n = lvl === 0 ? 1 : this.mode || Math.max(1, affordable(def, lvl, this.d.coins / m));
+    return { n, price: Math.ceil(costN(def, lvl, n) * m) };
   }
 
   private sheetY() {
@@ -195,7 +220,9 @@ export class PubScene extends Phaser.Scene {
     const zone = this.add.zone(x, y, w, h).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(depth + 2);
     const b: Btn = { bg, label, zone, x, y, w, h, enabled: true, visible: true };
     zone.on('pointerdown', () => {
-      if (!b.enabled || !b.visible) return;
+      if (!b.visible) return;
+      sfx.init();
+      if (!b.enabled) return sfx.error();
       fn();
       if (label.active) this.tweens.add({ targets: label, scale: { from: 0.88, to: 1 }, duration: 120 });
     });
@@ -218,21 +245,23 @@ export class PubScene extends Phaser.Scene {
     return (p.st[id] ??= { lvl: 0, auto: false, prog: 0 });
   }
 
-  private price(p: PubState, def: StationDef) {
-    return Math.ceil(cost(def, this.st(p, def.id).lvl) * actMult(p.act));
-  }
 
   private manual(i: number, def: StationDef) {
     const s = this.st(this.d.pubs[i], def.id);
-    if (s.lvl > 0 && !s.auto && s.prog === 0) s.prog = 0.0001;
+    if (s.lvl > 0 && !s.auto && s.prog === 0) {
+      s.prog = 0.0001;
+      if (def.id === 'tap') sfx.pour();
+      else sfx.click();
+    }
   }
 
   private buy(i: number, def: StationDef) {
     const p = this.d.pubs[i];
-    const c = this.price(p, def);
-    if (this.d.coins < c) return;
-    this.d.coins -= c;
-    this.st(p, def.id).lvl++;
+    const { n, price } = this.offer(p, def);
+    if (this.d.coins < price) return sfx.error();
+    this.d.coins -= price;
+    this.st(p, def.id).lvl += n;
+    sfx.buy();
     this.views[i].refresh();
     this.refresh();
   }
@@ -241,8 +270,10 @@ export class PubScene extends Phaser.Scene {
     const p = this.d.pubs[i];
     const s = this.st(p, def.id);
     const c = def.staff * actMult(p.act);
-    if (s.auto || s.lvl === 0 || this.d.coins < c) return;
+    if (s.auto || s.lvl === 0) return;
+    if (this.d.coins < c) return sfx.error();
     this.d.coins -= c;
+    sfx.hire();
     s.auto = true;
     if (s.prog === 0) s.prog = 0.0001;
     this.views[i].refresh();
@@ -265,6 +296,7 @@ export class PubScene extends Phaser.Scene {
 
   update(_t: number, dms: number) {
     const dt = Math.min(dms / 1000, 0.25);
+    this.coinT -= dt;
     this.d.pubs.forEach((p, i) => {
       let open = 0;
       for (const def of STATIONS) {
@@ -277,6 +309,10 @@ export class PubScene extends Phaser.Scene {
           const g = payout(def, s.lvl) * actMult(p.act);
           this.gain(g);
           this.views[i].payout(def.id, g);
+          if (this.coinT <= 0) {
+            sfx.coin(1 + i * 0.12);
+            this.coinT = 0.3; // ať se cinkání neslévá
+          }
           s.prog = s.auto ? s.prog - 1 : 0;
         }
       }
@@ -300,12 +336,12 @@ export class PubScene extends Phaser.Scene {
       const p = this.d.pubs[c.pub];
       const s = this.st(p, c.def.id);
       const open = s.lvl > 0;
-      const price = this.price(p, c.def);
+      const { n, price } = this.offer(p, c.def);
       const staff = c.def.staff * actMult(p.act);
       c.name.setText(STATION_NAMES[p.act][c.def.id]).setAlpha(open ? 1 : 0.55);
       c.lvl.setText(open ? t('úroveň {n}', { n: s.lvl }) : t('zavřeno'));
       c.info.setText(open ? t('+{n} / {s} s', { n: big(payout(c.def, s.lvl) * actMult(p.act)), s: c.def.cycle }) : '');
-      this.drawBtn(c.buy, open ? `+1\n${big(price)}` : t('Otevřít\n{n}', { n: big(price) }), this.d.coins >= price, 'green');
+      this.drawBtn(c.buy, open ? `+${n}\n${big(price)}` : t('Otevřít\n{n}', { n: big(price) }), this.d.coins >= price, 'green');
       this.drawBtn(c.staff, t('Kostlivec {n}', { n: big(staff) }), this.d.coins >= staff, 'plum', open && !s.auto);
       if (open && s.auto) c.staff.label.setVisible(true).setText(t('kostlivec ✓')).setColor(PAL.mint);
       c.bar.clear();

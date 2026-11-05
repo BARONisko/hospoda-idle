@@ -43,6 +43,7 @@ interface Guest {
   leaving: boolean;
   t: number;
   tipped: boolean;
+  mug?: Phaser.GameObjects.Image;
 }
 
 export class PubView {
@@ -204,15 +205,22 @@ export class PubView {
       if (!g.leaving && g.seat) {
         sp.setFrame(12).setFlipX(g.seat.flip);
         g.sitT -= dt;
+        // po chvíli dostane pivo na stůl (v krčmě krev, u Žabáka bahno – zatím stejný půllitr)
+        if (!g.mug && g.t > 1.2) {
+          g.mug = this.s.add.image(sp.x + (g.seat.flip ? -13 : 13), sp.y - 6, 'obj', g.sitT > 6 ? 'mug' : 'mugDark').setOrigin(0.5, 1).setDepth(sp.y + 4);
+          this.objs.push(g.mug);
+        }
         if (g.sitT <= 0) {
           g.leaving = true;
           g.tipped = true;
+          g.mug?.setFrame('mugEmpty');
           g.path = [{ x: g.seat.x, y: g.seat.aisle }, { x: DOOR.x, y: g.seat.aisle }, { x: DOOR.x, y: DOOR.y + 6 }];
         }
         return;
       }
       // odešel
       if (g.seat) g.seat.taken = false;
+      g.mug?.destroy();
       sp.destroy();
       this.guests.splice(this.guests.indexOf(g), 1);
       return;

@@ -7,10 +7,15 @@ Koncept A (schválen uživatelem): manažer hospody. Stanice (pípa, kuchyně, s
 kostlivci jako obsluha = automatizace, peníze tečou i offline, prestiž = hygiena hospodu zavře a otevřeš o patro
 níž (Pajzl → sklepní krčma s příšerami → Žabákův podnik → Cthulhu) s trvalým bonusem (krígly).
 
+## Rozložení obrazovky (schváleno uživatelem)
+1 hospoda: výhled nahoře + karty stanic dole. Po 1. prestiži se obrazovka rozdělí na 2 pruhy (Pajzl + sklepní krčma),
+po 2. prestiži na 3 (+ Žabákův podnik) – víc ne. Všechny hospody pořád žijí; „▲ Stanice“ vysune panel s kartami.
+Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
+
 ## Pracovní části
 1. **Kostra** ✅ – Vite + TypeScript + Phaser 3, 540×960 na výšku (FIT), grafika z P.U.B., ukládání,
    velká čísla (K, M, B, T, aa…), 4 stanice s cyklem, nákup úrovní, obsluha (automatizace).
-2. **Hospoda ožije** – pípy, stoly, hosté chodí a sedí, hostinský točí, kostlivci u stanic, animace výdělku,
+2. **Hospoda ožije** ✅ – pípy, stoly, hosté chodí a sedí, hostinský točí, kostlivci u stanic, animace výdělku,
    ťuknutí do hospody = spropitné. Lepší tlačítka (×1 / ×10 / max), zvuky.
 3. **Offline výdělek** – okno „Zatímco jsi byl pryč…“ (strop 8 h), později ×2 za reklamu.
 4. **Milníky a vylepšení** – milníky úrovní (×2), obchod s jednorázovými vylepšeními, manažeři se schopnostmi.
