@@ -1,59 +1,58 @@
 import Phaser from 'phaser';
-import { renderPubBackground } from '../gfx';
 import { PAL } from '../data/palette';
 import { t } from '../i18n';
 import { txt } from '../ui/font';
 import { big } from '../core/num';
-import { STATIONS, StationDef, cost, payout, perSec } from '../core/economy';
-import { Save, load, store } from '../core/save';
+import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, cost, payout, perSec, actMult } from '../core/economy';
+import { Save, PubState, load, store, newPub } from '../core/save';
+import { PubView } from '../game/PubView';
 
 const W = 540;
-const TOP = 76; // horní lišta s penězi
-const VIEW_H = 440; // výhled do hospody
-const ROW_Y = TOP + VIEW_H + 8;
-const ROW_H = 104;
-const T = 16; // dlaždice
+const H = 960;
+const TOP = 84; // horní lišta s penězi
+const CARD_H = 108;
+const col = (k: keyof typeof PAL) => Phaser.Display.Color.HexStringToColor(PAL[k]).color;
 
-/** kde ve světě hospody stanice stojí (pixely pozadí) – tam se ukazuje obsluha a „+coins“ */
-const SPOT: Record<string, { x: number; y: number }> = {
-  tap: { x: 3 * T + 8, y: 4 * T + 6 },
-  kitchen: { x: 11 * T + 8, y: 3 * T + 12 },
-  cellar: { x: 12 * T + 8, y: 3 * T + 4 },
-  dice: { x: 15 * T, y: 9 * T },
-};
+interface Btn {
+  bg: Phaser.GameObjects.Graphics;
+  label: Phaser.GameObjects.Text;
+  zone: Phaser.GameObjects.Zone;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  enabled: boolean;
+  visible: boolean;
+}
 
-interface Row {
+interface Card {
+  pub: number;
   def: StationDef;
+  box: Phaser.GameObjects.Graphics;
   name: Phaser.GameObjects.Text;
   lvl: Phaser.GameObjects.Text;
   bar: Phaser.GameObjects.Graphics;
   info: Phaser.GameObjects.Text;
   buy: Btn;
   staff: Btn;
-  staffSprite?: Phaser.GameObjects.Sprite;
-}
-
-interface Btn {
-  bg: Phaser.GameObjects.Graphics;
-  label: Phaser.GameObjects.Text;
-  zone: Phaser.GameObjects.Zone;
-  w: number;
-  h: number;
-  x: number;
+  tapZone: Phaser.GameObjects.Zone;
   y: number;
-  enabled: boolean;
-  visible: boolean;
 }
 
-/** Hlavní obrazovka: nahoře výhled do hospody, dole stanice s vylepšením. */
+/**
+ * Hlavní obrazovka. 1 hospoda: výhled nahoře, karty stanic pod ním.
+ * 2–3 hospody (po prestiži): obrazovka rozdělená na pruhy, každá hospoda žije; „▲ Stanice“ vysune panel s kartami.
+ */
 export class PubScene extends Phaser.Scene {
   d!: Save;
-  rows: Row[] = [];
+  views: PubView[] = [];
+  cards: Card[] = [];
   coinsText!: Phaser.GameObjects.Text;
   rateText!: Phaser.GameObjects.Text;
-  uiCam!: Phaser.Cameras.Scene2D.Camera;
-  world: Phaser.GameObjects.GameObject[] = [];
-  ui: Phaser.GameObjects.GameObject[] = [];
+  /** otevřený panel stanic (index hospody) při 2–3 hospodách */
+  sheet = -1;
+  sheetObjs: Phaser.GameObjects.GameObject[] = [];
+  stripRates: Phaser.GameObjects.Text[] = [];
   saveT = 0;
 
   constructor() {
@@ -62,38 +61,50 @@ export class PubScene extends Phaser.Scene {
 
   create() {
     this.d = load();
-    this.rows = [];
-    this.world = [];
-    this.ui = [];
+    // ladění: ?pubs=2|3 přidá hospody (než bude prestiž)
+    const dbg = Number(new URLSearchParams(location.search).get('pubs'));
+    while (dbg && this.d.pubs.length < Math.min(3, dbg)) {
+      const p = newPub((this.d.pubs.length + 1) as 1 | 2 | 3);
+      p.st = { tap: { lvl: 10, auto: true, prog: 0.1 }, kitchen: { lvl: 5, auto: true, prog: 0.3 }, cellar: { lvl: 2, auto: false, prog: 0 }, dice: { lvl: 1, auto: false, prog: 0 } };
+      this.d.pubs.push(p);
+    }
+    this.views = [];
+    this.cards = [];
+    this.stripRates = [];
+    this.sheet = -1;
+    this.cameras.main.setBackgroundColor(PAL.ink);
+    // hospody leží ve světě daleko vpravo (x ≥ 2000), aby je UI kamera neviděla; UI kamera je nad nimi
+    this.d.pubs.forEach((p, i) => this.views.push(new PubView(this, p, 2000 + i * 1000)));
+    const ui = this.cameras.main;
+    this.cameras.remove(ui, false);
+    this.cameras.addExisting(ui);
+    ui.setBackgroundColor('rgba(0,0,0,0)');
 
-    // --- svět hospody (kamera main, zoom 2) ---
-    const bg = this.add.image(0, 0, renderPubBackground(this, 1, 1)).setOrigin(0);
-    this.world.push(bg);
-    const keeper = this.add.sprite(SPOT.tap.x, SPOT.tap.y, 'player', 0).setOrigin(0.5, 1);
-    this.world.push(keeper);
-    const cam = this.cameras.main;
-    cam.setViewport(0, TOP, W, VIEW_H).setZoom(2).setBackgroundColor(PAL.ink);
-    cam.centerOn(140, 112);
-    cam.roundPixels = true;
+    // horní lišta
+    const top = this.add.graphics().setDepth(100);
+    top.fillStyle(col('dusk')).fillRect(0, 0, W, TOP);
+    top.fillStyle(col('gold')).fillRect(0, TOP - 3, W, 3);
+    this.add.image(40, TOP / 2 - 2, 'obj', 'coin').setScale(4).setDepth(101);
+    this.coinsText = this.add.text(76, 12, '', txt(40, PAL.gold)).setDepth(101);
+    this.rateText = this.add.text(78, 50, '', txt(22, PAL.mint)).setDepth(101);
 
-    // --- UI (vlastní kamera bez zoomu) ---
-    this.uiCam = this.cameras.add(0, 0, W, 960);
-    const top = this.add.graphics();
-    top.fillStyle(Phaser.Display.Color.HexStringToColor(PAL.dusk).color).fillRect(0, 0, W, TOP);
-    top.fillStyle(Phaser.Display.Color.HexStringToColor(PAL.gold).color).fillRect(0, TOP - 3, W, 3);
-    const panel = this.add.graphics();
-    panel.fillStyle(Phaser.Display.Color.HexStringToColor(PAL.dusk).color).fillRect(0, TOP + VIEW_H, W, 960 - TOP - VIEW_H);
-    panel.fillStyle(Phaser.Display.Color.HexStringToColor(PAL.gold).color).fillRect(0, TOP + VIEW_H, W, 3);
-    this.ui.push(top, panel);
-    this.coinsText = this.ui$(this.add.text(W / 2, 26, '', txt(44, PAL.gold)).setOrigin(0.5));
-    this.rateText = this.ui$(this.add.text(W / 2, 58, '', txt(22, PAL.bone)).setOrigin(0.5));
+    this.layout();
 
-    STATIONS.forEach((def, i) => this.makeRow(def, ROW_Y + i * ROW_H));
+    // ťuknutí do hospody → spropitné od hosta
+    this.input.on('pointerdown', (ptr: Phaser.Input.Pointer) => {
+      for (const v of this.views) {
+        const c = v.cam;
+        if (!Phaser.Geom.Rectangle.Contains(new Phaser.Geom.Rectangle(c.x, c.y, c.width, c.height), ptr.x, ptr.y)) continue;
+        if (this.sheet >= 0 && ptr.y > this.sheetY()) continue; // pod panelem
+        const wp = c.getWorldPoint(ptr.x, ptr.y);
+        if (v.tap(wp.x, wp.y)) {
+          const tip = Math.max(1, Math.round(this.rate(v.pub) * 2 + payout(STATIONS[0], v.pub.st.tap?.lvl ?? 1) * actMult(v.pub.act)));
+          this.gain(tip);
+          v.tipPop('+' + big(tip));
+        }
+      }
+    });
 
-    cam.ignore(this.ui);
-    this.uiCam.ignore(this.world);
-
-    // ukládání: průběžně a při odchodu z aplikace
     const save = () => store(this.d);
     document.addEventListener('visibilitychange', save);
     window.addEventListener('pagehide', save);
@@ -104,99 +115,173 @@ export class PubScene extends Phaser.Scene {
     this.refresh();
   }
 
-  private ui$<T extends Phaser.GameObjects.GameObject>(o: T): T {
-    this.ui.push(o);
-    return o;
+  private sheetY() {
+    return H - 4 * CARD_H - 70;
   }
 
-  private st(id: string) {
-    return (this.d.st[id] ??= { lvl: 0, auto: false, prog: 0 });
+  /** rozložení obrazovky podle počtu hospod */
+  private layout() {
+    const n = this.views.length;
+    if (n === 1) {
+      const viewH = 404;
+      this.views[0].frame(0, TOP, W, viewH, 118);
+      const g = this.add.graphics();
+      g.fillStyle(col('dusk')).fillRect(0, TOP + viewH, W, H - TOP - viewH);
+      g.fillStyle(col('gold')).fillRect(0, TOP + viewH, W, 3);
+      this.addCards(0, TOP + viewH + 10);
+      return;
+    }
+    const h = Math.floor((H - TOP) / n);
+    this.views.forEach((v, i) => {
+      const y = TOP + i * h;
+      v.frame(0, y, W, h - 4, 112);
+      const g = this.add.graphics().setDepth(50);
+      g.fillStyle(col('gold')).fillRect(0, y + h - 4, W, 4);
+      g.fillStyle(col('ink'), 0.8).fillRoundedRect(8, y + 8, 260, 36, 8);
+      g.fillStyle(col('ink'), 0.8).fillRoundedRect(W - 150, y + 8, 142, 36, 8);
+      this.add.text(18, y + 12, PUB_NAMES[v.pub.act], txt(24, PAL.gold)).setDepth(51);
+      this.stripRates.push(this.add.text(W - 18, y + 12, '', txt(22, PAL.mint)).setOrigin(1, 0).setDepth(51));
+      const b = this.btn(W - 170, y + h - 64, 156, 48, () => this.openSheet(i), 60);
+      this.drawBtn(b, t('▲ Stanice'), true, 'green');
+    });
   }
 
-  private makeRow(def: StationDef, y: number) {
-    const g = this.ui$(this.add.graphics());
-    g.fillStyle(Phaser.Display.Color.HexStringToColor(PAL.ink).color, 0.55).fillRoundedRect(10, y, W - 20, ROW_H - 10, 8);
-    const name = this.ui$(this.add.text(24, y + 8, def.name, txt(28, PAL.bone)));
-    const lvl = this.ui$(this.add.text(24, y + 38, '', txt(20, PAL.fog)));
-    const bar = this.ui$(this.add.graphics());
-    const info = this.ui$(this.add.text(24, y + 68, '', txt(18, PAL.gold)));
-    // ťuknutím na řádek se ručně spustí cyklus (dokud stanice nemá obsluhu)
-    const tapZone = this.ui$(this.add.zone(10, y, 300, ROW_H - 10).setOrigin(0).setInteractive({ useHandCursor: true }));
-    tapZone.on('pointerdown', () => this.manual(def));
-    const buy = this.btn(W - 200, y + 8, 180, 46, () => this.buy(def));
-    const staff = this.btn(W - 200, y + 58, 180, 32, () => this.hire(def));
-    this.rows.push({ def, name, lvl, bar, info, buy, staff });
+  private openSheet(i: number) {
+    this.closeSheet();
+    this.sheet = i;
+    const y0 = this.sheetY();
+    const g = this.add.graphics().setDepth(200);
+    g.fillStyle(col('dusk'), 0.97).fillRoundedRect(0, y0, W, H - y0 + 20, 16);
+    g.fillStyle(col('gold')).fillRect(0, y0, W, 3);
+    const title = this.add.text(20, y0 + 14, PUB_NAMES[this.d.pubs[i].act], txt(28, PAL.gold)).setDepth(201);
+    const close = this.btn(W - 120, y0 + 10, 104, 40, () => this.closeSheet(), 210);
+    this.drawBtn(close, t('Zavřít'), true, 'red');
+    this.sheetObjs.push(g, title, close.bg, close.label, close.zone);
+    this.addCards(i, y0 + 60, 201);
+    this.refresh();
   }
 
-  private btn(x: number, y: number, w: number, h: number, fn: () => void): Btn {
-    const bg = this.ui$(this.add.graphics());
-    const label = this.ui$(this.add.text(x + w / 2, y + h / 2, '', txt(h > 40 ? 22 : 16, PAL.white)).setOrigin(0.5).setAlign('center'));
-    const zone = this.ui$(this.add.zone(x, y, w, h).setOrigin(0).setInteractive({ useHandCursor: true }));
-    const b: Btn = { bg, label, zone, w, h, x, y, enabled: true, visible: true };
+  private closeSheet() {
+    if (this.views.length === 1) return;
+    this.sheetObjs.forEach((o) => o.destroy());
+    this.sheetObjs = [];
+    for (const c of this.cards)
+      [c.box, c.name, c.lvl, c.bar, c.info, c.tapZone, c.buy.bg, c.buy.label, c.buy.zone, c.staff.bg, c.staff.label, c.staff.zone].forEach((o) => o.destroy());
+    this.cards = [];
+    this.sheet = -1;
+  }
+
+  private addCards(pubIdx: number, y0: number, depth = 10) {
+    STATIONS.forEach((def, i) => {
+      const y = y0 + i * CARD_H;
+      const box = this.add.graphics().setDepth(depth);
+      box.fillStyle(col('ink'), 0.6).fillRoundedRect(10, y, W - 20, CARD_H - 8, 10);
+      const name = this.add.text(26, y + 8, '', txt(28, PAL.bone)).setDepth(depth);
+      const lvl = this.add.text(26, y + 40, '', txt(20, PAL.fog)).setDepth(depth);
+      const bar = this.add.graphics().setDepth(depth);
+      const info = this.add.text(161, y + 81, '', txt(16, PAL.white)).setOrigin(0.5).setDepth(depth + 1);
+      // ťuknutím na kartu se ručně spustí cyklus (dokud stanice nemá obsluhu)
+      const tapZone = this.add.zone(10, y, 300, CARD_H - 8).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(depth);
+      tapZone.on('pointerdown', () => this.manual(pubIdx, def));
+      const buy = this.btn(W - 212, y + 10, 190, 56, () => this.buy(pubIdx, def), depth);
+      const staff = this.btn(W - 212, y + 72, 190, 26, () => this.hire(pubIdx, def), depth);
+      this.cards.push({ pub: pubIdx, def, box, name, lvl, bar, info, buy, staff, tapZone, y });
+    });
+  }
+
+  private btn(x: number, y: number, w: number, h: number, fn: () => void, depth = 10): Btn {
+    const bg = this.add.graphics().setDepth(depth);
+    const label = this.add.text(x + w / 2, y + h / 2, '', txt(h > 40 ? 22 : 16, PAL.white)).setOrigin(0.5).setAlign('center').setDepth(depth + 1);
+    const zone = this.add.zone(x, y, w, h).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(depth + 2);
+    const b: Btn = { bg, label, zone, x, y, w, h, enabled: true, visible: true };
     zone.on('pointerdown', () => {
       if (!b.enabled || !b.visible) return;
       fn();
-      this.tweens.add({ targets: label, scale: { from: 0.9, to: 1 }, duration: 120 });
+      if (label.active) this.tweens.add({ targets: label, scale: { from: 0.88, to: 1 }, duration: 120 });
     });
     return b;
   }
 
-  private drawBtn(b: Btn, text: string, enabled: boolean, color: string, visible = true) {
+  private drawBtn(b: Btn, text: string, enabled: boolean, c: keyof typeof PAL, visible = true) {
     b.enabled = enabled;
     b.visible = visible;
     b.bg.clear();
     b.label.setVisible(visible);
     if (!visible) return;
-    const c = Phaser.Display.Color.HexStringToColor(enabled ? color : PAL.slate).color;
-    b.bg.fillStyle(Phaser.Display.Color.HexStringToColor(PAL.ink).color).fillRoundedRect(b.x, b.y + 3, b.w, b.h, 8);
-    b.bg.fillStyle(c).fillRoundedRect(b.x, b.y, b.w, b.h, 8);
+    b.bg.fillStyle(col('ink')).fillRoundedRect(b.x, b.y + 4, b.w, b.h, 9);
+    b.bg.fillStyle(col(enabled ? c : 'slate')).fillRoundedRect(b.x, b.y, b.w, b.h, 9);
+    b.bg.fillStyle(0xffffff, enabled ? 0.15 : 0.06).fillRoundedRect(b.x + 3, b.y + 3, b.w - 6, b.h / 3, 6);
     b.label.setText(text).setColor(enabled ? PAL.white : PAL.fog);
   }
 
-  private manual(def: StationDef) {
-    const s = this.st(def.id);
+  private st(p: PubState, id: string) {
+    return (p.st[id] ??= { lvl: 0, auto: false, prog: 0 });
+  }
+
+  private price(p: PubState, def: StationDef) {
+    return Math.ceil(cost(def, this.st(p, def.id).lvl) * actMult(p.act));
+  }
+
+  private manual(i: number, def: StationDef) {
+    const s = this.st(this.d.pubs[i], def.id);
     if (s.lvl > 0 && !s.auto && s.prog === 0) s.prog = 0.0001;
   }
 
-  private buy(def: StationDef) {
-    const s = this.st(def.id);
-    const c = Math.ceil(cost(def, s.lvl));
+  private buy(i: number, def: StationDef) {
+    const p = this.d.pubs[i];
+    const c = this.price(p, def);
     if (this.d.coins < c) return;
     this.d.coins -= c;
-    s.lvl++;
+    this.st(p, def.id).lvl++;
+    this.views[i].refresh();
     this.refresh();
   }
 
-  private hire(def: StationDef) {
-    const s = this.st(def.id);
-    if (s.auto || s.lvl === 0 || this.d.coins < def.staff) return;
-    this.d.coins -= def.staff;
+  private hire(i: number, def: StationDef) {
+    const p = this.d.pubs[i];
+    const s = this.st(p, def.id);
+    const c = def.staff * actMult(p.act);
+    if (s.auto || s.lvl === 0 || this.d.coins < c) return;
+    this.d.coins -= c;
     s.auto = true;
     if (s.prog === 0) s.prog = 0.0001;
+    this.views[i].refresh();
     this.refresh();
   }
 
-  private pop(def: StationDef, amount: number) {
-    const p = SPOT[def.id];
-    const tx = this.add.text(p.x, p.y - 22, '+' + big(amount), txt(12, PAL.gold)).setOrigin(0.5).setDepth(10);
-    this.uiCam.ignore(tx);
-    this.tweens.add({ targets: tx, y: p.y - 40, alpha: 0, duration: 900, onComplete: () => tx.destroy() });
+  private gain(n: number) {
+    this.d.coins += n;
+    this.d.earned += n;
+  }
+
+  private rate(p: PubState) {
+    let r = 0;
+    for (const def of STATIONS) {
+      const s = p.st[def.id];
+      if (s?.auto) r += perSec(def, s.lvl) * actMult(p.act);
+    }
+    return r;
   }
 
   update(_t: number, dms: number) {
     const dt = Math.min(dms / 1000, 0.25);
-    for (const r of this.rows) {
-      const s = this.st(r.def.id);
-      if (s.lvl === 0 || s.prog === 0) continue;
-      s.prog += dt / r.def.cycle;
-      if (s.prog >= 1) {
-        const gain = payout(r.def, s.lvl);
-        this.d.coins += gain;
-        this.d.earned += gain;
-        this.pop(r.def, gain);
-        s.prog = s.auto ? s.prog - 1 : 0;
+    this.d.pubs.forEach((p, i) => {
+      let open = 0;
+      for (const def of STATIONS) {
+        const s = p.st[def.id];
+        if (!s || s.lvl === 0) continue;
+        open++;
+        if (s.prog === 0) continue;
+        s.prog += dt / def.cycle;
+        if (s.prog >= 1) {
+          const g = payout(def, s.lvl) * actMult(p.act);
+          this.gain(g);
+          this.views[i].payout(def.id, g);
+          s.prog = s.auto ? s.prog - 1 : 0;
+        }
       }
-    }
+      this.views[i].update(dt, open);
+    });
     this.saveT += dt;
     if (this.saveT > 5) {
       this.saveT = 0;
@@ -206,34 +291,27 @@ export class PubScene extends Phaser.Scene {
   }
 
   private refresh() {
-    let rate = 0;
-    for (const r of this.rows) {
-      const s = this.st(r.def.id);
-      if (s.auto) rate += perSec(r.def, s.lvl);
-    }
+    const total = this.d.pubs.reduce((a, p) => a + this.rate(p), 0);
     this.coinsText.setText(`${big(this.d.coins)} coins`);
-    this.rateText.setText(t('{n} coins / s', { n: big(rate) }));
+    this.rateText.setText(t('+{n} / s', { n: big(total) }));
+    this.stripRates.forEach((r, i) => r.setText(t('+{n} / s', { n: big(this.rate(this.d.pubs[i])) })));
 
-    for (const r of this.rows) {
-      const s = this.st(r.def.id);
+    for (const c of this.cards) {
+      const p = this.d.pubs[c.pub];
+      const s = this.st(p, c.def.id);
       const open = s.lvl > 0;
-      const c = Math.ceil(cost(r.def, s.lvl));
-      r.lvl.setText(open ? t('úroveň {n}', { n: s.lvl }) : t('zavřeno'));
-      r.info.setText(open ? t('{n} coins za {s} s', { n: big(payout(r.def, s.lvl)), s: r.def.cycle }) : '');
-      r.name.setAlpha(open ? 1 : 0.6);
-      this.drawBtn(r.buy, open ? `+1   ${big(c)}` : t('Otevřít  {n}', { n: big(c) }), this.d.coins >= c, PAL.green);
-      this.drawBtn(r.staff, t('Kostlivec  {n}', { n: big(r.def.staff) }), this.d.coins >= r.def.staff, PAL.plum, open && !s.auto);
-      // ukazatel cyklu
-      r.bar.clear();
-      const bx = 24, by = r.name.y + 56, bw = 290 - 24;
-      r.bar.fillStyle(Phaser.Display.Color.HexStringToColor(PAL.ink).color).fillRect(bx, by - 4, bw, 6);
-      if (open) r.bar.fillStyle(Phaser.Display.Color.HexStringToColor(s.auto ? PAL.mint : PAL.amber).color).fillRect(bx, by - 4, bw * Math.min(1, s.prog), 6);
-      // obsluha (kostlivec) u stanice ve výhledu
-      if (s.auto && !r.staffSprite && r.def.id !== 'tap') {
-        const p = SPOT[r.def.id];
-        r.staffSprite = this.add.sprite(p.x, p.y, 'skeleton', 0).setOrigin(0.5, 1);
-        this.uiCam.ignore(r.staffSprite);
-      }
+      const price = this.price(p, c.def);
+      const staff = c.def.staff * actMult(p.act);
+      c.name.setText(STATION_NAMES[p.act][c.def.id]).setAlpha(open ? 1 : 0.55);
+      c.lvl.setText(open ? t('úroveň {n}', { n: s.lvl }) : t('zavřeno'));
+      c.info.setText(open ? t('+{n} / {s} s', { n: big(payout(c.def, s.lvl) * actMult(p.act)), s: c.def.cycle }) : '');
+      this.drawBtn(c.buy, open ? `+1\n${big(price)}` : t('Otevřít\n{n}', { n: big(price) }), this.d.coins >= price, 'green');
+      this.drawBtn(c.staff, t('Kostlivec {n}', { n: big(staff) }), this.d.coins >= staff, 'plum', open && !s.auto);
+      if (open && s.auto) c.staff.label.setVisible(true).setText(t('kostlivec ✓')).setColor(PAL.mint);
+      c.bar.clear();
+      c.bar.fillStyle(col('dusk')).fillRoundedRect(26, c.y + 72, 270, 18, 6);
+      if (open && s.prog > 0) c.bar.fillStyle(col(s.auto ? 'mint' : 'amber')).fillRoundedRect(26, c.y + 72, Math.max(12, 270 * Math.min(1, s.prog)), 18, 6);
+      if (open && !s.auto && s.prog === 0) c.info.setText(t('ťukni sem!'));
     }
   }
 }

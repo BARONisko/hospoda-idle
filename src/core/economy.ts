@@ -24,6 +24,16 @@ export const STATIONS: StationDef[] = [
   { id: 'dice', name: t('Kostky v rohu'), base: 8640, growth: 1.13, income: 600, cycle: 20, staff: 500000 },
 ];
 
+/** názvy stanic podle hospody (dějství) */
+export const STATION_NAMES: Record<number, Record<string, string>> = {
+  1: { tap: t('Pípa'), kitchen: t('Kuchyně'), cellar: t('Sklep se sudy'), dice: t('Kostky v rohu') },
+  2: { tap: t('Pípa s krví'), kitchen: t('Kotel s guláškem'), cellar: t('Sudomorův sklep'), dice: t('Kostky s kostlivcem') },
+  3: { tap: t('Bahenní pípa'), kitchen: t('Žabí kuchyně'), cellar: t('Studna'), dice: t('Pulčí závody') },
+};
+export const PUB_NAMES: Record<number, string> = { 1: t('Pajzl u Berana'), 2: t('Sklepní krčma'), 3: t('Žabákův podnik') };
+/** každá další hospoda vydělává řádově víc */
+export const actMult = (act: number) => 50 ** (act - 1);
+
 export const MILESTONES = [25, 50, 100, 200, 300, 400, 500];
 
 export const cost = (d: StationDef, lvl: number) => d.base * d.growth ** lvl;

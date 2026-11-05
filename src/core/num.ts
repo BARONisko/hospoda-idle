@@ -11,7 +11,7 @@ export function big(n: number): string {
     const e = Math.floor(Math.log10(n) / 3); // skupina po tisících
     const v = n / 10 ** (e * 3);
     const d = v >= 100 ? 0 : v >= 10 ? 1 : 2;
-    s = (Math.floor(v * 10 ** d) / 10 ** d).toFixed(d) + suffix(e);
+    s = String(Math.floor(v * 10 ** d) / 10 ** d) + suffix(e); // bez koncových nul: 5K, 1.5K, 12.34M
   }
   return (neg ? '-' : '') + s;
 }
