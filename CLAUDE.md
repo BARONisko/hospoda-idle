@@ -3,7 +3,7 @@
 - Uživatel píše česky; odpovídej krátce česky. Commity česky.
 - Hra: P.U.B. Idle – Pajzl Tycoon (idle hra pro mobil, na výšku). Plán a stav prací: PLAN.md.
 - Původní hra P.U.B. je v repu `BARONisko/hospoda` – tu NEMĚNIT; odtud se jen kopíruje grafika (`src/gfx`, `src/data`).
-- Kontroly: `npx tsc --noEmit`, `npm run build`; snímek na výšku `node tools/shot.mjs <url> <out.png>`
+- Kontroly: `npx tsc --noEmit`, `npm run build`, `npm test` (headless test), `npm run sim` (balanc); snímek na výšku `node tools/shot.mjs <url> <out.png>`
   (vite `npx vite --port 5177`, Chromium: /opt/pw-browsers/chromium-1243/chrome-linux64/chrome).
 - Texty v t() (zdroj česky, překlady v src/i18n/locales/<jazyk>.json), měna „coins“.
 - Před velkou vizuální změnou ≥ 3 návrhy na screenshotech. Hra je hlavně mobilní (dotyk, jedna ruka, na výšku).

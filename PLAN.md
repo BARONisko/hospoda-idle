@@ -27,6 +27,9 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
    netopýr = upíří hodina (×2 na 60 s), banshee karaoke (12 ťuků za 9 s = 120 s výdělku). Ladění `?ev=gold|frogs|bat|banshee`.
 7. **Sbírka a úkoly** ✅ – tlačítko „Menu“ = panel se záložkami Obchod / Úkoly / Sbírka: 3 denní úkoly (odměna 5 min výdělku),
    18 úspěchů (každý +1 krígl), bestiář 20 druhů hostů (siluety neviděných). Červená tečka = je co vyzvednout.
-8. **Zvuk, hudba, jazyky** – cs + en a dalších 10 jazyků (t() jako v P.U.B.).
-9. **Mobil** – PWA, Capacitor (Android), notifikace, reklamy za odměnu, odstranění reklam.
-10. **Balanc a testy** – simulace průběhu (tools/sim), headless testy (Playwright).
+8. **Zvuk, hudba, jazyky** ✅ – hospodská polka (Web Audio), nastavení ⚙ v Menu (zvuky, hudba, jazyk), cs + en + 10 jazyků
+   (src/i18n/locales).
+9. **Mobil** ✅ – GitHub Pages (https://baronisko.github.io/hospoda-idle/), PWA + service worker (hraní bez internetu),
+   ikona na plochu, příprava Capacitor (capacitor.config.json, návod v README), rozhraní reklam src/core/ads.ts (×2 offline).
+10. **Balanc a testy** ✅ – `npm run sim` (chamtivý hráč: 1. prestiž ~34 min ideálně, další běhy 7–9 min),
+   `npm test` (headless test celé hry: nákupy, Menu, obchod, manažer, události, úkoly, prestiž, offline).
