@@ -7,6 +7,7 @@ import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payo
 import { sfx } from '../core/sfx';
 import { Save, PubState, load, store, newPub } from '../core/save';
 import { PubView } from '../game/PubView';
+import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
 
 const W = 540;
 const H = 960;
@@ -69,6 +70,9 @@ export class PubScene extends Phaser.Scene {
   mode = 1;
   coinT = 0;
   modeBtn!: Btn;
+  ev!: PubEvents;
+  /** upíří hodina z události: ×2 vše do (ms) */
+  evBoostUntil = 0;
 
   constructor() {
     super('Pub');
@@ -114,6 +118,19 @@ export class PubScene extends Phaser.Scene {
     this.shopDot = this.add.graphics().setDepth(104);
 
     this.layout();
+    this.ev = new PubEvents(this, {
+      views: this.views,
+      reward: (secs, view) => {
+        const p = this.d.pubs[view];
+        const n = Math.max(10, Math.round(Math.max(this.rate(p), this.pay(p, STATIONS[0]) / STATIONS[0].cycle) * secs));
+        this.gain(n);
+        return n;
+      },
+      banner: (c, text, top) => this.banner(c, text, top),
+      boostAll: (ms) => (this.evBoostUntil = Date.now() + ms),
+    });
+    const evq = new URLSearchParams(location.search).get('ev') as EventKind | null;
+    if (evq && EVENT_KINDS.includes(evq)) this.time.delayedCall(800, () => this.ev.start(evq, 0));
 
     // ťuknutí do hospody → spropitné od hosta
     this.input.on('pointerdown', (ptr: Phaser.Input.Pointer) => {
@@ -124,6 +141,7 @@ export class PubScene extends Phaser.Scene {
         if (!Phaser.Geom.Rectangle.Contains(new Phaser.Geom.Rectangle(c.x, c.y, c.width, c.height), ptr.x, ptr.y)) continue;
         if (this.sheet >= 0 && ptr.y > this.sheetY()) continue; // pod panelem
         const wp = c.getWorldPoint(ptr.x, ptr.y);
+        if (this.ev.tap(this.views.indexOf(v), wp.x, wp.y)) return;
         if (v.tap(wp.x, wp.y)) {
           const tip = Math.max(1, Math.round(this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])));
           this.gain(tip);
@@ -205,10 +223,10 @@ export class PubScene extends Phaser.Scene {
     this.banner(this.views[i].cam, t('{s}: výdělek ×2!', { s: STATION_NAMES[this.d.pubs[i].act][def.id] }));
   }
 
-  private banner(c: Phaser.Cameras.Scene2D.Camera, text: string) {
+  private banner(c: Phaser.Cameras.Scene2D.Camera, text: string, top = false) {
     sfx.fanfare();
     const tx = this.add
-      .text(c.x + c.width / 2, c.y + c.height / 2, text, txt(30, PAL.gold))
+      .text(c.x + c.width / 2, top ? c.y + 70 : c.y + c.height / 2, text, txt(30, PAL.gold))
       .setOrigin(0.5)
       .setStroke(PAL.ink, 8)
       .setDepth(450);
@@ -565,7 +583,7 @@ export class PubScene extends Phaser.Scene {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1);
   }
 
   private gain(n: number) {
@@ -607,6 +625,7 @@ export class PubScene extends Phaser.Scene {
       }
       this.views[i].update(dt, open);
     });
+    this.ev.update(dt);
     this.saveT += dt;
     if (this.saveT > 5) {
       this.saveT = 0;

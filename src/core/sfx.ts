@@ -91,6 +91,11 @@ class Sfx {
   fanfare() {
     [523, 659, 784, 1046, 784, 1046].forEach((f, i) => this.tone(f, i > 3 ? 0.3 : 0.12, 'square', 0.07, undefined, i * 0.08));
   }
+  /** tón stupnice (karaoke) */
+  note(i: number) {
+    const sc = [523, 587, 659, 698, 784, 880, 988, 1046];
+    this.tone(sc[i % sc.length], 0.14, 'triangle', 0.07);
+  }
   hire() {
     this.tone(220, 0.12, 'square', 0.07, 440);
     this.tone(330, 0.2, 'square', 0.06, 660, 0.1);
