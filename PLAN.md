@@ -1,0 +1,22 @@
+# P.U.B. Idle – Pajzl Tycoon · plán prací
+
+Idle (inkrementální) hra pro mobil na výšku se stejným námětem a grafikou jako P.U.B. – Pajzl u Berana
+(repo `BARONisko/hospoda` – tu hru NEMĚNIT, odtud se jen kopíruje grafika kreslená kódem `src/gfx`).
+
+Koncept A (schválen uživatelem): manažer hospody. Stanice (pípa, kuchyně, sklep se sudy, kostky…) s úrovněmi,
+kostlivci jako obsluha = automatizace, peníze tečou i offline, prestiž = hygiena hospodu zavře a otevřeš o patro
+níž (Pajzl → sklepní krčma s příšerami → Žabákův podnik → Cthulhu) s trvalým bonusem (krígly).
+
+## Pracovní části
+1. **Kostra** ✅ – Vite + TypeScript + Phaser 3, 540×960 na výšku (FIT), grafika z P.U.B., ukládání,
+   velká čísla (K, M, B, T, aa…), 4 stanice s cyklem, nákup úrovní, obsluha (automatizace).
+2. **Hospoda ožije** – pípy, stoly, hosté chodí a sedí, hostinský točí, kostlivci u stanic, animace výdělku,
+   ťuknutí do hospody = spropitné. Lepší tlačítka (×1 / ×10 / max), zvuky.
+3. **Offline výdělek** – okno „Zatímco jsi byl pryč…“ (strop 8 h), později ×2 za reklamu.
+4. **Milníky a vylepšení** – milníky úrovní (×2), obchod s jednorázovými vylepšeními, manažeři se schopnostmi.
+5. **Prestiž** – zavření hygienou → nové dějství (krčma, Žabák, Cthulhu), krígly = trvalé bonusy, nové stanice.
+6. **Události s ťukáním** – nájezd žab, banshee karaoke, upíří hodina, zlatý sud (krátké bonusy).
+7. **Sbírka a úkoly** – bestiář hostů-příšer, denní úkoly, úspěchy.
+8. **Zvuk, hudba, jazyky** – cs + en a dalších 10 jazyků (t() jako v P.U.B.).
+9. **Mobil** – PWA, Capacitor (Android), notifikace, reklamy za odměnu, odstranění reklam.
+10. **Balanc a testy** – simulace průběhu (tools/sim), headless testy (Playwright).
