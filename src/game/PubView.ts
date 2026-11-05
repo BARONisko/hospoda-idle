@@ -13,7 +13,7 @@ const DOOR = { x: PUB.door.x * T + 8, y: PUB.door.y * T + 14 };
 const TABLES = PUB.tables.slice(0, 6);
 
 /** hosté podle dějství: 1 lidé, 2 příšery, 3 žabí lidé a kultisté */
-const GUESTS: Record<number, string[]> = {
+export const GUESTS: Record<number, string[]> = {
   1: Array.from({ length: 12 }, (_, i) => `guest${i}`),
   2: ['zombie', 'werewolf', 'banshee', 'vampire', 'ghost', 'ratman', 'guest3', 'zombie', 'vampire'],
   3: ['frogman', 'frogman', 'guest1', 'guest5', 'frogman', 'guest8', 'zabak'],
@@ -185,6 +185,7 @@ export class PubView {
     const seat = this.rnd.pick(free);
     seat.taken = true;
     const key = this.rnd.pick(GUESTS[this.pub.act]);
+    this.s.events.emit('guestSeen', key);
     const spr = this.s.add.sprite(this.ox + DOOR.x, DOOR.y, key, 4).setOrigin(0.5, 1).setDepth(DOOR.y);
     this.objs.push(spr);
     this.s.events.emit('pubObj', spr);

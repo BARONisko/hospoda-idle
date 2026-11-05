@@ -25,7 +25,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
    √(výdělek v běhu / 100 000), každý +2 % výdělek navždy; přibude další hospoda (max 3). Později: utrácení krígel, Cthulhu?
 6. **Události s ťukáním** ✅ – každé 1,5–3 min v náhodné hospodě: zlatý sud (60 s výdělku), nájezd žab (6× 6 s),
    netopýr = upíří hodina (×2 na 60 s), banshee karaoke (12 ťuků za 9 s = 120 s výdělku). Ladění `?ev=gold|frogs|bat|banshee`.
-7. **Sbírka a úkoly** – bestiář hostů-příšer, denní úkoly, úspěchy.
+7. **Sbírka a úkoly** ✅ – tlačítko „Menu“ = panel se záložkami Obchod / Úkoly / Sbírka: 3 denní úkoly (odměna 5 min výdělku),
+   18 úspěchů (každý +1 krígl), bestiář 20 druhů hostů (siluety neviděných). Červená tečka = je co vyzvednout.
 8. **Zvuk, hudba, jazyky** – cs + en a dalších 10 jazyků (t() jako v P.U.B.).
 9. **Mobil** – PWA, Capacitor (Android), notifikace, reklamy za odměnu, odstranění reklam.
 10. **Balanc a testy** – simulace průběhu (tools/sim), headless testy (Playwright).

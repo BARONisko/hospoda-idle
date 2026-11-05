@@ -1,3 +1,5 @@
+import type { Stats, Daily } from './goals';
+
 // Uložení hry do localStorage (na mobilu přes Capacitor stejně). Verzované kvůli převodům.
 export interface StationState {
   lvl: number;
@@ -29,18 +31,27 @@ export interface Save {
   run: number;
   /** krígly z prestiže – trvalý bonus */
   krigle: number;
+  stats: Stats;
+  /** denní úkoly */
+  daily: Daily;
+  /** vyzvednuté úspěchy (id) */
+  ach: string[];
+  /** bestiář: viděné druhy hostů */
+  seen: string[];
   /** koupená vylepšení z obchodu (id) */
   up: string[];
   /** čas posledního uložení (ms) – pro výdělek offline */
   at: number;
 }
 
+const extra = () => ({ stats: { tips: 0, levels: 0, events: 0, prestiges: 0 }, daily: { day: '', tasks: [] }, ach: [], seen: [] });
+
 const KEY = 'pubidle_save_v1';
 
 export const newPub = (act: 1 | 2 | 3): PubState => ({ act, st: { tap: { lvl: act === 1 ? 1 : 0, auto: false, prog: 0 } } });
 
 export function fresh(): Save {
-  return { v: 2, coins: 0, earned: 0, pubs: [newPub(1)], up: [], run: 0, krigle: 0, at: Date.now() };
+  return { v: 2, coins: 0, earned: 0, pubs: [newPub(1)], up: [], run: 0, krigle: 0, ...extra(), at: Date.now() };
 }
 
 export function load(): Save {
@@ -49,8 +60,8 @@ export function load(): Save {
     if (raw) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const d = JSON.parse(raw) as any;
-      if (d?.v === 1) return { v: 2, coins: d.coins, earned: d.earned, pubs: [{ act: 1, st: d.st }], up: [], run: d.earned, krigle: 0, at: d.at };
-      if (d?.v === 2) return { up: [], run: d.earned ?? 0, krigle: 0, ...d } as Save;
+      if (d?.v === 1) return { v: 2, coins: d.coins, earned: d.earned, pubs: [{ act: 1, st: d.st }], up: [], run: d.earned, krigle: 0, ...extra(), at: d.at };
+      if (d?.v === 2) return { up: [], run: d.earned ?? 0, krigle: 0, ...extra(), ...d } as Save;
     }
   } catch {
     /* poškozené nebo nedostupné úložiště → nová hra */

@@ -8,6 +8,8 @@ import { sfx } from '../core/sfx';
 import { Save, PubState, load, store, newPub } from '../core/save';
 import { PubView } from '../game/PubView';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
+import { GUESTS } from '../game/PubView';
+import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today } from '../core/goals';
 
 const W = 540;
 const H = 960;
@@ -87,6 +89,10 @@ export class PubScene extends Phaser.Scene {
       p.st = { tap: { lvl: 10, auto: true, prog: 0.1 }, kitchen: { lvl: 5, auto: true, prog: 0.3 }, cellar: { lvl: 2, auto: false, prog: 0 }, dice: { lvl: 1, auto: false, prog: 0 } };
       this.d.pubs.push(p);
     }
+    this.events.off('guestSeen');
+    this.events.on('guestSeen', (key: string) => {
+      if (!this.d.seen.includes(key)) this.d.seen.push(key);
+    });
     this.views = [];
     this.cards = [];
     this.stripRates = [];
@@ -114,10 +120,11 @@ export class PubScene extends Phaser.Scene {
     }, 102);
     this.drawMode();
     this.shopBtn = this.btn(W - 230, 16, 108, 50, () => this.openShop(), 102);
-    this.drawBtn(this.shopBtn, t('Obchod'), true, 'plum');
+    this.drawBtn(this.shopBtn, t('Menu'), true, 'plum');
     this.shopDot = this.add.graphics().setDepth(104);
 
     this.layout();
+    this.daily();
     this.ev = new PubEvents(this, {
       views: this.views,
       reward: (secs, view) => {
@@ -128,6 +135,11 @@ export class PubScene extends Phaser.Scene {
       },
       banner: (c, text, top) => this.banner(c, text, top),
       boostAll: (ms) => (this.evBoostUntil = Date.now() + ms),
+      onEvent: (_k, ok) => {
+        if (!ok) return;
+        this.d.stats.events++;
+        this.task('events', 1);
+      },
     });
     const evq = new URLSearchParams(location.search).get('ev') as EventKind | null;
     if (evq && EVENT_KINDS.includes(evq)) this.time.delayedCall(800, () => this.ev.start(evq, 0));
@@ -145,6 +157,8 @@ export class PubScene extends Phaser.Scene {
         if (v.tap(wp.x, wp.y)) {
           const tip = Math.max(1, Math.round(this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])));
           this.gain(tip);
+          this.d.stats.tips++;
+          this.task('tips', 1);
           v.tipPop('+' + big(tip));
           sfx.tip();
         }
@@ -265,50 +279,157 @@ export class PubScene extends Phaser.Scene {
     return [...mgrs, ...ups].sort((a, b) => a.cost - b.cost).slice(0, 5);
   }
 
-  private openShop() {
-    if (this.shopObjs.length) return this.closeShop();
+  tab: 'shop' | 'tasks' | 'book' = 'shop';
+
+  private openShop(tab = this.tab, toggle = true) {
+    if (this.shopObjs.length && toggle) return this.closeShop();
+    this.closeShop();
     this.closeSheet();
+    this.tab = tab;
     const D = 300, RH = 96;
-    const offer = this.shopOffer();
-    const y0 = H - (Math.max(1, offer.length) + 1) * RH - 74;
+    const y0 = H - 6 * RH - 74;
     const block = this.add.rectangle(0, TOP, W, H - TOP, 0x000000, 0.55).setOrigin(0).setDepth(D).setInteractive();
     block.on('pointerdown', (ptr: Phaser.Input.Pointer) => ptr.y < y0 && this.closeShop());
     const g = this.add.graphics().setDepth(D);
     g.fillStyle(col('dusk'), 0.98).fillRoundedRect(0, y0, W, H - y0 + 20, 16);
     g.fillStyle(col('gold')).fillRect(0, y0, W, 3);
-    const title = this.add.text(20, y0 + 14, t('Obchod'), txt(28, PAL.gold)).setDepth(D + 1);
-    const close = this.btn(W - 120, y0 + 10, 104, 40, () => this.closeShop(), D + 5);
-    this.drawBtn(close, t('Zavřít'), true, 'red');
-    this.shopObjs.push(block, g, title, close.bg, close.label, close.zone);
-    if (!offer.length) this.shopObjs.push(this.add.text(W / 2, y0 + 200, t('Teď tu nic není.\nOtevři další stanice.'), txt(22, PAL.fog)).setOrigin(0.5).setAlign('center').setDepth(D + 1));
-    {
-      const y = y0 + 64;
-      const k = kriglyFor(this.d.run);
-      const box = this.add.graphics().setDepth(D + 1);
-      box.fillStyle(col('blood'), 0.7).fillRoundedRect(10, y, W - 20, RH - 8, 10);
-      const name = this.add.text(26, y + 10, t('Zavolat hygienu'), txt(26, PAL.sand)).setDepth(D + 1);
-      const sub = this.add
-        .text(26, y + 46, t('krígly: {k} (+{b} % výdělek)', { k: this.d.krigle, b: Math.round(this.d.krigle * KRIGL_BONUS * 100) }), txt(18, PAL.bone))
-        .setDepth(D + 1);
-      sub.setScale(Math.min(1, 280 / sub.width));
-      const b = this.btn(W - 212, y + 12, 190, 62, () => this.askPrestige(), D + 2);
-      this.drawBtn(b, k >= PRESTIGE_MIN ? t('+{k} krígel', { k }) : t('{k} / {m} krígel', { k, m: PRESTIGE_MIN }), k >= PRESTIGE_MIN, 'red');
-      this.shopObjs.push(box, name, sub, b.bg, b.label, b.zone);
-    }
-    offer.forEach((o, k) => {
-      const y = y0 + 64 + (k + 1) * RH;
-      const box = this.add.graphics().setDepth(D + 1);
-      box.fillStyle(col('ink'), 0.6).fillRoundedRect(10, y, W - 20, RH - 8, 10);
-      const name = this.add.text(26, y + 10, o.title, txt(26, PAL.bone)).setDepth(D + 1);
-      name.setScale(Math.min(1, 280 / name.width));
-      const sub = this.add.text(26, y + 46, o.sub, txt(18, PAL.fog)).setDepth(D + 1);
-      sub.setScale(Math.min(1, 280 / sub.width));
-      const b = this.btn(W - 212, y + 12, 190, 62, () => o.buy(), D + 2);
-      this.shopRows.push({ o, b });
-      this.shopObjs.push(box, name, sub, b.bg, b.label, b.zone);
+    this.shopObjs.push(block, g);
+    const tabs: [typeof tab, string][] = [
+      ['shop', t('Obchod')],
+      ['tasks', t('Úkoly')],
+      ['book', t('Sbírka')],
+    ];
+    tabs.forEach(([id, label], i) => {
+      const b = this.btn(10 + i * 130, y0 + 10, 122, 42, () => this.openShop(id, false), D + 5);
+      this.drawBtn(b, label, true, id === tab ? 'amber' : 'slate');
+      if (id !== tab) b.label.setColor(PAL.bone);
+      this.shopObjs.push(b.bg, b.label, b.zone);
+      if (id === 'tasks' && this.claimable()) {
+        const dot = this.add.graphics().setDepth(D + 8);
+        dot.fillStyle(col('ink')).fillCircle(b.x + b.w - 6, b.y + 4, 10).fillStyle(col('scarlet')).fillCircle(b.x + b.w - 6, b.y + 4, 7);
+        this.shopObjs.push(dot);
+      }
     });
+    const close = this.btn(W - 76, y0 + 10, 62, 42, () => this.closeShop(), D + 5);
+    this.drawBtn(close, '✕', true, 'red');
+    this.shopObjs.push(close.bg, close.label, close.zone);
+    if (tab === 'shop') this.shopTab(y0 + 64, D, RH);
+    else if (tab === 'tasks') this.tasksTab(y0 + 64, D);
+    else this.bookTab(y0 + 64, D);
     sfx.click();
     this.refresh();
+  }
+
+  /** řádek panelu: text vlevo, tlačítko vpravo */
+  private row(y: number, h: number, D: number, title: string, sub: string, boxCol: keyof typeof PAL = 'ink', titleCol: string = PAL.bone) {
+    const box = this.add.graphics().setDepth(D + 1);
+    box.fillStyle(col(boxCol), boxCol === 'ink' ? 0.6 : 0.7).fillRoundedRect(10, y, W - 20, h - 8, 10);
+    const name = this.add.text(26, y + 8, title, txt(h > 85 ? 26 : 22, titleCol)).setDepth(D + 1);
+    name.setScale(Math.min(1, 300 / name.width));
+    const st = this.add.text(26, y + (h > 85 ? 46 : 40), sub, txt(18, PAL.fog)).setDepth(D + 1);
+    st.setScale(Math.min(1, 300 / st.width));
+    this.shopObjs.push(box, name, st);
+  }
+
+  private shopTab(y0: number, D: number, RH: number) {
+    const offer = this.shopOffer();
+    const k = kriglyFor(this.d.run);
+    this.row(y0, RH, D, t('Zavolat hygienu'), t('krígly: {k} (+{b} % výdělek)', { k: this.d.krigle, b: Math.round(this.d.krigle * KRIGL_BONUS * 100) }), 'blood', PAL.sand);
+    const pb = this.btn(W - 212, y0 + 12, 190, 62, () => this.askPrestige(), D + 2);
+    this.drawBtn(pb, k >= PRESTIGE_MIN ? t('+{k} krígel', { k }) : t('{k} / {m} krígel', { k, m: PRESTIGE_MIN }), k >= PRESTIGE_MIN, 'red');
+    this.shopObjs.push(pb.bg, pb.label, pb.zone);
+    if (!offer.length) this.shopObjs.push(this.add.text(W / 2, y0 + 150, t('Teď tu nic není.\nOtevři další stanice.'), txt(22, PAL.fog)).setOrigin(0.5).setAlign('center').setDepth(D + 1));
+    offer.forEach((o, i) => {
+      const y = y0 + (i + 1) * RH;
+      this.row(y, RH, D, o.title, o.sub);
+      const b = this.btn(W - 212, y + 12, 190, 62, () => o.buy(), D + 2);
+      this.shopRows.push({ o, b });
+      this.shopObjs.push(b.bg, b.label, b.zone);
+    });
+  }
+
+  // ---------- úkoly a úspěchy ----------
+  private daily() {
+    if (this.d.daily.day !== today()) this.d.daily = newDaily(this.totalRate());
+    return this.d.daily;
+  }
+
+  private totalRate() {
+    return this.d.pubs.reduce((a, p) => a + this.rate(p), 0);
+  }
+
+  private task(kind: TaskKind, n: number) {
+    for (const tk of this.daily().tasks) if (tk.kind === kind && !tk.claimed) tk.prog = Math.min(tk.goal, tk.prog + n);
+  }
+
+  /** je co vyzvednout (úkol nebo úspěch)? */
+  private claimable() {
+    return this.daily().tasks.some((k) => !k.claimed && k.prog >= k.goal) || ACHIEVEMENTS.some((a) => !this.d.ach.includes(a.id) && a.done(this.d));
+  }
+
+  private taskReward() {
+    return Math.max(100, Math.round(Math.max(this.totalRate(), this.pay(this.d.pubs[0], STATIONS[0]) / STATIONS[0].cycle) * 300));
+  }
+
+  private tasksTab(y0: number, D: number) {
+    const RH = 80;
+    const head = (y: number, s: string) => this.shopObjs.push(this.add.text(20, y, s, txt(24, PAL.gold)).setDepth(D + 1));
+    head(y0, t('Denní úkoly'));
+    this.daily().tasks.forEach((tk, i) => {
+      const y = y0 + 34 + i * RH;
+      const done = tk.prog >= tk.goal;
+      this.row(y, RH, D, taskText(tk.kind, big(tk.goal)), tk.claimed ? t('hotovo') : `${big(tk.prog)} / ${big(tk.goal)}`);
+      const b = this.btn(W - 172, y + 10, 150, 54, () => {
+        if (tk.claimed || !done) return sfx.error();
+        tk.claimed = true;
+        const n = this.taskReward();
+        this.gain(n);
+        sfx.fanfare();
+        store(this.d);
+        this.openShop('tasks', false);
+      }, D + 2);
+      this.drawBtn(b, tk.claimed ? '✓' : done ? t('+{n}', { n: big(this.taskReward()) }) : t('{p} %', { p: Math.floor((tk.prog / tk.goal) * 100) }), done && !tk.claimed, 'green');
+      this.shopObjs.push(b.bg, b.label, b.zone);
+    });
+    const y1 = y0 + 34 + 3 * RH + 12;
+    const got = this.d.ach.length;
+    head(y1, t('Úspěchy {a} / {b}  (odměna 1 krígl)', { a: got, b: ACHIEVEMENTS.length }));
+    // nejdřív k vyzvednutí, pak nesplněné
+    const list = ACHIEVEMENTS.filter((a) => !this.d.ach.includes(a.id)).sort((a, b) => Number(b.done(this.d)) - Number(a.done(this.d))).slice(0, 3);
+    if (!list.length) head(y1 + 50, t('Všechny úspěchy splněny!'));
+    list.forEach((a, i) => {
+      const y = y1 + 34 + i * RH;
+      const done = a.done(this.d);
+      this.row(y, RH, D, a.text, done ? t('splněno!') : t('zatím ne'));
+      const b = this.btn(W - 172, y + 10, 150, 54, () => {
+        if (!a.done(this.d) || this.d.ach.includes(a.id)) return sfx.error();
+        this.d.ach.push(a.id);
+        this.d.krigle += 1;
+        sfx.fanfare();
+        store(this.d);
+        this.openShop('tasks', false);
+      }, D + 2);
+      this.drawBtn(b, done ? t('+1 krígl') : '—', done, 'green');
+      this.shopObjs.push(b.bg, b.label, b.zone);
+    });
+  }
+
+  // ---------- bestiář ----------
+  private bookTab(y0: number, D: number) {
+    const all = [...new Set(Object.values(GUESTS).flat())];
+    this.shopObjs.push(this.add.text(W - 90, y0 - 50, `${this.d.seen.length}/${all.length}`, txt(22, PAL.gold)).setOrigin(1, 0).setDepth(D + 6));
+    all.forEach((key, i) => {
+      const cx = 10 + (i % 5) * 104 + 52;
+      const y = y0 + Math.floor(i / 5) * 140;
+      const seen = this.d.seen.includes(key);
+      const box = this.add.graphics().setDepth(D + 1);
+      box.fillStyle(col('ink'), 0.6).fillRoundedRect(cx - 48, y, 96, 132, 10);
+      const spr = this.add.sprite(cx, y + 92, key, 1).setOrigin(0.5, 1).setScale(4.5).setDepth(D + 2);
+      if (!seen) spr.setTintFill(col('dusk'));
+      const nm = this.add.text(cx, y + 112, seen ? GUEST_NAMES[key] ?? key : '???', txt(15, seen ? PAL.bone : PAL.slate)).setOrigin(0.5).setDepth(D + 2);
+      nm.setScale(Math.min(1, 90 / nm.width));
+      this.shopObjs.push(box, spr, nm);
+    });
   }
 
   private closeShop() {
@@ -322,8 +443,7 @@ export class PubScene extends Phaser.Scene {
     this.d.coins -= u.cost;
     this.d.up.push(u.id);
     const i = this.d.pubs.findIndex((p) => p.act === u.act);
-    this.closeShop();
-    this.openShop();
+    this.openShop('shop', false);
     this.banner(this.views[i].cam, t('{s}: výdělek ×{m}!', { s: STATION_NAMES[u.act][u.station], m: u.mult }));
     store(this.d);
   }
@@ -334,8 +454,7 @@ export class PubScene extends Phaser.Scene {
     this.d.coins -= c;
     p.mgr = true;
     const i = this.d.pubs.indexOf(p);
-    this.closeShop();
-    this.openShop();
+    this.openShop('shop', false);
     this.banner(this.views[i].cam, t('{n} nastoupil!', { n: MANAGERS[p.act].name }));
     this.skillBtns[i] && this.drawSkill(i);
     store(this.d);
@@ -412,6 +531,7 @@ export class PubScene extends Phaser.Scene {
     const k = kriglyFor(this.d.run);
     const n = Math.min(3, this.d.pubs.length + 1);
     this.d.krigle += k;
+    this.d.stats.prestiges++;
     this.d.run = 0;
     this.d.coins = 0;
     this.d.up = [];
@@ -560,6 +680,8 @@ export class PubScene extends Phaser.Scene {
     const s = this.st(p, def.id);
     const before = nextMilestone(s.lvl);
     s.lvl += n;
+    this.d.stats.levels += n;
+    this.task('levels', n);
     sfx.buy();
     if (before && s.lvl >= before) this.milestone(i, def);
     this.views[i].refresh();
@@ -590,6 +712,7 @@ export class PubScene extends Phaser.Scene {
     this.d.coins += n;
     this.d.earned += n;
     this.d.run += n;
+    this.task('earn', n);
   }
 
   private rate(p: PubState) {
@@ -642,7 +765,7 @@ export class PubScene extends Phaser.Scene {
     this.skillBtns.forEach((_, i) => this.drawSkill(i));
     this.stripRates.forEach((r, i) => r.setText(t('+{n} / s', { n: big(this.rate(this.d.pubs[i])) })));
 
-    const cheap = this.shopOffer().some((u) => u.cost <= this.d.coins);
+    const cheap = this.shopOffer().some((u) => u.cost <= this.d.coins) || this.claimable();
     this.shopDot.clear();
     if (cheap) this.shopDot.fillStyle(col('ink')).fillCircle(W - 126, 20, 11).fillStyle(col('scarlet')).fillCircle(W - 126, 20, 8);
     for (const r of this.shopRows) this.drawBtn(r.b, big(r.o.cost), this.d.coins >= r.o.cost, 'green');
