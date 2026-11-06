@@ -6,6 +6,7 @@ import { big } from '../core/num';
 import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN, KRIGL_SHOP, KriglItem, startCoins } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
+import { season, SEASONS, SEASON_BONUS } from '../core/season';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS } from '../core/save';
 import { PubView } from '../game/PubView';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
@@ -498,18 +499,18 @@ export class PubScene extends Phaser.Scene {
 
   // ---------- bestiář ----------
   private bookTab(y0: number, D: number) {
-    const all = [...new Set(Object.values(GUESTS).flat())];
+    const all = [...new Set([...Object.values(GUESTS).flat(), ...Object.values(SEASONS).map((x) => x.guest)])];
     this.shopObjs.push(this.add.text(W - 20, y0 + 586, `${this.d.seen.length}/${all.length}`, txt(22, PAL.gold)).setOrigin(1, 0).setDepth(D + 6));
     all.forEach((key, i) => {
-      const cx = 10 + (i % 5) * 104 + 52;
-      const y = y0 + Math.floor(i / 5) * 140;
+      const cx = 10 + (i % 7) * 74 + 37;
+      const y = y0 + Math.floor(i / 7) * 114;
       const seen = this.d.seen.includes(key);
       const box = this.add.graphics().setDepth(D + 1);
-      box.fillStyle(col('ink'), 0.6).fillRoundedRect(cx - 48, y, 96, 132, 10);
-      const spr = this.add.sprite(cx, y + 92, key, 1).setOrigin(0.5, 1).setScale(4.5).setDepth(D + 2);
+      box.fillStyle(col('ink'), 0.6).fillRoundedRect(cx - 34, y, 68, 108, 8);
+      const spr = this.add.sprite(cx, y + 76, key, 1).setOrigin(0.5, 1).setScale(3.6).setDepth(D + 2);
       if (!seen) spr.setTintFill(col('dusk'));
-      const nm = this.add.text(cx, y + 112, seen ? GUEST_NAMES[key] ?? key : '???', txt(15, seen ? PAL.bone : PAL.slate)).setOrigin(0.5).setDepth(D + 2);
-      nm.setScale(Math.min(1, 90 / nm.width));
+      const nm = this.add.text(cx, y + 92, seen ? GUEST_NAMES[key] ?? Object.values(SEASONS).find((x) => x.guest === key)?.guestName ?? key : '???', txt(14, seen ? PAL.bone : PAL.slate)).setOrigin(0.5).setDepth(D + 2);
+      nm.setScale(Math.min(1, 64 / nm.width));
       this.shopObjs.push(box, spr, nm);
     });
   }
@@ -901,7 +902,7 @@ export class PubScene extends Phaser.Scene {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * (this.kl('cthulhu') ? 10 : 1);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * (this.kl('cthulhu') ? 10 : 1) * (season ? 1 + SEASON_BONUS : 1);
   }
 
   // ---------- obchod s krígly ----------
@@ -1004,7 +1005,8 @@ export class PubScene extends Phaser.Scene {
     const total = this.d.pubs.reduce((a, p) => a + this.rate(p), 0);
     this.coinsText.setText(`${big(this.d.coins)} coins`);
     this.coinsText.setScale(Math.min(1, 226 / this.coinsText.width));
-    this.rateText.setText(t('+{n} / s', { n: big(total) }));
+    this.rateText.setText(t('+{n} / s', { n: big(total) }) + (season ? `  · ${SEASONS[season].name} +${SEASON_BONUS * 100} %` : ''));
+    this.rateText.setScale(Math.min(1, 240 / this.rateText.width));
     this.skillBtns.forEach((_, i) => this.drawSkill(i));
     this.stripRates.forEach((r, i) => r.setText(t('+{n} / s', { n: big(this.rate(this.d.pubs[i])) })));
 

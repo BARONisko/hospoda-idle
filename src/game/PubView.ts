@@ -5,6 +5,7 @@ import { PAL } from '../data/palette';
 import { txt } from '../ui/font';
 import { big } from '../core/num';
 import type { PubState } from '../core/save';
+import { season, SEASONS } from '../core/season';
 
 // Jedna živá hospoda: pozadí podle dějství, vybavení, hostinský, kostlivci u stanic, hosté chodí, sedí a odcházejí.
 // Každá hospoda leží ve světě scény na vlastním místě (ox) a má vlastní kameru.
@@ -123,6 +124,19 @@ export class PubView {
         g.path = [];
         g.sitT = this.rnd.realInRange(3, 15);
       }
+    }
+    // sezónní výzdoba
+    if (season) {
+      const spots = [
+        [8.5 * T, 2 * T + 6],
+        [11 * T, 2 * T + 6],
+        [1 * T, 2 * T + 14],
+        [16 * T, 2 * T + 14],
+      ];
+      SEASONS[season].decor.forEach((f, i) => {
+        const [x, y] = spots[i % spots.length];
+        add(s.add.image(ox + x, y, 'obj', f).setOrigin(0.5, 1).setDepth(y));
+      });
     }
     this.cam = s.cameras.add(0, 0, 10, 10).setBackgroundColor(PAL.ink);
     this.cam.roundPixels = true;
@@ -248,7 +262,7 @@ export class PubView {
     if (!free.length) return;
     const seat = this.rnd.pick(free);
     seat.taken = true;
-    const key = this.rnd.pick(GUESTS[this.pub.act]);
+    const key = season && this.rnd.frac() < 0.15 ? SEASONS[season].guest : this.rnd.pick(GUESTS[this.pub.act]);
     this.s.events.emit('guestSeen', key);
     const spr = this.s.add.sprite(this.ox + DOOR.x, DOOR.y, key, 4).setOrigin(0.5, 1).setDepth(DOOR.y);
     this.objs.push(spr);
