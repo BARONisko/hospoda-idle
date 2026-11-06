@@ -25,6 +25,8 @@ import { GUESTS } from '../game/PubView';
 import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today, WeekKind, newWeekly, weekId, weekText } from '../core/goals';
 
 const W = 540;
+/** kolik talířů z kuchyně může čekat na číšníky */
+const FOOD_CAP = 6;
 const H = 960;
 const T = 16;
 const TOP = 108;
@@ -2857,7 +2859,18 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         }
         return;
       }
-      if (bar.n < 1 || this.night) return;
+      if (this.night) return;
+      // jídlo z kuchyně nosí číšníci, když na baru nečeká pivo (coins za jídlo už dala kuchyně)
+      if (bar.n < 1) {
+        const f = Math.floor(p.food ?? 0);
+        if (f < 1 || !p.st.tap?.auto) return;
+        const n = Math.min(tray(w), f);
+        p.food = (p.food ?? 0) - n;
+        const dur = tripTime(w);
+        run[k] = { t: dur, dur, v: 0, paid: true };
+        this.views[i].waiterTrip(k, n, dur, true);
+        return;
+      }
       const n = Math.min(tray(w), Math.floor(bar.n));
       const v = (bar.v * n) / bar.n;
       bar.n -= n;
@@ -2892,6 +2905,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         else if (s.prog >= 1) {
           let g = this.pay(p, def) * this.happyMult();
           if (Math.random() < this.ts().crit) g *= 2;
+          if (def.id === 'kitchen' && s.auto && !this.night && p.st.tap?.auto && p.w?.length) p.food = Math.min(FOOD_CAP, (p.food ?? 0) + 1);
           if (toBar) {
             bar.n += this.beers(p);
             bar.v += g;

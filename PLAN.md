@@ -125,3 +125,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Žádní pracovníci u stanic (přání uživatele): v hospodě nic nenosí nikdo kromě 4 číšníků z lišty (piva). Kuchyně, sklep
   a kostky po najmutí („Číšník …“ na kartě) jen běží samy, bez postavy; jídlo hostům se objeví samo jako dřív. Místo
   u kostek je volné pro hosty.
+- Místo u kostek zase zabrané. Jídlo nosí číšníci z lišty: kuchyně s obsluhou přidá talíř do fronty (max 6, p.food),
+  číšník ho vezme, když na baru nečeká pivo (pivo má přednost; coins za jídlo dál dává kuchyně hned). Hosté s objednávkou
+  jídla dostanou talíř až od číšníka (když kuchyně běží sama a číšníci jsou najatí).

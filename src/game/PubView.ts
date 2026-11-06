@@ -137,6 +137,8 @@ export class PubView {
       this.seats.push({ x: tb.x * T - 8, y: tb.y * T + 12, flip: false, aisle, taken: false });
       this.seats.push({ x: tb.x * T + 40, y: tb.y * T + 12, flip: true, aisle, taken: false });
     }
+    // kostky: místo u stolu s kostkami je zabrané (nesedá tam host)
+    this.seats.find((st) => st.x === SPOT.dice.x && st.y === SPOT.dice.y)!.taken = true;
     this.keeper = add(s.add.sprite(ox + SPOT.tap.x, SPOT.tap.y, pub.act === 3 ? 'zabak' : pub.act === 4 ? 'cultist4' : 'player', 0).setOrigin(0.5, 1).setDepth(SPOT.tap.y));
     // hospoda je už rozjetá: pár hostů sedí hned od začátku
     for (let i = 0; i < 4; i++) {
@@ -376,6 +378,16 @@ export class PubView {
     return !this.night && (this.pub.w?.length ?? 0) > 0 && !!this.pub.st.tap?.auto;
   }
 
+  /** objednává si host jídlo (jinak pivo) */
+  private isFood(g: Guest) {
+    return (g.spr.x * 7 + g.spr.y) % 3 === 0;
+  }
+
+  /** nosí to (pivo / jídlo) číšníci? jídlo jen když kuchyně běží sama */
+  private carried(food: boolean) {
+    return this.waiting() && (!food || !!this.pub.st.kitchen?.auto);
+  }
+
   /** piva čekající na baru: hrnky na pultu a počet (červeně, když je bar plný) */
   setBar(n: number, cap: number) {
     const show = this.waiting() || n > 0 ? Math.min(6, n) : 0;
@@ -396,12 +408,16 @@ export class PubView {
   }
 
   /** číšník i nese n piv ke stolu: tam za dur/2 s, pak zpátky; vrací hosta, kterému pivo nese (kvůli „+coins“) */
-  waiterTrip(i: number, n: number, dur: number) {
+  waiterTrip(i: number, n: number, dur: number, food = false) {
     const spr = this.waiters[i];
     if (!spr?.active) return;
     const home = WAIT_HOME[i];
     const seated = this.guests.filter((q) => q.seat && !q.leaving && !q.path.length);
-    const g = this.rnd.pick(seated.filter((q) => !q.mug && !q.served).length ? seated.filter((q) => !q.mug && !q.served) : seated.length ? seated : [undefined as unknown as Guest]);
+    // nejdřív host, který na to (pivo / jídlo) čeká, pak kdokoli, kdo to chce, pak kdokoli
+    const want = seated.filter((q) => this.isFood(q) === food);
+    const wait = want.filter((q) => !q.mug && !q.served);
+    const pool = wait.length ? wait : want.length ? want : seated;
+    const g = pool.length ? this.rnd.pick(pool) : undefined;
     const seat = g?.seat ?? this.rnd.pick(this.seats);
     if (g) g.served = true;
     const cx = CORRIDORS.reduce((a, b) => (Math.abs(b - seat.x) < Math.abs(a - seat.x) ? b : a));
@@ -418,7 +434,12 @@ export class PubView {
     spr.setPosition(this.ox + home.x, home.y);
     // podnos s pivy nad hlavou
     const tray = this.s.add.rectangle(spr.x, spr.y - 17, 16, 2, 0xc8c8d0).setStrokeStyle(1, 0x1a1a24);
-    const mugs = Array.from({ length: Math.min(n, 4) }, () => this.s.add.image(spr.x, spr.y, 'obj', 'mug').setOrigin(0.5, 1).setScale(0.8));
+    const item = food ? FOOD[this.pub.act] : 'mug';
+    const mugs = Array.from({ length: Math.min(n, 4) }, () => {
+      const m = this.s.add.image(spr.x, spr.y, 'obj', item).setOrigin(0.5, 1).setScale(0.8);
+      if (m.width > 14 || m.height > 12) m.setScale(0.45);
+      return m;
+    });
     const carry = [tray, ...mugs];
     carry.forEach((o) => (this.objs.push(o), this.s.events.emit('pubObj', o)));
     const follow = () => {
@@ -431,9 +452,9 @@ export class PubView {
       spr.setFrame(13);
       // pivo na stůl
       if (g && g.seat && !g.leaving) {
-        if (g.mug) g.mug.setFrame('mug');
+        if (g.mug) g.mug.setFrame(item);
         else {
-          g.mug = this.s.add.image(g.spr.x + (g.seat.flip ? -13 : 13), g.spr.y - 6, 'obj', 'mug').setOrigin(0.5, 1).setDepth(g.spr.y + 4);
+          g.mug = this.s.add.image(g.spr.x + (g.seat.flip ? -13 : 13), g.spr.y - 6, 'obj', item).setOrigin(0.5, 1).setDepth(g.spr.y + 4);
           this.objs.push(g.mug);
           this.s.events.emit('pubObj', g.mug);
         }
@@ -526,7 +547,7 @@ export class PubView {
         // po chvíli dostane pivo na stůl (v krčmě krev, u Žabáka bahno – zatím stejný půllitr)
         g.sat = (g.sat ?? 0) + dt;
         // nejdřív si objedná (bublina nad hlavou), pak mu přinesou pivo nebo jídlo
-        const food = (g.spr.x * 7 + g.spr.y) % 3 === 0;
+        const food = this.isFood(g);
         // objedná si hned po usednutí a pak znovu, pokud ještě chvíli sedí (každá objednávka = nové spropitné)
         const again = !g.order && g.mug && g.next !== undefined && g.sat >= g.next && g.sitT > 6;
         if ((!g.order && !g.mug && g.sat < 0.2) || again) {
@@ -554,7 +575,7 @@ export class PubView {
         // bublina vydrží 6 s, pak se obslouží sama (ťuknutím hned)
         if (g.order && g.sat - (g.orderAt ?? 0) > 6) this.serve(g);
         // pivo nosí číšníci (přes den, když nějaké má); jídlo a noc jako dřív
-        if (!g.mug && !g.order && g.sat > 0.5 && (food || !this.waiting())) {
+        if (!g.mug && !g.order && g.sat > 0.5 && !this.carried(food)) {
           g.mug = this.s.add.image(sp.x + (g.seat.flip ? -13 : 13), sp.y - 6, 'obj', food ? FOOD[this.pub.act] : g.sitT > 6 ? 'mug' : 'mugDark').setOrigin(0.5, 1).setDepth(sp.y + 4);
           this.objs.push(g.mug);
           this.s.events.emit('pubObj', g.mug);

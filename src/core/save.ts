@@ -25,6 +25,8 @@ export interface PubState {
   w?: import('./waiters').WaiterState[];
   /** piva čekající na baru: počet a jejich hodnota v coins */
   bar?: { n: number; v: number };
+  /** talíře z kuchyně čekající na číšníky (jen pro vzhled, coins dala kuchyně) */
+  food?: number;
 }
 
 export interface Save {
