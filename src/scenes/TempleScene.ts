@@ -62,6 +62,8 @@ export class TempleScene extends Phaser.Scene {
   left = 0;
   spawnT = 0;
   inkT = 0;
+  /** délka tahu prstem od položení (px) */
+  stroke = 0;
   deepT = 0;
   weakT = 0;
   cultT: number[] = [];
@@ -156,6 +158,7 @@ export class TempleScene extends Phaser.Scene {
   private down(p: Phaser.Input.Pointer) {
     sfx.init();
     this.last = { x: p.x, y: p.y };
+    this.stroke = 0;
     if (this.mode !== 'fight') return;
     // hlubinný na molu
     for (const d of this.deeps) if (!d.dead && Phaser.Math.Distance.Between(p.x, p.y, d.s.x, d.s.y - 24) < 46) return this.kickDeep(d);
@@ -177,6 +180,7 @@ export class TempleScene extends Phaser.Scene {
     const len = Phaser.Math.Distance.Between(a.x, a.y, bpt.x, bpt.y);
     if (len < 6) return;
     this.last = bpt;
+    this.stroke += len;
     // stopa swipu
     this.fx.lineStyle(6, 0xffffff, 0.9).lineBetween(a.x, a.y, bpt.x, bpt.y);
     this.fx.lineStyle(12, 0x8fd3ff, 0.3).lineBetween(a.x, a.y, bpt.x, bpt.y);
@@ -191,7 +195,8 @@ export class TempleScene extends Phaser.Scene {
         }
       }
     }
-    for (const k of this.inks) if (distToSeg(k.x, k.y, a.x, a.y, bpt.x, bpt.y) < k.r) k.a -= 0.09;
+    // inkoust jde pryč jen stíráním (delší tah prstem), ne ťukáním
+    if (this.stroke > 40) for (const k of this.inks) if (distToSeg(k.x, k.y, a.x, a.y, bpt.x, bpt.y) < k.r) k.a -= Math.min(0.12, len * 0.004);
   }
 
   // ---------- boj ----------

@@ -61,7 +61,7 @@ export function msToSwitch(now = Date.now()) {
 }
 
 export const ROUNDS_PER_DAY = 5;
-export const ROUND_S = 90;
+export const ROUND_S = 60;
 export const MAX_CULT = 2;
 
 /** životy bosse (v bodech zásahu): roste s každým poraženým */
