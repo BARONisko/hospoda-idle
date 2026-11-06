@@ -9,7 +9,8 @@ import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
 import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
 import { isNight, phaseLeft, BONE_RATE, BONE_UPS, boneCost } from '../core/night';
-import { BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
+import { TALISMANS, STAT_NAMES, talisCost, stats } from '../core/talisman';
+import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS } from '../core/save';
 import { PubView } from '../game/PubView';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
@@ -167,7 +168,7 @@ export class PubScene extends Phaser.Scene {
       views: this.views,
       reward: (secs, view) => {
         const p = this.d.pubs[view];
-        const n = Math.max(10, Math.round(Math.max(this.rate(p), this.pay(p, STATIONS[0]) / STATIONS[0].cycle) * secs * (this.has('piano') ? 2 : 1)));
+        const n = Math.max(10, Math.round(Math.max(this.rate(p), this.pay(p, STATIONS[0]) / STATIONS[0].cycle) * secs * (this.has('piano') ? 2 : 1) * (1 + this.ts().events)));
         this.gain(n);
         return n;
       },
@@ -179,8 +180,9 @@ export class PubScene extends Phaser.Scene {
         return n;
       },
       boostAll: (ms) => (this.evBoostUntil = Date.now() + ms),
-      onEvent: (_k, ok) => {
+      onEvent: (k, ok) => {
         if (!ok) return;
+        this.tryDrop(k === 'brawl' ? 0.06 : 0.04);
         this.d.stats.events++;
         this.task('events', 1);
       },
@@ -207,7 +209,7 @@ export class PubScene extends Phaser.Scene {
         const wp = c.getWorldPoint(ptr.x, ptr.y);
         if (this.ev.tap(this.views.indexOf(v), wp.x, wp.y)) return;
         if (v.tap(wp.x, wp.y)) {
-          const tip = Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1)));
+          const tip = Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (1 + this.ts().tips)));
           if (this.night) this.d.bones = (this.d.bones ?? 0) + tip * this.boneMult();
           else this.gain(tip);
           this.d.stats.tips++;
@@ -223,6 +225,7 @@ export class PubScene extends Phaser.Scene {
     const away = Number(new URLSearchParams(location.search).get('away'));
     if (away) this.d.at = Date.now() - away * 1000;
     this.offline();
+    if (new URLSearchParams(location.search).get('talis')) this.d.talis = Object.fromEntries(TALISMANS.map((x, i) => [x.id, i % 3 ? i : 0]));
     const dc = Number(new URLSearchParams(location.search).get('coins'));
     if (dc) this.d.coins = dc;
     const save = () => {
@@ -352,7 +355,7 @@ export class PubScene extends Phaser.Scene {
     return [...mgrs, ...ups].sort((a, b) => a.cost - b.cost).slice(0, 5);
   }
 
-  tab: 'shop' | 'tasks' | 'book' | 'krigl' | 'brew' | 'opts' = 'shop';
+  tab: 'shop' | 'tasks' | 'book' | 'krigl' | 'brew' | 'talis' | 'opts' = 'shop';
 
   private openShop(tab = this.tab, toggle = true) {
     this.tut('menu');
@@ -401,6 +404,7 @@ export class PubScene extends Phaser.Scene {
     else if (tab === 'book') this.bookTab(cy0, D);
     else if (tab === 'krigl') this.kriglTab(cy0, D);
     else if (tab === 'brew') this.brewTab(cy0, D);
+    else if (tab === 'talis') this.talisTab(cy0, D);
     else this.optsTab(cy0, D);
     sfx.click();
     this.refresh();
@@ -408,7 +412,56 @@ export class PubScene extends Phaser.Scene {
 
   /** další záložky ve 2. řádku (talismany, hostinský) */
   private extraTabs(): [PubScene['tab'], string, number, number][] {
-    return [];
+    return [['talis', t('Talismany'), 1, 1]];
+  }
+
+  // ---------- talismany ----------
+  private ts() {
+    return stats(this.d.talis);
+  }
+
+  /** vzácný nález talismanu (nový = úroveň 1, už ho máš = +1 úroveň zdarma) */
+  private tryDrop(chance: number) {
+    if (Math.random() >= chance) return;
+    const d = Phaser.Utils.Array.GetRandom(TALISMANS);
+    const tl = (this.d.talis ??= {});
+    tl[d.id] = (tl[d.id] ?? 0) + 1;
+    this.applyKup();
+    this.banner(this.views[0].cam, tl[d.id] === 1 ? t('Nalezen talisman: {n}!', { n: d.name }) : t('{n} – úroveň {l}!', { n: d.name, l: tl[d.id] }));
+    store(this.d);
+  }
+
+  private talisTab(y0: number, D: number) {
+    const tl = this.d.talis ?? {};
+    const bones = this.d.bones ?? 0;
+    this.shopObjs.push(this.add.text(20, y0 - 4, t('Vzácné nálezy z událostí, rvaček a návštěv. Vylepšují se za kosti.'), txt(16, PAL.fog)).setDepth(D + 1).setWordWrapWidth(W - 40));
+    TALISMANS.forEach((d, i) => {
+      const x = 10 + (i % 2) * 262, y = y0 + 24 + Math.floor(i / 2) * 112;
+      const lvl = tl[d.id] ?? 0;
+      const box = this.add.graphics().setDepth(D + 1);
+      box.fillStyle(col(lvl ? 'ink' : 'dusk'), 0.7).fillRoundedRect(x, y, 256, 104, 10);
+      const ic = this.add.image(x + 34, y + 40, d.atlas, d.frame).setScale(3).setDepth(D + 2);
+      if (!lvl) ic.setTintFill(col('slate'));
+      const nm = this.add.text(x + 66, y + 8, lvl ? `${d.name} ${lvl}` : '???', txt(20, lvl ? PAL.gold : PAL.slate)).setDepth(D + 2);
+      nm.setScale(Math.min(1, 180 / nm.width));
+      const st = this.add.text(x + 66, y + 34, STAT_NAMES[d.stat](Math.max(1, lvl) * d.per), txt(15, lvl ? PAL.mint : PAL.slate)).setDepth(D + 2);
+      st.setScale(Math.min(1, 182 / st.width));
+      this.shopObjs.push(box, ic, nm, st);
+      if (!lvl) return;
+      const cost = talisCost(lvl);
+      const b = this.btn(x + 66, y + 58, 180, 38, () => {
+        if ((this.d.bones ?? 0) < cost) return sfx.error();
+        this.d.bones! -= cost;
+        tl[d.id] = lvl + 1;
+        this.applyKup();
+        sfx.buy();
+        store(this.d);
+        this.openShop('talis', false);
+      }, D + 2);
+      this.drawBtn(b, t('+1 · {n} kostí', { n: big(cost) }), bones >= cost, 'blue');
+      b.label.setScale(Math.min(1, 170 / b.label.width));
+      this.shopObjs.push(b.bg, b.label, b.zone);
+    });
   }
 
   // ---------- pivovar ----------
@@ -681,7 +734,7 @@ export class PubScene extends Phaser.Scene {
     const p = this.d.pubs[i];
     const now = Date.now();
     if (!p.mgr || this.boosted(p) || (p.boostReady ?? 0) > now) return sfx.error();
-    p.boostUntil = now + BOOST_S * 1000 * (this.has('sabre') ? 2 : 1);
+    p.boostUntil = now + BOOST_S * 1000 * (this.has('sabre') ? 2 : 1) * (1 + this.ts().skill);
     p.boostReady = now + (BOOST_S + BOOST_CD) * 1000;
     this.banner(this.views[i].cam, t('{s}! Výdělek ×{m}', { s: MANAGERS[p.act].skill, m: BOOST_MULT }));
     store(this.d);
@@ -789,6 +842,7 @@ export class PubScene extends Phaser.Scene {
         this.d.coins -= cost;
         close();
         ch.run(c);
+        this.tryDrop(0.03);
         store(this.d);
       }, D + 3);
       this.drawBtn(b, cost ? `${ch.label}\n${big(cost)} coins` : ch.label, ok, i === 0 ? 'green' : 'plum');
@@ -1126,7 +1180,7 @@ export class PubScene extends Phaser.Scene {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * (this.kl('cthulhu') ? 10 : 1) * (season ? 1 + SEASON_BONUS : 1) * this.specialMult(def.id) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (this.night ? 1 : 1 + 0.1 * this.bl('band'));
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * (this.kl('cthulhu') ? 10 : 1) * (season ? 1 + SEASON_BONUS : 1) * this.specialMult(def.id) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (this.night ? 1 : 1 + 0.1 * this.bl('band')) * (1 + this.ts().income);
   }
 
   // ---------- obchod s krígly ----------
@@ -1136,11 +1190,11 @@ export class PubScene extends Phaser.Scene {
   }
 
   private cyc(def: StationDef) {
-    return def.cycle * 0.9 ** this.kl('speed') * (this.has('aquarium') ? 0.9 : 1);
+    return def.cycle * 0.9 ** this.kl('speed') * (this.has('aquarium') ? 0.9 : 1) / (1 + this.ts().cycle);
   }
 
   private offCap() {
-    return OFFLINE_CAP + (this.kl('offline') + (this.has('cuckoo') ? 1 : 0)) * 4 * 3600;
+    return OFFLINE_CAP + (this.kl('offline') + (this.has('cuckoo') ? 1 : 0)) * 4 * 3600 + this.ts().offline * 3600;
   }
 
   /** úroveň vylepšení za kosti */
@@ -1149,7 +1203,7 @@ export class PubScene extends Phaser.Scene {
   }
 
   private boneMult() {
-    return BONE_RATE * (1 + 0.5 * this.bl('pipe'));
+    return BONE_RATE * (1 + 0.5 * this.bl('pipe')) * (1 + this.ts().bones);
   }
 
   private bonesTab(y0: number, D: number) {
@@ -1181,7 +1235,7 @@ export class PubScene extends Phaser.Scene {
 
   /** krígly za hygienu teď (se Zlatou modlou +25 %) */
   private kriglyNow() {
-    return Math.floor(kriglyFor(this.d.run) * (this.has('idol') ? 1.25 : 1));
+    return Math.floor(kriglyFor(this.d.run) * (this.has('idol') ? 1.25 : 1) * (1 + this.ts().krigly));
   }
 
   shopSub: 'up' | 'decor' | 'bones' = 'up';
@@ -1238,7 +1292,8 @@ export class PubScene extends Phaser.Scene {
 
   /** promítne vylepšení z krígel do systémů */
   private applyKup() {
-    this.ev.freq = 0.75 ** this.kl('events');
+    this.ev.freq = 0.75 ** this.kl('events') / (1 + this.ts().evfreq);
+    brewCfg.speed = 1 + this.ts().brew;
     this.views.forEach((v) => (v.cthulhu = this.kl('cthulhu') > 0));
   }
 

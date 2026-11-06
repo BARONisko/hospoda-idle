@@ -78,6 +78,11 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('pivovar: offline uvařil 3 piva', await S(p, (s) => s.brew().stock === 3));
   for (let k = 0; k < 2; k++) await S(p, (s) => s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown'));
   ok('pivovar: 2 piva vložena → úroveň 2', await S(p, (s) => s.brew().lvl === 2));
+  // 5f) talismany
+  await S(p, (s) => { const r = Math.random; Math.random = () => 0; s.tryDrop(0.5); Math.random = r; });
+  ok('talisman: nález', await S(p, (s) => Object.values(s.d.talis ?? {}).some((x) => x >= 1)));
+  await S(p, (s) => { s.d.bones = 1e9; s.openShop('talis', false); s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown'); });
+  ok('talisman: vylepšení za kosti', await S(p, (s) => Object.values(s.d.talis).some((x) => x >= 2)));
   // 6) prestiž
   await S(p, (s) => { s.d.run = 1e8; s.askPrestige(); s.prestige(); });
   await p.waitForTimeout(800);
