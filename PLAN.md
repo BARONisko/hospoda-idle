@@ -122,3 +122,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Kostlivci u stanic zrušeni (přání uživatele): práci kuchyně, sklepa a kostek dělají lidé – číšníci (looky staffK/C/D),
   všude „Číšník {n}“ / „číšník ✓“, úspěch „Číšníci u všech 4 stanic“, Kostnice „Rychlejší obsluha“, offline „číšníci
   pracovali“, stanice 2. hospody „Kostky v kobce“. Kostlivci zůstali jen jako noční hosté a Kostňák v Kostnici.
+- Žádní pracovníci u stanic (přání uživatele): v hospodě nic nenosí nikdo kromě 4 číšníků z lišty (piva). Kuchyně, sklep
+  a kostky po najmutí („Číšník …“ na kartě) jen běží samy, bez postavy; jídlo hostům se objeví samo jako dřív. Místo
+  u kostek je volné pro hosty.
