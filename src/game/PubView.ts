@@ -11,6 +11,8 @@ import { registerBubble } from './bubbleArt';
 // Jedna živá hospoda: pozadí podle dějství, vybavení, hostinský, kostlivci u stanic, hosté chodí, sedí a odcházejí.
 // Každá hospoda leží ve světě scény na vlastním místě (ox) a má vlastní kameru.
 const T = 16;
+/** střed interiéru na šířku: sloupce 1–17 (sloupec 0 je vnější zeď – byl vidět jako černý pruh vlevo) */
+const CX_ROOM = 9.5 * T;
 const DOOR = { x: PUB.door.x * T + 8, y: PUB.door.y * T + 14 };
 const TABLES = PUB.tables.slice(0, 6);
 
@@ -162,7 +164,7 @@ export class PubView {
     const zoom = zoomTo ?? w / (17 * T); // šířka interiéru (sloupce 0–16) přes celou šířku výřezu
     this.cam.setViewport(x, y, w, h).setZoom(zoom);
     const halfH = h / zoom / 2;
-    this.cam.centerOn(this.ox + 8.5 * T, Phaser.Math.Clamp(cy, halfH, 14 * T - halfH));
+    this.cam.centerOn(this.ox + CX_ROOM, Phaser.Math.Clamp(cy, halfH, 14 * T - halfH));
   }
 
   /** jako frame(), ale rámeček může být zčásti mimo obrazovku (posuvné pruhy) – kamera ukáže jen viditelnou část */
@@ -176,7 +178,7 @@ export class PubView {
       return;
     }
     this.cam.setVisible(true).setViewport(x, y0, w, y1 - y0).setZoom(zoom);
-    this.cam.centerOn(this.ox + 8.5 * T, c + ((y0 + y1) / 2 - (y + h / 2)) / zoom);
+    this.cam.centerOn(this.ox + CX_ROOM, c + ((y0 + y1) / 2 - (y + h / 2)) / zoom);
   }
 
   /** noc: potemnělá hospoda a chodí příšery */

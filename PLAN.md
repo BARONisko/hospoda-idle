@@ -93,3 +93,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   během návodu nepřijde noc (dřív mohl nový hráč začít v noci a sbírat kosti místo coins) a nezačnou události; po konci
   návodu začne celý nový den; rámeček u nákupu/kostlivce je přesně kolem tlačítka; v Menu ukazuje na skutečnou dlaždici
   Obchod (dřív na zamčenou 1. dlaždici – návod se zasekl). Bez peněz na kostlivce: „Ťukej na Pípu … 2 / 100“.
+- Hospoda vyplní celou šířku (přiblížení na šířku, střed na sloupcích 1–17): zmizel černý pruh vlevo (vnější zeď) i useknutý
+  pravý okraj; nahoře/dole se ořízne jen kousek zdi.
