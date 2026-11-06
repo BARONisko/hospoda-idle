@@ -76,4 +76,4 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Ručně se NEmíří – jen automatické házení po 2 s (ZAP/VYP), zapnuté hází i offline (max 12 h šipek). Terč z P.U.B. (makeDartboard).
   12 vylepšení terče (políčka po úrovních) + 8 do celé hry (+0,9 %/úr.: výdělek,
   spropitné, kosti, chapadla, síla v chrámu, krígly, sběrač, pivo). Do šipek: Kostnice (přesnost, rychlejší šipky), chrám (bod navíc).
-  Překlady šipek zatím anglicky ve všech jazycích kromě češtiny.
+  Šipky přeložené do všech jazyků.
