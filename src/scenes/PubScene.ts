@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { PAL } from '../data/palette';
 import { t, lang, LANGS, AVAILABLE, setLang } from '../i18n';
 import { txt } from '../ui/font';
-import { big } from '../core/num';
+import { big, dur } from '../core/num';
 import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
@@ -236,6 +236,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.shopDot = this.add.graphics().setDepth(104);
 
     this.layout();
+    this.hintObjs = [];
+    this.hintBtn = undefined;
+    this.idleS = 0;
+    if (this.hintMode === 'a') this.hintBtn = this.btn(W - 66, this.hintY() - 52, 52, 44, () => (this.hintObjs.length ? this.hideHint() : this.showHint(this.hintY(), false)), 60);
     this.daily();
     this.time.delayedCall(700, () => this.leagueCheck());
     // „Delší noc“ byla po 30 s, teď po 1 s → úrovně ×30
@@ -299,6 +303,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // ťuknutí do hospody → spropitné od hosta
     this.input.on('pointerdown', (ptr: Phaser.Input.Pointer) => {
       sfx.init();
+      this.idleS = Math.min(this.idleS, 0) < 0 ? this.idleS : 0;
       if (this.awayObjs.length || this.shopObjs.length) return; // otevřené okno
       for (const v of this.views) {
         const c = v.cam;
@@ -1368,6 +1373,124 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     store(this.d);
   }
 
+  // ---------- rádce „Co dál?“ ----------
+  /** varianta zobrazení (návrhy pro uživatele): a = tlačítko „?“, b = lišta s radou, c = hostinský sám poradí, když hráč nic nedělá */
+  hintMode = (new URLSearchParams(location.search).get('hint') ?? 'x') as 'a' | 'b' | 'c' | 'x'; // x = vypnuto, dokud uživatel nevybere
+  hintObjs: Phaser.GameObjects.GameObject[] = [];
+  hintBtn?: Btn;
+  /** sekundy bez ťuknutí (pro variantu c) */
+  idleS = 0;
+  hintT = 0;
+  hintKey = '';
+
+  /** co má hráč udělat teď: první splnitelná věc podle priorit, jinak na co šetřit */
+  advice(): { text: string; go?: () => void } {
+    const d = this.d, i = this.views.length > 1 ? this.sel : 0, p = d.pubs[i];
+    const open = (tab: PubScene['tab'], sub?: PubScene['shopSub']) => () => {
+      if (sub) this.shopSub = sub;
+      this.openShop(tab);
+    };
+    if (this.claimable()) return { text: t('Máš splněný úkol – vyzvedni odměnu v Úkolech.'), go: open('tasks') };
+    const now = Date.now();
+    if (p.mgr && !this.boosted(p) && (p.boostReady ?? 0) <= now) return { text: t('Pusť schopnost manažera „{s}“ – výdělek ×{m}.', { s: MANAGERS[p.act].skill, m: BOOST_MULT }), go: () => this.useSkill(i) };
+    for (const def of STATIONS) {
+      const st = p.st[def.id];
+      const cost = def.staff * actMult(p.act) * (1 - this.ts().staff);
+      if (st && st.lvl > 0 && !st.auto && d.coins >= cost) return { text: t('Najmi kostlivce na „{s}“ – pak pracuje sám, i když tu nejsi.', { s: STATION_NAMES[p.act][def.id] }) };
+    }
+    const off = this.shopOffer().find((o) => o.cost <= d.coins);
+    if (off) return { text: t('V Obchodě si můžeš koupit: {s}.', { s: off.title }), go: open('shop', 'up') };
+    const k = this.kriglyNow(), pm = prestigeMin(d.stats.prestiges);
+    if (k >= pm && k >= d.krigle * 0.3) return { text: t('Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.', { k: big(k), v: big(Math.round(k * KRIGL_BONUS * 100)) }), go: open('shop', 'up') };
+    if (!this.tileLock('krigl')) {
+      const it = KRIGL_SHOP.find((x) => !kMaxed(x, this.kl(x.id)) && x.cost(this.kl(x.id)) <= d.krigle);
+      if (it) return { text: t('Za krígly si můžeš koupit: {s}.', { s: it.name }), go: open('krigl') };
+    }
+    if (!this.tileLock('keeper') && this.skillPoints() > 0) return { text: t('Hostinský má volný bod – vyber dovednost.'), go: open('keeper') };
+    if (!this.tileLock('brew') && this.brewFull()) return { text: t('Pivovar je plný – prodej pivo nebo ho dej do vylepšení.'), go: open('brew') };
+    if (this.tabAlert('temple')) return { text: t('Je víkend – v Chrámu čeká Cthulhu.'), go: () => this.openTemple() };
+    // na co šetřit: nejlevnější další úroveň stanice ve vybrané hospodě
+    let best: { name: string; cost: number } | null = null;
+    for (const def of STATIONS) {
+      const lvl = p.st[def.id]?.lvl ?? 0;
+      const cost = Math.ceil(costN(def, lvl, 1) * actMult(p.act));
+      if (!best || cost < best.cost) best = { name: STATION_NAMES[p.act][def.id], cost };
+    }
+    if (best && d.coins >= best.cost) return { text: t('Kup další úroveň: {s}. Každých 25 úrovní výdělek ×2.', { s: best.name }) };
+    const rate = this.totalRate();
+    const wait = best && rate > 0 ? dur((best.cost - d.coins) / rate) : '';
+    return { text: best ? t('Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.', { s: best.name, c: big(best.cost), d: wait }) : t('Ťukej na hosty – dávají spropitné.') };
+  }
+
+  /** bublina s radou (u hostinského), ťuknutí na „Ukaž“ to rovnou otevře */
+  private showHint(y: number, auto: boolean) {
+    this.hideHint();
+    const h = this.advice();
+    const prev = this.hintKey;
+    this.hintKey = h.text;
+    const D = 300, x0 = 12, w = W - 24;
+    const face = this.add.sprite(x0 + 34, y + 62, 'player', 0).setOrigin(0.5, 1).setScale(3).setDepth(D + 2);
+    const tx = this.add.text(x0 + 70, y + 12, h.text, txt(20, PAL.ink)).setWordWrapWidth(w - 90 - (h.go ? 110 : 0)).setDepth(D + 2);
+    const hh = Math.max(76, tx.height + 24);
+    const g = this.add.graphics().setDepth(D + 1);
+    g.fillStyle(col('ink'), 0.5).fillRoundedRect(x0 + 3, y + 4, w, hh, 14);
+    g.fillStyle(col('sand')).fillRoundedRect(x0, y, w, hh, 14);
+    g.lineStyle(3, col('gold')).strokeRoundedRect(x0, y, w, hh, 14);
+    this.hintObjs.push(g, face, tx);
+    const close = this.add.zone(x0, y, w, hh).setOrigin(0).setInteractive().setDepth(D + 3);
+    close.on('pointerdown', (_p: unknown, _x: unknown, _y: unknown, ev: Phaser.Types.Input.EventData) => {
+      ev?.stopPropagation?.();
+      this.hideHint();
+    });
+    this.hintObjs.push(close);
+    if (h.go) {
+      const b = this.btn(x0 + w - 116, y + hh / 2 - 26, 104, 52, () => {
+        this.hideHint();
+        h.go!();
+      }, D + 4);
+      this.drawBtn(b, t('Ukaž'), true, 'green');
+      this.hintObjs.push(b.bg, b.label, b.zone);
+    }
+    if (h.text !== prev) this.hintObjs.forEach((o) => this.tweens.add({ targets: o, alpha: { from: 0, to: 1 }, duration: 250 }));
+    this.hintT = auto ? 9 : 12;
+  }
+
+  private hideHint() {
+    this.hintObjs.forEach((o) => o.destroy());
+    this.hintObjs = [];
+  }
+
+  /** rádce: volá se z update */
+  private hintTick(dt: number) {
+    if ((this.d.tut ?? -1) >= 0) return;
+    const busy = this.awayObjs.length || this.shopObjs.length || this.ev.active || this.sheet >= 0;
+    this.hintBtn && this.drawBtn(this.hintBtn, '?', true, 'blue', !busy);
+    if (busy) {
+      if (this.hintObjs.length) this.hideHint();
+      return;
+    }
+    if (this.hintMode === 'b') {
+      // stálá lišta s radou dole ve výhledu hospody (obnovuje se)
+      if ((this.hintT -= dt) <= 0) {
+        this.showHint(TOP + VIEW_H - 100, false);
+        this.hintT = 3;
+      }
+      return;
+    }
+    if (this.hintObjs.length && (this.hintT -= dt) <= 0) this.hideHint();
+    if (this.hintMode === 'c' && !this.hintObjs.length) {
+      this.idleS += dt;
+      if (this.idleS > 20) {
+        this.idleS = -40; // další rada nejdřív za minutu
+        this.showHint(this.hintY(), true);
+      }
+    }
+  }
+
+  private hintY() {
+    return TOP + (this.views.length > 1 ? TABH : 0) + 62;
+  }
+
   // ---------- schopnost manažera ----------
   skillBtns: Btn[] = [];
 
@@ -2288,6 +2411,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.saveT = 0;
       store(this.d);
     }
+    this.hintTick(dt);
     this.refresh();
   }
 
