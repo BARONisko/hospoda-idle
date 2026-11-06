@@ -3,7 +3,7 @@ import { PAL } from '../data/palette';
 import { t, lang, LANGS, AVAILABLE, setLang } from '../i18n';
 import { txt } from '../ui/font';
 import { big } from '../core/num';
-import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kTips, kKrigly, kMaxed } from '../core/economy';
+import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kTips, kKrigly, kMaxed } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
@@ -519,10 +519,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const many = this.d.pubs.length > 1;
     const sub = (act: number, x: string) => (many ? PUB_NAMES[act] + ' · ' + x : x);
     const acts = this.d.pubs.map((p) => p.act as number);
-    const ups: Offer[] = UPGRADES.filter((u) => acts.includes(u.act) && !this.d.up.includes(u.id))
-      .filter((u) => (this.d.pubs.find((p) => p.act === u.act)?.st[u.station]?.lvl ?? 0) > 0)
-      .filter((u) => u.tier === 1 || this.d.up.includes(`${u.act}_${u.station}_${u.tier - 1}`))
-      .map((u) => ({
+    const ups: Offer[] = this.d.pubs.flatMap((p) =>
+      STATIONS.filter((d) => (p.st[d.id]?.lvl ?? 0) > 0).map((d) => upDef(p.act, d.id, upTiers(this.d.up, p.act, d.id) + 1)),
+    ).map((u) => ({
         title: t('{s} ×{m}', { s: STATION_NAMES[u.act][u.station], m: u.mult }),
         sub: sub(u.act, t('stupeň {n}', { n: u.tier })),
         cost: u.cost,

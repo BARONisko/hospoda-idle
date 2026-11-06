@@ -1,5 +1,5 @@
 // Den a noc: přes den platí lidé coins, v noci příšery kostmi. Kosti mají vlastní vylepšení (zůstávají i po hygieně).
-import { MILESTONES } from './economy';
+import { milestoneCount } from './economy';
 
 export const DAY_MS = 8 * 60_000;
 /** noc je na začátku krátká (1 min) a vylepšením „Delší noc“ se prodlužuje o 1 s za úroveň */
@@ -8,7 +8,7 @@ export const NIGHT_STEP = 1_000;
 export const NIGHT_MAX_LVL = 420; // až 8 min
 /** Kosti v noci: každá výplata stanice dá 1 kost za každý milník, kterého stanice dosáhla (25, 50, 100, 200, …);
  *  stanice pod 25. úrovní nedá nic. Ťuknutí na hosta v noci = 1 kost. (Násobí se bonusy ke kostem.) */
-export const bonesFor = (lvl: number) => MILESTONES.filter((m) => lvl >= m).length;
+export const bonesFor = (lvl: number) => milestoneCount(lvl);
 
 const forced = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('night') : null;
 

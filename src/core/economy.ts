@@ -51,7 +51,9 @@ export function affordable(d: StationDef, lvl: number, coins: number) {
   return Math.max(0, Math.floor(Math.log((coins * (r - 1)) / (d.base * r ** lvl) + 1) / Math.log(r)));
 }
 
-export const milestoneMult = (lvl: number) => 2 ** MILESTONES.filter((m) => lvl >= m).length;
+/** počet dosažených milníků: 25, 50, 100, 200, 300, 400, 500 a dál každých 100 úrovní donekonečna */
+export const milestoneCount = (lvl: number) => MILESTONES.filter((m) => lvl >= m).length + Math.max(0, Math.floor((lvl - 500) / 100));
+export const milestoneMult = (lvl: number) => 2 ** milestoneCount(lvl);
 
 /** výdělek za cyklus */
 export const payout = (d: StationDef, lvl: number) => d.income * lvl * milestoneMult(lvl);
@@ -60,7 +62,7 @@ export const payout = (d: StationDef, lvl: number) => d.income * lvl * milestone
 export const perSec = (d: StationDef, lvl: number) => payout(d, lvl) / d.cycle;
 
 /** další milník (úroveň, kde se výdělek zdvojnásobí), nebo null */
-export const nextMilestone = (lvl: number) => MILESTONES.find((m) => lvl < m) ?? null;
+export const nextMilestone = (lvl: number): number | null => MILESTONES.find((m) => lvl < m) ?? (Math.floor(lvl / 100) + 1) * 100;
 
 /** jednorázové vylepšení z obchodu: ×3 výdělek stanice v dané hospodě */
 export interface UpgradeDef {
@@ -88,9 +90,17 @@ export const UPGRADES: UpgradeDef[] = [1, 2, 3, 4].flatMap((act) =>
   ),
 );
 
+/** vylepšení libovolného stupně (obchod jde donekonečna: každý stupeň ×3, cena ×1000) */
+export function upDef(act: number, station: string, tier: number): UpgradeDef {
+  const d = STATIONS.find((x) => x.id === station)!;
+  return { id: `${act}_${station}_${tier}`, act, station, tier, cost: d.staff * 10 * 1000 ** (tier - 1) * actMult(act), mult: 3 };
+}
+
+/** koupené stupně stanice v hospodě */
+export const upTiers = (owned: string[], act: number, station: string) => owned.filter((id) => id.startsWith(`${act}_${station}_`)).length;
+
 /** násobek výdělku stanice z koupených vylepšení */
-export const upMult = (owned: string[], act: number, station: string) =>
-  UPGRADES.reduce((m, u) => (u.act === act && u.station === station && owned.includes(u.id) ? m * u.mult : m), 1);
+export const upMult = (owned: string[], act: number, station: string) => 3 ** upTiers(owned, act, station);
 
 /** manažer hospody: schopnost „hodina“ = ×BOOST_MULT výdělek na BOOST_S, pak nabíjení BOOST_CD */
 export const MANAGERS: Record<number, { name: string; skill: string }> = {
