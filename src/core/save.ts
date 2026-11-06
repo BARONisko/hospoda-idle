@@ -46,6 +46,8 @@ export interface Save {
   /** kosti (noční měna) a jejich vylepšení – zůstávají i po hygieně */
   bones?: number;
   bup?: Record<string, number>;
+  /** Kostnice: úrovně statů koupené za kosti */
+  oss?: Record<string, number>;
   /** talismany: úrovně (0 = nemá) */
   talis?: Record<string, number>;
   /** hostinský: zkušenosti, úroveň, koupené dovednosti (zůstává i po hygieně) */

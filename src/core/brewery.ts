@@ -25,11 +25,11 @@ export const BEERS: Record<BeerKind, { name: string; time: number; value: number
 export const newBrew = (): BrewState => ({ lvl: 1, inv: 0, stock: 0, at: Date.now(), kind: 'lager' });
 
 /** zrychlení vaření z talismanů (nastavuje scéna) */
-export const brewCfg = { speed: 1 };
+export const brewCfg = { speed: 1, tank: 0 };
 /** délka jedné várky (ms): 15 min na 1. úrovni, každá úroveň o 8 % rychleji */
 export const brewMs = (b: BrewState) => (15 * 60_000 * BEERS[b.kind].time * 0.92 ** (b.lvl - 1)) / brewCfg.speed;
 /** velikost tanku */
-export const tank = (b: BrewState) => 2 + b.lvl;
+export const tank = (b: BrewState) => 2 + b.lvl + brewCfg.tank;
 /** kolik piv stojí další úroveň */
 export const lvlCost = (b: BrewState) => 2 * b.lvl;
 /** trvalý bonus k výdělku */

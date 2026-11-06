@@ -2,7 +2,9 @@
 // Každý zvedá jeden stat. Staty se sčítají ze všech talismanů (později přibudou další zdroje statů).
 import { t } from '../i18n';
 
-export type StatId = 'income' | 'tips' | 'events' | 'bones' | 'brew' | 'offline' | 'krigly' | 'skill' | 'evfreq' | 'cycle';
+export type StatId =
+  | 'income' | 'tips' | 'events' | 'bones' | 'brew' | 'offline' | 'krigly' | 'skill' | 'evfreq' | 'cycle'
+  | 'luck' | 'xp' | 'tank' | 'night' | 'guests' | 'crit' | 'staff' | 'decor' | 'daily' | 'nighttips';
 
 export const STAT_NAMES: Record<StatId, (v: number) => string> = {
   income: (v) => t('výdělek +{v} %', { v: Math.round(v * 100) }),
@@ -15,7 +17,45 @@ export const STAT_NAMES: Record<StatId, (v: number) => string> = {
   skill: (v) => t('schopnost manažera +{v} %', { v: Math.round(v * 100) }),
   evfreq: (v) => t('události častěji o {v} %', { v: Math.round(v * 100) }),
   cycle: (v) => t('stanice rychlejší o {v} %', { v: Math.round(v * 100) }),
+  luck: (v) => t('šance na talisman +{v} %', { v: Math.round(v * 100) }),
+  xp: (v) => t('XP hostinského +{v} %', { v: Math.round(v * 100) }),
+  tank: (v) => t('tank pivovaru +{v} piv', { v }),
+  night: (v) => t('noc delší o {v} %', { v: Math.round(v * 100) }),
+  guests: (v) => t('hostů +{v}', { v }),
+  crit: (v) => t('šance na dvojitý výdělek {v} %', { v: Math.round(v * 100) }),
+  staff: (v) => t('kostlivci levnější o {v} %', { v: Math.round(v * 100) }),
+  decor: (v) => t('výzdoba levnější o {v} %', { v: Math.round(v * 100) }),
+  daily: (v) => t('odměny za úkoly +{v} %', { v: Math.round(v * 100) }),
+  nighttips: (v) => t('spropitné v noci +{v} %', { v: Math.round(v * 100) }),
 };
+
+export const STAT_IDS = Object.keys(STAT_NAMES) as StatId[];
+
+/** Kostnice: každý stat jde vylepšovat za kosti (přírůstek za úroveň, případně strop) */
+export const OSSUARY: { stat: StatId; per: number; max?: number }[] = [
+  { stat: 'income', per: 0.03 },
+  { stat: 'tips', per: 0.1 },
+  { stat: 'events', per: 0.05 },
+  { stat: 'bones', per: 0.05 },
+  { stat: 'brew', per: 0.02, max: 25 },
+  { stat: 'offline', per: 0.5, max: 32 },
+  { stat: 'krigly', per: 0.02 },
+  { stat: 'skill', per: 0.05 },
+  { stat: 'evfreq', per: 0.02, max: 20 },
+  { stat: 'cycle', per: 0.01, max: 40 },
+  { stat: 'luck', per: 0.05 },
+  { stat: 'xp', per: 0.05 },
+  { stat: 'tank', per: 1, max: 20 },
+  { stat: 'night', per: 0.05, max: 10 },
+  { stat: 'guests', per: 1, max: 6 },
+  { stat: 'crit', per: 0.01, max: 50 },
+  { stat: 'staff', per: 0.03, max: 20 },
+  { stat: 'decor', per: 0.02, max: 25 },
+  { stat: 'daily', per: 0.1 },
+  { stat: 'nighttips', per: 0.1 },
+];
+/** cena další úrovně statu v Kostnici (kosti) */
+export const ossCost = (lvl: number) => Math.ceil(400 * 1.8 ** lvl);
 
 export interface TalisDef {
   id: string;
@@ -45,7 +85,7 @@ export const talisCost = (lvl: number) => Math.ceil(150 * 2.6 ** lvl);
 
 /** součet statů ze všech talismanů */
 export function stats(levels: Record<string, number> = {}): Record<StatId, number> {
-  const s = { income: 0, tips: 0, events: 0, bones: 0, brew: 0, offline: 0, krigly: 0, skill: 0, evfreq: 0, cycle: 0 };
+  const s = Object.fromEntries(STAT_IDS.map((k) => [k, 0])) as Record<StatId, number>;
   for (const d of TALISMANS) s[d.stat] += (levels[d.id] ?? 0) * d.per;
   return s;
 }

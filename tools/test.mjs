@@ -114,8 +114,8 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   await S(p, (s) => { s.d.tut = -1; s.manual(0, s.cards[0].def); });
   await p.waitForFunction(() => (game.scene.getScene('Pub').d.bones ?? 0) > 0, null, { timeout: 8000 }).catch(() => undefined);
   ok('noc: pípa vydělala kosti', await S(p, (s) => s.d.bones > 0 && s.d.coins === 0));
-  await S(p, (s) => { s.d.bones = 1e6; s.shopSub = 'bones'; s.openShop('shop', false); s.shopObjs.filter((o) => o.type === 'Zone').at(-4).emit('pointerdown'); });
-  ok('noc: vylepšení za kosti', await S(p, (s) => Object.values(s.d.bup ?? {}).some((x) => x > 0)));
+  await S(p, (s) => { s.d.bones = 1e6; s.shopSub = 'bones'; s.openShop('shop', false); s.shopObjs.filter((o) => o.type === 'Zone').find((z) => z.x === 540 - 182 && z.y > 400).emit('pointerdown'); });
+  ok('noc: Kostnice – stat za kosti', await S(p, (s) => Object.values(s.d.oss ?? {}).some((x) => x > 0) && s.ts().income > 0));
   ok('bez chyb v konzoli (noc)', p.errors.length === 0);
   await p.close();
 }

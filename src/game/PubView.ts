@@ -72,6 +72,8 @@ const LEVEL_DECOR: { id: string; lvl: number; frame: string; x: number; y: numbe
 const MGR_SPRITE: Record<number, string> = { 1: 'tapster', 2: 'count', 3: 'deep0', 4: 'yellowKing' };
 
 export class PubView {
+  /** hostů navíc (stat z Kostnice) */
+  static extraGuests = 0;
   /** probuzený Cthulhu (vylepšení z krígel) – kouká do hospody */
   cthulhu = false;
   private cth?: Phaser.GameObjects.Sprite;
@@ -287,7 +289,7 @@ export class PubView {
   update(dt: number, busy: number) {
     // hosté: čím víc otevřených stanic, tím víc lidí
     this.spawnT -= dt;
-    const want = Math.min(this.seats.length - 1, 3 + busy * 2);
+    const want = Math.min(this.seats.length - 1, 3 + busy * 2 + PubView.extraGuests);
     if (this.spawnT <= 0) {
       this.spawnT = this.rnd.realInRange(1.2, 3.5);
       if (this.guests.length < want) this.spawn();

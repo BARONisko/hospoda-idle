@@ -1,5 +1,4 @@
 // Den a noc: přes den platí lidé coins, v noci příšery kostmi. Kosti mají vlastní vylepšení (zůstávají i po hygieně).
-import { t } from '../i18n';
 
 export const DAY_MS = 8 * 60_000;
 export const NIGHT_MS = 4 * 60_000;
@@ -9,30 +8,17 @@ export const BONE_RATE = 0.0002;
 const forced = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('night') : null;
 
 /** je teď noc? (cyklus podle reálného času) */
+/** prodloužení noci (stat) – nastavuje scéna */
+export const nightCfg = { mult: 1 };
+const nightMs = () => NIGHT_MS * nightCfg.mult;
+
 export function isNight(now = Date.now()) {
   if (forced !== null) return forced === '1';
-  return now % (DAY_MS + NIGHT_MS) >= DAY_MS;
+  return now % (DAY_MS + nightMs()) >= DAY_MS;
 }
 
 /** kolik ms zbývá do změny dne/noci */
 export function phaseLeft(now = Date.now()) {
-  const p = now % (DAY_MS + NIGHT_MS);
-  return p < DAY_MS ? DAY_MS - p : DAY_MS + NIGHT_MS - p;
+  const p = now % (DAY_MS + nightMs());
+  return p < DAY_MS ? DAY_MS - p : DAY_MS + nightMs() - p;
 }
-
-export interface BoneUp {
-  id: 'pipe' | 'band' | 'grave' | 'moon';
-  name: string;
-  desc: string;
-  base: number;
-  max?: number;
-}
-
-/** vylepšení za kosti – ceny rostou ×4 za úroveň */
-export const BONE_UPS: BoneUp[] = [
-  { id: 'pipe', name: t('Kostěná pípa'), desc: t('v noci kostí +50 %'), base: 250 },
-  { id: 'band', name: t('Kostlivá kapela'), desc: t('přes den výdělek +10 %'), base: 500 },
-  { id: 'grave', name: t('Hřbitovní nábor'), desc: t('kostlivci o 15 % levnější'), base: 1000, max: 5 },
-  { id: 'moon', name: t('Měsíční svit'), desc: t('offline kostí +50 %'), base: 400 },
-];
-export const boneCost = (u: BoneUp, lvl: number) => Math.ceil(u.base * 4 ** lvl);
