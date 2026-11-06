@@ -184,6 +184,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       delete k.tips;
       this.d.kup2 = true;
     }
+    // Zlatý výčep (dřív Cthulhu ×10): starým hráčům vrátit krígly za Cthulhu podle starých cen (300·6^l) a úroveň vynulovat
+    if (!this.d.kup3) {
+      const n = this.d.kup?.cthulhu ?? 0;
+      for (let l = 0; l < n; l++) this.d.krigle += Math.ceil(300 * 6 ** l);
+      if (this.d.kup) delete this.d.kup.cthulhu;
+      this.d.kup3 = true;
+    }
     this.events.off('guestArrive');
     this.events.on('guestArrive', () => (this.d.gxp = (this.d.gxp ?? 0) + 1));
     this.events.off('guestSeen');

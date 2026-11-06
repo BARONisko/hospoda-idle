@@ -44,6 +44,8 @@ export interface Save {
   gxp?: number;
   /** obchod s krígly v2: vrácené krígly za starý Delší spánek a Štědré hosty */
   kup2?: boolean;
+  /** vrácené krígly za starý Cthulhu (×10) */
+  kup3?: boolean;
   /** koupená výzdoba (id) – zůstává i po hygieně */
   decor?: string[];
   /** pivovar (zůstává i po hygieně) */
