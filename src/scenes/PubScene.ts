@@ -168,7 +168,7 @@ export class PubScene extends Phaser.Scene {
       this.drawMode();
     }, 102);
     this.drawMode();
-    this.shopBtn = this.btn(W - 230, 16, 108, 50, () => this.openShop(), 102);
+    this.shopBtn = this.btn(W - 230, 16, 108, 50, () => this.openMenu(), 102);
     this.drawBtn(this.shopBtn, t('Menu'), true, 'plum');
     this.shopDot = this.add.graphics().setDepth(104);
 
@@ -387,6 +387,21 @@ export class PubScene extends Phaser.Scene {
 
   tab: 'shop' | 'tasks' | 'book' | 'krigl' | 'brew' | 'talis' | 'keeper' | 'league' | 'opts' = 'shop';
 
+  /** má záložka něco nového (červená tečka)? Stejná pravidla rozsvěcují tečku na tlačítku Menu. */
+  private tabAlert(id: string) {
+    if (id === 'shop') return this.shopOffer().some((u) => u.cost <= this.d.coins);
+    if (id === 'tasks') return this.claimable();
+    if (id === 'brew') return this.brewFull();
+    if (id === 'keeper') return this.skillPoints() > 0;
+    return false;
+  }
+
+  /** Menu: když někde svítí tečka, otevře rovnou tu záložku */
+  private openMenu() {
+    const hot = (['tasks', 'shop', 'keeper', 'brew'] as const).filter((id) => this.tabAlert(id));
+    this.openShop(hot.includes(this.tab as (typeof hot)[number]) || !hot.length ? this.tab : hot[0]);
+  }
+
   private openShop(tab = this.tab, toggle = true) {
     this.tut('menu');
     if (this.shopObjs.length && toggle) return this.closeShop();
@@ -419,7 +434,7 @@ export class PubScene extends Phaser.Scene {
       b.label.setScale(Math.min(1, 102 / Math.max(1, b.label.width)));
       if (id !== tab) b.label.setColor(PAL.bone);
       this.shopObjs.push(b.bg, b.label, b.zone);
-      if ((id === 'tasks' && this.claimable()) || (id === 'brew' && this.brewFull()) || (id === 'keeper' && this.skillPoints() > 0)) {
+      if (this.tabAlert(id)) {
         const dot = this.add.graphics().setDepth(D + 8);
         dot.fillStyle(col('ink')).fillCircle(b.x + b.w - 6, b.y + 4, 10).fillStyle(col('scarlet')).fillCircle(b.x + b.w - 6, b.y + 4, 7);
         this.shopObjs.push(dot);
@@ -1705,7 +1720,7 @@ export class PubScene extends Phaser.Scene {
     this.skillBtns.forEach((_, i) => this.drawSkill(i));
     this.stripRates.forEach((r, i) => r.setText(t('+{n} / s', { n: big(this.rate(this.d.pubs[i])) })));
 
-    const cheap = this.shopOffer().some((u) => u.cost <= this.d.coins) || this.claimable() || this.brewFull() || this.skillPoints() > 0;
+    const cheap = ['shop', 'tasks', 'brew', 'keeper'].some((id) => this.tabAlert(id));
     this.shopDot.clear();
     if (cheap) this.shopDot.fillStyle(col('ink')).fillCircle(W - 126, 20, 11).fillStyle(col('scarlet')).fillCircle(W - 126, 20, 8);
     for (const r of this.shopRows) this.drawBtn(r.b, big(r.o.cost), this.d.coins >= r.o.cost, 'green');
