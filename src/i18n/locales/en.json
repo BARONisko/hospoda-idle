@@ -360,5 +360,10 @@
  "V noci chodí příšery a platí kostmi – coins teď nepřibývají.": "At night monsters come and pay in bones – no coins for now.",
  "Coins se vrátí ráno. Noc trvá {m} min.": "Coins come back in the morning. The night lasts {m} min.",
  "Kosti utratíš v Obchodě (Kostnice) a za vylepšení talismanů.": "Spend bones in the Shop (Ossuary) and on talisman upgrades.",
- "Rozumím": "Got it"
+ "Rozumím": "Got it",
+ "SOUPEŘ": "RIVAL",
+ "Soupeř zrychluje každý den – a když vedeš, zabere víc.": "The rival speeds up every day – and pushes harder when you lead.",
+ "Vedeš o {n} coins – soupeř přidává!": "You lead by {n} coins – the rival is pushing!",
+ "Soupeř vede o {n} coins": "The rival leads by {n} coins",
+ "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "Your takings: {a} coins\nRival: {b} coins"
 }

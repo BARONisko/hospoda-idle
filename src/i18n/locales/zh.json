@@ -360,5 +360,10 @@
  "V noci chodí příšery a platí kostmi – coins teď nepřibývají.": "夜里怪物来访，用骨头付账——现在没有 coins。",
  "Coins se vrátí ráno. Noc trvá {m} min.": "coins 早上回来。夜晚持续 {m} 分钟。",
  "Kosti utratíš v Obchodě (Kostnice) a za vylepšení talismanů.": "骨头可在商店（骨堂）和护身符升级中使用。",
- "Rozumím": "明白了"
+ "Rozumím": "明白了",
+ "SOUPEŘ": "对手",
+ "Soupeř zrychluje každý den – a když vedeš, zabere víc.": "对手每天都在加速——你领先时它会更拼。",
+ "Vedeš o {n} coins – soupeř přidává!": "你领先 {n} coins——对手在加劲！",
+ "Soupeř vede o {n} coins": "对手领先 {n} coins",
+ "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "你的营业额: {a} coins\n对手: {b} coins"
 }

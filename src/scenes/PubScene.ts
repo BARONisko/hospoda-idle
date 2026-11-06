@@ -8,7 +8,7 @@ import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
 import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
-import { LEAGUES, LeagueState, weekStart, rivalScore, weekEnd, winReward } from '../core/league';
+import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward } from '../core/league';
 import { isNight, phaseLeft, BONE_RATE, nightCfg, NIGHT_MS } from '../core/night';
 import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
@@ -517,7 +517,7 @@ export class PubScene extends Phaser.Scene {
     if (!L || L.start !== ws) {
       let tier = L?.tier ?? 1;
       if (L) {
-        const rival = rivalScore(L, weekEnd(L));
+        const rival = rivalTick(L, weekEnd(L));
         const win = L.me > rival;
         this.leagueResult = { win, me: L.me, rival, tier };
         this.d.leagueHist = [...(this.d.leagueHist ?? []), [tier, win] as [number, boolean]].slice(-8);
@@ -527,13 +527,16 @@ export class PubScene extends Phaser.Scene {
           tier = Math.min(LEAGUES.length, tier + 1);
         } else tier = Math.max(1, tier - 1);
       }
-      L = { week: String(ws), start: ws, tier, rate: Math.max(1, this.totalRate()), me: 0 };
+      L = { week: String(ws), start: ws, tier, rate: Math.max(1, this.totalRate()), me: 0, rival: 0, rAt: ws };
       this.d.league = L;
       store(this.d);
     }
     return L;
   }
 
+  /** živé překreslení čísel v záložce Liga (nastaví leagueTab) */
+  leagueLive?: () => void;
+  leagueLiveT = 0;
   leagueResult?: { win: boolean; me: number; rival: number; tier: number };
   leagueWinDrop = false;
 
@@ -556,7 +559,7 @@ export class PubScene extends Phaser.Scene {
     objs.push(g);
     const tx = (y: number, s2: string, size: number, c: string) => objs.push(this.add.text(W / 2, y, s2, txt(size, c)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 100).setDepth(D + 2));
     tx(284, r.win ? t('Vyhrál jsi ligu!') : t('Prohrál jsi ligu…'), 34, r.win ? PAL.gold : PAL.scarlet);
-    tx(344, t('Tvoje tržba: {a} coins\nCíl týdne: {b} coins', { a: big(r.me), b: big(r.rival) }), 22, PAL.bone);
+    tx(344, t('Tvoje tržba: {a} coins\nSoupeř: {b} coins', { a: big(r.me), b: big(r.rival) }), 22, PAL.bone);
     tx(420, r.win ? t('Odměna: +{k} krígel a talisman. Postupuješ do: {l}', { k: winReward(r.tier), l: LEAGUES[Math.min(LEAGUES.length, r.tier + 1) - 1] }) : t('Sestupuješ do: {l}', { l: LEAGUES[Math.max(1, r.tier - 1) - 1] }), 22, r.win ? PAL.mint : PAL.fog);
     const ok = this.btn(W / 2 - 100, 560, 200, 60, () => {
       objs.forEach((o) => o.destroy());
@@ -571,8 +574,6 @@ export class PubScene extends Phaser.Scene {
 
   private leagueTab(y0: number, D: number) {
     const L = this.league();
-    const goal = rivalScore(L, weekEnd(L));
-    const pace = rivalScore(L);
     const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
     const g = add(this.add.graphics().setDepth(D + 1));
     // žebříček lig
@@ -593,25 +594,31 @@ export class PubScene extends Phaser.Scene {
     const left = Math.max(0, weekEnd(L) - Date.now());
     const d = Math.floor(left / 86400000), h = Math.floor((left % 86400000) / 3600000), m = Math.floor((left % 3600000) / 60000);
     add(this.add.text(W / 2, y0 + 104, t('do konce týdne: {d} d {h} h {m} min', { d, h, m }), txt(17, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2));
-    // karta: cíl týdne a moje tržba
-    const done = L.me >= goal, ahead = L.me >= pace;
+    // karta: soupeř proti mně – čísla se živě přepisují (leagueLive)
     g.fillStyle(col('ink'), 0.7).fillRoundedRect(10, y0 + 132, W - 20, 232, 14);
-    g.lineStyle(3, col(done ? 'mint' : 'amber')).strokeRoundedRect(10, y0 + 132, W - 20, 232, 14);
-    add(this.add.text(30, y0 + 146, t('CÍL TÝDNE'), txt(18, PAL.fog)).setDepth(D + 2));
-    add(this.add.text(30, y0 + 166, big(goal), txt(44, PAL.gold)).setDepth(D + 2));
+    const frame = add(this.add.graphics().setDepth(D + 1));
+    add(this.add.text(30, y0 + 146, t('SOUPEŘ'), txt(18, PAL.fog)).setDepth(D + 2));
+    const rivalT = add(this.add.text(30, y0 + 166, '', txt(44, PAL.scarlet)).setDepth(D + 2));
     add(this.add.text(W - 30, y0 + 146, t('TVOJE TRŽBA'), txt(18, PAL.fog)).setOrigin(1, 0).setDepth(D + 2));
-    add(this.add.text(W - 30, y0 + 166, big(L.me), txt(44, PAL.mint)).setOrigin(1, 0).setDepth(D + 2));
-    const bx = 30, bw = W - 60, by = y0 + 236;
-    const pMe = Math.min(1, L.me / Math.max(1, goal)), pPace = Math.min(1, pace / Math.max(1, goal));
-    g.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, 34, 10);
-    g.fillStyle(col(ahead ? 'mint' : 'amber')).fillRoundedRect(bx, by, Math.max(16, bw * pMe), 34, 10);
-    g.fillStyle(col('white')).fillRect(bx + bw * pPace - 2, by - 8, 4, 50);
-    add(this.add.text(Phaser.Math.Clamp(bx + bw * pPace, 50, W - 50), by + 44, t('tempo'), txt(16, PAL.bone)).setOrigin(0.5, 0).setDepth(D + 2));
-    // procenta světle s obrysem na pravém konci proužku – čitelná na tmavém pozadí i na výplni
-    add(this.add.text(bx + bw - 12, by + 17, `${Math.floor(pMe * 100)} %`, txt(24, PAL.white)).setOrigin(1, 0.5).setDepth(D + 3));
-    const msg = done ? t('Cíl splněn! Výhra je jistá.') : ahead ? t('Jsi před tempem – drž to!') : t('Za tempem o {n} coins', { n: big(pace - L.me) });
-    add(this.add.text(W / 2, y0 + 304, msg, txt(20, done || ahead ? PAL.mint : PAL.sand)).setOrigin(0.5, 0).setDepth(D + 2));
-    add(this.add.text(W / 2, y0 + 332, t('Počítá se vše, co tento týden vyděláš.'), txt(15, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2));
+    const meT = add(this.add.text(W - 30, y0 + 166, '', txt(44, PAL.mint)).setOrigin(1, 0).setDepth(D + 2));
+    const bar = add(this.add.graphics().setDepth(D + 2));
+    const msg = add(this.add.text(W / 2, y0 + 296, '', txt(20, PAL.mint)).setOrigin(0.5, 0).setDepth(D + 2));
+    add(this.add.text(W / 2, y0 + 326, t('Soupeř zrychluje každý den – a když vedeš, zabere víc.'), txt(15, PAL.fog)).setOrigin(0.5, 0).setWordWrapWidth(W - 60).setAlign('center').setDepth(D + 2));
+    this.leagueLive = () => {
+      const rival = rivalTick(L), lead = L.me >= rival;
+      rivalT.setText(big(rival));
+      meT.setText(big(L.me));
+      frame.clear().lineStyle(3, col(lead ? 'mint' : 'scarlet')).strokeRoundedRect(10, y0 + 132, W - 20, 232, 14);
+      // přetahovaná: vlevo podíl soupeře, vpravo můj, bílá čára = remíza
+      const bx = 30, bw = W - 60, by = y0 + 236;
+      const share = L.me + rival > 0 ? rival / (L.me + rival) : 0.5;
+      bar.clear().fillStyle(col('mint')).fillRoundedRect(bx, by, bw, 34, 10);
+      bar.fillStyle(col('scarlet')).fillRoundedRect(bx, by, Math.max(20, Math.min(bw - 20, bw * share)), 34, 10);
+      bar.fillStyle(col('white')).fillRect(bx + bw / 2 - 2, by - 8, 4, 50);
+      msg.setText(lead ? t('Vedeš o {n} coins – soupeř přidává!', { n: big(L.me - rival) }) : t('Soupeř vede o {n} coins', { n: big(rival - L.me) }));
+      msg.setColor(lead ? PAL.mint : PAL.sand);
+    };
+    this.leagueLive();
     // odměny
     g.fillStyle(col('pine'), 0.8).fillRoundedRect(10, y0 + 376, W / 2 - 15, 76, 12);
     g.fillStyle(col('blood'), 0.8).fillRoundedRect(W / 2 + 5, y0 + 376, W / 2 - 15, 76, 12);
@@ -1012,6 +1019,7 @@ export class PubScene extends Phaser.Scene {
   }
 
   private closeShop() {
+    this.leagueLive = undefined;
     this.shopObjs.forEach((o) => o.destroy());
     this.shopObjs = [];
     this.shopRows = [];
@@ -1714,6 +1722,10 @@ export class PubScene extends Phaser.Scene {
       this.night = nn;
       this.views.forEach((v) => v.setNight(nn));
       this.banner(this.views[0].cam, nn ? t('Padla noc – příšery platí kostmi!') : t('Svítá – lidé zase platí coins.'), true);
+    }
+    if (this.leagueLive && (this.leagueLiveT -= dt) <= 0) {
+      this.leagueLiveT = 0.5;
+      this.leagueLive();
     }
     if (this.tab === 'brew' && this.shopObjs.length) {
       const before = this.brew().stock;

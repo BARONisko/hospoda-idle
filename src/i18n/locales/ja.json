@@ -360,5 +360,10 @@
  "V noci chodí příšery a platí kostmi – coins teď nepřibývají.": "夜はモンスターが来て骨で払う – 今は coins が入らない。",
  "Coins se vrátí ráno. Noc trvá {m} min.": "coins は朝に戻る。夜は {m} 分続く。",
  "Kosti utratíš v Obchodě (Kostnice) a za vylepšení talismanů.": "骨はショップ（納骨堂）とお守りの強化に使える。",
- "Rozumím": "わかった"
+ "Rozumím": "わかった",
+ "SOUPEŘ": "ライバル",
+ "Soupeř zrychluje každý den – a když vedeš, zabere víc.": "ライバルは毎日加速し、あなたがリードすると本気を出す。",
+ "Vedeš o {n} coins – soupeř přidává!": "{n} coins リード – ライバルが追い上げ中！",
+ "Soupeř vede o {n} coins": "ライバルが {n} coins リード",
+ "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "あなたの売上: {a} coins\nライバル: {b} coins"
 }

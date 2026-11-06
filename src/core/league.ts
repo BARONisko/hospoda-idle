@@ -1,5 +1,6 @@
-// Týdenní liga: soupeřova hospoda je jen číselný cíl týdne (tržba), který musíš překonat.
-// Výhra = postup do vyšší ligy + krígly + talisman, prohra = sestup. Soupeř roste každý den a vyšší liga je silnější.
+// Týdenní liga: soupeřova hospoda je číslo – její tržba během týdne živě roste a na konci týdne ji musíš mít vyšší.
+// Soupeř zrychluje každý den, vyšší liga je silnější, a když vedeš, soupeř zabere víc (až +60 %).
+// Výhra = postup do vyšší ligy + krígly + talisman, prohra = sestup.
 import { t } from '../i18n';
 
 export const LEAGUES = [t('Okresní přebor'), t('Krajská liga'), t('Národní liga'), t('Pivní mistrovství'), t('Liga hlubin')];
@@ -14,6 +15,10 @@ export interface LeagueState {
   rate: number;
   /** můj výdělek tento týden */
   me: number;
+  /** tržba soupeře tento týden (roste průběžně, viz rivalTick) */
+  rival?: number;
+  /** kdy se tržba soupeře naposledy dopočítala (ms) */
+  rAt?: number;
 }
 
 const WEEK = 7 * 86400_000;
@@ -38,3 +43,24 @@ export function rivalScore(L: LeagueState, now = Date.now()) {
 
 export const weekEnd = (L: LeagueState) => L.start + WEEK;
 export const winReward = (tier: number) => 5 * tier;
+
+/** jak rychle soupeř právě vydělává (coins/s) – bez reakce na hráče */
+const rivalSpeed = (L: LeagueState, at: number) => L.rate * activity(L.tier) * GROW ** ((at - L.start) / 86400_000);
+
+/** když vedeš, soupeř zabere: +0 až +60 % podle náskoku */
+const push = (me: number, rival: number, rate: number) => (me > rival ? 1 + 0.6 * Math.min(1, (me - rival) / Math.max(rival, rate * 3600)) : 1);
+
+/** dopočítá tržbu soupeře do teď (po krocích max. 10 min, kvůli reakci na náskok) a vrátí ji */
+export function rivalTick(L: LeagueState, now = Date.now()) {
+  if (L.rival === undefined || L.rAt === undefined) {
+    L.rival = rivalScore(L, now);
+    L.rAt = Math.max(L.start, Math.min(now, weekEnd(L)));
+  }
+  const end = Math.min(now, weekEnd(L));
+  while (L.rAt < end) {
+    const dt = Math.min(600_000, end - L.rAt);
+    L.rival += rivalSpeed(L, L.rAt + dt / 2) * push(L.me, L.rival, L.rate) * (dt / 1000);
+    L.rAt += dt;
+  }
+  return L.rival;
+}

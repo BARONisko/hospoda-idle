@@ -360,5 +360,10 @@
  "V noci chodí příšery a platí kostmi – coins teď nepřibývají.": "W nocy przychodzą potwory i płacą kośćmi – teraz nie ma coins.",
  "Coins se vrátí ráno. Noc trvá {m} min.": "Coins wrócą rano. Noc trwa {m} min.",
  "Kosti utratíš v Obchodě (Kostnice) a za vylepšení talismanů.": "Kości wydasz w Sklepie (Kostnica) i na ulepszenia talizmanów.",
- "Rozumím": "Rozumiem"
+ "Rozumím": "Rozumiem",
+ "SOUPEŘ": "RYWAL",
+ "Soupeř zrychluje každý den – a když vedeš, zabere víc.": "Rywal przyspiesza każdego dnia – a gdy prowadzisz, cisnie mocniej.",
+ "Vedeš o {n} coins – soupeř přidává!": "Prowadzisz o {n} coins – rywal dociska!",
+ "Soupeř vede o {n} coins": "Rywal prowadzi o {n} coins",
+ "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "Twój utarg: {a} coins\nRywal: {b} coins"
 }

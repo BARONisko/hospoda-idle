@@ -360,5 +360,10 @@
  "V noci chodí příšery a platí kostmi – coins teď nepřibývají.": "Gece canavarlar gelir ve kemikle öder – şimdi coins yok.",
  "Coins se vrátí ráno. Noc trvá {m} min.": "Coins sabah geri gelir. Gece {m} dk sürer.",
  "Kosti utratíš v Obchodě (Kostnice) a za vylepšení talismanů.": "Kemikleri Dükkân'da (Kemikhane) ve tılsım geliştirmelerinde harca.",
- "Rozumím": "Anladım"
+ "Rozumím": "Anladım",
+ "SOUPEŘ": "RAKİP",
+ "Soupeř zrychluje každý den – a když vedeš, zabere víc.": "Rakip her gün hızlanır – önde olduğunda daha çok yüklenir.",
+ "Vedeš o {n} coins – soupeř přidává!": "{n} coins öndesin – rakip yükleniyor!",
+ "Soupeř vede o {n} coins": "Rakip {n} coins önde",
+ "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "Hasılatın: {a} coins\nRakip: {b} coins"
 }
