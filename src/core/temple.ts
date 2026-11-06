@@ -26,6 +26,8 @@ export interface TempleState {
   diff?: number;
   maxD?: number;
   lv?: Record<number, { hp: number; chests: number }>;
+  /** oltář: týdenní bonusy ke statům (platí jen do dalšího víkendu) – 3 nabídky, úrovně */
+  altar?: { wk: string; offers: string[]; lv: Record<string, number> };
   /** v pondělí: kolik shnilo a kolik kostí zachránila sůl (ukázat při příštím otevření) */
   rot?: { ten: number; bones: number };
 }
@@ -122,12 +124,12 @@ export function templeState(s: TempleState | undefined, now = Date.now()): Templ
 }
 
 /** chapadla od kultistů za dobu bez hráče (jen o víkendu) */
-export function cultIdle(s: TempleState, now = Date.now()) {
+export function cultIdle(s: TempleState, now = Date.now(), gain = 0) {
   const n = s.up.kult ?? 0;
   const h = Math.min(8, Math.max(0, now - s.idleAt) / 3.6e6);
   s.idleAt = now;
   if (!n || !isWeekend(now)) return 0;
-  const got = Math.floor(h * CULT_IDLE_PER_H * n);
+  const got = Math.floor(h * CULT_IDLE_PER_H * n * (1 + gain));
   s.ten += got;
   return got;
 }
@@ -147,6 +149,10 @@ export const TEMPLE_UPS: TempleUp[] = [
   { id: 'ward', name: t('Ochranný amulet'), desc: () => t('první útok v kole oltář nezasáhne'), cost: () => 600, max: 1 },
   { id: 'salt', name: t('Solná lázeň'), desc: (l) => t('v pondělí zachrání {v} % chapadel jako kosti', { v: l }), cost: (l) => Math.ceil(200 * 1.6 ** l), max: 10 },
 ];
+
+/** oltářní obětina: +0,9 % ke statu na týden za koupi; cena roste s každou koupí toho víkendu */
+export const ALTAR_PER = 0.009;
+export const altarCost = (n: number) => Math.ceil(300 * 1.5 ** n);
 
 /** pečeť R'lyeh za poraženého bosse: trvale + výdělek v hospodách */
 export const SEAL_BONUS = 0.1;

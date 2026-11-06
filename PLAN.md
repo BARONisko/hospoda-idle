@@ -65,3 +65,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Výjimky dané uživatelem: Zlatý výčep (+0,25×), Věrnost hostů (+5 %).
 - Bonus za krígl snížen z 2 % na 0,9 % (přání uživatele); Zlatý výčep a Věrnost hostů ponechány.
 - Kultisté v chrámu dražší: 5 000 a 20 000 chapadel (důležitý upgrade pro postup).
+- Chrám odměny: truhly vždy chapadla + často navíc kosti / krígly / trvalý stat (templeReward 'stat' → d.oss) / talisman.
+  Obchod chrámu má záložky Hned / Oltář (týden) / Napořád; Oltář: 3 náhodné procentní staty každý víkend, +0,9 %/koupi,
+  platí do dalšího víkendu (d.temple.altar), cena 300·1,5^n. Kultisté 5 000 / 20 000 (potvrzeno).
+- 10 nových statů (talisman.ts): coll, mgrcd, brawl, visit, golden, gxp, beer (Kostnice + chrám), cultgain, candlesave, weak
+  (jen chrám – TEMPLE_STATS). Efekty v PubScene/TempleScene/events.

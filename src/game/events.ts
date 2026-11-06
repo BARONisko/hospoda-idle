@@ -23,6 +23,8 @@ export interface EventHost {
   boostAll(ms: number): void;
   /** událost proběhla (pro úkoly a sbírku) */
   onEvent?(kind: EventKind, ok: boolean): void;
+  /** stat „rvačka kratší“ (0–0,7) */
+  brawlCut?(): number;
 }
 
 interface Target {
@@ -143,7 +145,7 @@ export class PubEvents {
     } else if (kind === 'brawl') {
       // rvačka trvá, dokud ji hráč nerozežene; mezitím odcházejí hosté a výdělek hospody klesá
       a.dur = Infinity;
-      const need = 10;
+      const need = Math.max(3, Math.round(10 * (1 - (this.host.brawlCut?.() ?? 0))));
       // jen na podlaze hospody (ne u horní zdi s policemi ani za barem): dlaždice x 2–17, y 6,7–12,5
       const fx0 = Math.max(x0 + 30, v.ox + 2 * 16), fx1 = Math.min(x1 - 30, v.ox + 17 * 16);
       const fy0 = Math.max(y0 + 50, 6 * 16 + 12), fy1 = Math.min(y1 - 6, 12 * 16 + 8);

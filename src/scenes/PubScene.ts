@@ -11,8 +11,8 @@ import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
 import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward } from '../core/league';
 import { isNight, phaseLeft, bonesFor, nightCfg, nightLen, nightShare, switchPhase, nightCost, nightCostN, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
 import type { TempleHost } from './TempleScene';
-import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState } from '../core/temple';
-import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER } from '../core/talisman';
+import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER } from '../core/temple';
+import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave } from '../core/save';
 import { PubView } from '../game/PubView';
@@ -195,7 +195,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.d.kup3 = true;
     }
     this.events.off('guestArrive');
-    this.events.on('guestArrive', () => (this.d.gxp = (this.d.gxp ?? 0) + 1));
+    this.events.on('guestArrive', () => (this.d.gxp = (this.d.gxp ?? 0) + 1 + this.ts().gxp));
     this.events.off('guestSeen');
     this.events.on('guestSeen', (key: string) => {
       if (!this.d.seen.includes(key)) this.d.seen.push(key);
@@ -582,16 +582,19 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return this.totalRate();
   }
 
+  brawlCut() {
+    return Math.min(0.7, this.ts().brawl);
+  }
+
   templeStats() {
-    const s = this.ts();
-    return { temple: s.temple, tentacles: s.tentacles };
+    return this.ts();
   }
 
   templeKriglyGift() {
     return Math.max(5, Math.round(this.d.krigle * 0.03));
   }
 
-  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal', n: number): string {
+  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal' | 'stat', n: number): string {
     if (kind === 'krigle') {
       this.d.krigle += n;
       return t('+{k} krígel', { k: big(n) });
@@ -599,6 +602,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (kind === 'bones') {
       this.d.bones = (this.d.bones ?? 0) + n;
       return t('+{n} kostí', { n: big(n) });
+    }
+    if (kind === 'stat') {
+      // malý trvalý bonus k náhodnému statu (z Kostnice nebo chrámu, bez přetečení stropu)
+      const pool = [...OSSUARY, ...TEMPLE_STATS].filter((o) => o.cap === undefined || ((this.d.oss?.[o.stat] ?? 0) + n) * o.per <= o.cap + 1e-9);
+      const o = Phaser.Utils.Array.GetRandom(pool);
+      (this.d.oss ??= {})[o.stat] = (this.d.oss[o.stat] ?? 0) + n;
+      this.tsCache = undefined;
+      this.applyKup();
+      return STAT_NAMES[o.stat](n * o.per);
     }
     if (kind === 'seal') return t('Pečeť R\'lyeh: výdělek všude +{v} %', { v: Math.round((this.d.temple?.boss ?? 0) * SEAL_BONUS * 100) });
     const tl = (this.d.talis ??= {});
@@ -608,6 +620,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.tsCache = undefined;
     this.applyKup();
     return tl[d.id] === 1 ? t('Nalezen talisman: {n}!', { n: d.name }) : t('{n} – úroveň {l}!', { n: d.name, l: tl[d.id] });
+  }
+
+  templeRefresh() {
+    this.tsCache = undefined;
+    this.applyKup();
   }
 
   templeSave() {
@@ -764,6 +781,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const a = stats(this.d.talis), b = skillStats(this.d.skills);
     for (const k of Object.keys(a) as (keyof typeof a)[]) a[k] += b[k];
     for (const o of OSSUARY) a[o.stat] += (this.d.oss?.[o.stat] ?? 0) * o.per;
+    // staty z chrámu: trvalé z truhel (d.oss) a týdenní z oltáře (platí jen do dalšího víkendu)
+    for (const o of TEMPLE_STATS) a[o.stat] += (this.d.oss?.[o.stat] ?? 0) * o.per;
+    const al = this.d.temple?.altar;
+    if (al && al.wk === weekendKey()) for (const [k, n] of Object.entries(al.lv)) a[k as StatId] += (n as number) * ALTAR_PER;
     this.tsCache = a;
     this.tsAt = now;
     return a;
@@ -1032,7 +1053,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.shopObjs.push(bt.bg, bt.label, bt.zone);
     });
     // prodat / vložit do pivovaru
-    const price = this.visitCtx().income(sellSecs(b));
+    const price = this.visitCtx().income(sellSecs(b) * (1 + this.ts().beer));
     const sell = this.btn(10, y0 + 310, 255, 70, () => {
       if (b.stock < 1) return sfx.error();
       b.stock--;
@@ -1072,7 +1093,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         this.banner(this.views[0].cam, t('Happy hour! Výdělek ×2 na {m} min', { m: this.happyMin() }));
       } },
       { cost: 1, label: t('Runda pro všechny\nspropitné od všech'), ok: true, run: () => {
-        const per = Math.max(1, Math.round(this.visitCtx().income(sellSecs(b)) * 0.08));
+        const per = Math.max(1, Math.round(this.visitCtx().income(sellSecs(b) * (1 + this.ts().beer)) * 0.08));
         let n = 0;
         this.views.forEach((v) => (n += v.tipAll('+' + big(per))));
         n = Math.max(n, 1);
@@ -1503,7 +1524,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const now = Date.now();
     if (!p.mgr || this.boosted(p) || (p.boostReady ?? 0) > now) return sfx.error();
     p.boostUntil = now + BOOST_S * 1000 * (this.has('sabre') ? 2 : 1) * (1 + this.ts().skill);
-    p.boostReady = now + (BOOST_S + BOOST_CD) * 1000;
+    p.boostReady = now + (BOOST_S + BOOST_CD * (1 - Math.min(0.5, this.ts().mgrcd))) * 1000;
     this.banner(this.views[i].cam, t('{s}! Výdělek ×{m}', { s: MANAGERS[p.act].skill, m: BOOST_MULT }));
     store(this.d);
   }
@@ -2006,7 +2027,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** odměna za spropitné (ťuknutí nebo sběrač): přes den coins, v noci kost */
   private tipReward(v: PubView) {
-    const tip = Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (1 + this.ts().tips + guestTips(this.d.gxp ?? 0)) * this.happyMult()));
+    // zlatý host: občas dá spropitné ×10
+    const gold = !this.night && Math.random() < Math.min(0.1, this.ts().golden);
+    const tip = (gold ? 10 : 1) * Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (1 + this.ts().tips + guestTips(this.d.gxp ?? 0)) * this.happyMult()));
     const bone = this.boneMult() * (1 + this.ts().nighttips);
     if (this.night) this.d.bones = (this.d.bones ?? 0) + bone;
     else this.gain(tip);
@@ -2014,7 +2037,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.week('tips');
     this.xp(1);
     this.task('tips', 1);
-    v.tipPop('+' + big(this.night ? bone : tip));
+    v.tipPop((gold ? t('ZLATÝ HOST! ') : '') + '+' + big(this.night ? bone : tip));
   }
 
   // ---------- sběrač bublin (číšník): každá hospoda vlastní, kupuje se a vylepšuje za kosti ----------
@@ -2030,7 +2053,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** interval sběru (s): 30 s, každá úroveň rychlosti o 1 % rychleji, nejrychleji 1,5 s */
   private collSecs(spd: number) {
-    return Math.max(1.5, 30 * 0.99 ** spd);
+    return Math.max(1.5, (30 * 0.99 ** spd) / (1 + this.ts().coll));
   }
 
   private collTick(dt: number) {
@@ -2230,7 +2253,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     OSSUARY.forEach((o, i) => {
       const lvl = this.d.oss?.[o.stat] ?? 0;
       const capped = o.cap !== undefined && (lvl + 1) * o.per > o.cap + 1e-9;
-      const x = 20 + (i % 2) * 262, y = y0 + 262 + Math.floor(i / 2) * 26;
+      const x = 20 + (i % 2) * 262, y = y0 + 260 + Math.floor(i / 2) * 23;
       const tx = add(this.add.text(x, y, STAT_NAMES[o.stat](lvl * o.per) + (capped ? ' (max)' : ''), txt(15, o.stat === this.ossLast ? PAL.gold : lvl ? PAL.mint : PAL.slate)).setDepth(D + 2));
       tx.setScale(Math.min(1, 250 / tx.width));
     });
@@ -2403,7 +2426,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.collTick(dt);
     this.visitT -= dt;
     if (this.visitT <= 0 && !this.awayObjs.length && !this.shopObjs.length && this.sheet < 0 && !this.ev.active && (this.d.tut ?? -1) < 0) {
-      this.visitT = Phaser.Math.Between(180, 360);
+      this.visitT = Phaser.Math.Between(180, 360) / (1 + this.ts().visit);
       this.visit(Phaser.Utils.Array.GetRandom(VISITORS));
     }
     this.saveT += dt;

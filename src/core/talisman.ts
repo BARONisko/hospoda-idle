@@ -4,7 +4,8 @@ import { t } from '../i18n';
 
 export type StatId =
   | 'income' | 'tips' | 'events' | 'bones' | 'brew' | 'offline' | 'krigly' | 'skill' | 'evfreq' | 'cycle'
-  | 'luck' | 'xp' | 'tank' | 'night' | 'guests' | 'crit' | 'staff' | 'decor' | 'daily' | 'nighttips' | 'temple' | 'tentacles';
+  | 'luck' | 'xp' | 'tank' | 'night' | 'guests' | 'crit' | 'staff' | 'decor' | 'daily' | 'nighttips' | 'temple' | 'tentacles'
+  | 'coll' | 'mgrcd' | 'brawl' | 'visit' | 'golden' | 'cultgain' | 'candlesave' | 'weak' | 'gxp' | 'beer';
 
 /** procenta s jedním desetinným místem (0,5 %) */
 const pct = (v: number) => String(Math.round(v * 1000) / 10).replace('.', ',');
@@ -33,6 +34,16 @@ export const STAT_NAMES: Record<StatId, (v: number) => string> = {
   nighttips: (v) => t('spropitné v noci +{v} %', { v: pct(v) }),
   temple: (v) => t('síla v chrámu +{v} %', { v: pct(v) }),
   tentacles: (v) => t('chapadla +{v} %', { v: pct(v) }),
+  coll: (v) => t('sběrač bublin rychlejší o {v} %', { v: pct(v) }),
+  mgrcd: (v) => t('schopnost manažera dřív o {v} %', { v: pct(v) }),
+  brawl: (v) => t('rvačka kratší o {v} %', { v: pct(v) }),
+  visit: (v) => t('návštěvníci častěji o {v} %', { v: pct(v) }),
+  golden: (v) => t('zlatý host (×10 spropitné) {v} %', { v: pct(v) }),
+  cultgain: (v) => t('kultisté sbírají +{v} %', { v: pct(v) }),
+  candlesave: (v) => t('svíce nezhasne {v} %', { v: pct(v) }),
+  weak: (v) => t('slabé místo Cthulhu +{v} %', { v: pct(v) }),
+  gxp: (v) => t('věrnost hostů rychleji o {v} %', { v: pct(v) }),
+  beer: (v) => t('pivo dráž o {v} %', { v: pct(v) }),
 };
 
 export const STAT_IDS = Object.keys(STAT_NAMES) as StatId[];
@@ -59,6 +70,21 @@ export const OSSUARY: { stat: StatId; per: number; cap?: number }[] = [
   { stat: 'decor', per: 0.005, cap: 0.5 },
   { stat: 'daily', per: 0.005 },
   { stat: 'nighttips', per: 0.005 },
+  { stat: 'coll', per: 0.005, cap: 0.5 },
+  { stat: 'mgrcd', per: 0.005, cap: 0.5 },
+  { stat: 'brawl', per: 0.005, cap: 0.7 },
+  { stat: 'visit', per: 0.005, cap: 1 },
+  { stat: 'golden', per: 0.005, cap: 0.1 },
+  { stat: 'gxp', per: 0.005 },
+  { stat: 'beer', per: 0.005 },
+];
+/** staty jen z chrámu (truhly, oltář) – v Kostnici nepadají */
+export const TEMPLE_STATS: { stat: StatId; per: number; cap?: number }[] = [
+  { stat: 'temple', per: 0.005 },
+  { stat: 'tentacles', per: 0.005 },
+  { stat: 'cultgain', per: 0.005 },
+  { stat: 'candlesave', per: 0.005, cap: 0.5 },
+  { stat: 'weak', per: 0.005 },
 ];
 /** cena jednoho hodu kostkou (kosti) – zdražuje se s každým hodem */
 export const rollCost = (rolls: number) => Math.ceil(60 * 1.06 ** rolls);

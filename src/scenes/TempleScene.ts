@@ -6,8 +6,9 @@ import { txt } from '../ui/font';
 import { t } from '../i18n';
 import { big } from '../core/num';
 import { sfx } from '../core/sfx';
+import { STAT_NAMES, OSSUARY, TEMPLE_STATS, type StatId } from '../core/talisman';
 import {
-  TempleState, templeState, cultIdle, isWeekend, msToSwitch, ROUNDS_PER_DAY, ROUND_S, bossHp, DIFFS, DIFF_REW, DIFF_NAMES, setDiff, tapPower, chestTen, TEMPLE_UPS, SEAL_BONUS,
+  TempleState, templeState, cultIdle, isWeekend, msToSwitch, ROUNDS_PER_DAY, ROUND_S, bossHp, DIFFS, DIFF_REW, DIFF_NAMES, setDiff, ALTAR_PER, altarCost, weekendKey, tapPower, chestTen, TEMPLE_UPS, SEAL_BONUS,
 } from '../core/temple';
 
 const W = 540, H = 960;
@@ -21,10 +22,12 @@ export interface TempleHost {
   templeData(): TempleState;
   /** výdělek coins/s (síla zásahu – jen logaritmicky) */
   templeIncome(): number;
-  templeStats(): { temple: number; tentacles: number };
+  templeStats(): Record<StatId, number>;
   /** odměny do hlavní hry; vrací text pro hlášku */
-  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal', n: number): string;
+  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal' | 'stat', n: number): string;
   templeSave(): void;
+  /** přepočítat staty (po oltáři) */
+  templeRefresh?(): void;
   /** kolik krígel dá obchod chrámu (roste s tvými krígly) */
   templeKriglyGift(): number;
   templeClose(): void;
@@ -167,7 +170,7 @@ export class TempleScene extends Phaser.Scene {
       const w = this.weak;
       this.weak = undefined;
       w.g.destroy();
-      this.hit(p.x, p.y, 5, true);
+      this.hit(p.x, p.y, 5 * (1 + this.host.templeStats().weak), true);
       return;
     }
     const b = this.cth.getBounds();
@@ -238,7 +241,13 @@ export class TempleScene extends Phaser.Scene {
       this.chestsGot++;
       const n = Math.round(chestTen(this.T.boss) * this.tenMult());
       this.addTen(n, ALTAR.x, 300);
-      this.flash(t('Truhla! +{n} chapadel', { n: big(n) }), PAL.gold);
+      // vždy chapadla, k tomu často něco navíc (kosti, krígly, trvalý stat, talisman)
+      const d = this.diff(), r = Math.random();
+      const extra = r < 0.2 ? this.host.templeReward('bones', 5 * d)
+        : r < 0.35 ? this.host.templeReward('krigle', Math.max(1, Math.round(this.kriglyGift() * 0.1 * DIFF_REW[d - 1])))
+        : r < 0.55 ? this.host.templeReward('stat', d)
+        : r < 0.62 ? this.host.templeReward('talis', 1) : '';
+      this.flash(t('Truhla! +{n} chapadel', { n: big(n) }) + (extra ? '\n' + extra : ''), PAL.gold);
     }
     if (this.T.hp <= 0) this.defeat();
   }
@@ -303,7 +312,7 @@ export class TempleScene extends Phaser.Scene {
     tn.cut = s;
     tn.state = 'retract';
     const gold = tn.hue === 1;
-    const n2 = Math.round((byCult ? 1 : 3 + this.phase()) * (gold ? 5 : 1) * this.tenMult());
+    const n2 = Math.round((byCult ? 1 + this.host.templeStats().cultgain : 3 + this.phase()) * (gold ? 5 : 1) * this.tenMult());
     this.addTen(n2, q.x, q.y - 20);
     this.damage(this.power() * (byCult ? 1 : 2) * (gold ? 3 : 1));
     sfx.hiss(0.12, 900, 0.08, 300);
@@ -335,6 +344,10 @@ export class TempleScene extends Phaser.Scene {
   }
 
   private loseCandle(x: number, y: number) {
+    if (Math.random() < Math.min(0.5, this.host.templeStats().candlesave)) {
+      this.flash(t('Svíce se nezhasla!'), PAL.gold, 900);
+      return;
+    }
     if (this.ward) {
       this.ward = false;
       this.flash(t('Amulet ochránil oltář!'), PAL.ice, 900);
@@ -536,7 +549,7 @@ export class TempleScene extends Phaser.Scene {
     this.endFightObjs();
     const T = this.T;
     const we = isWeekend();
-    const idle = we ? cultIdle(T) : (cultIdle(T), 0);
+    const idle = we ? cultIdle(T, Date.now(), this.host.templeStats().cultgain) : (cultIdle(T), 0);
     const left = msToSwitch();
     const hh = Math.floor(left / 3.6e6), dd = Math.floor(hh / 24);
     this.topBar(we ? t('Víkend v R\'lyeh · zbývá {d} d {h} h', { d: dd, h: hh % 24 }) : t('Chrám je zavřený · otevře za {d} d {h} h', { d: dd, h: hh % 24 }));
@@ -674,6 +687,34 @@ export class TempleScene extends Phaser.Scene {
   }
 
   /** obchod s chapadly */
+  shopTab: 'now' | 'altar' | 'perm' = 'now';
+
+  /** oltářní obětiny: 3 nabídky statů na tento týden (do dalšího víkendu), každá koupě +0,9 %, cena roste */
+  private altarShop(row: (title: string, sub: string, price: number, ok: boolean, label: string, fn: () => void, icon?: [string, string?], c?: keyof typeof PAL) => void, can: (c: number) => boolean) {
+    const T = this.T, wk = weekendKey();
+    if (!T.altar || T.altar.wk !== wk) {
+      const pool = [...OSSUARY, ...TEMPLE_STATS].filter((o) => o.per === 0.005).map((o) => o.stat as string); // jen procentní staty
+      Phaser.Utils.Array.Shuffle(pool);
+      T.altar = { wk, offers: pool.slice(0, 3), lv: {} };
+    }
+    const al = T.altar;
+    this.text(W / 2, 440, t('Obětiny platí jen do dalšího víkendu.\nKaždý víkend 3 jiné nabídky.'), 18, PAL.fog, 0.5).setAlign('center');
+    const bought = Object.values(al.lv).reduce((a, b) => a + b, 0);
+    const price = altarCost(bought);
+    for (const st of al.offers) {
+      const n = al.lv[st] ?? 0;
+      const name = STAT_NAMES[st as StatId];
+      row(name(ALTAR_PER), t('teď: {v} · do dalšího víkendu', { v: name(n * ALTAR_PER) }), price, can(price), '', () => {
+        T.ten -= price;
+        al.lv[st] = n + 1;
+        sfx.fanfare();
+        this.host.templeSave();
+        this.host.templeRefresh?.();
+        this.shop();
+      }, ['obj', 'candle'], 'amber');
+    }
+  }
+
   private shop() {
     this.mode = 'shop';
     this.clearUi();
@@ -684,7 +725,13 @@ export class TempleScene extends Phaser.Scene {
     shade.fillStyle(0x000000, 0.55).fillRect(0, 100, W, H - 100);
     this.ui.push(shade);
     const can = (c: number) => isWeekend() && T.ten >= c;
-    let y = 112;
+    // záložky obchodu
+    const tabs: [typeof this.shopTab, string][] = [['now', t('Hned')], ['altar', t('Oltář (týden)')], ['perm', t('Napořád')]];
+    tabs.forEach(([id, name], i) => this.button(10 + i * ((W - 20) / 3) + 3, 108, (W - 20) / 3 - 6, 52, name, this.shopTab === id ? 'red' : 'blue', true, () => {
+      this.shopTab = id;
+      this.shop();
+    }));
+    let y = 172;
     const row = (title: string, sub: string, price: number, ok: boolean, label: string, fn: () => void, icon?: [string, string?], c: keyof typeof PAL = 'green') => {
       const g = this.add.graphics().setDepth(50);
       g.fillStyle(col('dusk'), 0.95).fillRoundedRect(10, y, W - 20, 78, 10);
@@ -701,12 +748,15 @@ export class TempleScene extends Phaser.Scene {
       this.button(W - 150, y + 10, 128, 56, label || t('{n}\nchapadel', { n: big(price) }), c, ok, fn);
       y += 84;
     };
-    this.text(20, y, t('HNED'), 22, PAL.gold); y += 28;
+    if (this.shopTab === 'altar') return this.altarShop(row, can);
+    if (this.shopTab === 'now') {
     const tc = Math.ceil(600 * 1.5 ** (T.up.talb ?? 0));
     row(t('Talisman hlubin'), t('Modla z R\'lyeh nebo Mušle hlubin (+1 úroveň)'), tc, can(tc), '', () => { T.ten -= tc; T.up.talb = (T.up.talb ?? 0) + 1; this.toast(this.host.templeReward('talis', 1)); this.shop(); }, ['obj', 'dIdol1']);
     row(t('Krígly'), t('+{n} krígel', { n: big(this.kriglyGift()) }), 400, can(400), '', () => { T.ten -= 400; this.toast(this.host.templeReward('krigle', this.kriglyGift())); this.shop(); }, ['obj', 'krigl0']);
     row(t('Kosti'), t('+30 kostí do Kostnice a na talismany'), 250, can(250), '', () => { T.ten -= 250; this.toast(this.host.templeReward('bones', 30)); this.shop(); }, ['obj', 'dSkulls']);
-    this.text(20, y, t('NAPOŘÁD (pro všechny další víkendy)'), 22, PAL.ice); y += 28;
+    }
+    if (this.shopTab === 'perm') {
+    this.text(20, y, t('Platí napořád, i další víkendy'), 20, PAL.ice); y += 28;
     for (const u of TEMPLE_UPS) {
       const lvl = T.up[u.id] ?? 0;
       const max = u.max !== undefined && lvl >= u.max;
@@ -721,6 +771,7 @@ export class TempleScene extends Phaser.Scene {
         this.host.templeSave();
         this.shop();
       }, ic ? [ic[0], ic[1] === '0' ? undefined : ic[1]] : undefined, 'plum');
+    }
     }
     if (!isWeekend()) this.text(W / 2, y + 4, t('Nakupovat jde jen o víkendu.'), 20, PAL.scarlet, 0.5);
   }
