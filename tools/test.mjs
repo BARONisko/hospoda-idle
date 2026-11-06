@@ -70,11 +70,15 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     }, k);
     ok(`návštěvník ${k + 1}: volba proběhne`, r);
   }
+  // 5d) výzdoba
+  await S(p, (s) => { s.d.coins = 1e16; s.shopSub = 'decor'; s.openShop('shop', false); s.decorRows[0].b.zone.emit('pointerdown'); });
+  ok('výzdoba: koupě portrétu', await S(p, (s) => s.has('portrait')));
   // 6) prestiž
   await S(p, (s) => { s.d.run = 1e8; s.askPrestige(); s.prestige(); });
   await p.waitForTimeout(800);
   ok('prestiž: 2 hospody a krígly', await S(p, (s) => s.d.pubs.length === 2 && s.d.krigle >= 31 && s.views.length === 2));
   ok('prestiž: startovní kapitál a věrní manažeři', await S(p, (s) => s.d.coins >= 1000 && s.d.pubs[0].mgr === true));
+  ok('prestiž: výzdoba zůstala', await S(p, (s) => s.has('portrait')));
   ok('bez chyb v konzoli', p.errors.length === 0);
   if (p.errors.length) console.log(p.errors);
   await p.close();

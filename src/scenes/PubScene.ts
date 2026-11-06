@@ -3,7 +3,7 @@ import { PAL } from '../data/palette';
 import { t, lang, LANGS, AVAILABLE, setLang } from '../i18n';
 import { txt } from '../ui/font';
 import { big } from '../core/num';
-import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN, KRIGL_SHOP, KriglItem, startCoins } from '../core/economy';
+import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN, KRIGL_SHOP, KriglItem, startCoins, DECOR } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
@@ -161,7 +161,7 @@ export class PubScene extends Phaser.Scene {
       views: this.views,
       reward: (secs, view) => {
         const p = this.d.pubs[view];
-        const n = Math.max(10, Math.round(Math.max(this.rate(p), this.pay(p, STATIONS[0]) / STATIONS[0].cycle) * secs));
+        const n = Math.max(10, Math.round(Math.max(this.rate(p), this.pay(p, STATIONS[0]) / STATIONS[0].cycle) * secs * (this.has('piano') ? 2 : 1)));
         this.gain(n);
         return n;
       },
@@ -182,6 +182,7 @@ export class PubScene extends Phaser.Scene {
     const evq = new URLSearchParams(location.search).get('ev') as EventKind | null;
     if (evq && EVENT_KINDS.includes(evq)) this.time.delayedCall(800, () => this.ev.start(evq, 0));
     this.applyKup();
+    this.views.forEach((v) => v.showDecor(DECOR.filter((x) => this.has(x.id))));
     this.time.delayedCall(600, () => this.askSpecial());
     const vq = new URLSearchParams(location.search).get('visit');
     if (vq !== null) this.time.delayedCall(900, () => this.visit(VISITORS[Number(vq) % VISITORS.length]));
@@ -198,7 +199,7 @@ export class PubScene extends Phaser.Scene {
         const wp = c.getWorldPoint(ptr.x, ptr.y);
         if (this.ev.tap(this.views.indexOf(v), wp.x, wp.y)) return;
         if (v.tap(wp.x, wp.y)) {
-          const tip = Math.max(1, Math.round(this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])));
+          const tip = Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1)));
           this.gain(tip);
           this.d.stats.tips++;
           this.task('tips', 1);
@@ -345,6 +346,7 @@ export class PubScene extends Phaser.Scene {
     if (this.shopObjs.length && toggle) return this.closeShop();
     this.closeShop();
     this.closeSheet();
+    this.tutObjs.forEach((o) => (o as unknown as Phaser.GameObjects.Components.Visible).setVisible(false));
     this.tab = tab;
     const D = 300, RH = 96;
     const y0 = H - 6 * RH - 74;
@@ -390,16 +392,28 @@ export class PubScene extends Phaser.Scene {
   private row(y: number, h: number, D: number, title: string, sub: string, boxCol: keyof typeof PAL = 'ink', titleCol: string = PAL.bone) {
     const box = this.add.graphics().setDepth(D + 1);
     box.fillStyle(col(boxCol), boxCol === 'ink' ? 0.6 : 0.7).fillRoundedRect(10, y, W - 20, h - 8, 10);
-    const name = this.add.text(26, y + 8, title, txt(h > 85 ? 26 : 22, titleCol)).setDepth(D + 1);
-    name.setScale(Math.min(1, 300 / name.width));
-    const st = this.add.text(26, y + (h > 85 ? 46 : 40), sub, txt(18, PAL.fog)).setDepth(D + 1);
-    st.setScale(Math.min(1, 300 / st.width));
+    const name = this.add.text(26, y + (h < 70 ? 5 : 8), title, txt(h > 85 ? 26 : 22, titleCol)).setDepth(D + 1);
+    name.setScale(Math.min(1, (h < 70 ? 240 : 300) / name.width));
+    const st = this.add.text(26, y + (h > 85 ? 46 : h < 70 ? 33 : 40), sub, txt(h < 70 ? 16 : 18, PAL.fog)).setDepth(D + 1);
+    st.setScale(Math.min(1, (h < 70 ? 240 : 300) / st.width));
     this.shopObjs.push(box, name, st);
   }
 
   private shopTab(y0: number, D: number, RH: number) {
-    const offer = this.shopOffer();
-    const k = kriglyFor(this.d.run);
+    // přepínač Vylepšení / Výzdoba
+    ([['up', t('Vylepšení')], ['decor', t('Výzdoba')]] as const).forEach(([id, label], i) => {
+      const b = this.btn(10 + i * 260, y0 - 4, 250, 40, () => {
+        this.shopSub = id;
+        this.openShop('shop', false);
+      }, D + 5);
+      this.drawBtn(b, label, true, this.shopSub === id ? 'gold' : 'slate');
+      if (this.shopSub !== id) b.label.setColor(PAL.bone);
+      this.shopObjs.push(b.bg, b.label, b.zone);
+    });
+    y0 += 48;
+    if (this.shopSub === 'decor') return this.decorTab(y0, D);
+    const offer = this.shopOffer().slice(0, 4);
+    const k = this.kriglyNow();
     this.row(y0, RH, D, t('Zavolat hygienu'), t('krígly: {k} (+{b} % výdělek)', { k: this.d.krigle, b: Math.round(this.d.krigle * KRIGL_BONUS * 100) }), 'blood', PAL.sand);
     const pb = this.btn(W - 212, y0 + 12, 190, 62, () => this.askPrestige(), D + 2);
     this.drawBtn(pb, k >= PRESTIGE_MIN ? t('+{k} krígel', { k }) : t('{k} / {m} krígel', { k, m: PRESTIGE_MIN }), k >= PRESTIGE_MIN, 'red');
@@ -524,6 +538,8 @@ export class PubScene extends Phaser.Scene {
     this.shopObjs.forEach((o) => o.destroy());
     this.shopObjs = [];
     this.shopRows = [];
+    this.decorRows = [];
+    this.tutObjs.forEach((o) => (o as unknown as Phaser.GameObjects.Components.Visible).setVisible(true));
   }
 
   private buyUp(u: UpgradeDef) {
@@ -560,7 +576,7 @@ export class PubScene extends Phaser.Scene {
     const p = this.d.pubs[i];
     const now = Date.now();
     if (!p.mgr || this.boosted(p) || (p.boostReady ?? 0) > now) return sfx.error();
-    p.boostUntil = now + BOOST_S * 1000;
+    p.boostUntil = now + BOOST_S * 1000 * (this.has('sabre') ? 2 : 1);
     p.boostReady = now + (BOOST_S + BOOST_CD) * 1000;
     this.banner(this.views[i].cam, t('{s}! Výdělek ×{m}', { s: MANAGERS[p.act].skill, m: BOOST_MULT }));
     store(this.d);
@@ -680,7 +696,7 @@ export class PubScene extends Phaser.Scene {
 
   // ---------- prestiž: hygiena ----------
   private askPrestige() {
-    const k = kriglyFor(this.d.run);
+    const k = this.kriglyNow();
     if (k < PRESTIGE_MIN) return sfx.error();
     this.closeShop();
     const D = 520;
@@ -715,7 +731,7 @@ export class PubScene extends Phaser.Scene {
   }
 
   private prestige() {
-    const k = kriglyFor(this.d.run);
+    const k = this.kriglyNow();
     const n = Math.min(MAX_PUBS, this.d.pubs.length + 1);
     this.d.krigle += k;
     this.d.stats.prestiges++;
@@ -1005,7 +1021,7 @@ export class PubScene extends Phaser.Scene {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * (this.kl('cthulhu') ? 10 : 1) * (season ? 1 + SEASON_BONUS : 1) * this.specialMult(def.id);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * (this.kl('cthulhu') ? 10 : 1) * (season ? 1 + SEASON_BONUS : 1) * this.specialMult(def.id) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0));
   }
 
   // ---------- obchod s krígly ----------
@@ -1015,12 +1031,47 @@ export class PubScene extends Phaser.Scene {
   }
 
   private cyc(def: StationDef) {
-    return def.cycle * 0.9 ** this.kl('speed');
+    return def.cycle * 0.9 ** this.kl('speed') * (this.has('aquarium') ? 0.9 : 1);
   }
 
   private offCap() {
-    return OFFLINE_CAP + this.kl('offline') * 4 * 3600;
+    return OFFLINE_CAP + (this.kl('offline') + (this.has('cuckoo') ? 1 : 0)) * 4 * 3600;
   }
+
+  /** koupená výzdoba */
+  private has(id: string) {
+    return !!this.d.decor?.includes(id);
+  }
+
+  /** krígly za hygienu teď (se Zlatou modlou +25 %) */
+  private kriglyNow() {
+    return Math.floor(kriglyFor(this.d.run) * (this.has('idol') ? 1.25 : 1));
+  }
+
+  shopSub: 'up' | 'decor' = 'up';
+
+  private decorTab(y0: number, D: number) {
+    const RH = 67;
+    DECOR.forEach((it, i) => {
+      const y = y0 + i * RH;
+      const own = this.has(it.id);
+      this.row(y, RH, D, it.name, it.desc, own ? 'pine' : 'ink');
+      this.shopObjs.push(this.add.image(W - 232, y + 50, 'obj', it.frame).setOrigin(0.5, 1).setScale(1.6).setDepth(D + 2));
+      const b = this.btn(W - 192, y + 6, 170, 48, () => {
+        if (own || this.d.coins < it.cost) return sfx.error();
+        this.d.coins -= it.cost;
+        (this.d.decor ??= []).push(it.id);
+        this.views.forEach((v) => v.showDecor(DECOR.filter((x) => this.has(x.id))));
+        this.banner(this.views[0].cam, t('{s}! {d}', { s: it.name, d: it.desc }));
+        store(this.d);
+        this.openShop('shop', false);
+      }, D + 2);
+      this.drawBtn(b, own ? '✓' : big(it.cost), !own && this.d.coins >= it.cost, 'amber');
+      this.shopObjs.push(b.bg, b.label, b.zone);
+      if (!own) this.decorRows.push({ cost: it.cost, b });
+    });
+  }
+  decorRows: { cost: number; b: Btn }[] = [];
 
   private kriglTab(y0: number, D: number) {
     const RH = 86;
@@ -1123,6 +1174,7 @@ export class PubScene extends Phaser.Scene {
     this.shopDot.clear();
     if (cheap) this.shopDot.fillStyle(col('ink')).fillCircle(W - 126, 20, 11).fillStyle(col('scarlet')).fillCircle(W - 126, 20, 8);
     for (const r of this.shopRows) this.drawBtn(r.b, big(r.o.cost), this.d.coins >= r.o.cost, 'green');
+    for (const r of this.decorRows) this.drawBtn(r.b, big(r.cost), this.d.coins >= r.cost, 'amber');
 
     for (const c of this.cards) {
       const p = this.d.pubs[c.pub];

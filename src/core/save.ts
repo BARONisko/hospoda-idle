@@ -40,6 +40,8 @@ export interface Save {
   kup?: Record<string, number>;
   /** denní specialita {den, id} */
   special?: { day: string; id: string };
+  /** koupená výzdoba (id) – zůstává i po hygieně */
+  decor?: string[];
   /** krok návodu pro nového hráče (-1 = hotovo) */
   tut?: number;
   /** bestiář: viděné druhy hostů */

@@ -125,3 +125,25 @@ export const KRIGL_SHOP: KriglItem[] = [
 ];
 /** startovní coins po hygieně podle úrovně „Startovní kapitál“ */
 export const startCoins = (lvl: number) => (lvl ? 1000 * 100 ** (lvl - 1) : 0);
+
+/** výzdoba: extrémně drahé předměty za coins s trvalým bonusem (zůstanou i po hygieně) */
+export interface DecorItem {
+  id: string;
+  name: string;
+  desc: string;
+  cost: number;
+  frame: string;
+  /** místo v hospodě (dlaždice) */
+  x: number;
+  y: number;
+}
+export const DECOR: DecorItem[] = [
+  { id: 'portrait', name: t('Portrét zakladatele'), desc: t('výdělek +10 %'), cost: 1e8, frame: 'dPortrait', x: 5.5, y: 1.9 },
+  { id: 'boar', name: t('Kančí hlava'), desc: t('spropitné ×3'), cost: 1e9, frame: 'dBoar', x: 7.5, y: 1.9 },
+  { id: 'cuckoo', name: t('Kukačky'), desc: t('výdělek offline o 4 h déle'), cost: 1e10, frame: 'dCuckoo', x: 9.5, y: 1.9 },
+  { id: 'piano', name: t('Klavír'), desc: t('odměny z událostí ×2'), cost: 1e11, frame: 'piano', x: 1.2, y: 9.2 },
+  { id: 'aquarium', name: t('Akvárium'), desc: t('všechny cykly o 10 % kratší'), cost: 1e12, frame: 'aquarium', x: 16, y: 6.8 },
+  { id: 'fireplace', name: t('Krb'), desc: t('výdělek +25 %'), cost: 1e13, frame: 'fireplace', x: 16, y: 10.4 },
+  { id: 'sabre', name: t('Husarská šavle'), desc: t('schopnost manažera trvá 2× déle'), cost: 1e14, frame: 'dSabre', x: 12.5, y: 1.9 },
+  { id: 'idol', name: t('Zlatá modla'), desc: t('krígly z hygieny +25 %'), cost: 1e15, frame: 'dIdol0', x: 14.2, y: 3.1 },
+];

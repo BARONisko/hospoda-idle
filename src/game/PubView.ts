@@ -165,6 +165,20 @@ export class PubView {
     this.cam.centerOn(this.ox + 8.5 * T, c + ((y0 + y1) / 2 - (y + h / 2)) / zoom);
   }
 
+  /** výzdoba z obchodu (snímek, místo v dlaždicích) */
+  showDecor(items: { id: string; frame: string; x: number; y: number }[]) {
+    for (const it of items) {
+      const k = 'deco_' + it.id;
+      if (this.decor[k]) continue;
+      const x = this.ox + it.x * T, y = it.y * T;
+      const o = this.s.add.image(x, y, 'obj', it.frame).setOrigin(0.5, 1).setDepth(y);
+      this.decor[k] = o;
+      this.objs.push(o);
+      this.s.events.emit('pubObj', o);
+      this.s.tweens.add({ targets: o, scale: { from: 2, to: 1 }, duration: 500, ease: 'Back.out' });
+    }
+  }
+
   /** stanice se otevřela/najala obsluhu → ukázat vybavení a kostlivce */
   refresh() {
     if (this.pub.mgr && !this.mgr) {
