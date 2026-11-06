@@ -119,3 +119,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Na Pípě už není kostlivec: tlačítko „Číšníci 50“ najme Frantu a Jarku (pípa pak točí sama, oni roznášejí); 3. a 4.
   číšník na liště za coins, vylepšení dál za body ze zkušeností. Návod/rádce mluví o číšnících. Migrace wv2: dosavadní
   číšníci prodáni – vráceny coins za najmutí, vylepšení (staré ceny), kostlivce na pípě a piva na baru; hráč je koupí znovu.
+- Kostlivci u stanic zrušeni (přání uživatele): práci kuchyně, sklepa a kostek dělají lidé – číšníci (looky staffK/C/D),
+  všude „Číšník {n}“ / „číšník ✓“, úspěch „Číšníci u všech 4 stanic“, Kostnice „Rychlejší obsluha“, offline „číšníci
+  pracovali“, stanice 2. hospody „Kostky v kobce“. Kostlivci zůstali jen jako noční hosté a Kostňák v Kostnici.

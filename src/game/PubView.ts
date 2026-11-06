@@ -9,7 +9,7 @@ import { season, SEASONS } from '../core/season';
 import { registerBubble } from './bubbleArt';
 import { WAITERS } from '../core/waiters';
 
-// Jedna živá hospoda: pozadí podle dějství, vybavení, hostinský, kostlivci u stanic, hosté chodí, sedí a odcházejí.
+// Jedna živá hospoda: pozadí podle dějství, vybavení, hostinský, číšníci u stanic, hosté chodí, sedí a odcházejí.
 // Každá hospoda leží ve světě scény na vlastním místě (ox) a má vlastní kameru.
 const T = 16;
 /** střed interiéru na šířku: sloupce 1–17 (sloupec 0 je vnější zeď – byl vidět jako černý pruh vlevo) */
@@ -77,6 +77,9 @@ const LEVEL_DECOR: { id: string; lvl: number; frame: string; x: number; y: numbe
   { id: 'dice', lvl: 100, frame: 'jukebox0', x: 10 * T + 8, y: 13 * T + 8 }, // u spodní zdi (dřív stál ve dveřích)
 ];
 
+/** číšníci u stanic (dřív kostlivci) */
+const STAFF_KEY: Record<string, string> = { kitchen: 'staffK', cellar: 'staffC', dice: 'staffD' };
+
 /** kde číšníci čekají před barem a kudy chodí mezi stoly */
 const WAIT_HOME = [
   { x: 4.5 * T, y: 6 * T + 2 },
@@ -138,7 +141,7 @@ export class PubView {
       this.seats.push({ x: tb.x * T - 8, y: tb.y * T + 12, flip: false, aisle, taken: false });
       this.seats.push({ x: tb.x * T + 40, y: tb.y * T + 12, flip: true, aisle, taken: false });
     }
-    // kostky: rezervované místo pro kostlivce s kostkami
+    // kostky: rezervované místo pro číšníka s kostkami
     this.seats.find((st) => st.x === SPOT.dice.x && st.y === SPOT.dice.y)!.taken = true;
     this.keeper = add(s.add.sprite(ox + SPOT.tap.x, SPOT.tap.y, pub.act === 3 ? 'zabak' : pub.act === 4 ? 'cultist4' : 'player', 0).setOrigin(0.5, 1).setDepth(SPOT.tap.y));
     // hospoda je už rozjetá: pár hostů sedí hned od začátku
@@ -214,7 +217,7 @@ export class PubView {
     this.s.tweens.add({ targets: this.dark, fillAlpha: on ? 0.55 : 0, duration: 1500 });
   }
 
-  /** kostlivec u stanice nestojí jako socha: přejde kousek vedle, chvíli „pracuje“ (ruce nahoře) a zase zpátky */
+  /** číšník u stanice nestojí jako socha: přejde kousek vedle, chvíli „pracuje“ (ruce nahoře) a zase zpátky */
   private staffWork(spr: Phaser.GameObjects.Sprite, x0: number) {
     const step = () => {
       if (!spr.active) return;
@@ -241,7 +244,7 @@ export class PubView {
     this.s.time.delayedCall(this.rnd.between(500, 2500), step);
   }
 
-  /** kostlivec obsluhy jde po bodech (relativně k hospodě), na konci zavolá done */
+  /** číšník u stanice jde po bodech (relativně k hospodě), na konci zavolá done */
   private staffPath(spr: Phaser.GameObjects.Sprite, pts: { x: number; y: number }[], done: () => void) {
     const p = pts.shift();
     if (!p || !spr.active) return done();
@@ -263,7 +266,7 @@ export class PubView {
     });
   }
 
-  /** obsluha má smysl: kuchař-kostlivec donese jídlo sedícímu hostovi, sklepník přinese sud k pípě */
+  /** obsluha má smysl: číšník z kuchyně donese jídlo sedícímu hostovi, sklepník přinese sud k pípě */
   private staffTrip(id: string) {
     const spr = this.staff[id];
     if (!spr?.active || spr.getData('busy') || !this.cam.visible) return;
@@ -329,7 +332,7 @@ export class PubView {
     }
   }
 
-  /** stanice se otevřela/najala obsluhu → ukázat vybavení a kostlivce */
+  /** stanice se otevřela/najala obsluhu → ukázat vybavení a číšníky */
   refresh() {
     if (this.pub.mgr && !this.mgr) {
       const x = this.ox + 8 * T, y = 4 * T + 10;
@@ -370,7 +373,7 @@ export class PubView {
       const on = id === 'dice' ? (st[id]?.lvl ?? 0) > 0 : !!st[id]?.auto;
       if (on && !this.staff[id]) {
         const p = SPOT[id];
-        const spr = this.s.add.sprite(this.ox + p.x, p.y, 'skeleton', id === 'dice' ? 12 : 4).setOrigin(0.5, 1).setDepth(p.y + 1);
+        const spr = this.s.add.sprite(this.ox + p.x, p.y, STAFF_KEY[id], id === 'dice' ? 12 : 4).setOrigin(0.5, 1).setDepth(p.y + 1);
         this.objs.push(spr);
         this.staff[id] = spr;
         this.s.events.emit('pubObj', spr);
@@ -603,7 +606,7 @@ export class PubView {
     // hostinský: při čepování ruce nahoře
     this.pourT -= dt;
     this.keeper.setFrame(this.pourT > 0 ? 13 : 0);
-    // kostlivec s kostkami pohupuje
+    // číšník s kostkami sedí
     const dice = this.staff.dice;
     if (dice) dice.setFrame(12);
   }

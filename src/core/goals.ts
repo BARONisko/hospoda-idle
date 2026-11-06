@@ -58,7 +58,7 @@ const maxLvl = (d: Save) => Math.max(0, ...d.pubs.flatMap((p) => Object.values(p
 export const ACHIEVEMENTS: AchDef[] = [
   ...[1e3, 1e6, 1e9, 1e12].map((n, i) => ({ id: `earn${i}`, text: t('Vydělej celkem {n} coins', { n: ['1K', '1M', '1B', '1T'][i] }), done: (d: Save) => d.earned >= n })),
   ...[25, 100, 200].map((n) => ({ id: `lvl${n}`, text: t('Stanice na úrovni {n}', { n }), done: (d: Save) => maxLvl(d) >= n })),
-  { id: 'staff4', text: t('Kostlivci u všech 4 stanic'), done: (d: Save) => d.pubs.some((p) => ['tap', 'kitchen', 'cellar', 'dice'].every((k) => p.st[k]?.auto)) },
+  { id: 'staff4', text: t('Číšníci u všech 4 stanic'), done: (d: Save) => d.pubs.some((p) => ['tap', 'kitchen', 'cellar', 'dice'].every((k) => p.st[k]?.auto)) },
   ...[100, 1000].map((n) => ({ id: `tips${n}`, text: t('Spropitné od {n} hostů', { n }), done: (d: Save) => d.stats.tips >= n })),
   ...[10, 50].map((n) => ({ id: `ev${n}`, text: t('Zvládni {n} událostí', { n }), done: (d: Save) => d.stats.events >= n })),
   ...[2, 3].map((n) => ({ id: `pubs${n}`, text: t('Měj {n} hospody', { n }), done: (d: Save) => d.pubs.length >= n })),

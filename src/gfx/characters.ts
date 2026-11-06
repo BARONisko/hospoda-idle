@@ -613,6 +613,22 @@ export const LOOKS: Record<string, Look> = {
     shirt: 'sky', shirtShade: 'blue', pants: 'ink', pantsShade: 'ink', shoes: 'ink',
     apron: true, longHair: true, beard: 'none', hat: 'cap', hatColor: 'scarlet', hatShade: 'red',
   },
+  // číšníci u stanic (místo kostlivců): kuchyně, sklep, kostky
+  staffK: {
+    skin: 'skin', skinShade: 'ochre', hair: 'ink', hairShade: 'ink',
+    shirt: 'white', shirtShade: 'bone', pants: 'ink', pantsShade: 'ink', shoes: 'ink',
+    apron: true, beard: 'mustache', hat: 'beanie', hatColor: 'white', hatShade: 'bone',
+  },
+  staffC: {
+    skin: 'tan', skinShade: 'mauve', hair: 'rust', hairShade: 'blood',
+    shirt: 'white', shirtShade: 'bone', pants: 'olive', pantsShade: 'ink', shoes: 'ink',
+    vest: 'olive', beard: 'full', hat: null,
+  },
+  staffD: {
+    skin: 'skin', skinShade: 'tan', hair: 'ink', hairShade: 'ink',
+    shirt: 'white', shirtShade: 'bone', pants: 'ink', pantsShade: 'ink', shoes: 'ink',
+    vest: 'plum', longHair: true, lips: true, beard: 'none', hat: null,
+  },
   cleaner: {
     skin: 'skin', skinShade: 'ochre', hair: 'fog', hairShade: 'slate',
     shirt: 'sky', shirtShade: 'blue', pants: 'sky', pantsShade: 'blue', shoes: 'bone',
