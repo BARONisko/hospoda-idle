@@ -1142,6 +1142,7 @@ export class PubScene extends Phaser.Scene {
   private tutShow() {
     this.tutObjs.forEach((o) => o.destroy());
     this.tutObjs = [];
+    this.tutFollow = null;
     const i = this.d.tut ?? -1;
     if (i < 0 || this.views.length > 1) return;
     const step = PubScene.TUT[i];
@@ -1150,7 +1151,6 @@ export class PubScene extends Phaser.Scene {
     let tx = 0, ty = 0;
     if (step.done === 'tap') [tx, ty] = [160, card('tap').y + 30];
     else if (step.done === 'buy:tap') [tx, ty] = [card('tap').buy.x + 95, card('tap').buy.y];
-    else if (step.done === 'tip') [tx, ty] = [W / 2, TOP + 230];
     else if (step.done === 'hire') [tx, ty] = [card('tap').staff.x + 95, card('tap').staff.y];
     else if (step.done === 'buy:kitchen') [tx, ty] = [card('kitchen').buy.x + 95, card('kitchen').buy.y];
     else [tx, ty] = [this.shopBtn.x + 54, this.shopBtn.y + 50];
@@ -1160,15 +1160,29 @@ export class PubScene extends Phaser.Scene {
     g.fillStyle(col('ink'), 0.5).fillRoundedRect(W / 2 - bub.width / 2 - 16, TOP + 10, bub.width + 32, bub.height + 16, 12);
     g.fillStyle(col('sand')).fillRoundedRect(W / 2 - bub.width / 2 - 18, TOP + 6, bub.width + 36, bub.height + 16, 12);
     const up = step.done === 'menu';
-    const arrow = this.add.graphics().setDepth(D + 2).setPosition(tx, up ? ty + 30 : ty - 30);
+    // šipka v kontejneru: kontejner jde za cílem (u hosta každý snímek), šipka v něm houpe
+    const holder = this.add.container(tx, ty).setDepth(D + 2);
+    const arrow = this.add.graphics().setPosition(0, up ? 30 : -30);
+    holder.add(arrow);
     const tri = (gr: Phaser.GameObjects.Graphics, c: number, grow: number) =>
       gr.fillStyle(c).fillTriangle(-22 - grow, -14 - grow, 22 + grow, -14 - grow, 0, 22 + grow).fillRect(-9 - grow, -40 - grow, 18 + grow * 2, 28);
     tri(arrow, col('ink'), 4);
     tri(arrow, col('gold'), 0);
     if (up) arrow.setAngle(180);
     this.tweens.add({ targets: arrow, y: arrow.y + (up ? -10 : 10), yoyo: true, repeat: -1, duration: 380, ease: 'Sine.inOut' });
-    this.tutObjs.push(g, bub, arrow);
+    this.tutObjs.push(g, bub, holder);
+    if (step.done === 'tip') {
+      this.tutFollow = () => {
+        const p = this.views[0]?.tipTarget();
+        arrow.setVisible(!!p);
+        if (p) holder.setPosition(p.x, p.y - 4);
+      };
+      this.tutFollow();
+    }
   }
+
+  /** u kroku „ťukni na hosta“ šipka sleduje hosta (volá se z update) */
+  private tutFollow: (() => void) | null = null;
 
   private drawMode() {
     this.drawBtn(this.modeBtn, this.mode ? `×${this.mode}` : 'MAX', true, 'amber');
@@ -1592,6 +1606,7 @@ export class PubScene extends Phaser.Scene {
 
   update(_t: number, dms: number) {
     const dt = Math.min(dms / 1000, 0.25);
+    this.tutFollow?.();
     this.coinT -= dt;
     this.d.pubs.forEach((p, i) => {
       let open = 0;

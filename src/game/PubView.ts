@@ -280,6 +280,15 @@ export class PubView {
     return false;
   }
 
+  /** kam na obrazovce ukázat návodem „ťukni na hosta“: hlava sedícího hosta, který ještě nedal spropitné */
+  tipTarget(): { x: number; y: number } | null {
+    const g = this.guests.find((q) => !q.tipped && !q.leaving && !q.path.length) ?? this.guests.find((q) => !q.tipped && !q.leaving);
+    if (!g || !this.cam.visible) return null;
+    const b = g.spr.getBounds();
+    const v = this.cam.worldView;
+    return { x: this.cam.x + (b.centerX - v.x) * this.cam.zoom, y: this.cam.y + (b.top - v.y) * this.cam.zoom };
+  }
+
   tipPop(text: string) {
     // poslední trefený host
     const g = [...this.guests].reverse().find((q) => q.tipped);
