@@ -512,5 +512,7 @@
  "Věrnost hostů": "손님 충성도",
  "spánek {h} (max 12 h)": "수면 {h} (최대 12시간)",
  "spropitné +{v} % (max)": "팁 +{v} % (최대)",
- "spropitné +{v} % · příchody {a} / {b}": "팁 +{v} % · 방문 {a} / {b}"
+ "spropitné +{v} % · příchody {a} / {b}": "팁 +{v} % · 방문 {a} / {b}",
+ "Odemčena obtížnost {d}!": "난이도 {d} 해금!",
+ "Obtížnost (víc životů a nástrah, odměny ×{r})": "난이도 (체력·함정 증가, 보상 ×{r})"
 }

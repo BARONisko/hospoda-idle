@@ -22,6 +22,10 @@ export interface TempleState {
   idleAt: number;
   /** statistiky */
   best?: number;
+  /** zvolená obtížnost 1–5, nejvyšší odemčená, uložené životy a truhly ostatních obtížností */
+  diff?: number;
+  maxD?: number;
+  lv?: Record<number, { hp: number; chests: number }>;
   /** v pondělí: kolik shnilo a kolik kostí zachránila sůl (ukázat při příštím otevření) */
   rot?: { ten: number; bones: number };
 }
@@ -61,11 +65,27 @@ export function msToSwitch(now = Date.now()) {
 }
 
 export const ROUNDS_PER_DAY = 5;
-export const ROUND_S = 60;
+export const ROUND_S = 45;
 export const MAX_CULT = 2;
 
-/** životy bosse (v bodech zásahu): roste s každým poraženým */
-export const bossHp = (boss: number) => Math.round(30000 * 1.7 ** boss);
+/** 5 obtížností: víc životů, víc chapadel a nástrah, ale i víc odměn (chapadla, truhly, krígly) */
+export const DIFFS = 5;
+export const DIFF_HP = [1, 3, 8, 20, 50];
+export const DIFF_REW = [1, 1.6, 2.5, 4, 6];
+export const DIFF_NAMES = ['I', 'II', 'III', 'IV', 'V'];
+
+/** životy bosse (v bodech zásahu): podle obtížnosti, mírně roste s každým poraženým */
+export const bossHp = (boss: number, diff = 1) => Math.round(30000 * 1.15 ** boss * DIFF_HP[diff - 1]);
+
+/** přepnout obtížnost: životy a truhly té minulé se uloží, nová pokračuje tam, kde hráč skončil */
+export function setDiff(s: TempleState, d: number) {
+  const lv = (s.lv ??= {});
+  lv[s.diff ?? 1] = { hp: s.hp, chests: s.chests };
+  const n = lv[d] ?? { hp: 1, chests: 0 };
+  s.diff = d;
+  s.hp = n.hp;
+  s.chests = n.chests;
+}
 
 /** síla zásahu: hospody pomáhají jen logaritmicky (10× výdělek ≈ +15 % síly), hlavně vylepšení chrámu */
 export function tapPower(incomePerSec: number, knife: number, templeStat: number) {
@@ -91,6 +111,7 @@ export function templeState(s: TempleState | undefined, now = Date.now()): Templ
     s.wk = wk;
     s.hp = 1;
     s.chests = 0;
+    s.lv = {};
     s.idleAt = now;
   }
   if (s.day !== todayKey(now)) {

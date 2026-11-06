@@ -512,5 +512,7 @@
  "Věrnost hostů": "Fidélité des clients",
  "spánek {h} (max 12 h)": "sommeil {h} (max 12 h)",
  "spropitné +{v} % (max)": "pourboires +{v} % (max)",
- "spropitné +{v} % · příchody {a} / {b}": "pourboires +{v} % · visites {a} / {b}"
+ "spropitné +{v} % · příchody {a} / {b}": "pourboires +{v} % · visites {a} / {b}",
+ "Odemčena obtížnost {d}!": "Difficulté {d} débloquée !",
+ "Obtížnost (víc životů a nástrah, odměny ×{r})": "Difficulté (plus de PV et de pièges, récompenses ×{r})"
 }

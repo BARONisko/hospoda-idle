@@ -512,5 +512,7 @@
  "Věrnost hostů": "客の忠誠度",
  "spánek {h} (max 12 h)": "睡眠 {h}（最大12時間）",
  "spropitné +{v} % (max)": "チップ +{v} %（最大）",
- "spropitné +{v} % · příchody {a} / {b}": "チップ +{v} % · 来店 {a} / {b}"
+ "spropitné +{v} % · příchody {a} / {b}": "チップ +{v} % · 来店 {a} / {b}",
+ "Odemčena obtížnost {d}!": "難易度 {d} 解放！",
+ "Obtížnost (víc životů a nástrah, odměny ×{r})": "難易度（HPと罠が増加、報酬 ×{r}）"
 }

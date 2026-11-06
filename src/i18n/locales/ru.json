@@ -512,5 +512,7 @@
  "Věrnost hostů": "Верность гостей",
  "spánek {h} (max 12 h)": "сон {h} (макс. 12 ч)",
  "spropitné +{v} % (max)": "чаевые +{v} % (макс.)",
- "spropitné +{v} % · příchody {a} / {b}": "чаевые +{v} % · визиты {a} / {b}"
+ "spropitné +{v} % · příchody {a} / {b}": "чаевые +{v} % · визиты {a} / {b}",
+ "Odemčena obtížnost {d}!": "Открыта сложность {d}!",
+ "Obtížnost (víc životů a nástrah, odměny ×{r})": "Сложность (больше HP и ловушек, награды ×{r})"
 }

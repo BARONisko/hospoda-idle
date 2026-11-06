@@ -512,5 +512,7 @@
  "Věrnost hostů": "Misafir sadakati",
  "spánek {h} (max 12 h)": "uyku {h} (en fazla 12 sa)",
  "spropitné +{v} % (max)": "bahşiş +{v} % (en fazla)",
- "spropitné +{v} % · příchody {a} / {b}": "bahşiş +{v} % · ziyaret {a} / {b}"
+ "spropitné +{v} % · příchody {a} / {b}": "bahşiş +{v} % · ziyaret {a} / {b}",
+ "Odemčena obtížnost {d}!": "Zorluk {d} açıldı!",
+ "Obtížnost (víc životů a nástrah, odměny ×{r})": "Zorluk (daha çok can ve tuzak, ödül ×{r})"
 }
