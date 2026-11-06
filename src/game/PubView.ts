@@ -6,6 +6,7 @@ import { txt } from '../ui/font';
 import { big } from '../core/num';
 import type { PubState } from '../core/save';
 import { season, SEASONS } from '../core/season';
+import { registerBubble } from './bubbleArt';
 
 // Jedna živá hospoda: pozadí podle dějství, vybavení, hostinský, kostlivci u stanic, hosté chodí, sedí a odcházejí.
 // Každá hospoda leží ve světě scény na vlastním místě (ox) a má vlastní kameru.
@@ -353,15 +354,24 @@ export class PubView {
         // nejdřív si objedná (bublina nad hlavou), pak mu přinesou pivo nebo jídlo
         const food = (g.spr.x * 7 + g.spr.y) % 3 === 0;
         if (!g.order && !g.mug && g.sat < 0.2) {
-          const bx = sp.x, by = sp.y - 18;
-          const b = this.s.add.image(bx, by, 'obj', 'bubble').setOrigin(0.5, 1).setDepth(sp.y + 50);
-          const ic = this.s.add.image(bx, by - 6, 'obj', food ? FOOD[this.pub.act] : 'mug').setOrigin(0.5, 0.5).setScale(0.6).setDepth(sp.y + 51);
+          registerBubble(this.s);
+          const bx = sp.x + 1, by = sp.y - 15;
+          const b = this.s.add.image(bx, by, 'orderBubble').setOrigin(0.3, 1).setDepth(sp.y + 50);
+          const ic = this.s.add.image(bx + 4, by - 11, 'obj', food ? FOOD[this.pub.act] : 'mug').setOrigin(0.5, 0.5).setDepth(sp.y + 51);
+          // ikona v celé velikosti, jen větší jídlo se zmenší na polovinu (celé pixely, žádné rozmazání)
+          if (ic.width > 14 || ic.height > 12) ic.setScale(0.5);
           g.order = [b, ic];
           g.order.forEach((o) => {
             this.objs.push(o);
             this.s.events.emit('pubObj', o);
           });
-          this.s.tweens.add({ targets: g.order, y: '-=2', yoyo: true, repeat: -1, duration: 300 });
+          // vyskočí a pak se pomalu pohupuje
+          b.setScale(0);
+          const icS = ic.scale;
+          ic.setScale(0);
+          this.s.tweens.add({ targets: b, scale: 1, duration: 220, ease: 'Back.out' });
+          this.s.tweens.add({ targets: ic, scale: icS, duration: 220, delay: 60, ease: 'Back.out' });
+          this.s.tweens.add({ targets: g.order, y: '-=2', yoyo: true, repeat: -1, duration: 700, delay: 250, ease: 'Sine.inOut' });
         }
         if (!g.mug && g.sat > 2.5) {
           g.order?.forEach((o) => o.destroy());
