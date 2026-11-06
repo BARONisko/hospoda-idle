@@ -141,7 +141,7 @@ export interface TempleUp {
   max?: number;
 }
 export const TEMPLE_UPS: TempleUp[] = [
-  { id: 'kult', name: t('Kultista'), desc: () => t('přijde hned, seká chapadla v každé události a sbírá i bez tebe'), cost: (l) => [500, 1500][l] ?? 0, max: MAX_CULT },
+  { id: 'kult', name: t('Kultista'), desc: () => t('přijde hned, seká chapadla v každé události a sbírá i bez tebe'), cost: (l) => [5000, 20000][l] ?? 0, max: MAX_CULT },
   { id: 'knife', name: t('Obětní dýka'), desc: (l) => t('síla zásahu +{v} %', { v: String(Math.round(9 * l) / 10).replace('.', ',') }), cost: (l) => Math.ceil(150 * 1.5 ** l) },
   { id: 'candle', name: t('Svíce navíc'), desc: (l) => t('svící na oltáři: {n}', { n: 3 + l }), cost: (l) => Math.ceil(400 * 2.5 ** l), max: 3 },
   { id: 'ward', name: t('Ochranný amulet'), desc: () => t('první útok v kole oltář nezasáhne'), cost: () => 600, max: 1 },

@@ -64,3 +64,4 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   pivovar (bonus, rychlost vaření, cena piva) 0,9 %/úr., krígly: Rychlejší kostlivci −0,9 %/úr., Hlubší sklep +0,9 %, chrám: Obětní dýka +0,9 %.
   Výjimky dané uživatelem: Zlatý výčep (+0,25×), Věrnost hostů (+5 %).
 - Bonus za krígl snížen z 2 % na 0,9 % (přání uživatele); Zlatý výčep a Věrnost hostů ponechány.
+- Kultisté v chrámu dražší: 5 000 a 20 000 chapadel (důležitý upgrade pro postup).
