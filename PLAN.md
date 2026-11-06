@@ -89,3 +89,7 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   terči i v obchodě); bez něj se hází ťuknutím na terč (míří se samo), offline nic. Dosavadní hráči automat dostali (darts v3).
 - Návod: nový hráč začíná s 6 coins (hned koupí 2. úroveň pípy); u ťukání na pípu je zvýrazněná přesně levá část karty,
   šipka nad ní a pulzující kruhy s nápisem „ŤUKNI SEM“ přímo na pruhu karty.
+- Návod opraven podle průchodu „slabšího hráče“ (tools/tutwalk.mjs – ťuká doprostřed zvýrazněného místa, snímek každého kroku):
+  během návodu nepřijde noc (dřív mohl nový hráč začít v noci a sbírat kosti místo coins) a nezačnou události; po konci
+  návodu začne celý nový den; rámeček u nákupu/kostlivce je přesně kolem tlačítka; v Menu ukazuje na skutečnou dlaždici
+  Obchod (dřív na zamčenou 1. dlaždici – návod se zasekl). Bez peněz na kostlivce: „Ťukej na Pípu … 2 / 100“.

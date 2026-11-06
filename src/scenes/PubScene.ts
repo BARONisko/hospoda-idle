@@ -9,7 +9,7 @@ import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
 import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
 import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward } from '../core/league';
-import { isNight, phaseLeft, bonesFor, nightCfg, nightLen, nightShare, switchPhase, nightCost, nightCostN, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
+import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, nightLen, nightShare, switchPhase, nightCost, nightCostN, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
 import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts } from '../core/darts';
 import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER } from '../core/temple';
@@ -295,7 +295,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const evq = new URLSearchParams(location.search).get('ev') as EventKind | null;
     if (evq && EVENT_KINDS.includes(evq)) this.time.delayedCall(800, () => this.ev.start(evq, 0));
     this.applyKup();
-    this.night = isNight();
+    this.night = this.nightNow();
     this.views.forEach((v) => v.setNight(this.night));
     this.views.forEach((v) => v.showDecor(DECOR.filter((x) => this.has(x.id))));
     const vq = new URLSearchParams(location.search).get('visit');
@@ -1774,6 +1774,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const i = this.d.tut ?? -1;
     if (i < 0 || PubScene.TUT[i].done !== ev) return;
     this.d.tut = i + 1 >= PubScene.TUT.length ? -1 : i + 1;
+    // konec návodu: začne celý nový den (noc s kostmi přijde až za 8 min)
+    if (this.d.tut < 0) {
+      const dn = (this.d.dn ??= { lvl: 0, v2: true });
+      nightCfg.shift = dn.shift ?? 0;
+      dn.shift = switchPhase(false);
+    }
     this.tutShow();
   }
 
@@ -1788,6 +1794,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       return;
     }
     this.tutBub = null;
+    this.tutRect = null;
     this.tutObjs.forEach((o) => o.destroy());
     this.tutObjs = [];
     this.tutFollow = null;
@@ -1804,6 +1811,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (need > 0) text = tapManual
       ? t('Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.', { c: Math.floor(this.d.coins), n: need })
       : t('Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).', { c: Math.floor(this.d.coins), n: need });
+    // dlaždice Obchod v mřížce Menu (stejný výpočet jako menuGrid)
+    const menuY0 = H - 6 * 96 - 126, tw = (W - 40) / 3, th = 118;
+    const si = PubScene.TILES.findIndex(([tb, sub]) => tb === 'shop' && sub === 'up');
+    const shopTile = [10 + (si % 3) * (tw + 10), menuY0 + 64 + Math.floor(si / 3) * (th + 8), tw, th];
     let tx = 0, ty = 0;
     // ťukání na pípu: šipka nad kartou, zvýrazněná přesně levá část karty (kde se ťuká)
     const tapHere = (need > 0 && tapManual) || step.done === 'tap';
@@ -1811,8 +1822,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     else if (step.done === 'buy:tap') [tx, ty] = [card('tap').buy.x + 95, card('tap').buy.y];
     else if (step.done === 'hire') [tx, ty] = [card('tap').staff.x + 95, card('tap').staff.y];
     else if (step.done === 'buy:kitchen') [tx, ty] = [card('kitchen').buy.x + 95, card('kitchen').buy.y];
-    else if (step.done === 'tile:shop') [tx, ty] = [10 + (W - 40) / 6, H - 6 * 96 - 126 + 64];
-    else if (step.done === 'close') [tx, ty] = [W - 36, H - 6 * 96 - 126 + 10];
+    else if (step.done === 'tile:shop') [tx, ty] = [shopTile[0] + shopTile[2] / 2, shopTile[1]];
+    else if (step.done === 'close') [tx, ty] = [W - 36, menuY0 + 10];
     else [tx, ty] = [this.shopBtn.x + 54, this.shopBtn.y + 50];
     const D = 420;
     // ztmavení okolí: světlý zůstane jen cíl (u hosta ne – ten se hýbe)
@@ -1820,12 +1831,23 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const [hw, hh] = step.done === 'tile:shop' ? [180, 126] : step.done === 'close' ? [66, 54] : [260, 96];
       let [hx, hy] = step.done === 'menu' ? [this.shopBtn.x - 6, this.shopBtn.y - 6] : [tx - hw / 2, ty - 6];
       let [w2, h2] = step.done === 'menu' ? [120, 62] : [hw, hh];
+      if (step.done === 'tile:shop') [hx, hy, w2, h2] = [shopTile[0] - 4, shopTile[1] - 4, shopTile[2] + 8, shopTile[3] + 8];
+      if (step.done === 'close') [hx, hy, w2, h2] = [W - 68, menuY0 + 4, 64, 54];
+      // nákup / kostlivec: rámeček přesně kolem tlačítka
+      if (step.done === 'buy:tap' || step.done === 'buy:kitchen') {
+        const b = card(step.done.slice(4)).buy;
+        [hx, hy, w2, h2] = [b.x - 6, b.y - 6, b.w + 12, b.h + 12];
+      } else if (step.done === 'hire') {
+        const b = card('tap').staff;
+        [hx, hy, w2, h2] = [b.x - 6, b.y - 6, b.w + 12, b.h + 12];
+      }
       // bez peněz: světlá celá karta (vlevo ťukání, vpravo nákup), ať je vidět obojí
       if (tapHere && need <= 0) [hx, hy, w2, h2] = [6, card('tap').y - 4, 308, CARD_H];
       if (need > 0) {
         const cy = card(tapManual ? 'tap' : step.done === 'buy:kitchen' ? 'kitchen' : 'tap').y;
         [hx, hy, w2, h2] = [6, cy - 4, W - 12, CARD_H];
       }
+      this.tutRect = [hx, hy, w2, h2];
       const dim = this.add.graphics().setDepth(D - 1);
       dim.fillStyle(0x000000, 0.6);
       dim.fillRect(0, 0, W, hy).fillRect(0, hy + h2, W, H - hy - h2).fillRect(0, hy, hx, h2).fillRect(hx + w2, hy, W - hx - w2, h2);
@@ -1873,9 +1895,16 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     }
   }
 
+  /** noc (příšery platí kostmi) – během návodu nikdy, ať nový hráč vydělává coins */
+  private nightNow() {
+    return (this.d.tut ?? -1) < 0 && isNight();
+  }
+
   /** u kroku „ťukni na hosta“ šipka sleduje hosta (volá se z update) */
   private tutFollow: (() => void) | null = null;
   private tutPoor = false;
+  /** zvýrazněné místo návodu (x, y, š, v) – i pro automatický test */
+  tutRect: number[] | null = null;
   private tutBub: Phaser.GameObjects.Text | null = null;
   private tutCoins = -1;
 
@@ -2540,7 +2569,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       }
       this.views[i].update(dt, open);
     });
-    this.ev.update(dt);
+    // během návodu nezačínají události (rvačka, žáby…) – nový hráč by nevěděl, co dělat
+    if ((this.d.tut ?? -1) < 0 || this.ev.active) this.ev.update(dt);
     // první noc: jednou vysvětlit, že teď místo coins chodí kosti (až nebude otevřené jiné okno)
     if (this.night && !this.d.nightInfo && !this.awayObjs.length) this.nightIntro();
     if (this.d.pubIntro && !this.awayObjs.length) this.pubIntro(this.d.pubIntro);
@@ -2548,7 +2578,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.menuT = 2;
       this.menuUnlocks();
     }
-    const nn = isNight();
+    const nn = this.nightNow();
     if (nn !== this.night) {
       this.night = nn;
       this.views.forEach((v) => v.setNight(nn));
@@ -2594,7 +2624,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.coinsText.setScale(Math.min(1, 226 / this.coinsText.width));
     this.rateText.setText(this.night ? t('+{n} kostí / s', { n: this.bonesPerSec() < 1 ? this.bonesPerSec().toFixed(2) : big(this.bonesPerSec()) }) : t('+{n} / s', { n: big(total) }));
     this.rateText.setColor(this.night ? PAL.ice : PAL.mint).setScale(Math.min(1, 220 / this.rateText.width));
-    const left = Math.ceil(phaseLeft() / 1000);
+    // během návodu noc nepřijde – čas dne stojí
+    const left = Math.ceil(((this.d.tut ?? -1) >= 0 ? DAY_MS : phaseLeft()) / 1000);
     this.infoText.setText(
       `${this.night ? t('Noc') : t('Den')} ${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}  ·  ${t('kosti: {n}', { n: big(this.d.bones ?? 0) })}` +
         (season ? `  ·  ${SEASONS[season].name} +${SEASON_BONUS * 100} %` : ''),
