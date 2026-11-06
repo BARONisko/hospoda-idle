@@ -507,5 +507,10 @@
  "síla v chrámu +{v} %": "temple power +{v} %",
  "chapadla +{v} %": "tentacles +{v} %",
  "Modla z R'lyeh": "Idol of R'lyeh",
- "Mušle hlubin": "Shell of the Deep"
+ "Mušle hlubin": "Shell of the Deep",
+ "Zlatý výčep": "Golden Taproom",
+ "Věrnost hostů": "Guest Loyalty",
+ "spánek {h} (max 12 h)": "sleep {h} (max 12 h)",
+ "spropitné +{v} % (max)": "tips +{v} % (max)",
+ "spropitné +{v} % · příchody {a} / {b}": "tips +{v} % · visits {a} / {b}"
 }

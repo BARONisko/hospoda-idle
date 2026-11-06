@@ -3,7 +3,7 @@ import { PAL } from '../data/palette';
 import { t, lang, LANGS, AVAILABLE, setLang } from '../i18n';
 import { txt } from '../ui/font';
 import { big } from '../core/num';
-import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kTips, kKrigly, kMaxed } from '../core/economy';
+import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
@@ -175,6 +175,17 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       p.st = { tap: { lvl: 10, auto: true, prog: 0.1 }, kitchen: { lvl: 5, auto: true, prog: 0.3 }, cellar: { lvl: 2, auto: false, prog: 0 }, dice: { lvl: 1, auto: false, prog: 0 } };
       this.d.pubs.push(p);
     }
+    // obchod s krígly v2: Delší spánek je teď po 30 s a Štědré hosty nahradila věrnost hostů → vrátit utracené krígly
+    if (!this.d.kup2) {
+      const k = this.d.kup ?? {};
+      const back = (n: number, f: (l: number) => number) => Array.from({ length: n }, (_, l) => f(l)).reduce((a, b) => a + b, 0);
+      this.d.krigle += back(k.offline ?? 0, (l) => Math.ceil(10 * 2 ** l)) + back(k.tips ?? 0, (l) => Math.ceil(20 * 2 ** l));
+      delete k.offline;
+      delete k.tips;
+      this.d.kup2 = true;
+    }
+    this.events.off('guestArrive');
+    this.events.on('guestArrive', () => (this.d.gxp = (this.d.gxp ?? 0) + 1));
     this.events.off('guestSeen');
     this.events.on('guestSeen', (key: string) => {
       if (!this.d.seen.includes(key)) this.d.seen.push(key);
@@ -364,7 +375,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       objs.push(this.add.text(W / 2, y, s, txt(size, c)).setOrigin(0.5).setAlign('center').setDepth(D + 2));
     tx(by + 44, t('Zatímco jsi byl pryč…'), 30, PAL.gold);
     tx(by + 96, t('kostlivci točili {d}', { d: dur }), 22, PAL.fog);
-    if (capped) tx(by + 126, t('(víc než {h} h se nepočítá)', { h: this.offCap() / 3600 }), 18, PAL.fog);
+    if (capped) tx(by + 126, t('(víc než {h} h se nepočítá)', { h: String(Math.round(this.offCap() / 360) / 10).replace('.', ',') }), 18, PAL.fog);
     const amt = this.add.text(0, by + 190, `+${big(g)}`, txt(44, PAL.gold)).setOrigin(0, 0.5).setDepth(D + 2);
     const x0 = W / 2 - (amt.width + 46) / 2;
     amt.setX(x0 + 46);
@@ -591,6 +602,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   templeClose() {
     this.scene.stop('Temple');
     this.input.enabled = true;
+    this.applyKup();
     this.menuUnlocks();
   }
 
@@ -1843,7 +1855,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   private offCap() {
-    return OFFLINE_CAP + (kOffline(this.kl('offline')) + (this.has('cuckoo') ? 4 : 0)) * 3600 + this.ts().offline * 3600;
+    return Math.min(OFFLINE_MAX_H * 3600, OFFLINE_CAP + (kOffline(this.kl('offline')) + (this.has('cuckoo') ? 4 : 0)) * 3600 + this.ts().offline * 3600);
   }
 
   /** úroveň vylepšení za kosti */
@@ -1858,7 +1870,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** odměna za spropitné (ťuknutí nebo sběrač): přes den coins, v noci kost */
   private tipReward(v: PubView) {
-    const tip = Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (1 + this.ts().tips + kTips(this.kl('tips'))) * this.happyMult()));
+    const tip = Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (1 + this.ts().tips + guestTips(this.d.gxp ?? 0)) * this.happyMult()));
     const bone = this.boneMult() * (1 + this.ts().nighttips);
     if (this.night) this.d.bones = (this.d.bones ?? 0) + bone;
     else this.gain(tip);
@@ -2148,12 +2160,16 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         this.applyKup();
         sfx.fanfare();
         store(this.d);
-        if (it.id === 'cthulhu') this.views.forEach((v) => v.refresh());
         this.openShop('krigl', false);
       }, D + 2);
       this.drawBtn(b, max ? '✓' : t('{k} krígel', { k: big(price) }), !max && this.d.krigle >= price, 'amber');
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
+    // věrnost hostů: roste sama příchody hostů (nekupuje se)
+    const g = guestLvl(this.d.gxp ?? 0);
+    const gy = y0 + 44 + KRIGL_SHOP.length * RH2;
+    const gsub = g.lvl >= GUEST_MAX ? t('spropitné +{v} % (max)', { v: g.lvl * 5 }) : t('spropitné +{v} % · příchody {a} / {b}', { v: g.lvl * 5, a: big(g.xp), b: big(g.need) });
+    this.row(gy, RH2, D, `${t('Věrnost hostů')} ${t('úr.')} ${g.lvl}/${GUEST_MAX}`, gsub, 'pine');
   }
 
   /** promítne vylepšení z krígel do systémů */
@@ -2165,7 +2181,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     nightCfg.lvl = this.d.dn?.lvl ?? 0;
     nightCfg.shift = this.d.dn?.shift ?? 0;
     PubView.extraGuests = Math.floor(this.ts().guests);
-    this.views.forEach((v) => (v.cthulhu = this.kl('cthulhu') > 0));
+    // Cthulhu kouká do hospod, když v chrámu padl 1. boss
+    const cth = (this.d.temple?.boss ?? 0) > 0;
+    this.views.forEach((v) => {
+      if (v.cthulhu === cth) return;
+      v.cthulhu = cth;
+      v.refresh();
+    });
   }
 
   private gain(n: number) {

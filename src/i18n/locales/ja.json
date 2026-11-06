@@ -507,5 +507,10 @@
  "síla v chrámu +{v} %": "神殿での力 +{v} %",
  "chapadla +{v} %": "触手 +{v} %",
  "Modla z R'lyeh": "ルルイエの偶像",
- "Mušle hlubin": "深淵の貝"
+ "Mušle hlubin": "深淵の貝",
+ "Zlatý výčep": "黄金のビールサーバー",
+ "Věrnost hostů": "客の忠誠度",
+ "spánek {h} (max 12 h)": "睡眠 {h}（最大12時間）",
+ "spropitné +{v} % (max)": "チップ +{v} %（最大）",
+ "spropitné +{v} % · příchody {a} / {b}": "チップ +{v} % · 来店 {a} / {b}"
 }

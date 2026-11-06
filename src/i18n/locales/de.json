@@ -507,5 +507,10 @@
  "síla v chrámu +{v} %": "Tempelkraft +{v} %",
  "chapadla +{v} %": "Tentakel +{v} %",
  "Modla z R'lyeh": "Götze von R'lyeh",
- "Mušle hlubin": "Muschel der Tiefe"
+ "Mušle hlubin": "Muschel der Tiefe",
+ "Zlatý výčep": "Goldener Zapfhahn",
+ "Věrnost hostů": "Gästetreue",
+ "spánek {h} (max 12 h)": "Schlaf {h} (max 12 h)",
+ "spropitné +{v} % (max)": "Trinkgeld +{v} % (max)",
+ "spropitné +{v} % · příchody {a} / {b}": "Trinkgeld +{v} % · Besuche {a} / {b}"
 }

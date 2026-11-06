@@ -507,5 +507,10 @@
  "síla v chrámu +{v} %": "siła w świątyni +{v} %",
  "chapadla +{v} %": "macki +{v} %",
  "Modla z R'lyeh": "Bożek z R'lyeh",
- "Mušle hlubin": "Muszla głębin"
+ "Mušle hlubin": "Muszla głębin",
+ "Zlatý výčep": "Złoty szynk",
+ "Věrnost hostů": "Lojalność gości",
+ "spánek {h} (max 12 h)": "sen {h} (maks. 12 h)",
+ "spropitné +{v} % (max)": "napiwki +{v} % (maks.)",
+ "spropitné +{v} % · příchody {a} / {b}": "napiwki +{v} % · wizyty {a} / {b}"
 }

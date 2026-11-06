@@ -200,6 +200,7 @@ export class PubView {
   private staffWork(spr: Phaser.GameObjects.Sprite, x0: number) {
     const step = () => {
       if (!spr.active) return;
+      if (spr.getData('busy')) return void this.s.time.delayedCall(1000, step);
       const tx = x0 + this.rnd.between(-10, 10);
       const dist = Math.abs(tx - spr.x);
       spr.setFlipX(tx < spr.x);
@@ -220,6 +221,68 @@ export class PubView {
       });
     };
     this.s.time.delayedCall(this.rnd.between(500, 2500), step);
+  }
+
+  /** kostlivec obsluhy jde po bodech (relativně k hospodě), na konci zavolá done */
+  private staffPath(spr: Phaser.GameObjects.Sprite, pts: { x: number; y: number }[], done: () => void) {
+    const p = pts.shift();
+    if (!p || !spr.active) return done();
+    const tx = this.ox + p.x, dx = tx - spr.x, dy = p.y - spr.y;
+    const dist = Math.hypot(dx, dy);
+    let f = 0;
+    this.s.tweens.add({
+      targets: spr,
+      x: tx,
+      y: p.y,
+      duration: Math.max(60, (dist / 40) * 1000),
+      onUpdate: () => {
+        const a = Math.floor(f++ / 6) % 4;
+        if (Math.abs(dx) > Math.abs(dy)) spr.setFrame(8 + a).setFlipX(dx < 0);
+        else spr.setFrame((dy < 0 ? 4 : 0) + a).setFlipX(false);
+        spr.setDepth(spr.y + 1);
+      },
+      onComplete: () => this.staffPath(spr, pts, done),
+    });
+  }
+
+  /** obsluha má smysl: kuchař-kostlivec donese jídlo sedícímu hostovi, sklepník přinese sud k pípě */
+  private staffTrip(id: string) {
+    const spr = this.staff[id];
+    if (!spr?.active || spr.getData('busy') || !this.cam.visible) return;
+    const home = SPOT[id];
+    let there: { x: number; y: number }[];
+    let item: string;
+    if (id === 'kitchen') {
+      const g = this.rnd.pick(this.guests.filter((q) => q.seat && !q.leaving && !q.path.length) ?? []);
+      if (!g?.seat) return;
+      there = [{ x: home.x, y: g.seat.aisle }, { x: g.seat.x, y: g.seat.aisle }];
+      item = FOOD[this.pub.act];
+    } else if (id === 'cellar') {
+      there = [{ x: home.x, y: SPOT.tap.y }, { x: SPOT.tap.x + 20, y: SPOT.tap.y }];
+      item = 'keg';
+    } else return;
+    spr.setData('busy', true);
+    this.s.tweens.killTweensOf(spr);
+    const carry = this.s.add.image(spr.x, spr.y - 22, 'obj', item).setOrigin(0.5, 1);
+    if (carry.width > 14 || carry.height > 14) carry.setScale(0.6);
+    this.objs.push(carry);
+    this.s.events.emit('pubObj', carry);
+    const follow = () => {
+      if (!carry.active || !spr.active) return void this.s.events.off('update', follow);
+      carry.setPosition(spr.x, spr.y - 22).setDepth(spr.y + 2);
+    };
+    this.s.events.on('update', follow);
+    const back = [...there].reverse().slice(1).concat([{ x: home.x, y: home.y }]);
+    this.staffPath(spr, there, () => {
+      spr.setFrame(13);
+      this.s.time.delayedCall(500, () => {
+        carry.destroy();
+        this.staffPath(spr, back, () => {
+          this.s.events.off('update', follow);
+          spr.setFlipX(false).setFrame(4).setDepth(home.y + 1).setData('busy', false);
+        });
+      });
+    });
   }
 
   /** druhy hostů této hospody (pro rváče) */
@@ -294,7 +357,11 @@ export class PubView {
     const p = SPOT[id];
     if (id === 'tap') this.pourT = 0.5;
     const sk = this.staff[id];
-    if (sk) this.s.tweens.add({ targets: sk, y: p.y - 3, yoyo: true, duration: 120 });
+    if (sk && !sk.getData('busy')) {
+      // občas (ne každý cyklus) obsluha opravdu něco donese
+      if (this.rnd.frac() < 0.35) this.staffTrip(id);
+      else this.s.tweens.add({ targets: sk, y: p.y - 3, yoyo: true, duration: 120 });
+    }
     if (!bones) return this.pop(p.x, p.y - 22, '+' + big(amount), PAL.gold);
     // kosti chodí po zlomcích – ukázat až celou kost
     const acc = (this.boneAcc[id] ?? 0) + amount;
@@ -391,7 +458,11 @@ export class PubView {
     const want = Math.min(this.seats.length - 1, 3 + busy * 2 + PubView.extraGuests);
     if (this.spawnT <= 0) {
       this.spawnT = this.rnd.realInRange(1.2, 3.5);
-      if (this.guests.length < want) this.spawn();
+      if (this.guests.length < want) {
+        const n = this.guests.length;
+        this.spawn();
+        if (this.guests.length > n) this.s.events.emit('guestArrive');
+      }
     }
     for (const g of [...this.guests]) this.walk(g, dt);
     // hostinský: při čepování ruce nahoře

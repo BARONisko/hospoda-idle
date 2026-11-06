@@ -144,7 +144,11 @@ export class PubEvents {
       // rvačka trvá, dokud ji hráč nerozežene; mezitím odcházejí hosté a výdělek hospody klesá
       a.dur = Infinity;
       const need = 10;
-      const cx = Phaser.Math.Between(x0 + 40, x1 - 40), cy = Phaser.Math.Between(y0 + 50, y1 - 6);
+      // jen na podlaze hospody (ne u horní zdi s policemi ani za barem): dlaždice x 2–17, y 6,7–12,5
+      const fx0 = Math.max(x0 + 30, v.ox + 2 * 16), fx1 = Math.min(x1 - 30, v.ox + 17 * 16);
+      const fy0 = Math.max(y0 + 50, 6 * 16 + 12), fy1 = Math.min(y1 - 6, 12 * 16 + 8);
+      const cx = fx1 > fx0 ? Phaser.Math.Between(Math.round(fx0), Math.round(fx1)) : v.ox + 9 * 16;
+      const cy = fy1 > fy0 ? Phaser.Math.Between(Math.round(fy0), Math.round(fy1)) : 9 * 16;
       const pool = v.guestKeys();
       const f1 = add(this.s.add.sprite(cx - 10, cy, Phaser.Utils.Array.GetRandom(pool), 8).setOrigin(0.5, 1).setDepth(4000));
       const f2 = add(this.s.add.sprite(cx + 10, cy, Phaser.Utils.Array.GetRandom(pool), 8).setOrigin(0.5, 1).setDepth(4000).setFlipX(true));

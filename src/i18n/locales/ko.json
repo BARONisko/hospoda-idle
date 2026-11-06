@@ -507,5 +507,10 @@
  "síla v chrámu +{v} %": "신전 힘 +{v} %",
  "chapadla +{v} %": "촉수 +{v} %",
  "Modla z R'lyeh": "르뤼에의 우상",
- "Mušle hlubin": "심연의 조개"
+ "Mušle hlubin": "심연의 조개",
+ "Zlatý výčep": "황금 맥주탭",
+ "Věrnost hostů": "손님 충성도",
+ "spánek {h} (max 12 h)": "수면 {h} (최대 12시간)",
+ "spropitné +{v} % (max)": "팁 +{v} % (최대)",
+ "spropitné +{v} % · příchody {a} / {b}": "팁 +{v} % · 방문 {a} / {b}"
 }

@@ -507,5 +507,10 @@
  "síla v chrámu +{v} %": "force au temple +{v} %",
  "chapadla +{v} %": "tentacules +{v} %",
  "Modla z R'lyeh": "Idole de R'lyeh",
- "Mušle hlubin": "Coquille des abysses"
+ "Mušle hlubin": "Coquille des abysses",
+ "Zlatý výčep": "Comptoir doré",
+ "Věrnost hostů": "Fidélité des clients",
+ "spánek {h} (max 12 h)": "sommeil {h} (max 12 h)",
+ "spropitné +{v} % (max)": "pourboires +{v} % (max)",
+ "spropitné +{v} % · příchody {a} / {b}": "pourboires +{v} % · visites {a} / {b}"
 }

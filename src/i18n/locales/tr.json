@@ -507,5 +507,10 @@
  "síla v chrámu +{v} %": "tapınak gücü +%{v}",
  "chapadla +{v} %": "dokunaç +%{v}",
  "Modla z R'lyeh": "R'lyeh Putu",
- "Mušle hlubin": "Derinlerin Kabuğu"
+ "Mušle hlubin": "Derinlerin Kabuğu",
+ "Zlatý výčep": "Altın musluk",
+ "Věrnost hostů": "Misafir sadakati",
+ "spánek {h} (max 12 h)": "uyku {h} (en fazla 12 sa)",
+ "spropitné +{v} % (max)": "bahşiş +{v} % (en fazla)",
+ "spropitné +{v} % · příchody {a} / {b}": "bahşiş +{v} % · ziyaret {a} / {b}"
 }

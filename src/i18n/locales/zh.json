@@ -507,5 +507,10 @@
  "síla v chrámu +{v} %": "神殿力量 +{v} %",
  "chapadla +{v} %": "触手 +{v} %",
  "Modla z R'lyeh": "拉莱耶神像",
- "Mušle hlubin": "深渊贝壳"
+ "Mušle hlubin": "深渊贝壳",
+ "Zlatý výčep": "黄金酒头",
+ "Věrnost hostů": "客人忠诚度",
+ "spánek {h} (max 12 h)": "睡眠 {h}（最多12小时）",
+ "spropitné +{v} % (max)": "小费 +{v} %（最高）",
+ "spropitné +{v} % · příchody {a} / {b}": "小费 +{v} % · 来客 {a} / {b}"
 }

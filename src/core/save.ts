@@ -40,6 +40,10 @@ export interface Save {
   ach: string[];
   /** obchod s krígly: úrovně koupených položek */
   kup?: Record<string, number>;
+  /** věrnost hostů: počet příchodů hostů (XP) */
+  gxp?: number;
+  /** obchod s krígly v2: vrácené krígly za starý Delší spánek a Štědré hosty */
+  kup2?: boolean;
   /** koupená výzdoba (id) – zůstává i po hygieně */
   decor?: string[];
   /** pivovar (zůstává i po hygieně) */
