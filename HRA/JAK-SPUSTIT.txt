@@ -1,0 +1,6 @@
+P.U.B. Idle – Pajzl Tycoon (offline)
+
+Otevři soubor index.html dvojklikem (Chrome, Edge, Firefox, Safari).
+Hra běží bez internetu. Postup se ukládá v prohlížeči – zvlášť od verze na webu.
+
+Open index.html with a double click. The game runs offline; progress is saved in the browser.

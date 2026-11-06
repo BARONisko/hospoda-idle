@@ -2,9 +2,9 @@
 
 Idle hra pro mobil ze světa hry P.U.B. – Pajzl u Berana (Pub of Unholy Brews).
 
-**Hrát:** na webu https://baronisko.github.io/hospoda-idle/ · **do složky (offline):**
+**Hrát ze složky:** otevři `HRA/index.html` (dvojklik, bez internetu). **Na webu:** https://baronisko.github.io/hospoda-idle/ · **do složky (offline):**
 [PUB-Idle.zip](https://baronisko.github.io/hospoda-idle/PUB-Idle.zip) – rozbalit a otevřít `PUB-Idle/index.html`.
-(Stažené repo samo o sobě je jen zdrojový kód, jeho index.html z disku nepoběží.)
+(index.html v kořeni je zdrojový kód – z disku nepoběží; složku HRA aktualizuje GitHub po každé změně.)
 
 ```
 npm install
