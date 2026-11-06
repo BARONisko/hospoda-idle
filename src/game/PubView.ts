@@ -165,6 +165,18 @@ export class PubView {
     this.cam.centerOn(this.ox + 8.5 * T, c + ((y0 + y1) / 2 - (y + h / 2)) / zoom);
   }
 
+  /** druhy hostů této hospody (pro rváče) */
+  guestKeys() {
+    return GUESTS[this.pub.act];
+  }
+
+  /** jeden sedící host se zvedne a odejde (rvačka) */
+  leaveOne() {
+    const g = this.guests.find((q) => !q.leaving && !q.path.length);
+    if (g) g.sitT = 0;
+    this.spawnT = 6; // chvíli nikdo nepřijde
+  }
+
   /** výzdoba z obchodu (snímek, místo v dlaždicích) */
   showDecor(items: { id: string; frame: string; x: number; y: number }[]) {
     for (const it of items) {

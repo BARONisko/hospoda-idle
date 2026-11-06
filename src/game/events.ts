@@ -31,6 +31,12 @@ interface Target {
 }
 
 export class PubEvents {
+  /** násobek výdělku hospody kvůli rvačce (hosté utíkají): klesá až na 20 % */
+  brawlMult(view: number) {
+    const a = this.active;
+    return a && a.kind === 'brawl' && a.view === view ? Math.max(0.2, 1 - 0.04 * a.t) : 1;
+  }
+
   /** do další události (s) */
   next = 40;
   /** násobek intervalu mezi událostmi (vylepšení z krígel) */
@@ -43,6 +49,7 @@ export class PubEvents {
     const a = this.active;
     if (a) {
       a.t += dt;
+      if (a.kind === 'brawl' && Math.floor(a.t / 3) !== Math.floor((a.t - dt) / 3)) this.host.views[a.view].leaveOne();
       if (a.t >= a.dur) this.end(false);
       return;
     }
@@ -134,26 +141,30 @@ export class PubEvents {
       });
       this.host.banner(v.cam, t('Netopýr! Chyť ho!'), true);
     } else if (kind === 'brawl') {
-      a.dur = 8;
-      const need = 8;
-      const cx = Phaser.Math.Between(x0 + 30, x1 - 30), cy = Phaser.Math.Between(y0 + 40, y1 - 10);
-      const cloud = add(this.s.add.image(cx, cy, 'obj', 'dust').setOrigin(0.5, 1).setDepth(4000).setScale(3));
-      this.s.tweens.add({ targets: cloud, angle: { from: -10, to: 10 }, scaleX: { from: 2.7, to: 3.3 }, yoyo: true, repeat: -1, duration: 160 });
-      const ang = add(this.s.add.image(cx + 10, cy - 40, 'obj', 'anger').setDepth(4001).setScale(1.5));
-      this.s.tweens.add({ targets: ang, y: cy - 46, yoyo: true, repeat: -1, duration: 200 });
-      targets.push({
-        spr: cloud,
-        hit: () => {
-          a.hits++;
-          sfx.click();
-          if (a.hits >= need) {
-            const n = this.host.reward(30, view);
-            this.host.banner(v.cam, t('Rvačka rozehnána! +{n}', { n: big(n) }));
-            this.end(true);
-          }
-        },
-      });
-      this.host.banner(v.cam, t('Rvačka! Rozežeň ji ťukáním!'), true);
+      // rvačka trvá, dokud ji hráč nerozežene; mezitím odcházejí hosté a výdělek hospody klesá
+      a.dur = Infinity;
+      const need = 10;
+      const cx = Phaser.Math.Between(x0 + 40, x1 - 40), cy = Phaser.Math.Between(y0 + 50, y1 - 6);
+      const pool = v.guestKeys();
+      const f1 = add(this.s.add.sprite(cx - 10, cy, Phaser.Utils.Array.GetRandom(pool), 8).setOrigin(0.5, 1).setDepth(4000));
+      const f2 = add(this.s.add.sprite(cx + 10, cy, Phaser.Utils.Array.GetRandom(pool), 8).setOrigin(0.5, 1).setDepth(4000).setFlipX(true));
+      const cloud = add(this.s.add.image(cx, cy + 4, 'obj', 'dust').setOrigin(0.5, 1).setDepth(3999).setScale(1.3).setAlpha(0.7));
+      this.s.tweens.add({ targets: cloud, angle: { from: -12, to: 12 }, scaleX: { from: 1.1, to: 1.5 }, yoyo: true, repeat: -1, duration: 150 });
+      this.s.tweens.add({ targets: f1, x: cx - 6, yoyo: true, repeat: -1, duration: 180 });
+      this.s.tweens.add({ targets: f2, x: cx + 6, yoyo: true, repeat: -1, duration: 200, delay: 90 });
+      const ang = add(this.s.add.image(cx, cy - 26, 'obj', 'anger').setDepth(4002).setScale(1.2));
+      this.s.tweens.add({ targets: ang, y: cy - 30, yoyo: true, repeat: -1, duration: 200 });
+      const hit = () => {
+        a.hits++;
+        sfx.click();
+        this.s.tweens.add({ targets: [f1, f2], y: cy - 3, yoyo: true, duration: 80 });
+        if (a.hits >= need) {
+          this.host.banner(v.cam, t('Rvačka skončila, hosté se vracejí.'));
+          this.end(true);
+        }
+      };
+      targets.push({ spr: cloud, hit }, { spr: f1, hit }, { spr: f2, hit });
+      this.host.banner(v.cam, t('Rvačka! Hosté odcházejí – ťukej na rváče!'), true);
     } else {
       a.dur = 9;
       const need = 12;
@@ -199,10 +210,6 @@ export class PubEvents {
     const a = this.active;
     if (!a) return;
     this.active = null;
-    if (!ok && a.kind === 'brawl') {
-      const n = this.host.fine(60, a.view);
-      this.host.banner(this.host.views[a.view].cam, t('Rozbité židle! −{n}', { n: big(n) }));
-    }
     this.host.onEvent?.(a.kind, ok);
     a.off.forEach((f) => f());
     for (const o of a.objs) {
