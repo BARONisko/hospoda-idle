@@ -45,6 +45,9 @@ export interface Save {
   decor?: string[];
   /** pivovar (zůstává i po hygieně) */
   brew?: BrewState;
+  /** kosti (noční měna) a jejich vylepšení – zůstávají i po hygieně */
+  bones?: number;
+  bup?: Record<string, number>;
   /** krok návodu pro nového hráče (-1 = hotovo) */
   tut?: number;
   /** bestiář: viděné druhy hostů */
