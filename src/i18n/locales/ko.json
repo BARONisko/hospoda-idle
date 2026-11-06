@@ -545,5 +545,10 @@
  "Napořád": "영구",
  "Platí napořád, i další víkendy": "영구, 다음 주말에도 적용",
  "Obětiny platí jen do dalšího víkendu.\nKaždý víkend 3 jiné nabídky.": "제물은 다음 주말까지만 유효.\n매 주말 다른 3가지 제안.",
- "teď: {v} · do dalšího víkendu": "현재: {v} · 다음 주말까지"
+ "teď: {v} · do dalšího víkendu": "현재: {v} · 다음 주말까지",
+ "Truhla! Otevřeš ji na konci kola.": "상자! 라운드 끝에 열어요.",
+ "Otevřít truhly ({n})": "상자 열기 ({n})",
+ "Truhly: zbývá {n}": "상자: {n}개 남음",
+ "JACKPOT! Chapadla ×2": "잭팟! 촉수 ×2",
+ "Další truhla ({n})": "다음 상자 ({n})"
 }

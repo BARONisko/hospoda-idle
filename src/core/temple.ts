@@ -26,6 +26,8 @@ export interface TempleState {
   diff?: number;
   maxD?: number;
   lv?: Record<number, { hp: number; chests: number }>;
+  /** neotevřené truhly (obtížnost, ze které jsou) – otevírají se na konci kola */
+  pend?: number[];
   /** oltář: týdenní bonusy ke statům (platí jen do dalšího víkendu) – 3 nabídky, úrovně */
   altar?: { wk: string; offers: string[]; lv: Record<string, number> };
   /** v pondělí: kolik shnilo a kolik kostí zachránila sůl (ukázat při příštím otevření) */

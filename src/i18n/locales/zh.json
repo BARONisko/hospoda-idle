@@ -545,5 +545,10 @@
  "Napořád": "永久",
  "Platí napořád, i další víkendy": "永久有效，之后的周末也适用",
  "Obětiny platí jen do dalšího víkendu.\nKaždý víkend 3 jiné nabídky.": "供品只持续到下个周末。\n每个周末3个不同的选项。",
- "teď: {v} · do dalšího víkendu": "当前：{v} · 至下个周末"
+ "teď: {v} · do dalšího víkendu": "当前：{v} · 至下个周末",
+ "Truhla! Otevřeš ji na konci kola.": "宝箱！回合结束时打开。",
+ "Otevřít truhly ({n})": "打开宝箱（{n}）",
+ "Truhly: zbývá {n}": "宝箱：剩余{n}",
+ "JACKPOT! Chapadla ×2": "大奖！触手×2",
+ "Další truhla ({n})": "下一个宝箱（{n}）"
 }

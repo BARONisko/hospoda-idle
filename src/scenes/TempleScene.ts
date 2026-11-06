@@ -49,7 +49,7 @@ export class TempleScene extends Phaser.Scene {
   host!: TempleHost;
   T!: TempleState;
   ui: Phaser.GameObjects.GameObject[] = [];
-  mode: 'lobby' | 'fight' | 'shop' | 'result' = 'lobby';
+  mode: 'lobby' | 'fight' | 'shop' | 'result' | 'chest' = 'lobby';
   // boj
   tents: Tent[] = [];
   pieces: Piece[] = [];
@@ -239,15 +239,9 @@ export class TempleScene extends Phaser.Scene {
     while (Math.floor((1 - Math.max(0, this.T.hp)) * 10 + 1e-9) > this.T.chests && this.T.chests < 10) {
       this.T.chests++;
       this.chestsGot++;
-      const n = Math.round(chestTen(this.T.boss) * this.tenMult());
-      this.addTen(n, ALTAR.x, 300);
-      // vždy chapadla, k tomu často něco navíc (kosti, krígly, trvalý stat, talisman)
-      const d = this.diff(), r = Math.random();
-      const extra = r < 0.2 ? this.host.templeReward('bones', 5 * d)
-        : r < 0.35 ? this.host.templeReward('krigle', Math.max(1, Math.round(this.kriglyGift() * 0.1 * DIFF_REW[d - 1])))
-        : r < 0.55 ? this.host.templeReward('stat', d)
-        : r < 0.62 ? this.host.templeReward('talis', 1) : '';
-      this.flash(t('Truhla! +{n} chapadel', { n: big(n) }) + (extra ? '\n' + extra : ''), PAL.gold);
+      // truhla se otevře až na konci kola (s točením)
+      (this.T.pend ??= []).push(this.diff());
+      this.flash(t('Truhla! Otevřeš ji na konci kola.'), PAL.gold);
     }
     if (this.T.hp <= 0) this.defeat();
   }
@@ -569,6 +563,7 @@ export class TempleScene extends Phaser.Scene {
       T.rot = undefined;
     }
     const roundsLeft = ROUNDS_PER_DAY - T.used;
+    if (T.pend?.length) this.button(W / 2 - 160, 630, 320, 66, t('Otevřít truhly ({n})', { n: T.pend.length }), 'amber', true, () => this.openChests());
     if (we) {
       // obtížnosti: každá má vlastní životy bosse (pokračuje se, kde hráč skončil); další se odemkne poražením předchozí
       this.panel(712, 112);
@@ -683,7 +678,73 @@ export class TempleScene extends Phaser.Scene {
     this.text(W / 2, 404, t('Truhel: {n}', { n: this.chestsGot }), 22, PAL.bone, 0.5);
     this.hpBar(40, 450, W - 80, 26, this.ui);
     this.text(W / 2, 500, t('Zbývá kol dnes: {n}', { n: ROUNDS_PER_DAY - this.T.used }), 22, PAL.fog, 0.5);
-    this.button(W / 2 - 130, 560, 260, 70, t('Pokračovat'), 'green', true, () => this.lobby());
+    const pend = this.T.pend?.length ?? 0;
+    if (pend) this.button(W / 2 - 160, 560, 320, 70, t('Otevřít truhly ({n})', { n: pend }), 'amber', true, () => this.openChests());
+    else this.button(W / 2 - 130, 560, 260, 70, t('Pokračovat'), 'green', true, () => this.lobby());
+  }
+
+  /** otevírání truhel: truhla se natřásá, otevře se a točí se kolo odměn (chapadla vždy, k tomu něco navíc) */
+  private openChests() {
+    const T = this.T;
+    const d = T.pend?.shift();
+    if (d === undefined) return this.lobby();
+    this.mode = 'chest';
+    this.clearUi();
+    const tenTx = this.topBar(t('Truhly: zbývá {n}', { n: (T.pend?.length ?? 0) + 1 }));
+    const shade = this.add.graphics().setDepth(49);
+    shade.fillStyle(0x000000, 0.7).fillRect(0, 100, W, H - 100);
+    this.ui.push(shade);
+    const chest = this.add.image(W / 2, 420, 'obj', 'chest').setScale(7).setDepth(55);
+    this.ui.push(chest);
+    // výsledek je daný předem, kolo se jen „dotočí“
+    const mult = (1 + this.host.templeStats().tentacles) * DIFF_REW[d - 1];
+    const ten = Math.round(chestTen(T.boss) * mult);
+    const r = Math.random();
+    const kind = r < 0.2 ? 'bones' : r < 0.35 ? 'krigle' : r < 0.55 ? 'stat' : r < 0.62 ? 'talis' : 'ten2';
+    const icons: Record<string, [string, string?]> = { ten2: ['kTentacle'], bones: ['obj', 'dSkulls'], krigle: ['obj', 'krigl0'], stat: ['obj', 'candle'], talis: ['obj', 'dIdol1'] };
+    const order = ['ten2', 'bones', 'krigle', 'stat', 'talis'];
+    this.tweens.add({ targets: chest, angle: { from: -8, to: 8 }, yoyo: true, repeat: 5, duration: 70 });
+    this.time.delayedCall(900, () => {
+      if (this.mode !== 'chest') return;
+      chest.setFrame('chestOpen');
+      sfx.coin(1.4);
+      this.cameras.main.flash(200, 255, 220, 120);
+      // kolo odměn nad truhlou
+      const box = this.add.graphics().setDepth(56);
+      box.fillStyle(col('ink'), 0.95).fillRoundedRect(W / 2 - 70, 200, 140, 120, 14).lineStyle(4, col('gold')).strokeRoundedRect(W / 2 - 70, 200, 140, 120, 14);
+      const ic = this.add.image(W / 2, 260, 'kTentacle').setDepth(57);
+      this.ui.push(box, ic);
+      const set = (k: string) => {
+        const [a, f] = icons[k];
+        ic.setTexture(a, f);
+        ic.setScale(Math.min(4, 80 / Math.max(ic.width, ic.height))).setAngle(k === 'ten2' ? -60 : 0);
+      };
+      let i = 0, delay = 50;
+      const spin = () => {
+        if (this.mode !== 'chest') return;
+        set(order[i++ % order.length]);
+        sfx.click();
+        delay *= 1.15;
+        if (delay < 380) return void this.time.delayedCall(delay, spin);
+        // přistání
+        set(kind);
+        this.tweens.add({ targets: ic, scale: { from: ic.scale * 1.6, to: ic.scale }, duration: 300, ease: 'Back.out' });
+        sfx.fanfare();
+        T.ten += ten;
+        const extra = kind === 'bones' ? this.host.templeReward('bones', 5 * d)
+          : kind === 'krigle' ? this.host.templeReward('krigle', Math.max(1, Math.round(this.kriglyGift() * 0.1 * DIFF_REW[d - 1])))
+          : kind === 'stat' ? this.host.templeReward('stat', d)
+          : kind === 'talis' ? this.host.templeReward('talis', 1)
+          : (T.ten += ten, t('JACKPOT! Chapadla ×2'));
+        this.host.templeSave();
+        tenTx.setText(t('{n} chapadel', { n: big(T.ten) }));
+        const tx = this.text(W / 2, 560, t('+{n} chapadel', { n: big(kind === 'ten2' ? ten * 2 : ten) }) + '\n' + extra, 26, PAL.mint, 0.5).setAlign('center');
+        tx.setScale(Math.min(1, (W - 30) / tx.width));
+        const more = T.pend?.length ?? 0;
+        this.button(W / 2 - 150, 680, 300, 70, more ? t('Další truhla ({n})', { n: more }) : t('Pokračovat'), more ? 'amber' : 'green', true, () => (more ? this.openChests() : this.lobby()));
+      };
+      this.time.delayedCall(300, spin);
+    });
   }
 
   /** obchod s chapadly */

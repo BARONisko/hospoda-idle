@@ -545,5 +545,10 @@
  "Napořád": "Forever",
  "Platí napořád, i další víkendy": "Permanent, for all future weekends",
  "Obětiny platí jen do dalšího víkendu.\nKaždý víkend 3 jiné nabídky.": "Offerings last only until next weekend.\n3 different offers every weekend.",
- "teď: {v} · do dalšího víkendu": "now: {v} · until next weekend"
+ "teď: {v} · do dalšího víkendu": "now: {v} · until next weekend",
+ "Truhla! Otevřeš ji na konci kola.": "Chest! Open it at the end of the round.",
+ "Otevřít truhly ({n})": "Open chests ({n})",
+ "Truhly: zbývá {n}": "Chests: {n} left",
+ "JACKPOT! Chapadla ×2": "JACKPOT! Tentacles ×2",
+ "Další truhla ({n})": "Next chest ({n})"
 }

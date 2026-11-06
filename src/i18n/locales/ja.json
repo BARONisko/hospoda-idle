@@ -545,5 +545,10 @@
  "Napořád": "永続",
  "Platí napořád, i další víkendy": "永続、次の週末以降も有効",
  "Obětiny platí jen do dalšího víkendu.\nKaždý víkend 3 jiné nabídky.": "供物は次の週末まで有効。\n毎週末3つの別の提案。",
- "teď: {v} · do dalšího víkendu": "現在：{v} · 次の週末まで"
+ "teď: {v} · do dalšího víkendu": "現在：{v} · 次の週末まで",
+ "Truhla! Otevřeš ji na konci kola.": "宝箱！ラウンドの最後に開けよう。",
+ "Otevřít truhly ({n})": "宝箱を開ける（{n}）",
+ "Truhly: zbývá {n}": "宝箱：残り{n}",
+ "JACKPOT! Chapadla ×2": "大当たり！触手×2",
+ "Další truhla ({n})": "次の宝箱（{n}）"
 }

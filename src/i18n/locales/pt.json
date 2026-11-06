@@ -545,5 +545,10 @@
  "Napořád": "Para sempre",
  "Platí napořád, i další víkendy": "Permanente, também nos próximos fins de semana",
  "Obětiny platí jen do dalšího víkendu.\nKaždý víkend 3 jiné nabídky.": "As oferendas valem até o próximo fim de semana.\n3 ofertas diferentes a cada fim de semana.",
- "teď: {v} · do dalšího víkendu": "agora: {v} · até o próximo fim de semana"
+ "teď: {v} · do dalšího víkendu": "agora: {v} · até o próximo fim de semana",
+ "Truhla! Otevřeš ji na konci kola.": "Baú! Abra no fim da rodada.",
+ "Otevřít truhly ({n})": "Abrir baús ({n})",
+ "Truhly: zbývá {n}": "Baús: restam {n}",
+ "JACKPOT! Chapadla ×2": "JACKPOT! Tentáculos ×2",
+ "Další truhla ({n})": "Próximo baú ({n})"
 }

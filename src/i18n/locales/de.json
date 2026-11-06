@@ -545,5 +545,10 @@
  "Napořád": "Dauerhaft",
  "Platí napořád, i další víkendy": "Dauerhaft, auch für alle weiteren Wochenenden",
  "Obětiny platí jen do dalšího víkendu.\nKaždý víkend 3 jiné nabídky.": "Opfergaben gelten nur bis zum nächsten Wochenende.\nJedes Wochenende 3 andere Angebote.",
- "teď: {v} · do dalšího víkendu": "jetzt: {v} · bis zum nächsten Wochenende"
+ "teď: {v} · do dalšího víkendu": "jetzt: {v} · bis zum nächsten Wochenende",
+ "Truhla! Otevřeš ji na konci kola.": "Truhe! Öffne sie am Ende der Runde.",
+ "Otevřít truhly ({n})": "Truhen öffnen ({n})",
+ "Truhly: zbývá {n}": "Truhen: noch {n}",
+ "JACKPOT! Chapadla ×2": "JACKPOT! Tentakel ×2",
+ "Další truhla ({n})": "Nächste Truhe ({n})"
 }

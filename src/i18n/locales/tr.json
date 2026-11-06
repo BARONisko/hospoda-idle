@@ -545,5 +545,10 @@
  "Napořád": "Kalıcı",
  "Platí napořád, i další víkendy": "Kalıcı, sonraki hafta sonları da",
  "Obětiny platí jen do dalšího víkendu.\nKaždý víkend 3 jiné nabídky.": "Adaklar sadece gelecek hafta sonuna kadar geçerli.\nHer hafta sonu 3 farklı teklif.",
- "teď: {v} · do dalšího víkendu": "şimdi: {v} · gelecek hafta sonuna kadar"
+ "teď: {v} · do dalšího víkendu": "şimdi: {v} · gelecek hafta sonuna kadar",
+ "Truhla! Otevřeš ji na konci kola.": "Sandık! Turun sonunda açarsın.",
+ "Otevřít truhly ({n})": "Sandıkları aç ({n})",
+ "Truhly: zbývá {n}": "Sandık: {n} kaldı",
+ "JACKPOT! Chapadla ×2": "BÜYÜK İKRAMİYE! Dokunaç ×2",
+ "Další truhla ({n})": "Sonraki sandık ({n})"
 }

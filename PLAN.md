@@ -70,3 +70,4 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   platí do dalšího víkendu (d.temple.altar), cena 300·1,5^n. Kultisté 5 000 / 20 000 (potvrzeno).
 - 10 nových statů (talisman.ts): coll, mgrcd, brawl, visit, golden, gxp, beer (Kostnice + chrám), cultgain, candlesave, weak
   (jen chrám – TEMPLE_STATS). Efekty v PubScene/TempleScene/events.
+- Truhly v chrámu se otevírají až na konci kola (T.pend) s točením kola odměn (chapadla vždy; kosti/krígly/stat/talisman/jackpot ×2).
