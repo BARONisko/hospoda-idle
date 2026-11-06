@@ -40,3 +40,12 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   rušnější hospoda (častější události), věrní manažeři, Probudit Cthulhu (×10 navždy, Cthulhu kouká do hospod).
 - Manažeři jsou vidět za barem (tapster / count / deep0).
 - 4. hospoda Chrám Cthulhu (po 3. hygieně): rozložení C schváleno – pruhy 380 px posuvné prstem, ukazatel posunu vpravo.
+- Víc života: objednávky hostů (bublina → pivo/jídlo), vybavení podle úrovní stanic, sezóny (Vánoce, Dušičky, Pivní festival).
+- Rozhodování: 5 návštěvníků s volbou, denní specialita (1 ze 3), výzdoba (8 drahých předmětů 100M–1aa, trvalé).
+- Rvačka (přání uživatele, žádný vyhazovač): trvá, dokud hráč neťuká na rváče; mezitím hosté odcházejí, výdělek klesá až na 20 %.
+- Pivovar: pomalé vaření i offline, pivo prodat / vložit do vylepšení (rychlost, tank, cena, trvalý bonus). Menu má 2 řádky záložek.
+- Den/noc (8 + 4 min reálného času): ve dne coins, v noci příšery platí kostmi; vylepšení za kosti. Ladění ?night=0|1.
+- Talismany (10, vzácné nálezy 3–6 %, vylepšení za kosti donekonečna) a staty (src/core/talisman.ts: income, tips, events,
+  bones, brew, offline, krigly, skill, evfreq, cycle) – sem se budou přidávat další zdroje statů.
+- Hostinský na úrovni (XP, body, strom 3×5 uzlů) a týdenní výzva (jistý talisman + 5 krígel).
+- Soupeřova hospoda: zatím jen návrhy (čeká na výběr uživatele).
