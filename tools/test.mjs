@@ -58,6 +58,18 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   await S(p, (s) => { s.d.krigle = 400; s.openShop('krigl', false); s.shopObjs.filter((o) => o.type === 'Zone').at(-1); });
   await S(p, (s) => { s.d.kup = { start: 1, keepMgr: 1, speed: 2 }; s.applyKup(); });
   ok('krígly: rychlejší cyklus', await S(p, (s) => Math.abs(s.cyc(s.cards[0].def) - 1.5 * 0.81) < 1e-9));
+  // 5c) návštěvník s rozhodnutím
+  for (let k = 0; k < 5; k++) {
+    const r = await S(p, (s, k) => {
+      s.d.coins = 1e9;
+      const before = s.d.coins;
+      s.visit(s.visitList()[k]);
+      const zones = s.awayObjs.filter((o) => o.type === 'Zone');
+      zones[0].emit('pointerdown');
+      return s.awayObjs.length === 0 && before > 0;
+    }, k);
+    ok(`návštěvník ${k + 1}: volba proběhne`, r);
+  }
   // 6) prestiž
   await S(p, (s) => { s.d.run = 1e8; s.askPrestige(); s.prestige(); });
   await p.waitForTimeout(800);
