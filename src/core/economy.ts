@@ -116,7 +116,7 @@ export const BOOST_CD = 300;
 
 /** prestiž: krígly za výdělek v běhu, každý +KRIGL_BONUS výdělku navždy */
 export const kriglyFor = (run: number) => Math.floor(Math.sqrt(run / 1e5));
-export const KRIGL_BONUS = 0.02;
+export const KRIGL_BONUS = 0.009;
 export const PRESTIGE_MIN = 10;
 /** první hygiena (cesta k 2. hospodě) jde dřív: stačí 4 krígly (~1,6M tržby, cca 15 min) */
 export const PRESTIGE_FIRST = 4;

@@ -1625,7 +1625,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     tx(by + 24, t('Hygiena!'), 36, PAL.scarlet);
     tx(by + 84, t('Hygienik hospodu zavře. Přijdeš o coins, úrovně, vylepšení i manažery.'), 20, PAL.bone);
     tx(by + 170, t('Dostaneš +{k} krígel', { k: big(k) }), 30, PAL.gold);
-    tx(by + 212, t('každý krígl = +{b} % výdělek navždy', { b: KRIGL_BONUS * 100 }), 18, PAL.fog);
+    tx(by + 212, t('každý krígl = +{b} % výdělek navždy', { b: String(Math.round(KRIGL_BONUS * 1000) / 10).replace('.', ',') }), 18, PAL.fog);
     // o kolik se zlepší výdělek: bonus z krígel teď → po hygieně, a kolikrát víc
     const cur = this.d.krigle * KRIGL_BONUS, nw = (this.d.krigle + k) * KRIGL_BONUS;
     tx(by + 240, t('výdělek z krígel: +{a} % → +{b} %', { a: big(Math.round(cur * 100)), b: big(Math.round(nw * 100)) }), 22, PAL.mint);
