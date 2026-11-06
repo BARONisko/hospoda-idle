@@ -1389,7 +1389,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const p = this.d.pubs[i];
     const b = this.skillBtns[i];
     if (!b) return;
-    if (!p.mgr || (this.views.length > 1 && i !== this.sel)) return this.drawBtn(b, '', false, 'amber', false);
+    // tlačítka všech hospod leží na stejném místě – ťuknutí smí chytit jen to vybrané hospody (dřív chytalo poslední)
+    const mine = this.views.length < 2 || i === this.sel;
+    b.zone.input && (b.zone.input.enabled = mine);
+    if (!p.mgr || !mine) return this.drawBtn(b, '', false, 'amber', false);
     const now = Date.now();
     const mmss = (ms: number) => {
       const s = Math.ceil(ms / 1000);
