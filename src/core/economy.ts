@@ -136,8 +136,8 @@ export interface KriglItem {
 }
 const exp = (base: number, g: number) => (l: number) => Math.ceil(base * g ** l);
 const pc = (v: number) => String(Math.round(v * 10) / 10).replace('.', ',');
-/** násobek délky cyklů: prvních 5 úrovní −10 %, dál −3 % za úroveň */
-export const kSpeed = (n: number) => 0.9 ** Math.min(n, 5) * 0.97 ** Math.max(0, n - 5);
+/** násobek délky cyklů: −0,9 % za úroveň */
+export const kSpeed = (n: number) => 0.991 ** n;
 /** spánek offline: základ 8 h, celkem nejvýš 12 h */
 export const OFFLINE_BASE_H = 8;
 export const OFFLINE_MAX_H = 12;
@@ -161,7 +161,7 @@ const hm = (h: number) => {
   const m = Math.round(h * 60);
   return m < 60 ? `${m} min` : m % 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m / 60} h`;
 };
-export const kKrigly = (n: number) => 0.05 * n;
+export const kKrigly = (n: number) => 0.009 * n;
 export const KRIGL_SHOP: KriglItem[] = [
   { id: 'speed', name: t('Rychlejší kostlivci'), cost: exp(5, 2), eff: (n) => t('cykly kratší o {v} %', { v: pc(100 - kSpeed(n) * 100) }) },
   { id: 'start', name: t('Startovní kapitál'), cost: (n) => (n < 3 ? [5, 25, 100][n] : Math.ceil(100 * 5 ** (n - 2))), eff: (n) => t('start s {c} coins', { c: big(startCoins(n)) }) },

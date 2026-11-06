@@ -74,25 +74,25 @@ export interface TalisDef {
   atlas: string;
   frame: string;
   stat: StatId;
-  /** přírůstek statu za úroveň */
+  /** přírůstek statu za úroveň (přání uživatele: procenta pod 1 % za úroveň) */
   per: number;
   /** jen z chrámu R'lyeh (nepadá v hospodě) */
   temple?: boolean;
 }
 
 export const TALISMANS: TalisDef[] = [
-  { id: 'horseshoe', name: t('Podkova'), atlas: 'weapons', frame: 'c_horseshoe', stat: 'income', per: 0.05 },
-  { id: 'tooth', name: t('Vlčí zub'), atlas: 'weapons', frame: 'c_tooth', stat: 'tips', per: 0.15 },
-  { id: 'cork', name: t('Šťastný korek'), atlas: 'weapons', frame: 'c_cork', stat: 'events', per: 0.1 },
-  { id: 'ring', name: t('Kostěný prsten'), atlas: 'weapons', frame: 'c_ring', stat: 'bones', per: 0.1 },
-  { id: 'garlic', name: t('Česnek'), atlas: 'weapons', frame: 'c_garlic', stat: 'brew', per: 0.04 },
-  { id: 'feather', name: t('Pírko'), atlas: 'weapons', frame: 'c_feather', stat: 'offline', per: 1 },
-  { id: 'cateye', name: t('Kočičí oko'), atlas: 'weapons', frame: 'c_catEye', stat: 'krigly', per: 0.05 },
-  { id: 'key', name: t('Starý klíč'), atlas: 'obj', frame: 'cKey', stat: 'skill', per: 0.1 },
-  { id: 'crown', name: t('Žabí korunka'), atlas: 'obj', frame: 'cCrown', stat: 'evfreq', per: 0.05 },
-  { id: 'iceeye', name: t('Ledové oko'), atlas: 'obj', frame: 'cIceEye', stat: 'cycle', per: 0.02 },
-  { id: 'rlyeh', name: t("Modla z R'lyeh"), atlas: 'obj', frame: 'dIdol1', stat: 'temple', per: 0.15, temple: true },
-  { id: 'shell', name: t('Mušle hlubin'), atlas: 'obj', frame: 'gShell', stat: 'tentacles', per: 0.1, temple: true },
+  { id: 'horseshoe', name: t('Podkova'), atlas: 'weapons', frame: 'c_horseshoe', stat: 'income', per: 0.009 },
+  { id: 'tooth', name: t('Vlčí zub'), atlas: 'weapons', frame: 'c_tooth', stat: 'tips', per: 0.009 },
+  { id: 'cork', name: t('Šťastný korek'), atlas: 'weapons', frame: 'c_cork', stat: 'events', per: 0.009 },
+  { id: 'ring', name: t('Kostěný prsten'), atlas: 'weapons', frame: 'c_ring', stat: 'bones', per: 0.009 },
+  { id: 'garlic', name: t('Česnek'), atlas: 'weapons', frame: 'c_garlic', stat: 'brew', per: 0.009 },
+  { id: 'feather', name: t('Pírko'), atlas: 'weapons', frame: 'c_feather', stat: 'offline', per: 0.05 },
+  { id: 'cateye', name: t('Kočičí oko'), atlas: 'weapons', frame: 'c_catEye', stat: 'krigly', per: 0.009 },
+  { id: 'key', name: t('Starý klíč'), atlas: 'obj', frame: 'cKey', stat: 'skill', per: 0.009 },
+  { id: 'crown', name: t('Žabí korunka'), atlas: 'obj', frame: 'cCrown', stat: 'evfreq', per: 0.009 },
+  { id: 'iceeye', name: t('Ledové oko'), atlas: 'obj', frame: 'cIceEye', stat: 'cycle', per: 0.009 },
+  { id: 'rlyeh', name: t("Modla z R'lyeh"), atlas: 'obj', frame: 'dIdol1', stat: 'temple', per: 0.009, temple: true },
+  { id: 'shell', name: t('Mušle hlubin'), atlas: 'obj', frame: 'gShell', stat: 'tentacles', per: 0.009, temple: true },
 ];
 
 /** cena další úrovně v kostech (roste donekonečna) */

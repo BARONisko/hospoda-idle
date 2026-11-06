@@ -89,7 +89,7 @@ export function setDiff(s: TempleState, d: number) {
 
 /** síla zásahu: hospody pomáhají jen logaritmicky (10× výdělek ≈ +15 % síly), hlavně vylepšení chrámu */
 export function tapPower(incomePerSec: number, knife: number, templeStat: number) {
-  return 10 * (1 + 0.15 * Math.log10(1 + Math.max(0, incomePerSec))) * (1 + 0.25 * knife) * (1 + templeStat);
+  return 10 * (1 + 0.15 * Math.log10(1 + Math.max(0, incomePerSec))) * (1 + 0.009 * knife) * (1 + templeStat);
 }
 
 /** truhla po každých 10 % životů bosse */
@@ -142,7 +142,7 @@ export interface TempleUp {
 }
 export const TEMPLE_UPS: TempleUp[] = [
   { id: 'kult', name: t('Kultista'), desc: () => t('přijde hned, seká chapadla v každé události a sbírá i bez tebe'), cost: (l) => [500, 1500][l] ?? 0, max: MAX_CULT },
-  { id: 'knife', name: t('Obětní dýka'), desc: (l) => t('síla zásahu +{v} %', { v: 25 * l }), cost: (l) => Math.ceil(150 * 1.5 ** l) },
+  { id: 'knife', name: t('Obětní dýka'), desc: (l) => t('síla zásahu +{v} %', { v: String(Math.round(9 * l) / 10).replace('.', ',') }), cost: (l) => Math.ceil(150 * 1.5 ** l) },
   { id: 'candle', name: t('Svíce navíc'), desc: (l) => t('svící na oltáři: {n}', { n: 3 + l }), cost: (l) => Math.ceil(400 * 2.5 ** l), max: 3 },
   { id: 'ward', name: t('Ochranný amulet'), desc: () => t('první útok v kole oltář nezasáhne'), cost: () => 600, max: 1 },
   { id: 'salt', name: t('Solná lázeň'), desc: (l) => t('v pondělí zachrání {v} % chapadel jako kosti', { v: l }), cost: (l) => Math.ceil(200 * 1.6 ** l), max: 10 },

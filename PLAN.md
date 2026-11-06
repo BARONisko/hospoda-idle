@@ -60,3 +60,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   ×1/1,6/2,5/4/6, krígly za poražení), každá má vlastní uložené HP (d.temple.lv, diff, maxD), další se odemkne poražením předchozí.
 - Rádce „Co dál?“ (varianta C schválena): po 20 s bez ťuknutí hostinský poradí další krok (advice() v PubScene – úkoly, schopnost,
   kostlivec, obchod, hygiena, krígly, hostinský, pivovar, chrám, jinak na co šetřit), pak nejvýš 1× za minutu; „Ukaž“ otevře místo.
+- Přání uživatele: přírůstky za úroveň POD 1 % u všeho kromě obchodu za coins – talismany 0,9 %/úr. (Pírko offline +0,05 h),
+  pivovar (bonus, rychlost vaření, cena piva) 0,9 %/úr., krígly: Rychlejší kostlivci −0,9 %/úr., Hlubší sklep +0,9 %, chrám: Obětní dýka +0,9 %.
+  Výjimky dané uživatelem: Zlatý výčep (+0,25×), Věrnost hostů (+5 %).

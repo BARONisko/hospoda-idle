@@ -1014,7 +1014,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const ferm = add(this.add.image(80, y0 + 150, 'obj', b.stock < tank(b) ? 'fermenterHiss' : 'fermenter').setOrigin(0.5, 1).setScale(4).setDepth(D + 2));
     if (b.stock < tank(b)) this.tweens.add({ targets: ferm, scaleY: 4.15, yoyo: true, repeat: -1, duration: 700 });
     add(this.add.text(150, y0 + 12, t('Pivovar – úroveň {n}', { n: b.lvl }), txt(26, PAL.gold)).setDepth(D + 2));
-    add(this.add.text(150, y0 + 46, t('trvalý bonus: výdělek +{p} %', { p: big(Math.round(brewBonus(b) * 100)) }), txt(18, PAL.mint)).setDepth(D + 2));
+    add(this.add.text(150, y0 + 46, t('trvalý bonus: výdělek +{p} %', { p: String(Math.round(brewBonus(b) * 1000) / 10).replace('.', ',') }), txt(18, PAL.mint)).setDepth(D + 2));
     add(this.add.text(150, y0 + 72, t('V tanku: {a} / {b} piv', { a: b.stock, b: tank(b) }), txt(22, PAL.bone)).setDepth(D + 2));
     this.brewBar = add(this.add.graphics().setDepth(D + 2));
     this.brewTxt = add(this.add.text(150, y0 + 140, '', txt(18, PAL.fog)).setDepth(D + 2));

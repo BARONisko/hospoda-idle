@@ -26,16 +26,16 @@ export const newBrew = (): BrewState => ({ lvl: 1, inv: 0, stock: 0, at: Date.no
 
 /** zrychlení vaření z talismanů (nastavuje scéna) */
 export const brewCfg = { speed: 1, tank: 0 };
-/** délka jedné várky (ms): 15 min na 1. úrovni, každá úroveň o 8 % rychleji */
-export const brewMs = (b: BrewState) => (15 * 60_000 * BEERS[b.kind].time * 0.92 ** (b.lvl - 1)) / brewCfg.speed;
+/** délka jedné várky (ms): 15 min na 1. úrovni, každá úroveň o 0,9 % rychleji */
+export const brewMs = (b: BrewState) => (15 * 60_000 * BEERS[b.kind].time * 0.991 ** (b.lvl - 1)) / brewCfg.speed;
 /** velikost tanku */
 export const tank = (b: BrewState) => 2 + b.lvl + brewCfg.tank;
 /** kolik piv stojí další úroveň */
 export const lvlCost = (b: BrewState) => 2 * b.lvl;
 /** trvalý bonus k výdělku */
-export const brewBonus = (b: BrewState) => 0.03 * (b.lvl - 1);
+export const brewBonus = (b: BrewState) => 0.009 * (b.lvl - 1);
 /** cena jednoho piva = tolik sekund výdělku */
-export const sellSecs = (b: BrewState) => 300 * (1 + 0.2 * (b.lvl - 1)) * BEERS[b.kind].value;
+export const sellSecs = (b: BrewState) => 300 * (1 + 0.009 * (b.lvl - 1)) * BEERS[b.kind].value;
 
 /** dovaří, co se mezitím uvařilo (i offline); plný tank čeká */
 export function tick(b: BrewState, now = Date.now()) {
