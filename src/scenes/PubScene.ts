@@ -318,6 +318,7 @@ export class PubScene extends Phaser.Scene {
 
   /** výdělek za dobu nepřítomnosti (běží jen stanice s kostlivcem), strop 8 h */
   private offline() {
+    const leftAt = this.d.at;
     const raw = Math.max(0, (Date.now() - this.d.at) / 1000);
     const cap = this.offCap();
     const secs = Math.min(cap, raw);
@@ -329,21 +330,30 @@ export class PubScene extends Phaser.Scene {
     const ns = nightShare();
     const coins = Math.floor(g * (1 - ns));
     const bones = secs * ns * this.bonesPerSec(true);
+    // liga: o kolik soupeř mezitím přidal (jen když je to pořád stejný týden)
+    const L = this.league();
+    let rival: { add: number; lead: number } | undefined;
+    if (L.start <= leftAt) {
+      const before = rivalTick(L, leftAt);
+      const after = rivalTick(L);
+      rival = { add: after - before, lead: 0 };
+    }
     this.gain(coins);
     this.d.bones = (this.d.bones ?? 0) + bones;
+    if (rival) rival.lead = L.me - (L.rival ?? 0);
     store(this.d);
-    this.awayPopup(coins, secs, raw > cap, bones);
+    this.awayPopup(coins, secs, raw > cap, bones, rival);
   }
 
   awayObjs: Phaser.GameObjects.GameObject[] = [];
 
-  private awayPopup(g: number, secs: number, capped: boolean, bones = 0) {
+  private awayPopup(g: number, secs: number, capped: boolean, bones = 0, rival?: { add: number; lead: number }) {
     const D = 500;
     const h = Math.floor(secs / 3600);
     const m = Math.floor((secs % 3600) / 60);
     const dur = h ? t('{h} h {m} min', { h, m }) : t('{m} min', { m });
     const shade = this.add.rectangle(0, 0, W, H, 0x000000, 0.65).setOrigin(0).setDepth(D).setInteractive();
-    const bx = 40, by = 270, bw = W - 80, bh = 380;
+    const bx = 40, by = rival ? 230 : 270, bw = W - 80, bh = rival ? 460 : 380;
     const g0 = this.add.graphics().setDepth(D + 1);
     g0.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
     g0.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
@@ -359,6 +369,10 @@ export class PubScene extends Phaser.Scene {
     amt.setX(x0 + 46);
     objs.push(this.add.image(x0 + 16, by + 190, 'obj', 'coin').setScale(5).setDepth(D + 2), amt);
     tx(by + 236, bones >= 1 ? t('coins a {n} kostí', { n: big(bones) }) : 'coins', 22, PAL.mint);
+    if (rival) {
+      tx(by + 284, t('Soupeř v lize mezitím přidal +{n} coins', { n: big(rival.add) }), 20, PAL.scarlet);
+      tx(by + 314, rival.lead >= 0 ? t('Pořád vedeš o {n} coins', { n: big(rival.lead) }) : t('Soupeř vede o {n} coins', { n: big(-rival.lead) }), 20, rival.lead >= 0 ? PAL.mint : PAL.sand);
+    }
     const done = () => {
       this.awayObjs.forEach((o) => o.destroy());
       this.awayObjs = [];

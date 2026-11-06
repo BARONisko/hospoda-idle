@@ -403,5 +403,7 @@
  "Přepnout na noc": "Переключить на ночь",
  "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "Кости собираешь ночью: станции и нажатия на гостей.\nТратишь их в Костнице и на талисманы.",
  "noc trvá {a} · +1 s za úroveň": "ночь длится {a} · +1 с за уровень",
- "odemkne se, až noc potrvá {m}": "откроется, когда ночь будет {m}"
+ "odemkne se, až noc potrvá {m}": "откроется, когда ночь будет {m}",
+ "Soupeř v lize mezitím přidal +{n} coins": "Тем временем соперник в лиге добавил +{n} coins",
+ "Pořád vedeš o {n} coins": "Ты всё ещё впереди на {n} coins"
 }

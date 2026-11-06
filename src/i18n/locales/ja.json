@@ -403,5 +403,7 @@
  "Přepnout na noc": "夜に切り替え",
  "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "骨は夜に集まる:ステーションと客のタップ。\n納骨堂やお守りに使える。",
  "noc trvá {a} · +1 s za úroveň": "夜は {a} · 1レベルごとに+1秒",
- "odemkne se, až noc potrvá {m}": "夜が {m} になると解放"
+ "odemkne se, až noc potrvá {m}": "夜が {m} になると解放",
+ "Soupeř v lize mezitím přidal +{n} coins": "その間にリーグのライバルは +{n} coins 稼いだ",
+ "Pořád vedeš o {n} coins": "まだ {n} coins リード中"
 }

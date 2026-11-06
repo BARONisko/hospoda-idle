@@ -403,5 +403,7 @@
  "Přepnout na noc": "Passer à la nuit",
  "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "Les os se récoltent la nuit : stations et touches sur les clients.\nDépense-les à l'Ossuaire et en talismans.",
  "noc trvá {a} · +1 s za úroveň": "la nuit dure {a} · +1 s par niveau",
- "odemkne se, až noc potrvá {m}": "débloqué quand la nuit dure {m}"
+ "odemkne se, až noc potrvá {m}": "débloqué quand la nuit dure {m}",
+ "Soupeř v lize mezitím přidal +{n} coins": "Pendant ce temps, ton rival a gagné +{n} coins",
+ "Pořád vedeš o {n} coins": "Tu mènes toujours de {n} coins"
 }

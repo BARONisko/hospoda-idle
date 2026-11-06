@@ -403,5 +403,7 @@
  "Přepnout na noc": "Geceye geç",
  "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "Kemikleri gece toplarsın: istasyonlar ve misafirlere dokunma.\nKemikhane'de ve tılsımlara harcarsın.",
  "noc trvá {a} · +1 s za úroveň": "gece {a} sürer · seviye başına +1 sn",
- "odemkne se, až noc potrvá {m}": "gece {m} olunca açılır"
+ "odemkne se, až noc potrvá {m}": "gece {m} olunca açılır",
+ "Soupeř v lize mezitím přidal +{n} coins": "Bu arada lig rakibin +{n} coins ekledi",
+ "Pořád vedeš o {n} coins": "Hâlâ {n} coins öndesin"
 }

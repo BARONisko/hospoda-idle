@@ -403,5 +403,7 @@
  "Přepnout na noc": "Switch to night",
  "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "You collect bones at night: stations and tapping guests.\nSpend them in the Ossuary and on talismans.",
  "noc trvá {a} · +1 s za úroveň": "night lasts {a} · +1 s per level",
- "odemkne se, až noc potrvá {m}": "unlocks when the night lasts {m}"
+ "odemkne se, až noc potrvá {m}": "unlocks when the night lasts {m}",
+ "Soupeř v lize mezitím přidal +{n} coins": "Meanwhile your league rival added +{n} coins",
+ "Pořád vedeš o {n} coins": "You still lead by {n} coins"
 }

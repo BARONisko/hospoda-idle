@@ -403,5 +403,7 @@
  "Přepnout na noc": "切换到夜晚",
  "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "夜里收集骨头:站点和点击客人。\n可在骨堂和护身符上花掉。",
  "noc trvá {a} · +1 s za úroveň": "夜晚 {a} · 每级 +1 秒",
- "odemkne se, až noc potrvá {m}": "夜晚达到 {m} 时解锁"
+ "odemkne se, až noc potrvá {m}": "夜晚达到 {m} 时解锁",
+ "Soupeř v lize mezitím přidal +{n} coins": "期间联赛对手增加了 +{n} coins",
+ "Pořád vedeš o {n} coins": "你仍领先 {n} coins"
 }

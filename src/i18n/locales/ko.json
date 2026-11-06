@@ -403,5 +403,7 @@
  "Přepnout na noc": "밤으로 전환",
  "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "뼈는 밤에 모아요: 스테이션과 손님 탭.\n납골당과 부적에 쓸 수 있어요.",
  "noc trvá {a} · +1 s za úroveň": "밤 {a} · 레벨당 +1초",
- "odemkne se, až noc potrvá {m}": "밤이 {m}이 되면 해금"
+ "odemkne se, až noc potrvá {m}": "밤이 {m}이 되면 해금",
+ "Soupeř v lize mezitím přidal +{n} coins": "그동안 리그 라이벌이 +{n} coins 벌었어요",
+ "Pořád vedeš o {n} coins": "아직 {n} coins 앞서요"
 }
