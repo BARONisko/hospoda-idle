@@ -51,6 +51,9 @@ interface Guest {
   order?: Phaser.GameObjects.Image[];
   /** jak dlouho sedí (s) */
   sat?: number;
+  /** kdy (sat) si objednal naposledy / kdy si objedná znovu */
+  orderAt?: number;
+  next?: number;
 }
 
 /** přes den má každá hospoda své hosty, v noci chodí do všech kostlivci */
@@ -306,15 +309,25 @@ export class PubView {
   /** ťuknutí do hospody: host = spropitné (vrací true, když se trefil) */
   tap(wx: number, wy: number): boolean {
     for (const g of this.guests) {
-      if (g.tipped) continue;
-      const b = g.spr.getBounds();
-      if (Phaser.Geom.Rectangle.Contains(Phaser.Geom.Rectangle.Inflate(b, 4, 4), wx, wy)) {
+      if (g.tipped || g.leaving) continue;
+      // trefa = postava nebo bublina nad ní (s rezervou pro prst)
+      const b = Phaser.Geom.Rectangle.Inflate(g.spr.getBounds(), 6, 6);
+      if (g.order) Phaser.Geom.Rectangle.MergeRect(b, Phaser.Geom.Rectangle.Inflate(g.order[0].getBounds(), 4, 4));
+      if (Phaser.Geom.Rectangle.Contains(b, wx, wy)) {
         g.tipped = true;
+        if (g.order) this.serve(g);
         this.s.tweens.add({ targets: g.spr, y: g.spr.y - 4, yoyo: true, duration: 100 });
         return true;
       }
     }
     return false;
+  }
+
+  /** obsloužit objednávku: bublina zmizí, příští objednávka za 8–14 s */
+  private serve(g: Guest) {
+    g.order?.forEach((o) => o.destroy());
+    g.order = undefined;
+    g.next = (g.sat ?? 0) + this.rnd.realInRange(8, 14);
   }
 
   /** kam na obrazovce ukázat návodem „ťukni na hosta“: hlava sedícího hosta, který ještě nedal spropitné */
@@ -392,7 +405,11 @@ export class PubView {
         g.sat = (g.sat ?? 0) + dt;
         // nejdřív si objedná (bublina nad hlavou), pak mu přinesou pivo nebo jídlo
         const food = (g.spr.x * 7 + g.spr.y) % 3 === 0;
-        if (!g.order && !g.mug && g.sat < 0.2) {
+        // objedná si hned po usednutí a pak znovu, pokud ještě chvíli sedí (každá objednávka = nové spropitné)
+        const again = !g.order && g.mug && g.next !== undefined && g.sat >= g.next && g.sitT > 6;
+        if ((!g.order && !g.mug && g.sat < 0.2) || again) {
+          g.orderAt = g.sat;
+          g.tipped = false;
           registerBubble(this.s);
           const bx = sp.x + 1, by = sp.y - 15;
           const b = this.s.add.image(bx, by, 'orderBubble').setOrigin(0.3, 1).setDepth(sp.y + 50);
@@ -412,9 +429,9 @@ export class PubView {
           this.s.tweens.add({ targets: ic, scale: icS, duration: 220, delay: 60, ease: 'Back.out' });
           this.s.tweens.add({ targets: g.order, y: '-=2', yoyo: true, repeat: -1, duration: 700, delay: 250, ease: 'Sine.inOut' });
         }
-        if (!g.mug && g.sat > 2.5) {
-          g.order?.forEach((o) => o.destroy());
-          g.order = undefined;
+        // bublina vydrží 6 s, pak se obslouží sama (ťuknutím hned)
+        if (g.order && g.sat - (g.orderAt ?? 0) > 6) this.serve(g);
+        if (!g.mug && !g.order && g.sat > 0.5) {
           g.mug = this.s.add.image(sp.x + (g.seat.flip ? -13 : 13), sp.y - 6, 'obj', food ? FOOD[this.pub.act] : g.sitT > 6 ? 'mug' : 'mugDark').setOrigin(0.5, 1).setDepth(sp.y + 4);
           this.objs.push(g.mug);
           this.s.events.emit('pubObj', g.mug);
