@@ -49,16 +49,17 @@ function downloadOffline() {
 }
 function loadOpts() {
   try {
-    const o = JSON.parse(localStorage.getItem(OPTS_KEY) ?? '{}') as { snd?: boolean; mus?: boolean };
-    sfx.setMuted(o.snd === false);
-    sfx.setMusic(o.mus !== false);
+    // sv/mv = hlasitost zvuků/hudby 0–1; starší uložení měla jen zapnuto/vypnuto (snd/mus)
+    const o = JSON.parse(localStorage.getItem(OPTS_KEY) ?? '{}') as { snd?: boolean; mus?: boolean; sv?: number; mv?: number };
+    sfx.setSfxVol(o.sv ?? (o.snd === false ? 0 : 1));
+    sfx.setMusVol(o.mv ?? (o.mus === false ? 0 : 1));
   } catch {
     sfx.setMusic(true);
   }
 }
 function saveOpts() {
   try {
-    localStorage.setItem(OPTS_KEY, JSON.stringify({ snd: !sfx.muted, mus: sfx.musicOn }));
+    localStorage.setItem(OPTS_KEY, JSON.stringify({ sv: sfx.sfxVol, mv: sfx.musVol }));
   } catch {
     /* nic */
   }
@@ -901,15 +902,41 @@ export class PubScene extends Phaser.Scene {
   // ---------- nastavení ----------
   private optsTab(y0: number, D: number) {
     const RH = 96;
+    // hlasitost: − / hodnota / + po 10 % (0 % = vypnuto)
+    const vols: [string, () => number, (v: number) => void][] = [
+      [t('Zvuky'), () => sfx.sfxVol, (v) => sfx.setSfxVol(v)],
+      [t('Hudba'), () => sfx.musVol, (v) => sfx.setMusVol(v)],
+    ];
+    vols.forEach(([title, get, set], i) => {
+      const y = y0 + i * RH;
+      this.row(y, RH, D, title, '');
+      const v = get();
+      const step = (d: number) => {
+        set(get() + d);
+        saveOpts();
+        sfx.click();
+        this.openShop('opts', false);
+      };
+      const minus = this.btn(W - 232, y + 14, 60, 60, () => step(-0.1), D + 2);
+      this.drawBtn(minus, '−', v > 0, 'plum');
+      const plus = this.btn(W - 82, y + 14, 60, 60, () => step(0.1), D + 2);
+      this.drawBtn(plus, '+', v < 1, 'plum');
+      const val = this.add.text(W - 127, y + 44, v > 0 ? `${Math.round(v * 100)} %` : t('vypnuto'), txt(22, v > 0 ? PAL.gold : PAL.slate)).setOrigin(0.5).setDepth(D + 2);
+      val.setScale(Math.min(1, 84 / val.width));
+      // proužek hlasitosti pod názvem
+      const bar = this.add.graphics().setDepth(D + 2);
+      bar.fillStyle(col('ink')).fillRoundedRect(26, y + 56, 230, 14, 6);
+      if (v > 0) bar.fillStyle(col('gold')).fillRoundedRect(26, y + 56, 230 * v, 14, 6);
+      this.shopObjs.push(minus.bg, minus.label, minus.zone, plus.bg, plus.label, plus.zone, val, bar);
+    });
     const rows: [string, string, () => void][] = [
-      [t('Zvuky'), sfx.muted ? t('vypnuto') : t('zapnuto'), () => sfx.setMuted(!sfx.muted)],
-      [t('Hudba'), sfx.musicOn ? t('zapnuto') : t('vypnuto'), () => sfx.setMusic(!sfx.musicOn)],
       [t('Jazyk / Language'), LANGS[lang], () => setLang(AVAILABLE[(AVAILABLE.indexOf(lang) + 1) % AVAILABLE.length])],
     ];
     // offline verze do složky (zip s index.html) – nabízí se jen na webu, ne ve hře spuštěné z disku
     const web = location.protocol.startsWith('http');
     if (web) rows.push([t('Hra do složky'), t('Stáhnout'), downloadOffline]);
     rows.forEach(([title, val, fn], i) => {
+      i += vols.length;
       const y = y0 + i * RH;
       this.row(y, RH, D, title, i === 3 ? t('spustíš ji z disku bez internetu') : '');
       const b = this.btn(W - 232, y + 14, 210, 60, () => {
@@ -920,7 +947,7 @@ export class PubScene extends Phaser.Scene {
       this.drawBtn(b, val, true, 'plum');
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
-    this.shopObjs.push(this.add.text(W / 2, y0 + rows.length * RH + 30, 'P.U.B. Idle – Pajzl Tycoon', txt(18, PAL.slate)).setOrigin(0.5).setDepth(D + 1));
+    this.shopObjs.push(this.add.text(W / 2, y0 + (vols.length + rows.length) * RH + 30, 'P.U.B. Idle – Pajzl Tycoon', txt(18, PAL.slate)).setOrigin(0.5).setDepth(D + 1));
   }
 
   // ---------- bestiář ----------

@@ -3,7 +3,15 @@ class Sfx {
   ctx: AudioContext | null = null;
   private out!: GainNode;
   private noise!: AudioBuffer;
-  muted = false;
+  /** hlasitost zvuků a hudby 0–1 (0 = vypnuto); každá má vlastní větev do výstupu */
+  sfxVol = 1;
+  musVol = 1;
+  private sfxOut!: GainNode;
+  private musOut!: GainNode;
+  private bus: 'sfx' | 'mus' = 'sfx';
+  get muted() {
+    return this.sfxVol <= 0;
+  }
 
   /** musí se zavolat z dotyku/kliku (prohlížeče jinak zvuk nepustí) */
   init() {
@@ -17,21 +25,30 @@ class Sfx {
       return;
     }
     this.out = this.ctx.createGain();
-    this.out.gain.value = this.muted ? 0 : 0.8;
+    this.out.gain.value = 0.8;
     this.out.connect(this.ctx.destination);
+    this.sfxOut = this.ctx.createGain();
+    this.musOut = this.ctx.createGain();
+    this.sfxOut.connect(this.out);
+    this.musOut.connect(this.out);
+    this.applyVol();
     this.noise = this.ctx.createBuffer(1, this.ctx.sampleRate, this.ctx.sampleRate);
     const d = this.noise.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
   }
 
   // ---------- hudba: jednoduchá hospodská polka (bas – akord, melodie z pentatoniky) ----------
-  musicOn = false;
+  get musicOn() {
+    return this.musVol > 0;
+  }
   private mTimer = 0;
   private mStep = 0;
   private mNext = 0;
 
   setMusic(on: boolean) {
-    this.musicOn = on;
+    if (on && this.musVol <= 0) this.musVol = 1;
+    if (!on) this.musVol = 0;
+    this.applyVol();
     if (on && !this.mTimer) this.mTimer = window.setInterval(() => this.musicTick(), 50);
     if (!on && this.mTimer) {
       clearInterval(this.mTimer);
@@ -41,7 +58,8 @@ class Sfx {
 
   private musicTick() {
     const c = this.ctx;
-    if (!c || this.muted || c.state !== 'running') return;
+    if (!c || this.musVol <= 0 || c.state !== 'running') return;
+    this.bus = 'mus';
     const beat = 60 / 132 / 2; // osminy
     if (this.mNext < c.currentTime) this.mNext = c.currentTime + 0.05;
     // naplánuj noty na 0,2 s dopředu
@@ -65,15 +83,38 @@ class Sfx {
       this.mNext += beat;
       this.mStep++;
     }
+    this.bus = 'sfx';
   }
 
   setMuted(m: boolean) {
-    this.muted = m;
-    if (this.out) this.out.gain.value = m ? 0 : 0.8;
+    this.setSfxVol(m ? 0 : 1);
+  }
+
+  /** hlasitost zvuků 0–1 */
+  setSfxVol(v: number) {
+    this.sfxVol = Math.min(1, Math.max(0, Math.round(v * 10) / 10));
+    this.applyVol();
+  }
+
+  /** hlasitost hudby 0–1 (0 = hudba vypnutá) */
+  setMusVol(v: number) {
+    this.musVol = Math.min(1, Math.max(0, Math.round(v * 10) / 10));
+    this.setMusic(this.musVol > 0);
+  }
+
+  /** hlasitost je kvadratická – ucho vnímá hlasitost logaritmicky, takže 50 % zní opravdu jako „půlka“ */
+  private applyVol() {
+    if (!this.sfxOut) return;
+    this.sfxOut.gain.value = this.sfxVol * this.sfxVol;
+    this.musOut.gain.value = this.musVol * this.musVol;
+  }
+
+  private dest() {
+    return this.bus === 'mus' ? this.musOut : this.sfxOut;
   }
 
   tone(freq: number, dur: number, type: OscillatorType = 'square', vol = 0.12, slideTo?: number, delay = 0) {
-    if (!this.ctx || this.muted) return;
+    if (!this.ctx || (this.bus === 'mus' ? this.musVol : this.sfxVol) <= 0) return;
     const c = this.ctx, t = c.currentTime + delay;
     const o = c.createOscillator(), g = c.createGain();
     o.type = type;
@@ -82,13 +123,13 @@ class Sfx {
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(vol, t + 0.01);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(g).connect(this.out);
+    o.connect(g).connect(this.dest());
     o.start(t);
     o.stop(t + dur + 0.05);
   }
 
   hiss(dur: number, freq: number, vol = 0.1, slideTo?: number, delay = 0) {
-    if (!this.ctx || this.muted) return;
+    if (!this.ctx || this.sfxVol <= 0) return;
     const c = this.ctx, t = c.currentTime + delay;
     const s = c.createBufferSource();
     s.buffer = this.noise;
@@ -100,7 +141,7 @@ class Sfx {
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    s.connect(f).connect(g).connect(this.out);
+    s.connect(f).connect(g).connect(this.dest());
     s.start(t);
     s.stop(t + dur + 0.05);
   }
