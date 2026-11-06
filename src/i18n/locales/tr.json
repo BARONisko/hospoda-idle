@@ -428,5 +428,14 @@
  "Ťukni na Menu – najdeš v něm obchod, úkoly a další.": "Menü'ye dokun – dükkân, görevler ve fazlası orada.",
  "Ťukni na Obchod – tady kupuješ vylepšení výdělku.": "Dükkân'a dokun – gelir geliştirmelerini buradan alırsın.",
  "Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!": "Tamam! Menünün geri kalanı oynadıkça açılır. Menüyü kapat – bol şans, meyhaneci!",
- "chybí {n}": "eksik {n}"
+ "chybí {n}": "eksik {n}",
+ "až budeš mít kosti": "kemiğin olunca",
+ "Sběrač": "Toplayıcı",
+ "Sběrač obslouží bubliny s objednávkou za tebe.\nKaždá hospoda má vlastního. Platí se kostmi.": "Toplayıcı sipariş balonlarını senin yerine toplar.\nHer meyhanenin kendi toplayıcısı var. Kemikle ödenir.",
+ "1 bublina za {s} s · najednou {n}": "{s} sn'de 1 balon · aynı anda {n}",
+ "zatím nemáš sběrače": "henüz toplayıcı yok",
+ "Najmout\n{n} kostí": "İşe al\n{n} kemik",
+ "rychlost\nmax": "hız\nmaks",
+ "rychleji\n{n}": "daha hızlı\n{n}",
+ "+1 bublina\n{n}": "+1 balon\n{n}"
 }

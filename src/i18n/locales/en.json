@@ -428,5 +428,14 @@
  "Ťukni na Menu – najdeš v něm obchod, úkoly a další.": "Tap Menu – it has the shop, tasks and more.",
  "Ťukni na Obchod – tady kupuješ vylepšení výdělku.": "Tap Shop – this is where you buy income upgrades.",
  "Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!": "Done! More of the menu unlocks as you play. Close the menu – good luck, landlord!",
- "chybí {n}": "missing {n}"
+ "chybí {n}": "missing {n}",
+ "až budeš mít kosti": "once you have bones",
+ "Sběrač": "Collector",
+ "Sběrač obslouží bubliny s objednávkou za tebe.\nKaždá hospoda má vlastního. Platí se kostmi.": "The collector serves order bubbles for you.\nEach pub has its own. Paid in bones.",
+ "1 bublina za {s} s · najednou {n}": "1 bubble per {s} s · {n} at once",
+ "zatím nemáš sběrače": "no collector yet",
+ "Najmout\n{n} kostí": "Hire\n{n} bones",
+ "rychlost\nmax": "speed\nmax",
+ "rychleji\n{n}": "faster\n{n}",
+ "+1 bublina\n{n}": "+1 bubble\n{n}"
 }

@@ -428,5 +428,14 @@
  "Ťukni na Menu – najdeš v něm obchod, úkoly a další.": "메뉴를 탭하세요 – 상점, 임무 등이 있어요.",
  "Ťukni na Obchod – tady kupuješ vylepšení výdělku.": "상점을 탭하세요 – 여기서 수입 업그레이드를 사요.",
  "Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!": "완료! 나머지 메뉴는 플레이하며 열려요. 메뉴를 닫으세요 – 행운을 빌어요, 주인장!",
- "chybí {n}": "{n} 부족"
+ "chybí {n}": "{n} 부족",
+ "až budeš mít kosti": "뼈가 생기면",
+ "Sběrač": "수거꾼",
+ "Sběrač obslouží bubliny s objednávkou za tebe.\nKaždá hospoda má vlastního. Platí se kostmi.": "수거꾼이 주문 말풍선을 대신 처리해요.\n술집마다 따로 있어요. 뼈로 지불해요.",
+ "1 bublina za {s} s · najednou {n}": "{s}초마다 1개 · 한 번에 {n}",
+ "zatím nemáš sběrače": "아직 수거꾼 없음",
+ "Najmout\n{n} kostí": "고용\n뼈 {n}개",
+ "rychlost\nmax": "속도\n최대",
+ "rychleji\n{n}": "더 빠르게\n{n}",
+ "+1 bublina\n{n}": "+1개\n{n}"
 }

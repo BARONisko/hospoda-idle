@@ -428,5 +428,14 @@
  "Ťukni na Menu – najdeš v něm obchod, úkoly a další.": "Toca Menú: ahí están la tienda, las tareas y más.",
  "Ťukni na Obchod – tady kupuješ vylepšení výdělku.": "Toca Tienda: aquí compras mejoras de ingresos.",
  "Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!": "¡Listo! Más partes del menú se abren al jugar. Cierra el menú: ¡suerte, tabernero!",
- "chybí {n}": "faltan {n}"
+ "chybí {n}": "faltan {n}",
+ "až budeš mít kosti": "cuando tengas huesos",
+ "Sběrač": "Recolector",
+ "Sběrač obslouží bubliny s objednávkou za tebe.\nKaždá hospoda má vlastního. Platí se kostmi.": "El recolector atiende los bocadillos de pedido por ti.\nCada bar tiene el suyo. Se paga con huesos.",
+ "1 bublina za {s} s · najednou {n}": "1 pedido cada {s} s · {n} a la vez",
+ "zatím nemáš sběrače": "aún sin recolector",
+ "Najmout\n{n} kostí": "Contratar\n{n} huesos",
+ "rychlost\nmax": "velocidad\nmáx",
+ "rychleji\n{n}": "más rápido\n{n}",
+ "+1 bublina\n{n}": "+1 pedido\n{n}"
 }

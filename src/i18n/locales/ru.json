@@ -428,5 +428,14 @@
  "Ťukni na Menu – najdeš v něm obchod, úkoly a další.": "Нажми «Меню» – там магазин, задания и другое.",
  "Ťukni na Obchod – tady kupuješ vylepšení výdělku.": "Нажми «Магазин» – тут покупаются улучшения дохода.",
  "Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!": "Готово! Остальное меню откроется по ходу игры. Закрой меню – удачи, трактирщик!",
- "chybí {n}": "не хватает {n}"
+ "chybí {n}": "не хватает {n}",
+ "až budeš mít kosti": "когда будут кости",
+ "Sběrač": "Сборщик",
+ "Sběrač obslouží bubliny s objednávkou za tebe.\nKaždá hospoda má vlastního. Platí se kostmi.": "Сборщик обслуживает пузыри с заказами за тебя.\nУ каждой пивной свой. Оплата костями.",
+ "1 bublina za {s} s · najednou {n}": "1 пузырь за {s} с · сразу {n}",
+ "zatím nemáš sběrače": "сборщика пока нет",
+ "Najmout\n{n} kostí": "Нанять\n{n} костей",
+ "rychlost\nmax": "скорость\nмакс",
+ "rychleji\n{n}": "быстрее\n{n}",
+ "+1 bublina\n{n}": "+1 пузырь\n{n}"
 }

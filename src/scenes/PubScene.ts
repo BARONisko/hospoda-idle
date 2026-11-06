@@ -285,15 +285,8 @@ export class PubScene extends Phaser.Scene {
         const wp = c.getWorldPoint(ptr.x, ptr.y);
         if (this.ev.tap(this.views.indexOf(v), wp.x, wp.y)) return;
         if (v.tap(wp.x, wp.y)) {
-          const tip = Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (1 + this.ts().tips) * this.happyMult()));
-          if (this.night) this.d.bones = (this.d.bones ?? 0) + this.boneMult() * (1 + this.ts().nighttips);
-          else this.gain(tip);
-          this.d.stats.tips++;
-          this.week('tips');
-          this.xp(1);
-          this.task('tips', 1);
+          this.tipReward(v);
           this.tut('tip');
-          v.tipPop(this.night ? '+' + big(this.boneMult() * (1 + this.ts().nighttips)) : '+' + big(tip));
           sfx.tip();
         }
       }
@@ -452,6 +445,7 @@ export class PubScene extends Phaser.Scene {
       case 'krigl': return pre ? null : t('po první hygieně');
       case 'league': return pre ? null : t('po první hygieně');
       case 'bones': return d.pubs.length >= 2 ? null : t('od 2. hospody');
+      case 'coll': return d.nightInfo && (d.bones ?? 0) > 0 ? null : t('až budeš mít kosti');
       default: return null;
     }
   }
@@ -542,7 +536,7 @@ export class PubScene extends Phaser.Scene {
     return [...mgrs, ...ups].sort((a, b) => a.cost - b.cost).slice(0, 5);
   }
 
-  tab: 'home' | 'shop' | 'tasks' | 'book' | 'krigl' | 'brew' | 'talis' | 'keeper' | 'league' | 'daynight' | 'opts' = 'home';
+  tab: 'home' | 'shop' | 'tasks' | 'book' | 'krigl' | 'brew' | 'talis' | 'keeper' | 'league' | 'daynight' | 'coll' | 'opts' = 'home';
 
   /** má záložka něco nového (červená tečka)? Stejná pravidla rozsvěcují tečku na tlačítku Menu. */
   private tabAlert(id: string) {
@@ -568,6 +562,7 @@ export class PubScene extends Phaser.Scene {
     ['talis', null, t('Talismany'), 'icons', 'upAmulet'],
     ['shop', 'bones', t('Kostnice'), 'obj', 'dSkulls'],
     ['daynight', null, t('Den a noc'), 'obj', 'lanternOn'],
+    ['coll', null, t('Sběrač'), 'icons', 'tray'],
     ['keeper', null, t('Hostinský'), 'obj', 'apronIcon'],
     ['krigl', null, t('Krígly'), 'obj', 'krigl0'],
     ['book', null, t('Sbírka'), 'icons', 'book'],
@@ -650,6 +645,7 @@ export class PubScene extends Phaser.Scene {
     const cy0 = y0 + 112;
     if (tab === 'home') this.menuGrid(y0, D);
     else if (tab === 'daynight') this.dayNightTab(cy0 - 40, D);
+    else if (tab === 'coll') this.collTab(cy0 - 44, D);
     else if (tab === 'shop') this.shopTab(cy0 - 52, D, RH);
     else if (tab === 'tasks') this.tasksTab(cy0, D);
     else if (tab === 'book') this.bookTab(cy0, D);
@@ -1800,6 +1796,83 @@ export class PubScene extends Phaser.Scene {
     return (1 + this.ts().bones) * (this.d.fx?.nightx2 && this.night ? 2 : 1);
   }
 
+  /** odměna za spropitné (ťuknutí nebo sběrač): přes den coins, v noci kost */
+  private tipReward(v: PubView) {
+    const tip = Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (1 + this.ts().tips) * this.happyMult()));
+    const bone = this.boneMult() * (1 + this.ts().nighttips);
+    if (this.night) this.d.bones = (this.d.bones ?? 0) + bone;
+    else this.gain(tip);
+    this.d.stats.tips++;
+    this.week('tips');
+    this.xp(1);
+    this.task('tips', 1);
+    v.tipPop('+' + big(this.night ? bone : tip));
+  }
+
+  // ---------- sběrač bublin (číšník): každá hospoda vlastní, kupuje se a vylepšuje za kosti ----------
+  /** sběrač v hospodě i: úroveň rychlosti a množství (null = nekoupený) */
+  private coll(i: number) {
+    return this.d.coll?.[this.d.pubs[i].act];
+  }
+
+  /** každá další hospoda má sběrače 10× dražšího */
+  private collBase(i: number) {
+    return 200 * 10 ** (this.d.pubs[i].act - 1);
+  }
+
+  /** interval sběru (s): 30 s, každá úroveň rychlosti o 10 % rychleji, nejrychleji 1,5 s */
+  private collSecs(spd: number) {
+    return Math.max(1.5, 30 * 0.9 ** spd);
+  }
+
+  private collTick(dt: number) {
+    this.d.pubs.forEach((p, i) => {
+      const c = this.coll(i);
+      if (!c) return;
+      this.collT[i] = (this.collT[i] ?? this.collSecs(c.spd)) - dt;
+      if (this.collT[i] > 0) return;
+      this.collT[i] = this.collSecs(c.spd);
+      const v = this.views[i];
+      for (let k = 0; k < 1 + c.amt; k++) if (v.autoTip()) this.tipReward(v);
+    });
+  }
+
+  collT: number[] = [];
+
+  private collTab(y0: number, D: number) {
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
+    const bones = this.d.bones ?? 0;
+    add(this.add.text(W / 2, y0, t('Sběrač obslouží bubliny s objednávkou za tebe.\nKaždá hospoda má vlastního. Platí se kostmi.'), txt(18, PAL.fog)).setOrigin(0.5, 0).setAlign('center').setDepth(D + 2));
+    add(this.add.text(W / 2, y0 + 50, t('máš {n} kostí', { n: big(bones) }), txt(20, PAL.bone)).setOrigin(0.5, 0).setDepth(D + 2));
+    const RH = 118;
+    this.d.pubs.forEach((p, i) => {
+      const y = y0 + 84 + i * RH, c = this.coll(i), base = this.collBase(i);
+      const refresh = (cost: number, fn: () => void) => () => {
+        if ((this.d.bones ?? 0) < cost) return sfx.error();
+        this.d.bones! -= cost;
+        fn();
+        sfx.buy();
+        store(this.d);
+        this.openShop('coll', false);
+      };
+      this.row(y, RH, D, PUB_NAMES[p.act], c ? t('1 bublina za {s} s · najednou {n}', { s: Math.round(this.collSecs(c.spd) * 10) / 10, n: 1 + c.amt }) : t('zatím nemáš sběrače'));
+      if (!c) {
+        const b = this.btn(W - 212, y + 24, 190, 62, refresh(base, () => ((this.d.coll ??= {})[p.act] = { spd: 0, amt: 0 })), D + 2);
+        this.drawBtn(b, t('Najmout\n{n} kostí', { n: big(base) }), bones >= base, 'blue');
+        this.shopObjs.push(b.bg, b.label, b.zone);
+        return;
+      }
+      const cs = Math.ceil(base * 0.5 * 1.6 ** c.spd), ca = Math.ceil(base * 2 * 2.2 ** c.amt);
+      const maxS = this.collSecs(c.spd) <= 1.5;
+      const b1 = this.btn(W - 232, y + 24, 102, 62, refresh(cs, () => c.spd++), D + 2);
+      this.drawBtn(b1, maxS ? t('rychlost\nmax') : t('rychleji\n{n}', { n: big(cs) }), !maxS && bones >= cs, 'blue');
+      const b2 = this.btn(W - 122, y + 24, 102, 62, refresh(ca, () => c.amt++), D + 2);
+      this.drawBtn(b2, t('+1 bublina\n{n}', { n: big(ca) }), bones >= ca, 'plum');
+      [b1, b2].forEach((b) => b.label.setFontSize(16).setScale(Math.min(1, 94 / b.label.width)));
+      this.shopObjs.push(b1.bg, b1.label, b1.zone, b2.bg, b2.label, b2.zone);
+    });
+  }
+
   // ---------- den a noc ----------
   /** délka happy hour roste s pivovarem stejně jako cena piva (aby zůstala vyrovnaná s prodejem) */
   private happyMin() {
@@ -2114,6 +2187,7 @@ export class PubScene extends Phaser.Scene {
     }
     // návštěvník s rozhodnutím (jen když není otevřené jiné okno ani událost)
     this.visitLive?.();
+    this.collTick(dt);
     this.visitT -= dt;
     if (this.visitT <= 0 && !this.awayObjs.length && !this.shopObjs.length && this.sheet < 0 && !this.ev.active && (this.d.tut ?? -1) < 0) {
       this.visitT = Phaser.Math.Between(180, 360);

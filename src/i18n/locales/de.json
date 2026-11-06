@@ -428,5 +428,14 @@
  "Ťukni na Menu – najdeš v něm obchod, úkoly a další.": "Tippe auf Menü – dort sind Laden, Aufgaben und mehr.",
  "Ťukni na Obchod – tady kupuješ vylepšení výdělku.": "Tippe auf Laden – hier kaufst du Einnahme-Upgrades.",
  "Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!": "Fertig! Weitere Menüteile schalten sich im Spiel frei. Schließe das Menü – viel Glück, Wirt!",
- "chybí {n}": "fehlen {n}"
+ "chybí {n}": "fehlen {n}",
+ "až budeš mít kosti": "sobald du Knochen hast",
+ "Sběrač": "Sammler",
+ "Sběrač obslouží bubliny s objednávkou za tebe.\nKaždá hospoda má vlastního. Platí se kostmi.": "Der Sammler bedient Bestellblasen für dich.\nJede Kneipe hat ihren eigenen. Bezahlt mit Knochen.",
+ "1 bublina za {s} s · najednou {n}": "1 Blase pro {s} s · {n} auf einmal",
+ "zatím nemáš sběrače": "noch kein Sammler",
+ "Najmout\n{n} kostí": "Anheuern\n{n} Knochen",
+ "rychlost\nmax": "Tempo\nmax",
+ "rychleji\n{n}": "schneller\n{n}",
+ "+1 bublina\n{n}": "+1 Blase\n{n}"
 }

@@ -338,6 +338,14 @@ export class PubView {
   private last?: Guest;
 
 
+  /** sběrač: obslouží nejstarší bublinu s objednávkou (vrací true, když nějakou našel) */
+  autoTip(): boolean {
+    const g = this.guests.find((q) => q.order && !q.leaving);
+    if (!g) return false;
+    this.tipGuest(g);
+    return true;
+  }
+
   /** obsloužit objednávku: bublina zmizí, příští objednávka za 8–14 s */
   private serve(g: Guest) {
     g.order?.forEach((o) => o.destroy());

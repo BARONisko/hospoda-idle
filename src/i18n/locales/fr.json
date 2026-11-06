@@ -428,5 +428,14 @@
  "Ťukni na Menu – najdeš v něm obchod, úkoly a další.": "Touche Menu – boutique, tâches et plus encore.",
  "Ťukni na Obchod – tady kupuješ vylepšení výdělku.": "Touche Boutique – c'est là que tu achètes des améliorations.",
  "Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!": "C'est tout ! Le reste du menu se débloque en jouant. Ferme le menu – bonne chance, patron !",
- "chybí {n}": "manque {n}"
+ "chybí {n}": "manque {n}",
+ "až budeš mít kosti": "quand tu auras des os",
+ "Sběrač": "Serveur",
+ "Sběrač obslouží bubliny s objednávkou za tebe.\nKaždá hospoda má vlastního. Platí se kostmi.": "Le serveur prend les commandes à ta place.\nChaque bar a le sien. Payé en os.",
+ "1 bublina za {s} s · najednou {n}": "1 bulle toutes les {s} s · {n} à la fois",
+ "zatím nemáš sběrače": "pas encore de serveur",
+ "Najmout\n{n} kostí": "Engager\n{n} os",
+ "rychlost\nmax": "vitesse\nmax",
+ "rychleji\n{n}": "plus vite\n{n}",
+ "+1 bublina\n{n}": "+1 bulle\n{n}"
 }

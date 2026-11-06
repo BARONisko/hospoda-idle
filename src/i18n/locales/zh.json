@@ -428,5 +428,14 @@
  "Ťukni na Menu – najdeš v něm obchod, úkoly a další.": "点击菜单——里面有商店、任务等。",
  "Ťukni na Obchod – tady kupuješ vylepšení výdělku.": "点击商店——在这里购买收入升级。",
  "Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!": "完成！其余菜单会在游戏中解锁。关闭菜单——祝你好运，店主！",
- "chybí {n}": "还差 {n}"
+ "chybí {n}": "还差 {n}",
+ "až budeš mít kosti": "有骨头后",
+ "Sběrač": "收集员",
+ "Sběrač obslouží bubliny s objednávkou za tebe.\nKaždá hospoda má vlastního. Platí se kostmi.": "收集员替你处理点单气泡。\n每家酒馆各有一位。用骨头支付。",
+ "1 bublina za {s} s · najednou {n}": "每 {s} 秒 1 个 · 一次 {n} 个",
+ "zatím nemáš sběrače": "还没有收集员",
+ "Najmout\n{n} kostí": "雇用\n{n} 骨头",
+ "rychlost\nmax": "速度\n最大",
+ "rychleji\n{n}": "更快\n{n}",
+ "+1 bublina\n{n}": "+1 个\n{n}"
 }

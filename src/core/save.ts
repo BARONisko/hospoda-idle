@@ -51,6 +51,8 @@ export interface Save {
   dn?: { lvl: number; sw?: boolean; shift?: number; v2?: boolean };
   /** pivní akce: happy hour do (ms), noční várka (×2 kosti příští/tuto noc) */
   fx?: { happy?: number; nightx2?: boolean };
+  /** sběrač bublin podle hospody (act): úroveň rychlosti a množství */
+  coll?: Record<number, { spd: number; amt: number }>;
   /** po hygieně otevřená nová hospoda (ukázat uvítání) */
   pubIntro?: number;
   /** dlaždice menu, které už jsou odemčené (kvůli oznámení „nové v menu“) */

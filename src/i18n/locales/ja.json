@@ -428,5 +428,14 @@
  "Ťukni na Menu – najdeš v něm obchod, úkoly a další.": "メニューをタップ – ショップや任務などがある。",
  "Ťukni na Obchod – tady kupuješ vylepšení výdělku.": "ショップをタップ – 収入の強化はここで買う。",
  "Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!": "完了！メニューの他の部分はプレイ中に解放される。メニューを閉じて – 頑張れ、店主！",
- "chybí {n}": "あと {n}"
+ "chybí {n}": "あと {n}",
+ "až budeš mít kosti": "骨を手に入れたら",
+ "Sběrač": "給仕",
+ "Sběrač obslouží bubliny s objednávkou za tebe.\nKaždá hospoda má vlastního. Platí se kostmi.": "給仕が注文の吹き出しを代わりに処理する。\n店ごとに1人。骨で支払う。",
+ "1 bublina za {s} s · najednou {n}": "{s}秒ごとに1つ · 一度に{n}",
+ "zatím nemáš sběrače": "まだ給仕がいない",
+ "Najmout\n{n} kostí": "雇う\n骨 {n}",
+ "rychlost\nmax": "速さ\n最大",
+ "rychleji\n{n}": "速く\n{n}",
+ "+1 bublina\n{n}": "+1つ\n{n}"
 }
