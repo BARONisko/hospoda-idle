@@ -197,7 +197,7 @@ export class PubScene extends Phaser.Scene {
     this.rateText = this.add.text(78, 50, '', txt(22, PAL.mint)).setDepth(101);
     this.infoText = this.add.text(16, 80, '', txt(19, PAL.bone)).setDepth(101);
     this.modeBtn = this.btn(W - 112, 16, 96, 50, () => {
-      this.mode = ({ 1: 10, 10: 100, 100: 0, 0: 1 } as Record<number, number>)[this.mode];
+      this.mode = ({ 1: 10, 10: 100, 100: 0, 0: -1, [-1]: 1 } as Record<number, number>)[this.mode];
       sfx.click();
       this.drawMode();
     }, 102);
@@ -1488,14 +1488,16 @@ export class PubScene extends Phaser.Scene {
   private tutFollow: (() => void) | null = null;
 
   private drawMode() {
-    this.drawBtn(this.modeBtn, this.mode ? `×${this.mode}` : 'MAX', true, 'amber');
+    this.drawBtn(this.modeBtn, this.mode > 0 ? `×${this.mode}` : this.mode < 0 ? t('Další') : 'MAX', true, 'amber');
+    this.modeBtn.label.setScale(Math.min(1, 84 / this.modeBtn.label.width));
   }
 
   /** kolik úrovní a za kolik se koupí podle přepínače ×1/×10/×100/MAX */
   private offer(p: PubState, def: StationDef) {
     const lvl = this.st(p, def.id).lvl;
     const m = actMult(p.act);
-    const n = lvl === 0 ? 1 : this.mode || Math.max(1, affordable(def, lvl, this.d.coins / m));
+    // režim „Další“ (-1): přesně tolik úrovní, kolik chybí do dalšího milníku
+    const n = lvl === 0 ? 1 : this.mode < 0 ? Math.max(1, (nextMilestone(lvl) ?? lvl + 1) - lvl) : this.mode || Math.max(1, affordable(def, lvl, this.d.coins / m));
     return { n, price: Math.ceil(costN(def, lvl, n) * m) };
   }
 

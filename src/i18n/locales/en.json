@@ -423,5 +423,6 @@
  "Nové v menu: {s}": "New in the menu: {s}",
  "{s}: otevře se {c}": "{s}: unlocks {c}",
  "výdělek z krígel: +{a} % → +{b} %": "income from tankards: +{a} % → +{b} %",
- "= vyděláváš ×{m} víc": "= you earn ×{m} more"
+ "= vyděláváš ×{m} víc": "= you earn ×{m} more",
+ "Další": "Next"
 }
