@@ -22,3 +22,6 @@ Grafika je kreslená kódem (src/gfx, převzato z P.U.B.). Plán prací: PLAN.md
   ```
   Nastavení je v `capacitor.config.json`. Reklamy za odměnu: v `src/core/ads.ts` se přes `setAdProvider()`
   připojí reklamní síť (např. AdMob); bez ní se tlačítka „×2 za reklamu“ neukazují (ladění `?fakeads=1`).
+
+## Licence
+Všechna práva vyhrazena – viz [LICENSE](LICENSE).
