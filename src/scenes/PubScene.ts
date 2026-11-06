@@ -27,6 +27,13 @@ import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today, WeekKin
 const W = 540;
 /** kolik talířů z kuchyně může čekat na číšníky */
 const FOOD_CAP = 6;
+/** obsluha stanic: tlačítko, po najmutí, hláška */
+const STAFF_LABEL: Record<string, [string, string, string]> = {
+  tap: [t('Číšníci'), t('číšníci'), t('Číšníci nastoupili!')],
+  kitchen: [t('Kuchař'), t('kuchař'), t('Kuchař nastoupil!')],
+  cellar: [t('Sklepník'), t('sklepník'), t('Sklepník nastoupil!')],
+  dice: [t('Kostlivec'), t('kostlivec'), t('Kostlivec nastoupil!')],
+};
 const H = 960;
 const T = 16;
 const TOP = 108;
@@ -399,8 +406,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const daySecs = secs * (1 - nightShare());
     for (const p of this.d.pubs) {
       if (!p.st.tap?.auto || !p.w?.length) continue;
-      const tap = STATIONS[0];
-      const busy = Math.min(1, this.beers(p) / this.cyc(tap) / crew(p.w).rate);
+      const busy = Math.min(1, this.demand(p) / crew(p.w).rate);
       for (const w of p.w) w.xp = (w.xp ?? 0) + daySecs * busy;
     }
     if (secs < OFFLINE_MIN || g < 1 || this.awayObjs.length) return;
@@ -440,7 +446,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const tx = (y: number, s: string, size: number, c: string) =>
       objs.push(this.add.text(W / 2, y, s, txt(size, c)).setOrigin(0.5).setAlign('center').setDepth(D + 2));
     tx(by + 44, t('Zatímco jsi byl pryč…'), 30, PAL.gold);
-    tx(by + 96, t('číšníci pracovali {d}', { d: dur }), 22, PAL.fog);
+    tx(by + 96, t('obsluha pracovala {d}', { d: dur }), 22, PAL.fog);
     if (capped) tx(by + 126, t('(víc než {h} h se nepočítá)', { h: String(Math.round(this.offCap() / 360) / 10).replace('.', ',') }), 18, PAL.fog);
     const amt = this.add.text(0, by + 190, `+${big(g)}`, txt(44, PAL.gold)).setOrigin(0, 0.5).setDepth(D + 2);
     const x0 = W / 2 - (amt.width + 46) / 2;
@@ -1587,7 +1593,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     for (const def of STATIONS) {
       const st = p.st[def.id];
       const cost = def.staff * actMult(p.act) * (1 - this.ts().staff);
-      if (st && st.lvl > 0 && !st.auto && d.coins >= cost) return { text: def.id === 'tap' ? t('Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.') : t('Najmi číšníka na „{s}“ – pak pracuje sám, i když tu nejsi.', { s: STATION_NAMES[p.act][def.id] }) };
+      if (st && st.lvl > 0 && !st.auto && d.coins >= cost) return { text: def.id === 'tap' ? t('Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.') : t('Najmi obsluhu na „{s}“ – pak pracuje sama, i když tu nejsi.', { s: STATION_NAMES[p.act][def.id] }) };
     }
     const off = this.shopOffer().find((o) => o.cost <= d.coins);
     if (off) return { text: t('V Obchodě si můžeš koupit: {s}.', { s: off.title }), go: open('shop', 'up') };
@@ -2288,7 +2294,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const card = this.cards.find((k) => k.pub === i && k.def.id === def.id);
     if (card) {
       confetti(this, card.staff.x + card.staff.w / 2, card.staff.y, 30, 459, 0.7);
-      popText(this, card.staff.x + card.staff.w / 2, card.staff.y - 20, def.id === 'tap' ? t('Číšníci nastoupili!') : t('Číšník nastoupil!'), PAL.bone, 26);
+      popText(this, card.staff.x + card.staff.w / 2, card.staff.y - 20, STAFF_LABEL[def.id][2], PAL.bone, 26);
     }
     s.auto = true;
     if (s.prog === 0) s.prog = 0.0001;
@@ -2667,9 +2673,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const s = p.st[def.id];
       if (!s?.auto) continue;
       // pípa: vydělá jen to, co číšníci stihnou roznést (+ jejich spropitné)
-      if (def.id === 'tap' && p.w?.length) {
-        const c = crew(p.w);
-        r += (this.pay(p, def) / this.cyc(def)) * Math.min(1, (c.rate * this.cyc(def)) / this.beers(p)) * (1 + c.tip);
+      // pípa a kuchyně: vydělá jen to, co číšníci stihnou roznést (+ jejich spropitné)
+      if ((def.id === 'tap' && p.w?.length) || (def.id === 'kitchen' && this.served(p))) {
+        const c = crew(p.w!);
+        r += (this.pay(p, def) / this.cyc(def)) * Math.min(1, c.rate / this.demand(p)) * (1 + c.tip);
       } else r += this.pay(p, def) / this.cyc(def);
     }
     return r;
@@ -2860,17 +2867,20 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         return;
       }
       if (this.night) return;
-      // jídlo z kuchyně nosí číšníci, když na baru nečeká pivo (coins za jídlo už dala kuchyně)
-      if (bar.n < 1) {
-        const f = Math.floor(p.food ?? 0);
-        if (f < 1 || !p.st.tap?.auto) return;
-        const n = Math.min(tray(w), f);
-        p.food = (p.food ?? 0) - n;
+      // jídlo z kuchyně: vezme to, čeho čeká (poměrně) víc – pivo na baru, nebo talíře u kuchyně
+      const dish = (p.dish ??= { n: 0, v: 0 });
+      if (dish.n >= 1 && (bar.n < 1 || dish.n / FOOD_CAP > bar.n / BAR_CAP)) {
+        const n = Math.min(tray(w), Math.floor(dish.n));
+        const v = (dish.v * n) / dish.n;
+        dish.n -= n;
+        dish.v -= v;
+        if (dish.n < 1e-9) dish.v = 0;
         const dur = tripTime(w);
-        run[k] = { t: dur, dur, v: 0, paid: true };
+        run[k] = { t: dur, dur, v, paid: false };
         this.views[i].waiterTrip(k, n, dur, true);
         return;
       }
+      if (bar.n < 1) return;
       const n = Math.min(tray(w), Math.floor(bar.n));
       const v = (bar.v * n) / bar.n;
       bar.n -= n;
@@ -2881,6 +2891,20 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.views[i].waiterTrip(k, n, dur);
     });
     this.views[i].setBar(Math.floor(bar.n), BAR_CAP);
+    this.views[i].setDishes(Math.floor(p.dish?.n ?? 0));
+  }
+
+  /** nosí v hospodě číšníci? (najatí na pípě) */
+  private served(p: PubState) {
+    return !!p.w?.length && !!p.st.tap?.auto;
+  }
+
+  /** kolik věcí za sekundu se má roznést (piva + talíře) */
+  private demand(p: PubState) {
+    let d = 0;
+    if (p.st.tap?.auto) d += this.beers(p) / this.cyc(STATIONS[0]);
+    if (p.st.kitchen?.auto) d += 1 / this.cyc(STATIONS[1]);
+    return d;
   }
 
   update(_t: number, dms: number) {
@@ -2900,13 +2924,20 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         s.prog += dt / this.cyc(def);
         // pípa s číšníky: pivo jde na bar; když je bar plný, pípa počká
         const toBar = def.id === 'tap' && s.auto && !this.night && !!p.w?.length;
+        // kuchyně s kuchařem: talíř čeká u kuchyně na číšníka, coins až po donesení
+        const toPass = def.id === 'kitchen' && s.auto && !this.night && this.served(p);
         const bar = (p.bar ??= { n: 0, v: 0 });
+        const dish = (p.dish ??= { n: 0, v: 0 });
         if (toBar && s.prog >= 1 && bar.n + this.beers(p) > BAR_CAP) s.prog = 1;
+        else if (toPass && s.prog >= 1 && dish.n + 1 > FOOD_CAP) s.prog = 1;
         else if (s.prog >= 1) {
           let g = this.pay(p, def) * this.happyMult();
           if (Math.random() < this.ts().crit) g *= 2;
-          if (def.id === 'kitchen' && s.auto && !this.night && p.st.tap?.auto && p.w?.length) p.food = Math.min(FOOD_CAP, (p.food ?? 0) + 1);
-          if (toBar) {
+          if (toPass) {
+            dish.n++;
+            dish.v += g;
+            this.views[i].payout(def.id, 0, false, true);
+          } else if (toBar) {
             bar.n += this.beers(p);
             bar.v += g;
             this.views[i].payout(def.id, 0, false, true);
@@ -3011,15 +3042,16 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       c.lvl.setText(open ? (ms ? t('úroveň {n} · ×2 na {m}', { n: s.lvl, m: ms }) : t('úroveň {n}', { n: s.lvl })) : t('zavřeno'));
       c.info.setText(open ? t('+{n} / {s} s', { n: big(this.pay(p, c.def)), s: +this.cyc(c.def).toFixed(2) }) : '');
       this.drawBtn(c.buy, open ? `+${n}\n${big(price)}` : t('Otevřít\n{n}', { n: big(price) }), this.d.coins >= price, 'green');
-      const tapW = c.def.id === 'tap';
-      this.drawBtn(c.staff, tapW ? t('Číšníci {n}', { n: big(staff) }) : t('Číšník {n}', { n: big(staff) }), this.d.coins >= staff, 'plum', open && !s.auto);
-      if (open && s.auto) c.staff.label.setVisible(true).setText(tapW ? t('číšníci ✓') : t('číšník ✓')).setColor(PAL.mint);
+      const sl = STAFF_LABEL[c.def.id];
+      this.drawBtn(c.staff, `${sl[0]} ${big(staff)}`, this.d.coins >= staff, 'plum', open && !s.auto);
+      if (open && s.auto) c.staff.label.setVisible(true).setText(`${sl[1]} ✓`).setColor(PAL.mint);
       c.bar.clear();
       c.bar.fillStyle(col('dusk')).fillRoundedRect(26, c.y + 72, 270, 18, 6);
       if (open && s.prog > 0) c.bar.fillStyle(col(s.auto ? 'mint' : 'amber')).fillRoundedRect(26, c.y + 72, Math.max(12, 270 * Math.min(1, s.prog)), 18, 6);
       if (open && !s.auto && s.prog === 0) c.info.setText(t('ťukni sem!'));
       // pípa s číšníky: plný bar = číšníci nestíhají
-      if (c.def.id === 'tap' && s.auto && !this.night && p.w?.length && (p.bar?.n ?? 0) + this.beers(p) > BAR_CAP) c.info.setText(t('bar plný – číšníci nestíhají!')).setColor(PAL.sand);
+      if (c.def.id === 'kitchen' && s.auto && !this.night && this.served(p) && (p.dish?.n ?? 0) + 1 > FOOD_CAP) c.info.setText(t('talíře čekají – číšníci nestíhají!')).setColor(PAL.sand);
+      else if (c.def.id === 'tap' && s.auto && !this.night && p.w?.length && (p.bar?.n ?? 0) + this.beers(p) > BAR_CAP) c.info.setText(t('bar plný – číšníci nestíhají!')).setColor(PAL.sand);
       else c.info.setColor(PAL.white);
     }
     this.drawWaiterChips();

@@ -77,6 +77,9 @@ const LEVEL_DECOR: { id: string; lvl: number; frame: string; x: number; y: numbe
   { id: 'dice', lvl: 100, frame: 'jukebox0', x: 10 * T + 8, y: 13 * T + 8 }, // u spodní zdi (dřív stál ve dveřích)
 ];
 
+/** obsluha u stanic: kuchař, sklepník, u kostek kostlivec */
+const STAFF_KEY: Record<string, string> = { kitchen: 'cook', cellar: 'brewer', dice: 'skeleton' };
+
 /** kde číšníci čekají před barem a kudy chodí mezi stoly */
 const WAIT_HOME = [
   { x: 4.5 * T, y: 6 * T + 2 },
@@ -105,6 +108,9 @@ export class PubView {
   private keeper: Phaser.GameObjects.Sprite;
   private pourT = 0;
   private props: Record<string, Phaser.GameObjects.Image[]> = {};
+  /** obsluha u stanic: kuchař, sklepník, kostlivec u kostek (nic nenosí – nosí jen číšníci) */
+  private staff: Record<string, Phaser.GameObjects.Sprite> = {};
+  private dishes: Phaser.GameObjects.Image[] = [];
   /** číšníci (postavy) a piva čekající na baru */
   private waiters: Phaser.GameObjects.Sprite[] = [];
   private barMugs: Phaser.GameObjects.Image[] = [];
@@ -213,6 +219,33 @@ export class PubView {
     this.s.tweens.add({ targets: this.dark, fillAlpha: on ? 0.55 : 0, duration: 1500 });
   }
 
+  /** obsluha u stanice (kuchař, sklepník) nestojí jako socha: přejde kousek vedle, chvíli „pracuje“ (ruce nahoře) a zase zpátky */
+  private staffWork(spr: Phaser.GameObjects.Sprite, x0: number) {
+    const step = () => {
+      if (!spr.active) return;
+      if (spr.getData('busy')) return void this.s.time.delayedCall(1000, step);
+      const tx = x0 + this.rnd.between(-10, 10);
+      const dist = Math.abs(tx - spr.x);
+      spr.setFlipX(tx < spr.x);
+      let f = 0;
+      this.s.tweens.add({
+        targets: spr,
+        x: tx,
+        duration: Math.max(200, dist * 60),
+        onUpdate: () => spr.setFrame(8 + (Math.floor(f++ / 6) % 4)),
+        onComplete: () => {
+          if (!spr.active) return;
+          spr.setFlipX(false).setFrame(this.rnd.frac() < 0.4 ? 13 : 4);
+          this.s.time.delayedCall(this.rnd.between(1500, 4000), () => {
+            if (spr.active) spr.setFrame(4);
+            this.s.time.delayedCall(this.rnd.between(300, 1200), step);
+          });
+        },
+      });
+    };
+    this.s.time.delayedCall(this.rnd.between(500, 2500), step);
+  }
+
   /** druhy hostů této hospody (pro rváče) */
   guestKeys() {
     return GUESTS[this.pub.act];
@@ -274,6 +307,17 @@ export class PubView {
       this.waiters.push(spr);
       this.s.events.emit('pubObj', spr);
       this.s.tweens.add({ targets: spr, scale: { from: 1.6, to: 1 }, duration: 400, ease: 'Back.out' });
+    }
+    for (const id of ['kitchen', 'cellar', 'dice']) {
+      const on = id === 'dice' ? (st[id]?.lvl ?? 0) > 0 : !!st[id]?.auto;
+      if (on && !this.staff[id]) {
+        const p = SPOT[id];
+        const spr = this.s.add.sprite(this.ox + p.x, p.y, STAFF_KEY[id], id === 'dice' ? 12 : 4).setOrigin(0.5, 1).setDepth(p.y + 1);
+        this.objs.push(spr);
+        this.staff[id] = spr;
+        this.s.events.emit('pubObj', spr);
+        if (id !== 'dice') this.staffWork(spr, this.ox + p.x);
+      }
     }
     for (const [id, list] of Object.entries(this.props)) list.forEach((o) => o.setVisible((st[id]?.lvl ?? 0) > 0));
   }
@@ -405,6 +449,19 @@ export class PubView {
       this.s.events.emit('pubObj', this.barText);
     }
     this.barText.setVisible(this.waiting() || n > 0).setText(`${n}/${cap}`).setColor(n >= cap ? PAL.scarlet : PAL.gold);
+  }
+
+  /** talíře čekající u kuchyně na číšníky */
+  setDishes(n: number) {
+    const show = Math.min(4, n);
+    while (this.dishes.length < show) {
+      const i = this.dishes.length;
+      const m = this.s.add.image(this.ox + 13.2 * T + i * 7, 4 * T + 6, 'obj', FOOD[this.pub.act]).setOrigin(0.5, 1).setScale(0.45).setDepth(4 * T + 7 + i);
+      this.objs.push(m);
+      this.dishes.push(m);
+      this.s.events.emit('pubObj', m);
+    }
+    while (this.dishes.length > show) this.dishes.pop()!.destroy();
   }
 
   /** číšník i nese n piv ke stolu: tam za dur/2 s, pak zpátky; vrací hosta, kterému pivo nese (kvůli „+coins“) */

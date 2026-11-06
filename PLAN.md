@@ -128,3 +128,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Místo u kostek zase zabrané. Jídlo nosí číšníci z lišty: kuchyně s obsluhou přidá talíř do fronty (max 6, p.food),
   číšník ho vezme, když na baru nečeká pivo (pivo má přednost; coins za jídlo dál dává kuchyně hned). Hosté s objednávkou
   jídla dostanou talíř až od číšníka (když kuchyně běží sama a číšníci jsou najatí).
+- Obsluha stanic (finální přání uživatele): Pípa = Číšníci (Franta, Jarka + lišta), Kuchyně = Kuchař (vaří, nic nenosí),
+  Sklep = Sklepník (stojí u sklepa), Kostky = Kostlivec (sedí a hraje). Nosí jen číšníci. Jídlo vydělá až po donesení:
+  kuchyně s kuchařem dá talíř k výdeji (max 6, p.dish {n,v}, talíře u kuchyně), plný výdej = kuchyně stojí („talíře čekají
+  – číšníci nestíhají!“). Číšník vezme to, čeho čeká poměrně víc (bar / výdej). rate/offline: pípa + kuchyně × min(1,
+  kapacita / (piva/s + talíře/s)). Texty: „Obsluha u všech 4 stanic“, „obsluha pracovala“, „Kostky s kostlivcem“ zpět.

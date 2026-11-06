@@ -16,13 +16,18 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
   const marks: Record<string, number> = {};
   const kb = 1 + KRIGL_BONUS * krigle;
   const pay = (p: number, d: StationDef, s: St) => payout(d, Math.max(1, s.lvl)) * actMult(p + 1) * upMult(up, p + 1, d.id) * kb;
+  const demand = (p: number) => {
+    const ps = st[p];
+    return (ps[0].auto ? beersPerCycle(milestoneCount(ps[0].lvl)) / STATIONS[0].cycle : 0) + (ps[1].auto ? 1 / STATIONS[1].cycle : 0);
+  };
   const rate = () => {
     let r = 0;
     st.forEach((ps, p) => ps.forEach((s, i) => {
       const d = STATIONS[i];
-      if (s.lvl > 0 && i === 0 && s.auto && WAITERS_ON) {
+      // pípa a kuchyně: vydělá jen to, co číšníci roznesou (piva + talíře)
+      if (s.lvl > 0 && i <= 1 && s.auto && WAITERS_ON && ps[0].auto && ws[p].length) {
         const c = crew(ws[p]);
-        r += (pay(p, d, s) / d.cycle) * Math.min(1, (c.rate * d.cycle) / beersPerCycle(milestoneCount(s.lvl))) * (1 + c.tip);
+        r += (pay(p, d, s) / d.cycle) * Math.min(1, c.rate / demand(p)) * (1 + c.tip);
       } else if (s.lvl > 0 && (s.auto || (i === 0 && p === 0))) r += pay(p, d, s) / d.cycle; // pípu hráč ťuká ručně (jen v 1. hospodě), než má kostlivce
     }));
     return r;
@@ -75,7 +80,7 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
     if (WAITERS_ON) ws.forEach((list, p) => {
       const tap = st[p][0];
       if (!list.length || !tap.auto) return;
-      const busy = Math.min(1, beersPerCycle(milestoneCount(tap.lvl)) / STATIONS[0].cycle / crew(list).rate);
+      const busy = Math.min(1, demand(p) / crew(list).rate);
       for (const w of list) {
         w.xp = (w.xp ?? 0) + busy;
         while (freePoints(w) > 0) {

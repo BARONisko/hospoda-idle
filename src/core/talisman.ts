@@ -29,7 +29,7 @@ export const STAT_NAMES: Record<StatId, (v: number) => string> = {
   night: (v) => t('noc delší o {v} %', { v: pct(v) }),
   guests: (v) => t('hostů +{v}', { v: num(v) }),
   crit: (v) => t('šance na dvojitý výdělek {v} %', { v: pct(v) }),
-  staff: (v) => t('číšníci levnější o {v} %', { v: pct(v) }),
+  staff: (v) => t('obsluha levnější o {v} %', { v: pct(v) }),
   decor: (v) => t('výzdoba levnější o {v} %', { v: pct(v) }),
   daily: (v) => t('odměny za úkoly +{v} %', { v: pct(v) }),
   nighttips: (v) => t('spropitné v noci +{v} %', { v: pct(v) }),
