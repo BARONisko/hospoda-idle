@@ -38,6 +38,8 @@ export interface Save {
   ach: string[];
   /** obchod s krígly: úrovně koupených položek */
   kup?: Record<string, number>;
+  /** denní specialita {den, id} */
+  special?: { day: string; id: string };
   /** krok návodu pro nového hráče (-1 = hotovo) */
   tut?: number;
   /** bestiář: viděné druhy hostů */

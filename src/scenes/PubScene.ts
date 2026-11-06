@@ -12,7 +12,7 @@ import { Save, PubState, load, store, newPub, Act, MAX_PUBS } from '../core/save
 import { PubView } from '../game/PubView';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
 import { GUESTS } from '../game/PubView';
-import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today } from '../core/goals';
+import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today, SPECIALS } from '../core/goals';
 
 const W = 540;
 const H = 960;
@@ -182,6 +182,7 @@ export class PubScene extends Phaser.Scene {
     const evq = new URLSearchParams(location.search).get('ev') as EventKind | null;
     if (evq && EVENT_KINDS.includes(evq)) this.time.delayedCall(800, () => this.ev.start(evq, 0));
     this.applyKup();
+    this.time.delayedCall(600, () => this.askSpecial());
     const vq = new URLSearchParams(location.search).get('visit');
     if (vq !== null) this.time.delayedCall(900, () => this.visit(VISITORS[Number(vq) % VISITORS.length]));
 
@@ -269,6 +270,7 @@ export class PubScene extends Phaser.Scene {
       this.awayObjs.forEach((o) => o.destroy());
       this.awayObjs = [];
       sfx.coin(1);
+      this.askSpecial();
     };
     const two = ads.available;
     const ok = this.btn(two ? bx + 24 : W / 2 - 110, by + bh - 90, two ? 190 : 220, 64, done, D + 3);
@@ -576,6 +578,45 @@ export class PubScene extends Phaser.Scene {
     if (this.boosted(p)) this.drawBtn(b, `×${BOOST_MULT}  ${mmss(p.boostUntil! - now)}`, true, 'scarlet');
     else if ((p.boostReady ?? 0) > now) this.drawBtn(b, mmss(p.boostReady! - now), false, 'amber');
     else this.drawBtn(b, MANAGERS[p.act].skill, true, 'amber');
+  }
+
+  // ---------- denní specialita ----------
+  private specialMult(id: string) {
+    const sp = this.d.special;
+    if (!sp || sp.day !== today()) return 1;
+    return SPECIALS.find((x) => x.id === sp.id)?.mult[id] ?? 1;
+  }
+
+  /** nabídka 3 specialit (jednou denně) */
+  private askSpecial() {
+    if (this.d.special?.day === today() || this.awayObjs.length || (this.d.tut ?? -1) >= 0) return;
+    const D = 520;
+    const objs: Phaser.GameObjects.GameObject[] = [];
+    const shade = this.add.rectangle(0, 0, W, H, 0x000000, 0.6).setOrigin(0).setDepth(D).setInteractive();
+    const bx = 30, by = 200, bw = W - 60, bh = 520;
+    const g = this.add.graphics().setDepth(D + 1);
+    g.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
+    g.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
+    g.lineStyle(4, col('gold')).strokeRoundedRect(bx, by, bw, bh, 16);
+    objs.push(shade, g);
+    objs.push(this.add.text(W / 2, by + 24, t('Dnešní specialita'), txt(32, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 2));
+    objs.push(this.add.text(W / 2, by + 70, t('Vyber jednu – platí do půlnoci.'), txt(20, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2));
+    // 3 náhodné z nabídky (podle data, ať se při znovuotevření nemění)
+    const seed = today().split('-').reduce((a, x) => a * 31 + Number(x), 7);
+    const pick = [...SPECIALS].sort((a, b) => ((seed * (a.id.length + 3)) % 7) - ((seed * (b.id.length + 3)) % 7)).slice(0, 3);
+    pick.forEach((sp, i) => {
+      const b = this.btn(bx + 24, by + 120 + i * 124, bw - 48, 108, () => {
+        this.d.special = { day: today(), id: sp.id };
+        objs.forEach((o) => o.destroy());
+        this.awayObjs = [];
+        this.banner(this.views[0].cam, t('{s}! {d}', { s: sp.name, d: sp.desc }), true);
+        store(this.d);
+        this.refresh();
+      }, D + 3);
+      this.drawBtn(b, `${sp.name}\n${sp.desc}`, true, (['green', 'plum', 'amber'] as const)[i]);
+      objs.push(b.bg, b.label, b.zone);
+    });
+    this.awayObjs = objs;
   }
 
   // ---------- návštěvníci s rozhodnutím ----------
@@ -964,7 +1005,7 @@ export class PubScene extends Phaser.Scene {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * (this.kl('cthulhu') ? 10 : 1) * (season ? 1 + SEASON_BONUS : 1);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * (this.kl('cthulhu') ? 10 : 1) * (season ? 1 + SEASON_BONUS : 1) * this.specialMult(def.id);
   }
 
   // ---------- obchod s krígly ----------
@@ -1073,7 +1114,7 @@ export class PubScene extends Phaser.Scene {
     const total = this.d.pubs.reduce((a, p) => a + this.rate(p), 0);
     this.coinsText.setText(`${big(this.d.coins)} coins`);
     this.coinsText.setScale(Math.min(1, 226 / this.coinsText.width));
-    this.rateText.setText(t('+{n} / s', { n: big(total) }) + (season ? `  · ${SEASONS[season].name} +${SEASON_BONUS * 100} %` : ''));
+    this.rateText.setText(t('+{n} / s', { n: big(total) }) + (season ? `  · ${SEASONS[season].name} +${SEASON_BONUS * 100} %` : '') + (this.d.special?.day === today() ? `  · ${SPECIALS.find((x) => x.id === this.d.special!.id)?.name ?? ''}` : ''));
     this.rateText.setScale(Math.min(1, 240 / this.rateText.width));
     this.skillBtns.forEach((_, i) => this.drawSkill(i));
     this.stripRates.forEach((r, i) => r.setText(t('+{n} / s', { n: big(this.rate(this.d.pubs[i])) })));

@@ -96,3 +96,11 @@ export const GUEST_NAMES: Record<string, string> = {
   deep2: t('Stařešina hlubin'),
   drowner: t('Utopenec'),
 };
+
+/** denní specialita: hráč si každý den vybere jeden bonus (násobky výdělku stanic) */
+export const SPECIALS: { id: string; name: string; desc: string; mult: Record<string, number> }[] = [
+  { id: 'beer', name: t('Pivní den'), desc: t('pípa ×3'), mult: { tap: 3 } },
+  { id: 'goulash', name: t('Gulášový den'), desc: t('kuchyně ×3'), mult: { kitchen: 3 } },
+  { id: 'cellar', name: t('Den otevřených sklepů'), desc: t('sklep ×3'), mult: { cellar: 3 } },
+  { id: 'gamble', name: t('Hazardní den'), desc: t('kostky ×6, pípa ×½'), mult: { dice: 6, tap: 0.5 } },
+];
