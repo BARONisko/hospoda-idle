@@ -167,6 +167,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   create() {
     this.d = load();
+    // Chrám Cthulhu už není 4. hospoda (je z něj víkendová událost) → ze starých uložení ho odebrat
+    this.d.pubs = this.d.pubs.filter((p) => p.act <= 3).slice(0, MAX_PUBS);
+    if (!this.d.pubs.length) this.d.pubs = [newPub(1)];
     loadOpts();
     // ladění: ?pubs=2|3 přidá hospody (než bude prestiž)
     const dbg = Number(new URLSearchParams(location.search).get('pubs'));

@@ -55,4 +55,4 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   „Probudit Cthulhu“ → Zlatý výčep (×1,5, ×1,75, ×2 …, cena 300·3^n; Cthulhu kouká do hospod až po 1. bossovi v chrámu);
   Štědří hosté → Věrnost hostů (1 XP za příchod hosta, max úr. 10, 1. úr. 20 000 příchodů, ×1,3; +5 % spropitného/úr.;
   d.gxp). Staré krígly za spánek a Štědré hosty vráceny (d.kup2). Kostlivci obsluhy občas donesou jídlo hostovi / sud k pípě.
-  Rvačka jen na podlaze (ne u horní zdi).
+  Rvačka jen na podlaze (ne u horní zdi). Stará 4. hospoda Chrám Cthulhu se ze starých uložení odebere (chrám = víkendová událost).
