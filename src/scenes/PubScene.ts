@@ -8,6 +8,7 @@ import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
 import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
+import { BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS } from '../core/save';
 import { PubView } from '../game/PubView';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
@@ -339,7 +340,7 @@ export class PubScene extends Phaser.Scene {
     return [...mgrs, ...ups].sort((a, b) => a.cost - b.cost).slice(0, 5);
   }
 
-  tab: 'shop' | 'tasks' | 'book' | 'krigl' | 'opts' = 'shop';
+  tab: 'shop' | 'tasks' | 'book' | 'krigl' | 'brew' | 'opts' = 'shop';
 
   private openShop(tab = this.tab, toggle = true) {
     this.tut('menu');
@@ -349,28 +350,31 @@ export class PubScene extends Phaser.Scene {
     this.tutObjs.forEach((o) => (o as unknown as Phaser.GameObjects.Components.Visible).setVisible(false));
     this.tab = tab;
     const D = 300, RH = 96;
-    const y0 = H - 6 * RH - 74;
+    const y0 = H - 6 * RH - 126;
     const block = this.add.rectangle(0, TOP, W, H - TOP, 0x000000, 0.55).setOrigin(0).setDepth(D).setInteractive();
     block.on('pointerdown', (ptr: Phaser.Input.Pointer) => ptr.y < y0 && this.closeShop());
     const g = this.add.graphics().setDepth(D);
     g.fillStyle(col('dusk'), 0.98).fillRoundedRect(0, y0, W, H - y0 + 20, 16);
     g.fillStyle(col('gold')).fillRect(0, y0, W, 3);
     this.shopObjs.push(block, g);
-    const tabs: [typeof tab, string][] = [
-      ['shop', t('Obchod')],
-      ['tasks', t('Úkoly')],
-      ['book', t('Sbírka')],
-      ['krigl', t('Krígly')],
-      ['opts', ''],
+    // záložky ve dvou řádcích
+    const tabs: [typeof tab, string, number, number][] = [
+      ['shop', t('Obchod'), 0, 0],
+      ['tasks', t('Úkoly'), 1, 0],
+      ['book', t('Sbírka'), 2, 0],
+      ['krigl', t('Krígly'), 3, 0],
+      ['brew', t('Pivovar'), 0, 1],
+      ...this.extraTabs(),
+      ['opts', '', 3, 1],
     ];
-    tabs.forEach(([id, label], i) => {
-      const b = this.btn(10 + i * 102, y0 + 10, id === 'opts' ? 54 : 96, 42, () => this.openShop(id, false), D + 5);
+    tabs.forEach(([id, label, cx, cy]) => {
+      const b = this.btn(10 + cx * 118, y0 + 10 + cy * 48, id === 'opts' ? 54 : 112, 42, () => this.openShop(id, false), D + 5);
       if (id === 'opts') this.shopObjs.push(this.add.image(b.x + 27, b.y + 21, 'icons', 'gear').setScale(2).setDepth(D + 7));
       this.drawBtn(b, label, true, id === tab ? 'amber' : 'slate');
-      b.label.setScale(Math.min(1, 88 / Math.max(1, b.label.width)));
+      b.label.setScale(Math.min(1, 102 / Math.max(1, b.label.width)));
       if (id !== tab) b.label.setColor(PAL.bone);
       this.shopObjs.push(b.bg, b.label, b.zone);
-      if (id === 'tasks' && this.claimable()) {
+      if ((id === 'tasks' && this.claimable()) || (id === 'brew' && this.brewFull())) {
         const dot = this.add.graphics().setDepth(D + 8);
         dot.fillStyle(col('ink')).fillCircle(b.x + b.w - 6, b.y + 4, 10).fillStyle(col('scarlet')).fillCircle(b.x + b.w - 6, b.y + 4, 7);
         this.shopObjs.push(dot);
@@ -379,13 +383,101 @@ export class PubScene extends Phaser.Scene {
     const close = this.btn(W - 62, y0 + 10, 52, 42, () => this.closeShop(), D + 5);
     this.drawBtn(close, '✕', true, 'red');
     this.shopObjs.push(close.bg, close.label, close.zone);
-    if (tab === 'shop') this.shopTab(y0 + 64, D, RH);
-    else if (tab === 'tasks') this.tasksTab(y0 + 64, D);
-    else if (tab === 'book') this.bookTab(y0 + 64, D);
-    else if (tab === 'krigl') this.kriglTab(y0 + 64, D);
-    else this.optsTab(y0 + 64, D);
+    const cy0 = y0 + 112;
+    if (tab === 'shop') this.shopTab(cy0, D, RH);
+    else if (tab === 'tasks') this.tasksTab(cy0, D);
+    else if (tab === 'book') this.bookTab(cy0, D);
+    else if (tab === 'krigl') this.kriglTab(cy0, D);
+    else if (tab === 'brew') this.brewTab(cy0, D);
+    else this.optsTab(cy0, D);
     sfx.click();
     this.refresh();
+  }
+
+  /** další záložky ve 2. řádku (talismany, hostinský) */
+  private extraTabs(): [PubScene['tab'], string, number, number][] {
+    return [];
+  }
+
+  // ---------- pivovar ----------
+  private brew() {
+    return (this.d.brew ??= newBrew());
+  }
+
+  private brewFull() {
+    const b = this.brew();
+    tick(b);
+    return b.stock >= tank(b);
+  }
+
+  private brewTab(y0: number, D: number) {
+    const b = this.brew();
+    tick(b);
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
+    const box = add(this.add.graphics().setDepth(D + 1));
+    box.fillStyle(col('ink'), 0.6).fillRoundedRect(10, y0, W - 20, 196, 10);
+    const ferm = add(this.add.image(80, y0 + 150, 'obj', b.stock < tank(b) ? 'fermenterHiss' : 'fermenter').setOrigin(0.5, 1).setScale(4).setDepth(D + 2));
+    if (b.stock < tank(b)) this.tweens.add({ targets: ferm, scaleY: 4.15, yoyo: true, repeat: -1, duration: 700 });
+    add(this.add.text(150, y0 + 12, t('Pivovar – úroveň {n}', { n: b.lvl }), txt(26, PAL.gold)).setDepth(D + 2));
+    add(this.add.text(150, y0 + 46, t('trvalý bonus: výdělek +{p} %', { p: Math.round(brewBonus(b) * 100) }), txt(18, PAL.mint)).setDepth(D + 2));
+    add(this.add.text(150, y0 + 72, t('V tanku: {a} / {b} piv', { a: b.stock, b: tank(b) }), txt(22, PAL.bone)).setDepth(D + 2));
+    this.brewBar = add(this.add.graphics().setDepth(D + 2));
+    this.brewTxt = add(this.add.text(150, y0 + 140, '', txt(18, PAL.fog)).setDepth(D + 2));
+    this.brewY = y0 + 110;
+    // druh piva (rozhodnutí: rychle a levně, nebo pomalu a draze)
+    add(this.add.text(20, y0 + 208, t('Co vařit:'), txt(20, PAL.gold)).setDepth(D + 2));
+    (Object.keys(BEERS) as BeerKind[]).forEach((k, i) => {
+      const bt = this.btn(10 + i * 175, y0 + 236, 165, 62, () => {
+        b.kind = k;
+        store(this.d);
+        this.openShop('brew', false);
+      }, D + 2);
+      this.drawBtn(bt, `${BEERS[k].name}\n×${BEERS[k].value} · ${t('čas ×{t}', { t: BEERS[k].time })}`, true, b.kind === k ? 'amber' : 'slate');
+      bt.label.setScale(Math.min(1, 150 / bt.label.width));
+      this.shopObjs.push(bt.bg, bt.label, bt.zone);
+    });
+    // prodat / vložit do pivovaru
+    const price = this.visitCtx().income(sellSecs(b));
+    const sell = this.btn(10, y0 + 316, 255, 84, () => {
+      if (b.stock < 1) return sfx.error();
+      b.stock--;
+      this.gain(price);
+      sfx.coin(1.2);
+      store(this.d);
+      this.openShop('brew', false);
+    }, D + 2);
+    this.drawBtn(sell, t('Prodat pivo\n+{n} coins', { n: big(price) }), b.stock > 0, 'green');
+    const inv = this.btn(275, y0 + 316, 255, 84, () => {
+      if (b.stock < 1) return sfx.error();
+      b.stock--;
+      b.inv++;
+      if (b.inv >= lvlCost(b)) {
+        b.inv = 0;
+        b.lvl++;
+        this.banner(this.views[0].cam, t('Pivovar úroveň {n}!', { n: b.lvl }));
+      } else sfx.buy();
+      store(this.d);
+      this.openShop('brew', false);
+    }, D + 2);
+    this.drawBtn(inv, t('Vylepšit pivovar\n{a} / {b} piv', { a: b.inv, b: lvlCost(b) }), b.stock > 0, 'plum');
+    this.shopObjs.push(sell.bg, sell.label, sell.zone, inv.bg, inv.label, inv.zone);
+    add(this.add.text(W / 2, y0 + 420, t('Vaří se i když nehraješ. Plný tank čeká.'), txt(16, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2));
+    this.drawBrewBar();
+  }
+
+  brewBar?: Phaser.GameObjects.Graphics;
+  brewTxt?: Phaser.GameObjects.Text;
+  brewY = 0;
+
+  private drawBrewBar() {
+    if (!this.brewBar?.active || !this.brewTxt) return;
+    const b = this.brew();
+    const full = b.stock >= tank(b);
+    const p = full ? 1 : Math.min(1, (Date.now() - b.at) / brewMs(b));
+    this.brewBar.clear().fillStyle(col('dusk')).fillRoundedRect(150, this.brewY, 360, 22, 8);
+    this.brewBar.fillStyle(col(full ? 'scarlet' : 'amber')).fillRoundedRect(150, this.brewY, Math.max(14, 360 * p), 22, 8);
+    const left = Math.max(0, Math.ceil((brewMs(b) - (Date.now() - b.at)) / 1000));
+    this.brewTxt.setText(full ? t('Tank je plný – prodej nebo vylepši!') : t('{k}: další pivo za {m}:{s}', { k: BEERS[b.kind].name, m: Math.floor(left / 60), s: String(left % 60).padStart(2, '0') }));
   }
 
   /** řádek panelu: text vlevo, tlačítko vpravo */
@@ -1021,7 +1113,7 @@ export class PubScene extends Phaser.Scene {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * (this.kl('cthulhu') ? 10 : 1) * (season ? 1 + SEASON_BONUS : 1) * this.specialMult(def.id) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * (this.kl('cthulhu') ? 10 : 1) * (season ? 1 + SEASON_BONUS : 1) * this.specialMult(def.id) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0));
   }
 
   // ---------- obchod s krígly ----------
@@ -1147,6 +1239,12 @@ export class PubScene extends Phaser.Scene {
       this.views[i].update(dt, open);
     });
     this.ev.update(dt);
+    if (this.tab === 'brew' && this.shopObjs.length) {
+      const before = this.brew().stock;
+      tick(this.brew());
+      if (this.brew().stock !== before) this.openShop('brew', false);
+      else this.drawBrewBar();
+    }
     // návštěvník s rozhodnutím (jen když není otevřené jiné okno ani událost)
     this.visitT -= dt;
     if (this.visitT <= 0 && !this.awayObjs.length && !this.shopObjs.length && this.sheet < 0 && !this.ev.active && (this.d.tut ?? -1) < 0) {
@@ -1170,7 +1268,7 @@ export class PubScene extends Phaser.Scene {
     this.skillBtns.forEach((_, i) => this.drawSkill(i));
     this.stripRates.forEach((r, i) => r.setText(t('+{n} / s', { n: big(this.rate(this.d.pubs[i])) })));
 
-    const cheap = this.shopOffer().some((u) => u.cost <= this.d.coins) || this.claimable();
+    const cheap = this.shopOffer().some((u) => u.cost <= this.d.coins) || this.claimable() || this.brewFull();
     this.shopDot.clear();
     if (cheap) this.shopDot.fillStyle(col('ink')).fillCircle(W - 126, 20, 11).fillStyle(col('scarlet')).fillCircle(W - 126, 20, 8);
     for (const r of this.shopRows) this.drawBtn(r.b, big(r.o.cost), this.d.coins >= r.o.cost, 'green');

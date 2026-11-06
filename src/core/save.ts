@@ -1,4 +1,5 @@
 import type { Stats, Daily } from './goals';
+import type { BrewState } from './brewery';
 
 // Uložení hry do localStorage (na mobilu přes Capacitor stejně). Verzované kvůli převodům.
 export interface StationState {
@@ -42,6 +43,8 @@ export interface Save {
   special?: { day: string; id: string };
   /** koupená výzdoba (id) – zůstává i po hygieně */
   decor?: string[];
+  /** pivovar (zůstává i po hygieně) */
+  brew?: BrewState;
   /** krok návodu pro nového hráče (-1 = hotovo) */
   tut?: number;
   /** bestiář: viděné druhy hostů */

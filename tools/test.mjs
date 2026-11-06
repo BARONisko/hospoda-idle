@@ -73,6 +73,11 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   // 5d) výzdoba
   await S(p, (s) => { s.d.coins = 1e16; s.shopSub = 'decor'; s.openShop('shop', false); s.decorRows[0].b.zone.emit('pointerdown'); });
   ok('výzdoba: koupě portrétu', await S(p, (s) => s.has('portrait')));
+  // 5e) pivovar: uvaří se i offline, prodej a vylepšení
+  await S(p, (s) => { const b = s.brew(); b.stock = 0; b.at = Date.now() - 3 * 15 * 60_000 - 1000; b.kind = 'lager'; s.openShop('brew', false); });
+  ok('pivovar: offline uvařil 3 piva', await S(p, (s) => s.brew().stock === 3));
+  for (let k = 0; k < 2; k++) await S(p, (s) => s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown'));
+  ok('pivovar: 2 piva vložena → úroveň 2', await S(p, (s) => s.brew().lvl === 2));
   // 6) prestiž
   await S(p, (s) => { s.d.run = 1e8; s.askPrestige(); s.prestige(); });
   await p.waitForTimeout(800);
