@@ -1820,9 +1820,9 @@ export class PubScene extends Phaser.Scene {
     return 200 * 10 ** (this.d.pubs[i].act - 1);
   }
 
-  /** interval sběru (s): 30 s, každá úroveň rychlosti o 10 % rychleji, nejrychleji 1,5 s */
+  /** interval sběru (s): 30 s, každá úroveň rychlosti o 1 % rychleji, nejrychleji 1,5 s */
   private collSecs(spd: number) {
-    return Math.max(1.5, 30 * 0.9 ** spd);
+    return Math.max(1.5, 30 * 0.99 ** spd);
   }
 
   private collTick(dt: number) {
