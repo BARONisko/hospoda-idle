@@ -37,7 +37,7 @@
   dovedností, týdenní výzva, 20 statů + Kostnice (staty za kosti, src/core/talisman.ts OSSUARY), týdenní liga
   (src/core/league.ts, 5 lig, postup/sestup). Denní specialitu uživatel ZRUŠIL („k ničemu“) – nevracet.
 - Kosti mají být vzácné a vylepšení drahá (přání uživatele) – BONE_RATE 0.0002, ossCost 400·1.8^lvl, talisCost 150·2.6^lvl.
-- ROZPRACOVÁNO: 35 nových textů (staty, Kostnice, liga) chybí v překladech – seznam vygeneruj skriptem jako dřív
+- HOTOVO v 53: 35 textů (staty, Kostnice, liga) přeloženo do 11 jazyků.
   (grep t('…') v src/scenes/PubScene.ts src/game src/core vs. en.json) a nech přeložit do 11 jazyků (subagent).
 - Čeká na uživatele: soupeřova hospoda – navrženo 5 variant (souboj o hosty, sabotáž/poctivost, liga = HOTOVO,
   převzetí soupeře, souboj stanic); dojmy z hraní (tempo pivovaru, den/noc, talismany).
