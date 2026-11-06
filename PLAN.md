@@ -82,3 +82,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Propojení částí: pivovar → šipky rychleji (+0,5 %/úr.), sběrač → chapadla (+0,3 %/úr.), hostinský → síla v chrámu (+0,5 %/úr.),
   liga výhra → +3 body šipek, poražený Cthulhu → +2×obtížnost bodů šipek, dohraná hra šipek → +3 kosti a +5 XP hostinského;
   šipky → 8 statů celé hry; Kostnice → šipky (přesnost, rychlost); chrám → šipky (bod navíc).
+- Hospoda 56: tutoriál – když na nákup (úroveň pípy, kostlivec, kuchyně) nejsou coins, bublina ukáže „Ťukej na Pípu (vlevo)
+  a sbírej coins: 4 / 6. Pak kup vpravo.“ (po najmutí: počkej na coins), světlá je celá karta a šipka míří na ťukání;
+  jakmile coins stačí, přepne se na nákup. Šipky: od zbytku 60 hod, který by přestřelil, dopadne do mířeného pole
+  (zbývá 1 → opravdu hodí jedničku; vedle terče jde hodit dál). Automat se zase kupuje (1 bod, „Koupit automat“ na
+  terči i v obchodě); bez něj se hází ťuknutím na terč (míří se samo), offline nic. Dosavadní hráči automat dostali (darts v3).

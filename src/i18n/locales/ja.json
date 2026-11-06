@@ -557,7 +557,7 @@
  "Automat: VYP": "Auto: OFF",
  "Automat: ZAP": "Auto: ON",
  "Automat: kup za 1 bod": "Auto: buy for 1 point",
- "Automatické házení": "Auto-throw",
+ "Automatické házení": "自動投げ",
  "Bod navíc": "追加ポイント",
  "Body: {p}": "ポイント: {p}",
  "Delší čas na hod": "Longer throw time",
@@ -631,5 +631,11 @@
  "{n} šipek za hodinu": "1時間に {n} 本",
  " (bod navíc!)": "（ボーナスポイント！）",
  "+3 kosti, +5 XP hostinského": "骨+3、店主XP+5",
- "+{n} bodů do šipek": "ダーツポイント+{n}"
+ "+{n} bodů do šipek": "ダーツポイント+{n}",
+ "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "左のビールサーバーをタップしてcoinsを集めよう：{c} / {n}。その後、右で購入。",
+ "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "ガイコツが自動で注ぐ – coinsを待とう：{c} / {n}（客をタップしてもOK）。",
+ "hází samo po 2 s, i když tu nejsi": "いない間も2秒ごとに自動で投げる",
+ "Koupit automat\n1 bod": "自動投げを購入\n1ポイント",
+ "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "ボードをタップ＝投げる（狙いは自動）。ぴったり0で終われば1ポイント。1ポイントで自動投げを購入 – オフラインでも投げ続ける。",
+ "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "投げはオフ – ダーツは矢筒にたまる。ボードをタップ＝投げる。"
 }

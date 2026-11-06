@@ -557,7 +557,7 @@
  "Automat: VYP": "Auto: OFF",
  "Automat: ZAP": "Auto: ON",
  "Automat: kup za 1 bod": "Auto: buy for 1 point",
- "Automatické házení": "Auto-throw",
+ "Automatické házení": "Lançamento automático",
  "Bod navíc": "Ponto extra",
  "Body: {p}": "Pontos: {p}",
  "Delší čas na hod": "Longer throw time",
@@ -631,5 +631,11 @@
  "{n} šipek za hodinu": "{n} dardos por hora",
  " (bod navíc!)": " (ponto extra!)",
  "+3 kosti, +5 XP hostinského": "+3 ossos, +5 XP do taberneiro",
- "+{n} bodů do šipek": "+{n} pontos de dardos"
+ "+{n} bodů do šipek": "+{n} pontos de dardos",
+ "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "Toque na Torneira (esquerda) e junte coins: {c} / {n}. Depois compre à direita.",
+ "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "O esqueleto serve sozinho – espere os coins: {c} / {n} (ou toque nos clientes).",
+ "hází samo po 2 s, i když tu nejsi": "lança sozinho a cada 2 s, mesmo quando você não está",
+ "Koupit automat\n1 bod": "Comprar lançador\n1 ponto",
+ "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Toque no alvo = lançar (a mira é automática). Termine exatamente em zero = 1 ponto. Com 1 ponto compre o lançador automático – lança sozinho, até offline.",
+ "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "Lançamento desligado – os dardos ficam na aljava. Toque no alvo = lançar."
 }

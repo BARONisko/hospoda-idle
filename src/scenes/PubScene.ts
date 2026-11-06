@@ -1777,7 +1777,17 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.tutShow();
   }
 
-  private tutShow() {
+  private tutShow(textOnly = false) {
+    if (textOnly && this.tutBub) {
+      const i0 = this.d.tut ?? -1;
+      const need = i0 >= 0 ? this.tutNeed(PubScene.TUT[i0].done) : 0;
+      const manual = !this.st(this.d.pubs[0], 'tap').auto;
+      if (need > 0) this.tutBub.setText(manual
+        ? t('Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.', { c: Math.floor(this.d.coins), n: need })
+        : t('Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).', { c: Math.floor(this.d.coins), n: need }));
+      return;
+    }
+    this.tutBub = null;
     this.tutObjs.forEach((o) => o.destroy());
     this.tutObjs = [];
     this.tutFollow = null;
@@ -1786,8 +1796,17 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const step = PubScene.TUT[i];
     // kam ukázat
     const card = (id: string) => this.cards.find((c) => c.def.id === id)!;
+    // na nákup ještě nemá → ukázat, jak coins získat (ťukat na pípu vlevo / počkat), ne šedé tlačítko
+    const need = this.tutNeed(step.done);
+    this.tutPoor = need > 0;
+    const tapManual = !this.st(this.d.pubs[0], 'tap').auto;
+    let text = step.text;
+    if (need > 0) text = tapManual
+      ? t('Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.', { c: Math.floor(this.d.coins), n: need })
+      : t('Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).', { c: Math.floor(this.d.coins), n: need });
     let tx = 0, ty = 0;
-    if (step.done === 'tap') [tx, ty] = [160, card('tap').y + 30];
+    if (need > 0 && tapManual) [tx, ty] = [160, card('tap').y + 30];
+    else if (step.done === 'tap') [tx, ty] = [160, card('tap').y + 30];
     else if (step.done === 'buy:tap') [tx, ty] = [card('tap').buy.x + 95, card('tap').buy.y];
     else if (step.done === 'hire') [tx, ty] = [card('tap').staff.x + 95, card('tap').staff.y];
     else if (step.done === 'buy:kitchen') [tx, ty] = [card('kitchen').buy.x + 95, card('kitchen').buy.y];
@@ -1798,8 +1817,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // ztmavení okolí: světlý zůstane jen cíl (u hosta ne – ten se hýbe)
     if (step.done !== 'tip') {
       const [hw, hh] = step.done === 'tile:shop' ? [180, 126] : step.done === 'close' ? [66, 54] : [260, 96];
-      const [hx, hy] = step.done === 'menu' ? [this.shopBtn.x - 6, this.shopBtn.y - 6] : [tx - hw / 2, ty - 6];
-      const [w2, h2] = step.done === 'menu' ? [120, 62] : [hw, hh];
+      let [hx, hy] = step.done === 'menu' ? [this.shopBtn.x - 6, this.shopBtn.y - 6] : [tx - hw / 2, ty - 6];
+      let [w2, h2] = step.done === 'menu' ? [120, 62] : [hw, hh];
+      // bez peněz: světlá celá karta (vlevo ťukání, vpravo nákup), ať je vidět obojí
+      if (need > 0) {
+        const cy = card(tapManual ? 'tap' : step.done === 'buy:kitchen' ? 'kitchen' : 'tap').y;
+        [hx, hy, w2, h2] = [6, cy - 4, W - 12, CARD_H];
+      }
       const dim = this.add.graphics().setDepth(D - 1);
       dim.fillStyle(0x000000, 0.6);
       dim.fillRect(0, 0, W, hy).fillRect(0, hy + h2, W, H - hy - h2).fillRect(0, hy, hx, h2).fillRect(hx + w2, hy, W - hx - w2, h2);
@@ -1807,7 +1831,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.tutObjs.push(dim);
     }
     const by = TOP + (step.done === 'menu' ? 90 : 16); // u Menu níž, ať ji nepřekryje šipka
-    const bub = this.add.text(W / 2, by, step.text, txt(24, PAL.ink)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 80).setDepth(D + 1);
+    const bub = this.add.text(W / 2, by, text, txt(24, PAL.ink)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 80).setDepth(D + 1);
+    this.tutBub = bub;
     const g = this.add.graphics().setDepth(D);
     g.fillStyle(col('ink'), 0.5).fillRoundedRect(W / 2 - bub.width / 2 - 16, by - 6, bub.width + 32, bub.height + 16, 12);
     g.fillStyle(col('sand')).fillRoundedRect(W / 2 - bub.width / 2 - 18, by - 10, bub.width + 36, bub.height + 16, 12);
@@ -1835,6 +1860,37 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** u kroku „ťukni na hosta“ šipka sleduje hosta (volá se z update) */
   private tutFollow: (() => void) | null = null;
+  private tutPoor = false;
+  private tutBub: Phaser.GameObjects.Text | null = null;
+  private tutCoins = -1;
+
+  /** kolik coins chybí k nákupu v kroku návodu (0 = má dost / krok nic nekupuje) */
+  private tutNeed(done: string) {
+    const p = this.d.pubs[0];
+    if (!p) return 0;
+    let price = 0;
+    if (done === 'buy:tap' || done === 'buy:kitchen') {
+      const def = STATIONS.find((s) => 'buy:' + s.id === done)!;
+      price = this.offer(p, def).price;
+    } else if (done === 'hire') {
+      const def = STATIONS.find((s) => s.id === 'tap')!;
+      price = Math.ceil(def.staff * actMult(p.act) * (1 - this.ts().staff));
+    }
+    return this.d.coins < price ? price : 0;
+  }
+
+  /** návod: přepnout text/zvýraznění, když hráč nasbírá dost (nebo průběžně ukazovat coins) */
+  private tutTick() {
+    const i = this.d.tut ?? -1;
+    if (i < 0 || this.views.length > 1) return;
+    const done = PubScene.TUT[i].done;
+    if (done !== 'buy:tap' && done !== 'hire' && done !== 'buy:kitchen') return;
+    const poor = this.tutNeed(done) > 0;
+    const c = Math.floor(this.d.coins);
+    if (poor !== this.tutPoor) this.tutShow();
+    else if (poor && c !== this.tutCoins) this.tutShow(true);
+    this.tutCoins = c;
+  }
 
   private drawMode() {
     this.drawBtn(this.modeBtn, this.mode > 0 ? `×${this.mode}` : this.mode < 0 ? t('Další') : 'MAX', true, 'amber');
@@ -2439,6 +2495,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   update(_t: number, dms: number) {
     const dt = Math.min(dms / 1000, 0.25);
     this.tutFollow?.();
+    this.tutTick();
     this.coinT -= dt;
     this.d.pubs.forEach((p, i) => {
       let open = 0;

@@ -557,7 +557,7 @@
  "Automat: VYP": "Auto: OFF",
  "Automat: ZAP": "Auto: ON",
  "Automat: kup za 1 bod": "Auto: buy for 1 point",
- "Automatické házení": "Auto-throw",
+ "Automatické házení": "自动投掷",
  "Bod navíc": "额外得分",
  "Body: {p}": "分数：{p}",
  "Delší čas na hod": "Longer throw time",
@@ -631,5 +631,11 @@
  "{n} šipek za hodinu": "每小时 {n} 支飞镖",
  " (bod navíc!)": "（额外点数！）",
  "+3 kosti, +5 XP hostinského": "骨头+3，店主经验+5",
- "+{n} bodů do šipek": "飞镖点数+{n}"
+ "+{n} bodů do šipek": "飞镖点数+{n}",
+ "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "点击左边的啤酒龙头收集coins：{c} / {n}。然后在右边购买。",
+ "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "骷髅会自己倒酒 – 等待coins：{c} / {n}（或点击客人）。",
+ "hází samo po 2 s, i když tu nejsi": "即使你不在，也每2秒自动投掷",
+ "Koupit automat\n1 bod": "购买自动投掷\n1点",
+ "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "点击镖盘 = 投掷（自动瞄准）。正好归零 = 1点。用1点购买自动投掷 – 离线也会自己投。",
+ "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "投掷已关闭 – 飞镖存进箭袋。点击镖盘 = 投掷。"
 }

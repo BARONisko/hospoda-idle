@@ -557,7 +557,7 @@
  "Automat: VYP": "Auto: OFF",
  "Automat: ZAP": "Auto: ON",
  "Automat: kup za 1 bod": "Auto: buy for 1 point",
- "Automatické házení": "Auto-throw",
+ "Automatické házení": "Automatic throwing",
  "Bod navíc": "Bonus Point",
  "Body: {p}": "Points: {p}",
  "Delší čas na hod": "Longer throw time",
@@ -631,5 +631,11 @@
  "{n} šipek za hodinu": "{n} darts per hour",
  " (bod navíc!)": " (bonus point!)",
  "+3 kosti, +5 XP hostinského": "+3 bones, +5 landlord XP",
- "+{n} bodů do šipek": "+{n} darts points"
+ "+{n} bodů do šipek": "+{n} darts points",
+ "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "Tap the Beer Tap (left) to collect coins: {c} / {n}. Then buy on the right.",
+ "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "The skeleton pours by itself – wait for coins: {c} / {n} (or tap guests).",
+ "hází samo po 2 s, i když tu nejsi": "throws by itself every 2 s, even when you're away",
+ "Koupit automat\n1 bod": "Buy auto-thrower\n1 point",
+ "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Tap the board = throw (aiming is automatic). Finish exactly on zero = 1 point. Spend 1 point on the auto-thrower – it throws by itself, even offline.",
+ "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "Throwing is off – darts are saved in the quiver. Tap the board = throw."
 }

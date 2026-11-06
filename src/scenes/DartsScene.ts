@@ -7,7 +7,7 @@ import { txt } from '../ui/font';
 import { t } from '../i18n';
 import { big } from '../core/num';
 import { sfx } from '../core/sfx';
-import { DartsState, DART_UPS, dartMs, dartCap, START, NUMS, rings, aimFor, fieldPos, land, resolve, ThrowResult, THROW_GAP, migrateDarts } from '../core/darts';
+import { DartsState, DART_UPS, dartMs, dartCap, START, NUMS, rings, aimFor, aimLand, autoOn, resolve, ThrowResult, THROW_GAP, migrateDarts } from '../core/darts';
 import { makeDartboard, BOARD_R } from '../gfx/tourneyArt';
 import type { StatId } from '../core/talisman';
 
@@ -126,12 +126,35 @@ export class DartsScene extends Phaser.Scene {
     };
     this.button(W - 120, 22, 104, 64, t('Zpět'), 'blue', true, () => this.leave());
     this.button(20, 800, 240, 72, t('Vylepšení'), 'plum', true, () => this.shop());
-    this.button(280, 800, 240, 72, S.auto ? t('Házení: ZAP') : t('Házení: VYP'), S.auto ? 'green' : 'amber', true, () => {
-      S.auto = !S.auto;
-      this.host.dartsSave();
-      this.play();
-    });
-    this.text(W / 2, 888, S.auto ? t('Hází se samo, i když tu nejsi. Dohraj přesně na nulu = 1 bod.') : t('Házení je vypnuté – šipky se šetří do toulce.'), 17, PAL.fog, 0.5).setWordWrapWidth(W - 40).setAlign('center');
+    const has = (S.up.auto ?? 0) > 0;
+    if (has)
+      this.button(280, 800, 240, 72, S.auto ? t('Házení: ZAP') : t('Házení: VYP'), S.auto ? 'green' : 'amber', true, () => {
+        S.auto = !S.auto;
+        this.host.dartsSave();
+        this.play();
+      });
+    else
+      this.button(280, 800, 240, 72, t('Koupit automat\n1 bod'), 'green', S.pts >= 1, () => {
+        S.pts -= 1;
+        S.up.auto = 1;
+        S.auto = true;
+        sfx.fanfare();
+        this.host.dartsSave();
+        this.play();
+      });
+    const info = !has ? t('Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.')
+      : S.auto ? t('Hází se samo, i když tu nejsi. Dohraj přesně na nulu = 1 bod.') : t('Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.');
+    this.text(W / 2, 888, info, 17, PAL.fog, 0.5).setWordWrapWidth(W - 40).setAlign('center');
+    // ruční hod ťuknutím na terč (bez automatu nebo s vypnutým)
+    if (!autoOn(S)) {
+      const z = this.add.zone(CX, CY, R * 2 + 40, R * 2 + 40).setInteractive({ useHandCursor: true }).setDepth(20);
+      z.on('pointerdown', () => {
+        sfx.init();
+        if (S.have <= 0) return sfx.error();
+        this.throwDart();
+      });
+      this.ui.push(z);
+    }
     this.hudTick();
   }
 
@@ -141,18 +164,18 @@ export class DartsScene extends Phaser.Scene {
     h.have.setText(t('{n} šipek', { n: big(S.have) }));
     const ms = dartMs(S.up, this.host.dartsStats().dspeed ?? 0);
     const left = Math.max(0, Math.ceil((S.at + ms - Date.now()) / 1000));
-    h.next.setText(S.have >= dartCap(S.up) && !S.auto ? t('zásoba plná ({n})', { n: dartCap(S.up) }) : t('další šipka za {m}:{s}', { m: Math.floor(left / 60), s: String(left % 60).padStart(2, '0') }));
+    h.next.setText(S.have >= dartCap(S.up) && !autoOn(S) ? t('zásoba plná ({n})', { n: dartCap(S.up) }) : t('další šipka za {m}:{s}', { m: Math.floor(left / 60), s: String(left % 60).padStart(2, '0') }));
     h.pts.setText(t('body: {p} · dohraných her: {l}', { p: S.pts, l: S.legs }));
     h.left.setText(String(S.left));
     const a = aimFor(S.left);
     h.info.setText(t('zbývá do nuly (hra {n}) · míří na {f}', { n: S.legs + 1, f: a.n === 25 ? (a.mult === 2 ? 'BULL' : '25') : `${['', '', 'D', 'T'][a.mult]}${a.n}` }));
   }
 
-  private throwDart(ax: number, ay: number) {
+  private throwDart() {
     const S = this.S, st = this.host.dartsStats();
     if (S.have <= 0 || this.flying) return;
     S.have--;
-    const [x, y] = land(S, ax, ay, st.dacc ?? 0);
+    const [x, y] = aimLand(S, st.dacc ?? 0);
     const res = resolve(S, x, y, st.dextra ?? 0);
     if (res.saved) S.have++;
     this.flying = true;
@@ -189,6 +212,8 @@ export class DartsScene extends Phaser.Scene {
       this.toast(t('Hra dohraná! +{n} bod', { n: r.leg }) + (r.leg > 1 ? t(' (bod navíc!)') : '') + '\n' + t('+3 kosti, +5 XP hostinského'));
       this.stuck.forEach((o) => o.destroy());
       this.stuck = [];
+      // první bod → rozsvítit „Koupit automat“
+      if (!this.S.up.auto && this.mode === 'play') this.play();
     }
   }
 
@@ -205,11 +230,9 @@ export class DartsScene extends Phaser.Scene {
     if (this.mode !== 'play') return;
     const S = this.S;
     // hází se samo po 2 s, když je terč otevřený (jinak hází hospoda na pozadí)
-    if (S.auto && !this.flying && S.have > 0 && (this.autoT -= dt) <= 0) {
+    if (autoOn(S) && !this.flying && S.have > 0 && (this.autoT -= dt) <= 0) {
       this.autoT = THROW_GAP;
-      const a = aimFor(S.left);
-      const [fx, fy] = fieldPos(a.n, a.mult, S.up);
-      this.throwDart(fx, fy);
+      this.throwDart();
     }
     if (Math.floor(this.tm * 2) !== Math.floor((this.tm - dt) * 2)) this.hudTick();
   }

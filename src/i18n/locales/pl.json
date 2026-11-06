@@ -557,7 +557,7 @@
  "Automat: VYP": "Auto: OFF",
  "Automat: ZAP": "Auto: ON",
  "Automat: kup za 1 bod": "Auto: buy for 1 point",
- "Automatické házení": "Auto-throw",
+ "Automatické házení": "Automatyczne rzucanie",
  "Bod navíc": "Dodatkowy punkt",
  "Body: {p}": "Punkty: {p}",
  "Delší čas na hod": "Longer throw time",
@@ -631,5 +631,11 @@
  "{n} šipek za hodinu": "{n} rzutek na godzinę",
  " (bod navíc!)": " (punkt extra!)",
  "+3 kosti, +5 XP hostinského": "+3 kości, +5 PD karczmarza",
- "+{n} bodů do šipek": "+{n} punktów do rzutek"
+ "+{n} bodů do šipek": "+{n} punktów do rzutek",
+ "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "Stukaj w Nalewak (po lewej) i zbieraj coins: {c} / {n}. Potem kup po prawej.",
+ "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "Szkielet nalewa sam – poczekaj na coins: {c} / {n} (albo stukaj w gości).",
+ "hází samo po 2 s, i když tu nejsi": "rzuca samo co 2 s, nawet gdy cię nie ma",
+ "Koupit automat\n1 bod": "Kup automat\n1 punkt",
+ "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Stuknij tarczę = rzut (celowanie automatyczne). Skończ dokładnie na zerze = 1 punkt. Za 1 punkt kup automat – rzuca sam, także offline.",
+ "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "Rzucanie wyłączone – rzutki zostają w kołczanie. Stuknij tarczę = rzut."
 }

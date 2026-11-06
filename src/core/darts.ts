@@ -1,6 +1,7 @@
 // Šipky: hra na nulu (odečítá se, přestřelený hod se nepočítá). Začíná na 301 a každá dohraná hra cíl zvedne
 // (body ze začátku rychle, pak pomaleji). Šipky přibývají samy (10 za hodinu), dohraná hra = 1 bod na vylepšení.
-// Hází se jen automaticky (po 2 s; ručně se nemíří) – házení jde vypnout, zapnuté hází i offline.
+// Ručně se nemíří: bez automatu se hází ťuknutím na terč (jen když je otevřený); koupený automat (1 bod) hází
+// sám po 2 s i offline a jde vypnout. Na malý zbytek hází přesně (nepřestřelí – při zbytku 1 hodí jedničku).
 import { t } from '../i18n';
 import type { StatId } from './talisman';
 
@@ -11,9 +12,9 @@ export interface DartsState {
   /** body na vylepšení a úrovně vylepšení */
   pts: number;
   up: Record<string, number>;
-  /** automatické házení zapnuté */
+  /** automatické házení zapnuté (platí jen s koupeným automatem up.auto) */
   auto: boolean;
-  /** verze (2 = bez ručního míření; staré body vráceny) */
+  /** verze (2 = bez ručního míření; 3 = automat se kupuje) */
   v?: number;
   /** zbývá do nuly v aktuální hře; dohrané hry; zásahy v řadě; vítr této hry (x, y v poloměrech terče) */
   left: number;
@@ -34,7 +35,7 @@ export const dartMs = (up: Record<string, number>, statSpeed = 0) => 3_600_000 /
 export const DART_CAP = 60;
 export const dartCap = (up: Record<string, number>) => DART_CAP + 10 * (up.cap ?? 0);
 
-export const newDarts = (now = Date.now()): DartsState => ({ have: 100, at: now, pts: 0, up: {}, auto: true, v: 2, left: START, legs: 0, combo: 0, wind: newWind() });
+export const newDarts = (now = Date.now()): DartsState => ({ have: 100, at: now, pts: 0, up: {}, auto: true, v: 3, left: START, legs: 0, combo: 0, wind: newWind() });
 
 function newWind(): [number, number] {
   const a = Math.random() * Math.PI * 2, s = Math.random() * 0.15;
@@ -51,9 +52,12 @@ export interface DartUp {
   /** stat do celé hry (přičte se k talismanům) */
   stat?: StatId;
 }
+/** hází automat? (koupený a zapnutý) */
+export const autoOn = (s: DartsState) => s.auto && (s.up.auto ?? 0) > 0;
 const pc = (v: number) => String(Math.round(v * 10) / 10).replace('.', ',');
 const grow = (base: number, g: number) => (l: number) => Math.ceil(base * g ** l);
 export const DART_UPS: DartUp[] = [
+  { id: 'auto', name: t('Automatické házení'), desc: () => t('hází samo po 2 s, i když tu nejsi'), max: 1, cost: () => 1 },
   { id: 'acc', name: t('Přesnost'), desc: (l) => t('rozptyl menší o {v} %', { v: pc((1 - 0.96 ** l) * 100) }), max: 40, cost: grow(1, 1.06) },
   { id: 'rate', name: t('Víc šipek za hodinu'), desc: (l) => t('{n} šipek za hodinu', { n: 10 + l }), max: 20, cost: grow(2, 1.08) },
   { id: 'cap', name: t('Větší toulec'), desc: (l) => t('zásoba až {n} šipek', { n: DART_CAP + 10 * l }), max: 10, cost: grow(1, 1.15) },
@@ -131,6 +135,19 @@ export function aimFor(left: number): { n: number; mult: number } {
 export const spread = (up: Record<string, number>, statAcc = 0) => (0.3 * 0.96 ** (up.acc ?? 0)) / (1 + statAcc);
 
 const gauss = () => Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2 * Math.PI * Math.random());
+
+/** zbytek, od kterého se hází přesně (hod, který by přestřelil, dopadne do mířeného pole) */
+export const SURE_LEFT = 60;
+
+/** hod na pole, kam míří automat: na malý zbytek nikdy nepřestřelí – když by přestřelil, trefí mířené pole
+ *  (zbývá 1 → hodí opravdu jedničku); vedle terče se ale trefit dá dál */
+export function aimLand(s: DartsState, statAcc = 0): [number, number] {
+  const a = aimFor(s.left);
+  const [ax, ay] = fieldPos(a.n, a.mult, s.up);
+  const [x, y] = land(s, ax, ay, statAcc);
+  if (s.left <= SURE_LEFT && Math.hypot(x, y) <= 1 && score(x, y, s.up).pts > s.left) return [ax, ay];
+  return [x, y];
+}
 
 /** kam šipka dopadne při míření na (ax, ay) */
 export function land(s: DartsState, ax: number, ay: number, statAcc = 0): [number, number] {
@@ -211,16 +228,14 @@ export function tickDarts(s: DartsState, now: number, throwNow: boolean, statAcc
     s.at += n0 * ms;
     // bez automatu se zásoba plní jen do stropu
     const cap = dartCap(s.up);
-    s.have = s.auto ? s.have + n : s.have >= cap ? s.have : Math.min(cap, s.have + n);
+    s.have = autoOn(s) ? s.have + n : s.have >= cap ? s.have : Math.min(cap, s.have + n);
   }
   const out = { legs: 0, pts: 0, thrown: 0 };
-  if (!throwNow || !s.auto) return out;
+  if (!throwNow || !autoOn(s)) return out;
   let guard = 5000;
   while (s.have > 0 && guard-- > 0) {
     s.have--;
-    const a = aimFor(s.left);
-    const [ax, ay] = fieldPos(a.n, a.mult, s.up);
-    const [x, y] = land(s, ax, ay, statAcc);
+    const [x, y] = aimLand(s, statAcc);
     const r = resolve(s, x, y, extra);
     if (r.saved) s.have++;
     out.thrown++;
@@ -234,12 +249,18 @@ export function tickDarts(s: DartsState, now: number, throwNow: boolean, statAcc
 
 /** staré uložení (ruční míření, automat za bod): vrátit body za zrušená vylepšení */
 export function migrateDarts(s: DartsState) {
-  if (s.v === 2) return;
+  // v3: automat se kupuje – kdo hrál s automatem zdarma, dostane ho
+  if (s.v === 2) {
+    s.up.auto = 1;
+    s.v = 3;
+  }
+  if (s.v === 3) return;
   const old: Record<string, (l: number) => number> = { auto: () => 1, steady: grow(1, 1.15), slow: grow(1, 1.15), time: grow(1, 1.3) };
   for (const [id, f] of Object.entries(old)) {
     for (let l = 0; l < (s.up[id] ?? 0); l++) s.pts += f(l);
     delete s.up[id];
   }
   s.auto = true;
-  s.v = 2;
+  s.up.auto = 1;
+  s.v = 3;
 }

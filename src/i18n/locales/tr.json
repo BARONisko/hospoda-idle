@@ -557,7 +557,7 @@
  "Automat: VYP": "Auto: OFF",
  "Automat: ZAP": "Auto: ON",
  "Automat: kup za 1 bod": "Auto: buy for 1 point",
- "Automatické házení": "Auto-throw",
+ "Automatické házení": "Otomatik atış",
  "Bod navíc": "Ekstra Puan",
  "Body: {p}": "Puan: {p}",
  "Delší čas na hod": "Longer throw time",
@@ -631,5 +631,11 @@
  "{n} šipek za hodinu": "saatte {n} dart",
  " (bod navíc!)": " (bonus puan!)",
  "+3 kosti, +5 XP hostinského": "+3 kemik, +5 meyhaneci XP",
- "+{n} bodů do šipek": "+{n} dart puanı"
+ "+{n} bodů do šipek": "+{n} dart puanı",
+ "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "Musluğa (solda) dokun ve coins topla: {c} / {n}. Sonra sağdan satın al.",
+ "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "İskelet kendi dolduruyor – coins bekle: {c} / {n} (ya da misafirlere dokun).",
+ "hází samo po 2 s, i když tu nejsi": "sen yokken bile her 2 sn'de kendi atar",
+ "Koupit automat\n1 bod": "Otomatik atıcı al\n1 puan",
+ "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Tahtaya dokun = atış (nişan otomatik). Tam sıfırda bitir = 1 puan. 1 puanla otomatik atıcıyı al – çevrimdışı bile kendi atar.",
+ "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "Atış kapalı – oklar sadakta birikir. Tahtaya dokun = atış."
 }
