@@ -23,8 +23,8 @@ export interface DartsState {
 }
 
 export const START = 301;
-/** cíl hry podle počtu dohraných her: 301, 321, 341 … */
-export const target = (legs: number) => START + 20 * legs;
+/** cíl hry podle počtu dohraných her: 301, 311, 321 … až 1001 */
+export const target = (legs: number) => Math.min(1001, START + 10 * legs);
 /** mezera mezi hody, když je terč otevřený (s) */
 export const THROW_GAP = 2;
 /** 10 šipek za hodinu (+1 za úroveň „Víc šipek za hodinu“) */
@@ -54,27 +54,27 @@ export interface DartUp {
 const pc = (v: number) => String(Math.round(v * 10) / 10).replace('.', ',');
 const grow = (base: number, g: number) => (l: number) => Math.ceil(base * g ** l);
 export const DART_UPS: DartUp[] = [
-  { id: 'acc', name: t('Přesnost'), desc: (l) => t('rozptyl menší o {v} %', { v: pc((1 - 0.96 ** l) * 100) }), max: 40, cost: grow(1, 1.12) },
-  { id: 'rate', name: t('Víc šipek za hodinu'), desc: (l) => t('{n} šipek za hodinu', { n: 10 + l }), max: 20, cost: grow(2, 1.25) },
-  { id: 'cap', name: t('Větší toulec'), desc: (l) => t('zásoba až {n} šipek', { n: DART_CAP + 10 * l }), max: 10, cost: grow(1, 1.3) },
-  { id: 'more', name: t('Víc šipek do hry'), desc: (l) => t('+{n} šipek zdarma na začátku každé hry', { n: 2 * l }), max: 5, cost: grow(2, 1.6) },
-  { id: 'bull', name: t('Větší střed terče'), desc: (l) => t('bull větší o {v} %', { v: 5 * l }), max: 10, cost: grow(2, 1.3) },
-  { id: 'rings', name: t('Širší double a triple'), desc: (l) => t('pole s násobky širší o {v} %', { v: 4 * l }), max: 10, cost: grow(2, 1.3) },
-  { id: 'crit', name: t('Kritický hod'), desc: (l) => t('šance {v} % na ×2 body', { v: l }), max: 25, cost: grow(1, 1.18) },
-  { id: 'combo', name: t('Kombo'), desc: (l) => t('od 3. zásahu v řadě +{n} bodů za zásah', { n: l }), max: 10, cost: grow(2, 1.25) },
-  { id: 'magnet', name: t('Magnet'), desc: (l) => t('šipka se přitáhne k poli o {v} %', { v: 3 * l }), max: 20, cost: grow(1, 1.2) },
-  { id: 'second', name: t('Druhá šance'), desc: (l) => t('šance {v} %, že hod mimo terč šipku nespotřebuje', { v: 2 * l }), max: 25, cost: grow(1, 1.18) },
-  { id: 'wind', name: t('Méně větru'), desc: (l) => t('vítr stáčí šipky o {v} % méně', { v: 5 * l }), max: 20, cost: grow(1, 1.2) },
-  { id: 'extra', name: t('Bod navíc'), desc: (l) => t('šance {v} %, že dohraná hra dá 2 body', { v: l }), max: 30, cost: grow(2, 1.2) },
+  { id: 'acc', name: t('Přesnost'), desc: (l) => t('rozptyl menší o {v} %', { v: pc((1 - 0.96 ** l) * 100) }), max: 40, cost: grow(1, 1.06) },
+  { id: 'rate', name: t('Víc šipek za hodinu'), desc: (l) => t('{n} šipek za hodinu', { n: 10 + l }), max: 20, cost: grow(2, 1.08) },
+  { id: 'cap', name: t('Větší toulec'), desc: (l) => t('zásoba až {n} šipek', { n: DART_CAP + 10 * l }), max: 10, cost: grow(1, 1.15) },
+  { id: 'more', name: t('Víc šipek do hry'), desc: (l) => t('+{n} šipek zdarma na začátku každé hry', { n: 2 * l }), max: 5, cost: grow(2, 1.3) },
+  { id: 'bull', name: t('Větší střed terče'), desc: (l) => t('bull větší o {v} %', { v: 5 * l }), max: 10, cost: grow(2, 1.15) },
+  { id: 'rings', name: t('Širší double a triple'), desc: (l) => t('pole s násobky širší o {v} %', { v: 4 * l }), max: 10, cost: grow(2, 1.15) },
+  { id: 'crit', name: t('Kritický hod'), desc: (l) => t('šance {v} % na ×2 body', { v: l }), max: 25, cost: grow(1, 1.07) },
+  { id: 'combo', name: t('Kombo'), desc: (l) => t('od 3. zásahu v řadě +{n} bodů za zásah', { n: l }), max: 10, cost: grow(2, 1.15) },
+  { id: 'magnet', name: t('Magnet'), desc: (l) => t('šipka se přitáhne k poli o {v} %', { v: 3 * l }), max: 20, cost: grow(1, 1.08) },
+  { id: 'second', name: t('Druhá šance'), desc: (l) => t('šance {v} %, že hod mimo terč šipku nespotřebuje', { v: 2 * l }), max: 25, cost: grow(1, 1.07) },
+  { id: 'wind', name: t('Méně větru'), desc: (l) => t('vítr stáčí šipky o {v} % méně', { v: 5 * l }), max: 20, cost: grow(1, 1.08) },
+  { id: 'extra', name: t('Bod navíc'), desc: (l) => t('šance {v} %, že dohraná hra dá 2 body', { v: l }), max: 30, cost: grow(2, 1.05) },
   // do celé hry
-  { id: 'gIncome', name: t('Terč: výdělek'), desc: (l) => t('výdělek v hospodách +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(3, 1.2), stat: 'income' },
-  { id: 'gTips', name: t('Terč: spropitné'), desc: (l) => t('spropitné +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(2, 1.2), stat: 'tips' },
-  { id: 'gBones', name: t('Terč: kosti'), desc: (l) => t('kosti +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(3, 1.2), stat: 'bones' },
-  { id: 'gTent', name: t('Terč: chapadla'), desc: (l) => t('chapadla v chrámu +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(3, 1.2), stat: 'tentacles' },
-  { id: 'gTemple', name: t('Terč: síla v chrámu'), desc: (l) => t('síla zásahu v chrámu +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(3, 1.2), stat: 'temple' },
-  { id: 'gKrigly', name: t('Terč: krígly'), desc: (l) => t('krígly z hygieny +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(4, 1.2), stat: 'krigly' },
-  { id: 'gColl', name: t('Terč: sběrač'), desc: (l) => t('sběrač bublin rychlejší o {v} %', { v: pc(0.9 * l) }), max: 50, cost: grow(2, 1.2), stat: 'coll' },
-  { id: 'gBeer', name: t('Terč: pivo'), desc: (l) => t('pivo z pivovaru dráž o {v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(2, 1.2), stat: 'beer' },
+  { id: 'gIncome', name: t('Terč: výdělek'), desc: (l) => t('výdělek v hospodách +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'income' },
+  { id: 'gTips', name: t('Terč: spropitné'), desc: (l) => t('spropitné +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'tips' },
+  { id: 'gBones', name: t('Terč: kosti'), desc: (l) => t('kosti +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'bones' },
+  { id: 'gTent', name: t('Terč: chapadla'), desc: (l) => t('chapadla v chrámu +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'tentacles' },
+  { id: 'gTemple', name: t('Terč: síla v chrámu'), desc: (l) => t('síla zásahu v chrámu +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'temple' },
+  { id: 'gKrigly', name: t('Terč: krígly'), desc: (l) => t('krígly z hygieny +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'krigly' },
+  { id: 'gColl', name: t('Terč: sběrač'), desc: (l) => t('sběrač bublin rychlejší o {v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'coll' },
+  { id: 'gBeer', name: t('Terč: pivo'), desc: (l) => t('pivo z pivovaru dráž o {v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'beer' },
 ];
 export const GAME_PER = 0.009;
 
@@ -172,11 +172,12 @@ export function resolve(s: DartsState, x: number, y: number, extra = 0): ThrowRe
   }
   s.combo++;
   let pts = sc.pts;
-  if (Math.random() < 0.01 * (s.up.crit ?? 0)) {
+  // krit a kombo pomáhají, ale nikdy nepřestřelí (na konci se počítá jen čistý zásah)
+  if (Math.random() < 0.01 * (s.up.crit ?? 0) && pts * 2 <= s.left) {
     pts *= 2;
     res.crit = true;
   }
-  if (s.combo >= 3) {
+  if (s.combo >= 3 && pts + (s.up.combo ?? 0) <= s.left) {
     res.combo = s.combo;
     pts += s.up.combo ?? 0;
   }

@@ -628,5 +628,8 @@
  "Větší toulec": "Größerer Köcher",
  "zbývá do nuly (hra {n}) · míří na {f}": "Rest bis null (Spiel {n}) · zielt auf {f}",
  "zásoba až {n} šipek": "Vorrat bis {n} Darts",
- "{n} šipek za hodinu": "{n} Darts pro Stunde"
+ "{n} šipek za hodinu": "{n} Darts pro Stunde",
+ " (bod navíc!)": " (Bonuspunkt!)",
+ "+3 kosti, +5 XP hostinského": "+3 Knochen, +5 Wirt-EP",
+ "+{n} bodů do šipek": "+{n} Dartpunkte"
 }

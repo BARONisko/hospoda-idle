@@ -623,10 +623,13 @@
  "Házení: VYP": "Atış: KAPALI",
  "Házení: ZAP": "Atış: AÇIK",
  "Hází se samo, i když tu nejsi. Dohraj přesně na nulu = 1 bod.": "Sen yokken bile kendi atar. Tam sıfırda bitir = 1 puan.",
- "Plná truhla! Chapadla ×2": "Dolu sandık! Dokunaçlar ×2",
+ "Plná truhla! Chapadla ×2": "Dolu sandık! Dokunaç ×2",
  "Víc šipek za hodinu": "Saatte Daha Çok Dart",
  "Větší toulec": "Daha Büyük Sadak",
  "zbývá do nuly (hra {n}) · míří na {f}": "sıfıra kalan (oyun {n}) · hedef {f}",
  "zásoba až {n} šipek": "{n} darta kadar stok",
- "{n} šipek za hodinu": "saatte {n} dart"
+ "{n} šipek za hodinu": "saatte {n} dart",
+ " (bod navíc!)": " (bonus puan!)",
+ "+3 kosti, +5 XP hostinského": "+3 kemik, +5 meyhaneci XP",
+ "+{n} bodů do šipek": "+{n} dart puanı"
 }

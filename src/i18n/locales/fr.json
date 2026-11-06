@@ -628,5 +628,8 @@
  "Větší toulec": "Carquois plus grand",
  "zbývá do nuly (hra {n}) · míří na {f}": "reste avant zéro (partie {n}) · vise {f}",
  "zásoba až {n} šipek": "réserve jusqu'à {n} fléchettes",
- "{n} šipek za hodinu": "{n} fléchettes par heure"
+ "{n} šipek za hodinu": "{n} fléchettes par heure",
+ " (bod navíc!)": " (point bonus !)",
+ "+3 kosti, +5 XP hostinského": "+3 os, +5 XP du patron",
+ "+{n} bodů do šipek": "+{n} points de fléchettes"
 }

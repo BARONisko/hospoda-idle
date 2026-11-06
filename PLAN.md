@@ -77,3 +77,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   12 vylepšení terče (políčka po úrovních) + 8 do celé hry (+0,9 %/úr.: výdělek,
   spropitné, kosti, chapadla, síla v chrámu, krígly, sběrač, pivo). Do šipek: Kostnice (přesnost, rychlejší šipky), chrám (bod navíc).
   Šipky přeložené do všech jazyků.
+- Šipky balanc: cíl 301 +10 za hru (strop 1001), krit/kombo nikdy nepřestřelí (dřív kombo zablokovalo konec hry), levnější
+  vylepšení terče (celkem 874 bodů ≈ 56 dní), do celé hry 8 × 100 úrovní (≈ 267 dní vše).
+- Propojení částí: pivovar → šipky rychleji (+0,5 %/úr.), sběrač → chapadla (+0,3 %/úr.), hostinský → síla v chrámu (+0,5 %/úr.),
+  liga výhra → +3 body šipek, poražený Cthulhu → +2×obtížnost bodů šipek, dohraná hra šipek → +3 kosti a +5 XP hostinského;
+  šipky → 8 statů celé hry; Kostnice → šipky (přesnost, rychlost); chrám → šipky (bod navíc).

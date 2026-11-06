@@ -623,10 +623,13 @@
  "Házení: VYP": "投掷：关",
  "Házení: ZAP": "投掷：开",
  "Hází se samo, i když tu nejsi. Dohraj přesně na nulu = 1 bod.": "即使你不在也会自动投掷。正好归零 = 1 分。",
- "Plná truhla! Chapadla ×2": "满宝箱！触手 ×2",
+ "Plná truhla! Chapadla ×2": "满宝箱！触手×2",
  "Víc šipek za hodinu": "每小时更多飞镖",
  "Větší toulec": "更大箭袋",
  "zbývá do nuly (hra {n}) · míří na {f}": "距零剩余（第 {n} 局）· 瞄准 {f}",
  "zásoba až {n} šipek": "最多储存 {n} 支飞镖",
- "{n} šipek za hodinu": "每小时 {n} 支飞镖"
+ "{n} šipek za hodinu": "每小时 {n} 支飞镖",
+ " (bod navíc!)": "（额外点数！）",
+ "+3 kosti, +5 XP hostinského": "骨头+3，店主经验+5",
+ "+{n} bodů do šipek": "飞镖点数+{n}"
 }

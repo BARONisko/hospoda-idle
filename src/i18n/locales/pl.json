@@ -628,5 +628,8 @@
  "Větší toulec": "Większy kołczan",
  "zbývá do nuly (hra {n}) · míří na {f}": "zostało do zera (gra {n}) · celuje w {f}",
  "zásoba až {n} šipek": "zapas do {n} rzutek",
- "{n} šipek za hodinu": "{n} rzutek na godzinę"
+ "{n} šipek za hodinu": "{n} rzutek na godzinę",
+ " (bod navíc!)": " (punkt extra!)",
+ "+3 kosti, +5 XP hostinského": "+3 kości, +5 PD karczmarza",
+ "+{n} bodů do šipek": "+{n} punktów do rzutek"
 }

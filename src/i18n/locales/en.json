@@ -628,5 +628,8 @@
  "Větší toulec": "Bigger Quiver",
  "zbývá do nuly (hra {n}) · míří na {f}": "left to zero (game {n}) · aiming at {f}",
  "zásoba až {n} šipek": "stock up to {n} darts",
- "{n} šipek za hodinu": "{n} darts per hour"
+ "{n} šipek za hodinu": "{n} darts per hour",
+ " (bod navíc!)": " (bonus point!)",
+ "+3 kosti, +5 XP hostinského": "+3 bones, +5 landlord XP",
+ "+{n} bodů do šipek": "+{n} darts points"
 }

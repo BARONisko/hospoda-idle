@@ -623,10 +623,13 @@
  "Házení: VYP": "投げる: オフ",
  "Házení: ZAP": "投げる: オン",
  "Hází se samo, i když tu nejsi. Dohraj přesně na nulu = 1 bod.": "不在の間も自動で投げる。ぴったり0で終了 = 1ポイント。",
- "Plná truhla! Chapadla ×2": "満杯の宝箱! 触手 ×2",
+ "Plná truhla! Chapadla ×2": "満杯の宝箱！触手×2",
  "Víc šipek za hodinu": "1時間あたりのダーツ増加",
  "Větší toulec": "矢筒拡大",
  "zbývá do nuly (hra {n}) · míří na {f}": "0まで残り (ゲーム {n})・狙い {f}",
  "zásoba až {n} šipek": "ダーツ最大 {n} 本までストック",
- "{n} šipek za hodinu": "1時間に {n} 本"
+ "{n} šipek za hodinu": "1時間に {n} 本",
+ " (bod navíc!)": "（ボーナスポイント！）",
+ "+3 kosti, +5 XP hostinského": "骨+3、店主XP+5",
+ "+{n} bodů do šipek": "ダーツポイント+{n}"
 }

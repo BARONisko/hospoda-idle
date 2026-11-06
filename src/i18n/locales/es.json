@@ -628,5 +628,8 @@
  "Větší toulec": "Carcaj mayor",
  "zbývá do nuly (hra {n}) · míří na {f}": "faltan para cero (partida {n}) · apunta a {f}",
  "zásoba až {n} šipek": "reserva de hasta {n} dardos",
- "{n} šipek za hodinu": "{n} dardos por hora"
+ "{n} šipek za hodinu": "{n} dardos por hora",
+ " (bod navíc!)": " (¡punto extra!)",
+ "+3 kosti, +5 XP hostinského": "+3 huesos, +5 XP del tabernero",
+ "+{n} bodů do šipek": "+{n} puntos de dardos"
 }

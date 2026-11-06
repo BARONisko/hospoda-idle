@@ -595,6 +595,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     store(this.d);
   }
 
+  /** šipky → kosti a hostinský: každá dohraná hra +3 kosti a +5 XP */
+  dartsLeg(n: number) {
+    this.d.bones = (this.d.bones ?? 0) + 3 * n;
+    this.xp(5 * n);
+  }
+
   dartsClose() {
     this.scene.stop('Darts');
     this.dartsOpen = false;
@@ -610,6 +616,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const s = this.ts();
     const r = tickDarts(this.d.darts, Date.now(), true, s.dacc, s.dspeed, s.dextra);
     if (r.pts) {
+      this.dartsLeg(r.legs);
       this.tsCache = undefined;
       this.banner(this.views[0].cam, t('Šipky: dohraná hra! +{n} bod', { n: r.pts }), true);
     }
@@ -642,7 +649,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return Math.max(5, Math.round(this.d.krigle * 0.03));
   }
 
-  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal' | 'stat', n: number): string {
+  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal' | 'stat' | 'darts', n: number): string {
     if (kind === 'krigle') {
       this.d.krigle += n;
       return t('+{k} krígel', { k: big(n) });
@@ -650,6 +657,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (kind === 'bones') {
       this.d.bones = (this.d.bones ?? 0) + n;
       return t('+{n} kostí', { n: big(n) });
+    }
+    if (kind === 'darts') {
+      // chrám → šipky: body na vylepšení terče
+      this.dartsData().pts += n;
+      return t('+{n} bodů do šipek', { n });
     }
     if (kind === 'stat') {
       // malý trvalý bonus k náhodnému statu (z Kostnice nebo chrámu, bez přetečení stropu)
@@ -836,6 +848,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // staty z chrámu: trvalé z truhel (d.oss) a týdenní z oltáře (platí jen do dalšího víkendu)
     for (const o of TEMPLE_STATS) a[o.stat] += (this.d.oss?.[o.stat] ?? 0) * o.per;
     const al = this.d.temple?.altar;
+    // propojení částí hry (malé bonusy pod 1 % za úroveň):
+    // pivovar → šipky přibývají rychleji, sběrač → chapadla, hostinský → síla v chrámu
+    a.dspeed += 0.005 * Math.max(0, (this.d.brew?.lvl ?? 1) - 1);
+    a.tentacles += 0.003 * Object.values(this.d.coll ?? {}).reduce((x, c) => x + c.spd + c.amt, 0);
+    a.temple += 0.005 * Math.max(0, (this.d.klvl ?? 1) - 1);
     const ds = dartStats(this.d.darts);
     for (const [k, v] of Object.entries(ds)) a[k as StatId] += v as number;
     if (al && al.wk === weekendKey()) for (const [k, n] of Object.entries(al.lv)) a[k as StatId] += (n as number) * ALTAR_PER;
@@ -858,6 +875,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         this.d.leagueHist = [...(this.d.leagueHist ?? []), [tier, win] as [number, boolean]].slice(-8);
         if (win) {
           this.d.krigle += winReward(tier);
+          // liga → šipky: +3 body
+          if (this.d.darts) this.d.darts.pts += 3;
           this.leagueWinDrop = true;
           tier = Math.min(LEAGUES.length, tier + 1);
         } else tier = Math.max(1, tier - 1);

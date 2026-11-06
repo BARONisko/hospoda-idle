@@ -24,7 +24,7 @@ export interface TempleHost {
   templeIncome(): number;
   templeStats(): Record<StatId, number>;
   /** odměny do hlavní hry; vrací text pro hlášku */
-  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal' | 'stat', n: number): string;
+  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal' | 'stat' | 'darts', n: number): string;
   templeSave(): void;
   /** přepočítat staty (po oltáři) */
   templeRefresh?(): void;
@@ -254,7 +254,8 @@ export class TempleScene extends Phaser.Scene {
     const seal = this.host.templeReward('seal', 1);
     const tal = this.host.templeReward('talis', 1);
     const kr = this.host.templeReward('krigle', Math.round(this.kriglyGift() * DIFF_REW[d - 1]));
-    let msg = t('CTHULHU PORAŽEN!') + '\n' + seal + '\n' + tal + '\n' + kr;
+    const dp = this.host.templeReward('darts', 2 * d);
+    let msg = t('CTHULHU PORAŽEN!') + '\n' + seal + '\n' + tal + '\n' + kr + '\n' + dp;
     if (d < DIFFS && (this.T.maxD ?? 1) <= d) {
       this.T.maxD = d + 1;
       msg += '\n' + t('Odemčena obtížnost {d}!', { d: DIFF_NAMES[d] });

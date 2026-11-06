@@ -628,5 +628,8 @@
  "Větší toulec": "화살통 확대",
  "zbývá do nuly (hra {n}) · míří na {f}": "0까지 남음 (게임 {n}) · 조준 {f}",
  "zásoba až {n} šipek": "최대 {n}개 다트 보관",
- "{n} šipek za hodinu": "시간당 다트 {n}개"
+ "{n} šipek za hodinu": "시간당 다트 {n}개",
+ " (bod navíc!)": " (보너스 포인트!)",
+ "+3 kosti, +5 XP hostinského": "뼈 +3, 주인 XP +5",
+ "+{n} bodů do šipek": "다트 포인트 +{n}"
 }

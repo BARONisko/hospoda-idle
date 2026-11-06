@@ -628,5 +628,8 @@
  "Větší toulec": "Aljava maior",
  "zbývá do nuly (hra {n}) · míří na {f}": "faltam para zero (jogo {n}) · mira em {f}",
  "zásoba až {n} šipek": "estoque de até {n} dardos",
- "{n} šipek za hodinu": "{n} dardos por hora"
+ "{n} šipek za hodinu": "{n} dardos por hora",
+ " (bod navíc!)": " (ponto extra!)",
+ "+3 kosti, +5 XP hostinského": "+3 ossos, +5 XP do taberneiro",
+ "+{n} bodů do šipek": "+{n} pontos de dardos"
 }

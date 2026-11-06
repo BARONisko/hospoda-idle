@@ -21,6 +21,8 @@ export interface DartsHost {
   dartsStats(): Record<StatId, number>;
   dartsSave(): void;
   dartsClose(): void;
+  /** dohraná hra → odměny jinde (kosti, XP hostinského) */
+  dartsLeg(n: number): void;
 }
 
 export class DartsScene extends Phaser.Scene {
@@ -181,9 +183,10 @@ export class DartsScene extends Phaser.Scene {
     const o = this.add.text(x, y - 30, s, txt(26, c)).setOrigin(0.5).setDepth(45).setStroke(PAL.ink, 5);
     this.tweens.add({ targets: o, y: y - 80, alpha: 0, duration: 900, onComplete: () => o.destroy() });
     if (r.leg) {
+      this.host.dartsLeg(1);
       sfx.fanfare();
       this.cameras.main.flash(300, 255, 220, 120);
-      this.toast(t('Hra dohraná! +{n} bod', { n: r.leg }) + (r.leg > 1 ? ' (BONUS)' : ''));
+      this.toast(t('Hra dohraná! +{n} bod', { n: r.leg }) + (r.leg > 1 ? t(' (bod navíc!)') : '') + '\n' + t('+3 kosti, +5 XP hostinského'));
       this.stuck.forEach((o) => o.destroy());
       this.stuck = [];
     }
