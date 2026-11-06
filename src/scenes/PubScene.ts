@@ -12,7 +12,7 @@ import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward } from '
 import { isNight, phaseLeft, bonesFor, nightCfg, NIGHT_MS } from '../core/night';
 import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
-import { Save, PubState, load, store, newPub, Act, MAX_PUBS } from '../core/save';
+import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave } from '../core/save';
 import { PubView } from '../game/PubView';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
 import { GUESTS } from '../game/PubView';
@@ -37,6 +37,40 @@ interface Offer {
 }
 /** nastavení zvuku (zvlášť od uložené hry) */
 const OPTS_KEY = 'pubidle_opts';
+
+/** Stáhne soubor se zálohou hry */
+function downloadBackup(text: string) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+  a.download = `pub-idle-zaloha-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+/** Vybere soubor se zálohou a předá jeho text */
+function pickBackup(done: (text: string) => void) {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.json,application/json';
+  inp.style.display = 'none';
+  document.body.appendChild(inp);
+  inp.onchange = () => {
+    inp.files?.[0]?.text().then(done);
+    inp.remove();
+  };
+  // výběr souboru prohlížeč dovolí jen při „aktivaci“ – dotyk (pointerdown) se nepočítá, až zvednutí prstu
+  const open = () => {
+    window.removeEventListener('pointerup', open);
+    window.removeEventListener('touchend', open);
+    inp.click();
+  };
+  // Phaser zpracuje dotyk až ve snímku – zvednutí prstu už mohlo proběhnout, pak je aktivace platná hned
+  if ((navigator as Navigator & { userActivation?: { isActive: boolean } }).userActivation?.isActive) return open();
+  window.addEventListener('pointerup', open);
+  window.addEventListener('touchend', open);
+}
 
 /** Stáhne offline verzi hry (složka PUB-Idle s index.html v zipu; sestavuje tools/offline.mjs). */
 function downloadOffline() {
@@ -990,10 +1024,27 @@ export class PubScene extends Phaser.Scene {
     // offline verze do složky (zip s index.html) – nabízí se jen na webu, ne ve hře spuštěné z disku
     const web = location.protocol.startsWith('http');
     if (web) rows.push([t('Hra do složky'), t('Stáhnout'), downloadOffline]);
+    // záloha hry: dvě tlačítka v jednom řádku
+    {
+      const y = y0 + vols.length * RH;
+      this.row(y, RH, D, t('Záloha hry'), t('přenos mezi webem a složkou'));
+      const sv = this.btn(W - 232, y + 14, 102, 60, () => {
+        downloadBackup(exportSave(this.d));
+        this.banner(this.views[0].cam, t('Záloha uložena'));
+      }, D + 2);
+      this.drawBtn(sv, t('Uložit'), true, 'green');
+      const ld = this.btn(W - 124, y + 14, 102, 60, () =>
+        pickBackup((text) => {
+          if (!importSave(text)) return this.banner(this.views[0].cam, t('Tohle není záloha hry'));
+          location.reload();
+        }), D + 2);
+      this.drawBtn(ld, t('Nahrát'), true, 'amber');
+      this.shopObjs.push(sv.bg, sv.label, sv.zone, ld.bg, ld.label, ld.zone);
+    }
     rows.forEach(([title, val, fn], i) => {
-      i += vols.length;
+      i += vols.length + 1;
       const y = y0 + i * RH;
-      this.row(y, RH, D, title, i === 3 ? t('spustíš ji z disku bez internetu') : '');
+      this.row(y, RH, D, title, i === 4 ? t('spustíš ji z disku bez internetu') : '');
       const b = this.btn(W - 232, y + 14, 210, 60, () => {
         fn();
         saveOpts();
@@ -1002,7 +1053,7 @@ export class PubScene extends Phaser.Scene {
       this.drawBtn(b, val, true, 'plum');
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
-    this.shopObjs.push(this.add.text(W / 2, y0 + (vols.length + rows.length) * RH + 30, 'P.U.B. Idle – Pajzl Tycoon', txt(18, PAL.slate)).setOrigin(0.5).setDepth(D + 1));
+    this.shopObjs.push(this.add.text(W / 2, y0 + (vols.length + 1 + rows.length) * RH + 30, 'P.U.B. Idle – Pajzl Tycoon', txt(18, PAL.slate)).setOrigin(0.5).setDepth(D + 1));
   }
 
   // ---------- bestiář ----------

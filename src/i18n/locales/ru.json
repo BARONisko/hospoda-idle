@@ -365,5 +365,11 @@
  "Soupeř zrychluje každý den – a když vedeš, zabere víc.": "Соперник ускоряется каждый день – а когда ты впереди, жмёт сильнее.",
  "Vedeš o {n} coins – soupeř přidává!": "Ты впереди на {n} coins – соперник поднажал!",
  "Soupeř vede o {n} coins": "Соперник впереди на {n} coins",
- "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "Твоя выручка: {a} coins\nСоперник: {b} coins"
+ "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "Твоя выручка: {a} coins\nСоперник: {b} coins",
+ "Záloha hry": "Резервная копия",
+ "přenos mezi webem a složkou": "перенос между сайтом и папкой",
+ "Uložit": "Сохранить",
+ "Nahrát": "Загрузить",
+ "Záloha uložena": "Копия сохранена",
+ "Tohle není záloha hry": "Это не копия игры"
 }

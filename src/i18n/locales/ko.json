@@ -365,5 +365,11 @@
  "Soupeř zrychluje každý den – a když vedeš, zabere víc.": "라이벌은 매일 빨라지고, 네가 앞서면 더 몰아붙여요.",
  "Vedeš o {n} coins – soupeř přidává!": "{n} coins 앞서는 중 – 라이벌이 추격해요!",
  "Soupeř vede o {n} coins": "라이벌이 {n} coins 앞서요",
- "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "너의 매출: {a} coins\n라이벌: {b} coins"
+ "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "너의 매출: {a} coins\n라이벌: {b} coins",
+ "Záloha hry": "게임 백업",
+ "přenos mezi webem a složkou": "웹과 폴더 사이 진행 이전",
+ "Uložit": "저장",
+ "Nahrát": "불러오기",
+ "Záloha uložena": "백업 저장됨",
+ "Tohle není záloha hry": "게임 백업이 아니에요"
 }

@@ -365,5 +365,11 @@
  "Soupeř zrychluje každý den – a když vedeš, zabere víc.": "El rival acelera cada día, y si vas delante, aprieta más.",
  "Vedeš o {n} coins – soupeř přidává!": "Vas delante por {n} coins: ¡el rival aprieta!",
  "Soupeř vede o {n} coins": "El rival va delante por {n} coins",
- "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "Tu recaudación: {a} coins\nRival: {b} coins"
+ "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "Tu recaudación: {a} coins\nRival: {b} coins",
+ "Záloha hry": "Copia de seguridad",
+ "přenos mezi webem a složkou": "pasa el progreso entre web y carpeta",
+ "Uložit": "Guardar",
+ "Nahrát": "Cargar",
+ "Záloha uložena": "Copia guardada",
+ "Tohle není záloha hry": "Eso no es una copia del juego"
 }

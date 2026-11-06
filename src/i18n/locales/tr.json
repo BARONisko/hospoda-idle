@@ -365,5 +365,11 @@
  "Soupeř zrychluje každý den – a když vedeš, zabere víc.": "Rakip her gün hızlanır – önde olduğunda daha çok yüklenir.",
  "Vedeš o {n} coins – soupeř přidává!": "{n} coins öndesin – rakip yükleniyor!",
  "Soupeř vede o {n} coins": "Rakip {n} coins önde",
- "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "Hasılatın: {a} coins\nRakip: {b} coins"
+ "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "Hasılatın: {a} coins\nRakip: {b} coins",
+ "Záloha hry": "Oyun yedeği",
+ "přenos mezi webem a složkou": "web ve klasör arasında aktarım",
+ "Uložit": "Kaydet",
+ "Nahrát": "Yükle",
+ "Záloha uložena": "Yedek kaydedildi",
+ "Tohle není záloha hry": "Bu bir oyun yedeği değil"
 }

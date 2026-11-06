@@ -107,7 +107,11 @@ export function load(): Save {
   return fresh();
 }
 
+/** po nahrání zálohy už se do znovunačtení nic neukládá (přepsalo by to nahranou hru) */
+let locked = false;
+
 export function store(d: Save) {
+  if (locked) return;
   d.at = Date.now();
   try {
     localStorage.setItem(KEY, JSON.stringify(d));
@@ -121,5 +125,35 @@ export function wipe() {
     localStorage.removeItem(KEY);
   } catch {
     /* nic */
+  }
+}
+
+/** Záloha hry do souboru: uložená hra + nastavení + jazyk (pro přenos mezi webem a složkou HRA). */
+export function exportSave(d: Save): string {
+  store(d);
+  const ls = (k: string) => {
+    try {
+      return localStorage.getItem(k);
+    } catch {
+      return null;
+    }
+  };
+  return JSON.stringify({ game: 'pubidle', ver: 1, at: Date.now(), save: ls(KEY), opts: ls('pubidle_opts'), lang: ls('pubidle_lang') });
+}
+
+/** Nahraje zálohu; vrátí false, když soubor není záloha této hry. Po úspěchu je potřeba hru znovu načíst. */
+export function importSave(text: string): boolean {
+  try {
+    const b = JSON.parse(text);
+    if (b?.game !== 'pubidle' || typeof b.save !== 'string') return false;
+    const d = JSON.parse(b.save);
+    if (!d || !Array.isArray(d.pubs) || typeof d.coins !== 'number') return false;
+    localStorage.setItem(KEY, b.save);
+    if (typeof b.opts === 'string') localStorage.setItem('pubidle_opts', b.opts);
+    if (typeof b.lang === 'string') localStorage.setItem('pubidle_lang', b.lang);
+    locked = true;
+    return true;
+  } catch {
+    return false;
   }
 }

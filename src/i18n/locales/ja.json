@@ -365,5 +365,11 @@
  "Soupeř zrychluje každý den – a když vedeš, zabere víc.": "ライバルは毎日加速し、あなたがリードすると本気を出す。",
  "Vedeš o {n} coins – soupeř přidává!": "{n} coins リード – ライバルが追い上げ中！",
  "Soupeř vede o {n} coins": "ライバルが {n} coins リード",
- "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "あなたの売上: {a} coins\nライバル: {b} coins"
+ "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "あなたの売上: {a} coins\nライバル: {b} coins",
+ "Záloha hry": "バックアップ",
+ "přenos mezi webem a složkou": "Web版とフォルダ版で引き継ぎ",
+ "Uložit": "保存",
+ "Nahrát": "読込",
+ "Záloha uložena": "バックアップを保存した",
+ "Tohle není záloha hry": "ゲームのバックアップではない"
 }

@@ -365,5 +365,11 @@
  "Soupeř zrychluje každý den – a když vedeš, zabere víc.": "对手每天都在加速——你领先时它会更拼。",
  "Vedeš o {n} coins – soupeř přidává!": "你领先 {n} coins——对手在加劲！",
  "Soupeř vede o {n} coins": "对手领先 {n} coins",
- "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "你的营业额: {a} coins\n对手: {b} coins"
+ "Tvoje tržba: {a} coins\nSoupeř: {b} coins": "你的营业额: {a} coins\n对手: {b} coins",
+ "Záloha hry": "游戏备份",
+ "přenos mezi webem a složkou": "在网页版和文件夹版之间转移",
+ "Uložit": "保存",
+ "Nahrát": "读取",
+ "Záloha uložena": "备份已保存",
+ "Tohle není záloha hry": "这不是游戏备份"
 }
