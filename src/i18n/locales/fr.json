@@ -514,5 +514,18 @@
  "spropitné +{v} % (max)": "pourboires +{v} % (max)",
  "spropitné +{v} % · příchody {a} / {b}": "pourboires +{v} % · visites {a} / {b}",
  "Odemčena obtížnost {d}!": "Difficulté {d} débloquée !",
- "Obtížnost (víc životů a nástrah, odměny ×{r})": "Difficulté (plus de PV et de pièges, récompenses ×{r})"
+ "Obtížnost (víc životů a nástrah, odměny ×{r})": "Difficulté (plus de PV et de pièges, récompenses ×{r})",
+ "Hostinský má volný bod – vyber dovednost.": "Le patron a un point libre – choisis une compétence.",
+ "Je víkend – v Chrámu čeká Cthulhu.": "C'est le week-end – Cthulhu attend au Temple.",
+ "Kup další úroveň: {s}. Každých 25 úrovní výdělek ×2.": "Achète un niveau : {s}. Tous les 25 niveaux gains ×2.",
+ "Máš splněný úkol – vyzvedni odměnu v Úkolech.": "Tâche accomplie – récupère la récompense dans Tâches.",
+ "Najmi kostlivce na „{s}“ – pak pracuje sám, i když tu nejsi.": "Embauche un squelette pour « {s} » – il travaillera seul, même en ton absence.",
+ "Pivovar je plný – prodej pivo nebo ho dej do vylepšení.": "La brasserie est pleine – vends la bière ou mets-la dans les améliorations.",
+ "Pusť schopnost manažera „{s}“ – výdělek ×{m}.": "Utilise la compétence du gérant « {s} » – gains ×{m}.",
+ "V Obchodě si můžeš koupit: {s}.": "Dans la Boutique tu peux acheter : {s}.",
+ "Za krígly si můžeš koupit: {s}.": "Avec des chopes tu peux acheter : {s}.",
+ "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "Appelle l'inspection (Boutique) : tu gagnes +{k} chopes = gains +{v} % pour toujours.",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "Économise pour « {s} » ({c} coins, environ {d}). En attendant, touche les clients – ils donnent des pourboires.",
+ "Ťukej na hosty – dávají spropitné.": "Touche les clients – ils donnent des pourboires.",
+ "Ukaž": "Montrer"
 }

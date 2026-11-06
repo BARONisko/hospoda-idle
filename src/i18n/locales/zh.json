@@ -514,5 +514,18 @@
  "spropitné +{v} % (max)": "小费 +{v} %（最高）",
  "spropitné +{v} % · příchody {a} / {b}": "小费 +{v} % · 来客 {a} / {b}",
  "Odemčena obtížnost {d}!": "难度 {d} 已解锁！",
- "Obtížnost (víc životů a nástrah, odměny ×{r})": "难度（更多血量和陷阱，奖励 ×{r}）"
+ "Obtížnost (víc životů a nástrah, odměny ×{r})": "难度（更多血量和陷阱，奖励 ×{r}）",
+ "Hostinský má volný bod – vyber dovednost.": "店主有空闲点数 – 选一个技能。",
+ "Je víkend – v Chrámu čeká Cthulhu.": "周末了 – 克苏鲁在神殿等你。",
+ "Kup další úroveň: {s}. Každých 25 úrovní výdělek ×2.": "再买一级：{s}。每25级收入×2。",
+ "Máš splněný úkol – vyzvedni odměnu v Úkolech.": "任务完成 – 去任务领取奖励。",
+ "Najmi kostlivce na „{s}“ – pak pracuje sám, i když tu nejsi.": "给“{s}”雇个骷髅 – 你不在时它也会干活。",
+ "Pivovar je plný – prodej pivo nebo ho dej do vylepšení.": "酿酒厂满了 – 卖掉啤酒或用于升级。",
+ "Pusť schopnost manažera „{s}“ – výdělek ×{m}.": "使用经理技能“{s}” – 收入×{m}。",
+ "V Obchodě si můžeš koupit: {s}.": "商店里可以买：{s}。",
+ "Za krígly si můžeš koupit: {s}.": "可以用酒杯买：{s}。",
+ "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "叫卫生检查（商店）：获得+{k}酒杯 = 收入永久+{v} %。",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "为“{s}”攒钱（{c} coins，约{d}）。同时点击客人 – 他们给小费。",
+ "Ťukej na hosty – dávají spropitné.": "点击客人 – 他们给小费。",
+ "Ukaž": "查看"
 }

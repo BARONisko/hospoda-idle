@@ -514,5 +514,18 @@
  "spropitné +{v} % (max)": "팁 +{v} % (최대)",
  "spropitné +{v} % · příchody {a} / {b}": "팁 +{v} % · 방문 {a} / {b}",
  "Odemčena obtížnost {d}!": "난이도 {d} 해금!",
- "Obtížnost (víc životů a nástrah, odměny ×{r})": "난이도 (체력·함정 증가, 보상 ×{r})"
+ "Obtížnost (víc životů a nástrah, odměny ×{r})": "난이도 (체력·함정 증가, 보상 ×{r})",
+ "Hostinský má volný bod – vyber dovednost.": "주인에게 남은 포인트가 있어요 – 기술을 고르세요.",
+ "Je víkend – v Chrámu čeká Cthulhu.": "주말이에요 – 신전에서 크툴루가 기다려요.",
+ "Kup další úroveň: {s}. Každých 25 úrovní výdělek ×2.": "다음 레벨 구매: {s}. 25레벨마다 수입 ×2.",
+ "Máš splněný úkol – vyzvedni odměnu v Úkolech.": "과제 완료 – 과제에서 보상을 받으세요.",
+ "Najmi kostlivce na „{s}“ – pak pracuje sám, i když tu nejsi.": "„{s}“에 해골을 고용하세요 – 없어도 혼자 일해요.",
+ "Pivovar je plný – prodej pivo nebo ho dej do vylepšení.": "양조장이 가득 찼어요 – 맥주를 팔거나 강화에 쓰세요.",
+ "Pusť schopnost manažera „{s}“ – výdělek ×{m}.": "매니저 기술 „{s}“를 쓰세요 – 수입 ×{m}.",
+ "V Obchodě si můžeš koupit: {s}.": "상점에서 살 수 있어요: {s}.",
+ "Za krígly si můžeš koupit: {s}.": "맥주잔으로 살 수 있어요: {s}.",
+ "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "위생 검사 호출 (상점): 맥주잔 +{k} = 수입 영구 +{v} %.",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "„{s}“를 위해 모으세요 ({c} coins, 약 {d}). 그동안 손님을 탭 – 팁을 줘요.",
+ "Ťukej na hosty – dávají spropitné.": "손님을 탭하세요 – 팁을 줘요.",
+ "Ukaž": "보기"
 }

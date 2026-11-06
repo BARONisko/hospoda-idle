@@ -1375,7 +1375,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   // ---------- rádce „Co dál?“ ----------
   /** varianta zobrazení (návrhy pro uživatele): a = tlačítko „?“, b = lišta s radou, c = hostinský sám poradí, když hráč nic nedělá */
-  hintMode = (new URLSearchParams(location.search).get('hint') ?? 'x') as 'a' | 'b' | 'c' | 'x'; // x = vypnuto, dokud uživatel nevybere
+  hintMode = (new URLSearchParams(location.search).get('hint') ?? 'c') as 'a' | 'b' | 'c' | 'x'; // x = vypnuto, dokud uživatel nevybere
   hintObjs: Phaser.GameObjects.GameObject[] = [];
   hintBtn?: Btn;
   /** sekundy bez ťuknutí (pro variantu c) */

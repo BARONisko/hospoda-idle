@@ -514,5 +514,18 @@
  "spropitné +{v} % (max)": "tips +{v} % (max)",
  "spropitné +{v} % · příchody {a} / {b}": "tips +{v} % · visits {a} / {b}",
  "Odemčena obtížnost {d}!": "Difficulty {d} unlocked!",
- "Obtížnost (víc životů a nástrah, odměny ×{r})": "Difficulty (more HP and traps, rewards ×{r})"
+ "Obtížnost (víc životů a nástrah, odměny ×{r})": "Difficulty (more HP and traps, rewards ×{r})",
+ "Hostinský má volný bod – vyber dovednost.": "The landlord has a free point – pick a skill.",
+ "Je víkend – v Chrámu čeká Cthulhu.": "It's the weekend – Cthulhu awaits in the Temple.",
+ "Kup další úroveň: {s}. Každých 25 úrovní výdělek ×2.": "Buy another level: {s}. Every 25 levels income ×2.",
+ "Máš splněný úkol – vyzvedni odměnu v Úkolech.": "You completed a task – claim the reward in Tasks.",
+ "Najmi kostlivce na „{s}“ – pak pracuje sám, i když tu nejsi.": "Hire a skeleton for “{s}” – it then works on its own, even while you're away.",
+ "Pivovar je plný – prodej pivo nebo ho dej do vylepšení.": "The brewery is full – sell the beer or put it into upgrades.",
+ "Pusť schopnost manažera „{s}“ – výdělek ×{m}.": "Use the manager's skill “{s}” – income ×{m}.",
+ "V Obchodě si můžeš koupit: {s}.": "You can buy in the Shop: {s}.",
+ "Za krígly si můžeš koupit: {s}.": "You can buy with tankards: {s}.",
+ "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "Call the inspection (Shop): you get +{k} tankards = income +{v} % forever.",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "Save up for “{s}” ({c} coins, about {d}). Meanwhile tap guests – they tip.",
+ "Ťukej na hosty – dávají spropitné.": "Tap guests – they tip.",
+ "Ukaž": "Show"
 }

@@ -514,5 +514,18 @@
  "spropitné +{v} % (max)": "bahşiş +{v} % (en fazla)",
  "spropitné +{v} % · příchody {a} / {b}": "bahşiş +{v} % · ziyaret {a} / {b}",
  "Odemčena obtížnost {d}!": "Zorluk {d} açıldı!",
- "Obtížnost (víc životů a nástrah, odměny ×{r})": "Zorluk (daha çok can ve tuzak, ödül ×{r})"
+ "Obtížnost (víc životů a nástrah, odměny ×{r})": "Zorluk (daha çok can ve tuzak, ödül ×{r})",
+ "Hostinský má volný bod – vyber dovednost.": "Meyhanecinin boş puanı var – bir yetenek seç.",
+ "Je víkend – v Chrámu čeká Cthulhu.": "Hafta sonu – Tapınakta Cthulhu bekliyor.",
+ "Kup další úroveň: {s}. Každých 25 úrovní výdělek ×2.": "Bir seviye daha al: {s}. Her 25 seviyede kazanç ×2.",
+ "Máš splněný úkol – vyzvedni odměnu v Úkolech.": "Görev tamam – ödülü Görevler'den al.",
+ "Najmi kostlivce na „{s}“ – pak pracuje sám, i když tu nejsi.": "“{s}” için iskelet tut – sen yokken de kendi çalışır.",
+ "Pivovar je plný – prodej pivo nebo ho dej do vylepšení.": "Bira fabrikası dolu – birayı sat ya da geliştirmeye koy.",
+ "Pusť schopnost manažera „{s}“ – výdělek ×{m}.": "Müdür yeteneği “{s}” kullan – kazanç ×{m}.",
+ "V Obchodě si můžeš koupit: {s}.": "Dükkânda alabilirsin: {s}.",
+ "Za krígly si můžeš koupit: {s}.": "Kupalarla alabilirsin: {s}.",
+ "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "Teftiş çağır (Dükkân): +{k} kupa = kazanç sonsuza dek +{v} %.",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "“{s}” için biriktir ({c} coins, yaklaşık {d}). Bu arada misafirlere dokun – bahşiş verirler.",
+ "Ťukej na hosty – dávají spropitné.": "Misafirlere dokun – bahşiş verirler.",
+ "Ukaž": "Göster"
 }

@@ -514,5 +514,18 @@
  "spropitné +{v} % (max)": "napiwki +{v} % (maks.)",
  "spropitné +{v} % · příchody {a} / {b}": "napiwki +{v} % · wizyty {a} / {b}",
  "Odemčena obtížnost {d}!": "Odblokowano poziom trudności {d}!",
- "Obtížnost (víc životů a nástrah, odměny ×{r})": "Trudność (więcej HP i pułapek, nagrody ×{r})"
+ "Obtížnost (víc životů a nástrah, odměny ×{r})": "Trudność (więcej HP i pułapek, nagrody ×{r})",
+ "Hostinský má volný bod – vyber dovednost.": "Karczmarz ma wolny punkt – wybierz umiejętność.",
+ "Je víkend – v Chrámu čeká Cthulhu.": "Weekend – w Świątyni czeka Cthulhu.",
+ "Kup další úroveň: {s}. Každých 25 úrovní výdělek ×2.": "Kup kolejny poziom: {s}. Co 25 poziomów zarobek ×2.",
+ "Máš splněný úkol – vyzvedni odměnu v Úkolech.": "Zadanie wykonane – odbierz nagrodę w Zadaniach.",
+ "Najmi kostlivce na „{s}“ – pak pracuje sám, i když tu nejsi.": "Zatrudnij szkieleta do „{s}” – będzie pracował sam, nawet gdy cię nie ma.",
+ "Pivovar je plný – prodej pivo nebo ho dej do vylepšení.": "Browar pełny – sprzedaj piwo albo daj je na ulepszenia.",
+ "Pusť schopnost manažera „{s}“ – výdělek ×{m}.": "Użyj umiejętności menedżera „{s}” – zarobek ×{m}.",
+ "V Obchodě si můžeš koupit: {s}.": "W Sklepie możesz kupić: {s}.",
+ "Za krígly si můžeš koupit: {s}.": "Za kufle możesz kupić: {s}.",
+ "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "Wezwij sanepid (Sklep): dostaniesz +{k} kufli = zarobek na zawsze +{v} %.",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "Oszczędzaj na „{s}” ({c} coins, ok. {d}). W międzyczasie stukaj w gości – dają napiwki.",
+ "Ťukej na hosty – dávají spropitné.": "Stukaj w gości – dają napiwki.",
+ "Ukaž": "Pokaż"
 }

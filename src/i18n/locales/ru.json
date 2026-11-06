@@ -514,5 +514,18 @@
  "spropitné +{v} % (max)": "чаевые +{v} % (макс.)",
  "spropitné +{v} % · příchody {a} / {b}": "чаевые +{v} % · визиты {a} / {b}",
  "Odemčena obtížnost {d}!": "Открыта сложность {d}!",
- "Obtížnost (víc životů a nástrah, odměny ×{r})": "Сложность (больше HP и ловушек, награды ×{r})"
+ "Obtížnost (víc životů a nástrah, odměny ×{r})": "Сложность (больше HP и ловушек, награды ×{r})",
+ "Hostinský má volný bod – vyber dovednost.": "У трактирщика есть свободное очко – выбери навык.",
+ "Je víkend – v Chrámu čeká Cthulhu.": "Выходные – в Храме ждёт Ктулху.",
+ "Kup další úroveň: {s}. Každých 25 úrovní výdělek ×2.": "Купи уровень: {s}. Каждые 25 уровней доход ×2.",
+ "Máš splněný úkol – vyzvedni odměnu v Úkolech.": "Задание выполнено – забери награду в Заданиях.",
+ "Najmi kostlivce na „{s}“ – pak pracuje sám, i když tu nejsi.": "Найми скелета на «{s}» – он работает сам, даже когда тебя нет.",
+ "Pivovar je plný – prodej pivo nebo ho dej do vylepšení.": "Пивоварня полна – продай пиво или вложи в улучшения.",
+ "Pusť schopnost manažera „{s}“ – výdělek ×{m}.": "Включи навык менеджера «{s}» – доход ×{m}.",
+ "V Obchodě si můžeš koupit: {s}.": "В Магазине можно купить: {s}.",
+ "Za krígly si můžeš koupit: {s}.": "За кружки можно купить: {s}.",
+ "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "Вызови санинспекцию (Магазин): +{k} кружек = доход навсегда +{v} %.",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "Копи на «{s}» ({c} coins, примерно {d}). А пока тапай по гостям – они дают чаевые.",
+ "Ťukej na hosty – dávají spropitné.": "Тапай по гостям – они дают чаевые.",
+ "Ukaž": "Показать"
 }

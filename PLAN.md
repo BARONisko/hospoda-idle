@@ -58,3 +58,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Rvačka jen na podlaze (ne u horní zdi). Stará 4. hospoda Chrám Cthulhu se ze starých uložení odebere (chrám = víkendová událost).
 - Chrám: kolo 45 s, inkoust jen stíráním; 5 obtížností (I–V: HP ×1/3/8/20/50, víc chapadel/inkoustu/hlubinných, odměny
   ×1/1,6/2,5/4/6, krígly za poražení), každá má vlastní uložené HP (d.temple.lv, diff, maxD), další se odemkne poražením předchozí.
+- Rádce „Co dál?“ (varianta C schválena): po 20 s bez ťuknutí hostinský poradí další krok (advice() v PubScene – úkoly, schopnost,
+  kostlivec, obchod, hygiena, krígly, hostinský, pivovar, chrám, jinak na co šetřit), pak nejvýš 1× za minutu; „Ukaž“ otevře místo.

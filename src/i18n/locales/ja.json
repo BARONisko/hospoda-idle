@@ -514,5 +514,18 @@
  "spropitné +{v} % (max)": "チップ +{v} %（最大）",
  "spropitné +{v} % · příchody {a} / {b}": "チップ +{v} % · 来店 {a} / {b}",
  "Odemčena obtížnost {d}!": "難易度 {d} 解放！",
- "Obtížnost (víc životů a nástrah, odměny ×{r})": "難易度（HPと罠が増加、報酬 ×{r}）"
+ "Obtížnost (víc životů a nástrah, odměny ×{r})": "難易度（HPと罠が増加、報酬 ×{r}）",
+ "Hostinský má volný bod – vyber dovednost.": "店主にポイントがあります – スキルを選ぼう。",
+ "Je víkend – v Chrámu čeká Cthulhu.": "週末だ – 神殿でクトゥルフが待っている。",
+ "Kup další úroveň: {s}. Každých 25 úrovní výdělek ×2.": "次のレベルを買おう：{s}。25レベルごとに収入×2。",
+ "Máš splněný úkol – vyzvedni odměnu v Úkolech.": "タスク達成 – タスクで報酬を受け取ろう。",
+ "Najmi kostlivce na „{s}“ – pak pracuje sám, i když tu nejsi.": "「{s}」に骸骨を雇おう – 留守中も勝手に働く。",
+ "Pivovar je plný – prodej pivo nebo ho dej do vylepšení.": "醸造所が満杯 – ビールを売るか強化に使おう。",
+ "Pusť schopnost manažera „{s}“ – výdělek ×{m}.": "マネージャーのスキル「{s}」を使おう – 収入×{m}。",
+ "V Obchodě si můžeš koupit: {s}.": "ショップで買える：{s}。",
+ "Za krígly si můžeš koupit: {s}.": "ジョッキで買える：{s}。",
+ "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "衛生検査を呼ぼう（ショップ）：ジョッキ+{k} = 収入永久+{v} %。",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "「{s}」のために貯めよう（{c} coins、約{d}）。その間、客をタップ – チップをくれる。",
+ "Ťukej na hosty – dávají spropitné.": "客をタップ – チップをくれる。",
+ "Ukaž": "見る"
 }

@@ -514,5 +514,18 @@
  "spropitné +{v} % (max)": "propinas +{v} % (máx)",
  "spropitné +{v} % · příchody {a} / {b}": "propinas +{v} % · visitas {a} / {b}",
  "Odemčena obtížnost {d}!": "¡Dificultad {d} desbloqueada!",
- "Obtížnost (víc životů a nástrah, odměny ×{r})": "Dificultad (más vida y trampas, premios ×{r})"
+ "Obtížnost (víc životů a nástrah, odměny ×{r})": "Dificultad (más vida y trampas, premios ×{r})",
+ "Hostinský má volný bod – vyber dovednost.": "El tabernero tiene un punto libre – elige una habilidad.",
+ "Je víkend – v Chrámu čeká Cthulhu.": "Es fin de semana – Cthulhu espera en el Templo.",
+ "Kup další úroveň: {s}. Každých 25 úrovní výdělek ×2.": "Compra otro nivel: {s}. Cada 25 niveles ganancias ×2.",
+ "Máš splněný úkol – vyzvedni odměnu v Úkolech.": "Tarea cumplida – recoge la recompensa en Tareas.",
+ "Najmi kostlivce na „{s}“ – pak pracuje sám, i když tu nejsi.": "Contrata un esqueleto para «{s}» – trabajará solo, aunque no estés.",
+ "Pivovar je plný – prodej pivo nebo ho dej do vylepšení.": "La cervecería está llena – vende la cerveza o úsala en mejoras.",
+ "Pusť schopnost manažera „{s}“ – výdělek ×{m}.": "Usa la habilidad del gerente «{s}» – ganancias ×{m}.",
+ "V Obchodě si můžeš koupit: {s}.": "En la Tienda puedes comprar: {s}.",
+ "Za krígly si můžeš koupit: {s}.": "Con jarras puedes comprar: {s}.",
+ "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "Llama a la inspección (Tienda): obtienes +{k} jarras = ganancias +{v} % para siempre.",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "Ahorra para «{s}» ({c} coins, unos {d}). Mientras, toca a los clientes – dan propina.",
+ "Ťukej na hosty – dávají spropitné.": "Toca a los clientes – dan propina.",
+ "Ukaž": "Mostrar"
 }
