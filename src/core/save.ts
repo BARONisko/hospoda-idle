@@ -70,6 +70,8 @@ export interface Save {
   /** verze Kostnice (2 = náhodné hody) a počet hodů */
   ossV?: number;
   ossRolls?: number;
+  /** šipky (minihra 301) */
+  darts?: import('./darts').DartsState;
   /** víkendový chrám R'lyeh */
   temple?: import('./temple').TempleState;
   /** talismany: úrovně (0 = nemá) */

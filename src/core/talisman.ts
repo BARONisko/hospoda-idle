@@ -5,7 +5,8 @@ import { t } from '../i18n';
 export type StatId =
   | 'income' | 'tips' | 'events' | 'bones' | 'brew' | 'offline' | 'krigly' | 'skill' | 'evfreq' | 'cycle'
   | 'luck' | 'xp' | 'tank' | 'night' | 'guests' | 'crit' | 'staff' | 'decor' | 'daily' | 'nighttips' | 'temple' | 'tentacles'
-  | 'coll' | 'mgrcd' | 'brawl' | 'visit' | 'golden' | 'cultgain' | 'candlesave' | 'weak' | 'gxp' | 'beer';
+  | 'coll' | 'mgrcd' | 'brawl' | 'visit' | 'golden' | 'cultgain' | 'candlesave' | 'weak' | 'gxp' | 'beer'
+  | 'dacc' | 'dspeed' | 'dextra';
 
 /** procenta s jedním desetinným místem (0,5 %) */
 const pct = (v: number) => String(Math.round(v * 1000) / 10).replace('.', ',');
@@ -44,6 +45,9 @@ export const STAT_NAMES: Record<StatId, (v: number) => string> = {
   weak: (v) => t('slabé místo Cthulhu +{v} %', { v: pct(v) }),
   gxp: (v) => t('věrnost hostů rychleji o {v} %', { v: pct(v) }),
   beer: (v) => t('pivo dráž o {v} %', { v: pct(v) }),
+  dacc: (v) => t('šipky přesnější o {v} %', { v: pct(v) }),
+  dspeed: (v) => t('šipky přibývají rychleji o {v} %', { v: pct(v) }),
+  dextra: (v) => t('šance na bod navíc v šipkách {v} %', { v: pct(v) }),
 };
 
 export const STAT_IDS = Object.keys(STAT_NAMES) as StatId[];
@@ -77,6 +81,8 @@ export const OSSUARY: { stat: StatId; per: number; cap?: number }[] = [
   { stat: 'golden', per: 0.005, cap: 0.1 },
   { stat: 'gxp', per: 0.005 },
   { stat: 'beer', per: 0.005 },
+  { stat: 'dacc', per: 0.005, cap: 1 },
+  { stat: 'dspeed', per: 0.005, cap: 1 },
 ];
 /** staty jen z chrámu (truhly, oltář) – v Kostnici nepadají */
 export const TEMPLE_STATS: { stat: StatId; per: number; cap?: number }[] = [
@@ -85,6 +91,7 @@ export const TEMPLE_STATS: { stat: StatId; per: number; cap?: number }[] = [
   { stat: 'cultgain', per: 0.005 },
   { stat: 'candlesave', per: 0.005, cap: 0.5 },
   { stat: 'weak', per: 0.005 },
+  { stat: 'dextra', per: 0.005, cap: 0.5 },
 ];
 /** cena jednoho hodu kostkou (kosti) – zdražuje se s každým hodem */
 export const rollCost = (rolls: number) => Math.ceil(60 * 1.06 ** rolls);

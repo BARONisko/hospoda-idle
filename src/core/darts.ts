@@ -1,0 +1,224 @@
+// Šipky: klasická hra 301 (odečítá se na nulu, kdo přestřelí, toho hodu se nepočítá). Šipky přibývají samy
+// (10 za hodinu), dohraná hra (leg) = 1 bod na vylepšení. Automatické házení se kupuje za 1 bod, jde vypnout
+// a hází i offline (jen když je zapnuté). Na začátku létají šipky úplně mimo – přesnost se vylepšuje.
+import { t } from '../i18n';
+import type { StatId } from './talisman';
+
+export interface DartsState {
+  /** šipky v zásobě a čas posledního přírůstku (ms) */
+  have: number;
+  at: number;
+  /** body na vylepšení a úrovně vylepšení */
+  pts: number;
+  up: Record<string, number>;
+  /** automatické házení zapnuté */
+  auto: boolean;
+  /** zbývá do nuly v aktuální hře; dohrané hry; zásahy v řadě; vítr této hry (x, y v poloměrech terče) */
+  left: number;
+  legs: number;
+  combo: number;
+  wind: [number, number];
+}
+
+export const START = 301;
+/** 10 šipek za hodinu */
+export const DART_MS = 360_000;
+/** strop zásoby (když se nehází automaticky) */
+export const DART_CAP = 60;
+
+export const newDarts = (now = Date.now()): DartsState => ({ have: 50, at: now, pts: 0, up: {}, auto: false, left: START, legs: 0, combo: 0, wind: newWind() });
+
+function newWind(): [number, number] {
+  const a = Math.random() * Math.PI * 2, s = Math.random() * 0.15;
+  return [Math.cos(a) * s, Math.sin(a) * s];
+}
+
+/** vylepšení terče: 14 pro šipky + 8 do celé hry (staty jako talismany, pod 1 % za úroveň) */
+export interface DartUp {
+  id: string;
+  name: string;
+  desc: (lvl: number) => string;
+  max: number;
+  cost: (lvl: number) => number;
+  /** stat do celé hry (přičte se k talismanům) */
+  stat?: StatId;
+}
+const pc = (v: number) => String(Math.round(v * 10) / 10).replace('.', ',');
+const grow = (base: number, g: number) => (l: number) => Math.ceil(base * g ** l);
+export const DART_UPS: DartUp[] = [
+  { id: 'auto', name: t('Automatické házení'), desc: () => t('hází samo, i offline (jde vypnout)'), max: 1, cost: () => 1 },
+  { id: 'acc', name: t('Přesnost'), desc: (l) => t('rozptyl menší o {v} %', { v: pc((1 - 0.96 ** l) * 100) }), max: 40, cost: grow(1, 1.12) },
+  { id: 'steady', name: t('Klidná ruka'), desc: (l) => t('zaměřovač se třese o {v} % méně', { v: 2.5 * l }), max: 30, cost: grow(1, 1.15) },
+  { id: 'slow', name: t('Pomalejší zaměřovač'), desc: (l) => t('zaměřovač pomalejší o {v} %', { v: 2.5 * l }), max: 30, cost: grow(1, 1.15) },
+  { id: 'more', name: t('Víc šipek do hry'), desc: (l) => t('+{n} šipek zdarma na začátku každé hry', { n: 2 * l }), max: 5, cost: grow(2, 1.6) },
+  { id: 'bull', name: t('Větší střed terče'), desc: (l) => t('bull větší o {v} %', { v: 5 * l }), max: 10, cost: grow(2, 1.3) },
+  { id: 'rings', name: t('Širší double a triple'), desc: (l) => t('pole s násobky širší o {v} %', { v: 4 * l }), max: 10, cost: grow(2, 1.3) },
+  { id: 'crit', name: t('Kritický hod'), desc: (l) => t('šance {v} % na ×2 body', { v: l }), max: 25, cost: grow(1, 1.18) },
+  { id: 'combo', name: t('Kombo'), desc: (l) => t('od 3. zásahu v řadě +{n} bodů za zásah', { n: l }), max: 10, cost: grow(2, 1.25) },
+  { id: 'magnet', name: t('Magnet'), desc: (l) => t('šipka se přitáhne k poli o {v} %', { v: 3 * l }), max: 20, cost: grow(1, 1.2) },
+  { id: 'second', name: t('Druhá šance'), desc: (l) => t('šance {v} %, že hod mimo terč šipku nespotřebuje', { v: 2 * l }), max: 25, cost: grow(1, 1.18) },
+  { id: 'time', name: t('Delší čas na hod'), desc: (l) => t('čas na hod {n} s', { n: 6 + l }), max: 10, cost: grow(1, 1.3) },
+  { id: 'wind', name: t('Méně větru'), desc: (l) => t('vítr stáčí šipky o {v} % méně', { v: 5 * l }), max: 20, cost: grow(1, 1.2) },
+  { id: 'extra', name: t('Bod navíc'), desc: (l) => t('šance {v} %, že dohraná hra dá 2 body', { v: l }), max: 30, cost: grow(2, 1.2) },
+  // do celé hry
+  { id: 'gIncome', name: t('Terč: výdělek'), desc: (l) => t('výdělek v hospodách +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(3, 1.2), stat: 'income' },
+  { id: 'gTips', name: t('Terč: spropitné'), desc: (l) => t('spropitné +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(2, 1.2), stat: 'tips' },
+  { id: 'gBones', name: t('Terč: kosti'), desc: (l) => t('kosti +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(3, 1.2), stat: 'bones' },
+  { id: 'gTent', name: t('Terč: chapadla'), desc: (l) => t('chapadla v chrámu +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(3, 1.2), stat: 'tentacles' },
+  { id: 'gTemple', name: t('Terč: síla v chrámu'), desc: (l) => t('síla zásahu v chrámu +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(3, 1.2), stat: 'temple' },
+  { id: 'gKrigly', name: t('Terč: krígly'), desc: (l) => t('krígly z hygieny +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(4, 1.2), stat: 'krigly' },
+  { id: 'gColl', name: t('Terč: sběrač'), desc: (l) => t('sběrač bublin rychlejší o {v} %', { v: pc(0.9 * l) }), max: 50, cost: grow(2, 1.2), stat: 'coll' },
+  { id: 'gBeer', name: t('Terč: pivo'), desc: (l) => t('pivo z pivovaru dráž o {v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(2, 1.2), stat: 'beer' },
+];
+export const GAME_PER = 0.009;
+
+/** staty do celé hry z terče */
+export function dartStats(s: DartsState | undefined): Partial<Record<StatId, number>> {
+  const o: Partial<Record<StatId, number>> = {};
+  if (!s) return o;
+  for (const u of DART_UPS) if (u.stat) o[u.stat] = (o[u.stat] ?? 0) + (s.up[u.id] ?? 0) * GAME_PER;
+  return o;
+}
+
+// ---------- terč (souřadnice v poloměrech terče, 0 = střed, 1 = okraj) ----------
+export const NUMS = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
+/** poloměry podle vylepšení: bull, outer bull, triple od–do, double od–do */
+export function rings(up: Record<string, number>) {
+  const b = 1 + 0.05 * (up.bull ?? 0), w = 1 + 0.04 * (up.rings ?? 0);
+  const tw = 0.075 * w, dw = 0.09 * w;
+  return { bull: 0.05 * b, outer: 0.12 * b, t0: 0.6 - tw / 2, t1: 0.6 + tw / 2, d0: 1 - dw, d1: 1 };
+}
+export const segAt = (x: number, y: number) => {
+  const a = Math.atan2(x, -y);
+  return Math.floor(((((a + Math.PI / 20) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)) / (Math.PI / 10));
+};
+export function score(x: number, y: number, up: Record<string, number>): { pts: number; label: string; mult: number; n: number } {
+  const r = rings(up), d = Math.hypot(x, y);
+  if (d > 1) return { pts: 0, label: t('Vedle!'), mult: 0, n: 0 };
+  if (d < r.bull) return { pts: 50, label: 'BULL', mult: 2, n: 25 };
+  if (d < r.outer) return { pts: 25, label: '25', mult: 1, n: 25 };
+  const n = NUMS[segAt(x, y)];
+  if (d >= r.d0) return { pts: n * 2, label: `D${n}`, mult: 2, n };
+  if (d >= r.t0 && d <= r.t1) return { pts: n * 3, label: `T${n}`, mult: 3, n };
+  return { pts: n, label: String(n), mult: 1, n };
+}
+/** střed pole (pro míření a magnet) */
+export function fieldPos(n: number, mult: number, up: Record<string, number>): [number, number] {
+  const r = rings(up);
+  if (n === 25) return [0, 0];
+  const a = (NUMS.indexOf(n) / 20) * Math.PI * 2;
+  const rad = mult === 3 ? (r.t0 + r.t1) / 2 : mult === 2 ? (r.d0 + r.d1) / 2 : (r.outer + r.t0) / 2;
+  return [Math.sin(a) * rad, -Math.cos(a) * rad];
+}
+/** kam míří automat (a poradí hráči): na velký zbytek T20, na konci přesně na zbytek */
+export function aimFor(left: number): { n: number; mult: number } {
+  if (left > 60) return { n: 20, mult: 3 };
+  if (left === 50 || left === 25) return { n: 25, mult: left === 50 ? 2 : 1 };
+  if (left <= 20) return { n: left, mult: 1 };
+  if (left % 3 === 0 && left / 3 <= 20) return { n: left / 3, mult: 3 };
+  if (left % 2 === 0 && left / 2 <= 20) return { n: left / 2, mult: 2 };
+  return { n: Math.min(20, left - 20 > 0 ? left - 20 : left), mult: 1 };
+}
+
+/** rozptyl hodu (směrodatná odchylka v poloměrech terče): na začátku skoro mimo */
+export const spread = (up: Record<string, number>, statAcc = 0) => (0.55 * 0.96 ** (up.acc ?? 0)) / (1 + statAcc);
+
+const gauss = () => Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2 * Math.PI * Math.random());
+
+/** kam šipka dopadne při míření na (ax, ay) */
+export function land(s: DartsState, ax: number, ay: number, statAcc = 0): [number, number] {
+  const sg = spread(s.up, statAcc), wk = 1 - 0.05 * (s.up.wind ?? 0);
+  let x = ax + gauss() * sg + s.wind[0] * wk, y = ay + gauss() * sg + s.wind[1] * wk;
+  // magnet: přitáhne ke středu pole, kam dopadla
+  const m = 0.03 * (s.up.magnet ?? 0);
+  if (m > 0 && Math.hypot(x, y) <= 1) {
+    const sc = score(x, y, s.up);
+    const [fx, fy] = fieldPos(sc.n, sc.mult, s.up);
+    x += (fx - x) * m;
+    y += (fy - y) * m;
+  }
+  return [x, y];
+}
+
+export interface ThrowResult {
+  x: number;
+  y: number;
+  label: string;
+  pts: number;
+  bust: boolean;
+  crit: boolean;
+  combo: number;
+  /** šipka se nespotřebovala (druhá šance) */
+  saved: boolean;
+  /** dohraná hra: kolik bodů */
+  leg: number;
+}
+
+/** vyhodnotí hod (šipku už má volající odečtenou) */
+export function resolve(s: DartsState, x: number, y: number, extra = 0): ThrowResult {
+  const sc = score(x, y, s.up);
+  const res: ThrowResult = { x, y, label: sc.label, pts: 0, bust: false, crit: false, combo: 0, saved: false, leg: 0 };
+  if (!sc.pts) {
+    s.combo = 0;
+    res.saved = Math.random() < 0.02 * (s.up.second ?? 0);
+    return res;
+  }
+  s.combo++;
+  let pts = sc.pts;
+  if (Math.random() < 0.01 * (s.up.crit ?? 0)) {
+    pts *= 2;
+    res.crit = true;
+  }
+  if (s.combo >= 3) {
+    res.combo = s.combo;
+    pts += s.up.combo ?? 0;
+  }
+  if (pts > s.left) {
+    // přestřelil: hod se nepočítá
+    res.bust = true;
+    res.pts = 0;
+    return res;
+  }
+  s.left -= pts;
+  res.pts = pts;
+  if (s.left === 0) {
+    res.leg = Math.random() < 0.01 * (s.up.extra ?? 0) + extra ? 2 : 1;
+    s.pts += res.leg;
+    s.legs++;
+    s.left = START;
+    s.combo = 0;
+    s.wind = newWind();
+    s.have += 2 * (s.up.more ?? 0);
+  }
+  return res;
+}
+
+/** doplní šipky podle času; když hází automat (a terč není otevřený), rovnou je odhází. Vrací počet dohraných her. */
+export function tickDarts(s: DartsState, now: number, throwNow: boolean, statAcc = 0, statSpeed = 0, extra = 0): { legs: number; pts: number; thrown: number } {
+  const ms = DART_MS / (1 + statSpeed);
+  const n0 = Math.floor((now - s.at) / ms);
+  // offline nejvýš 12 h šipek
+  const n = Math.min(n0, Math.round((12 * 3600_000) / ms));
+  if (n0 > 0) {
+    s.at += n0 * ms;
+    // bez automatu se zásoba plní jen do stropu
+    s.have = s.up.auto && s.auto ? s.have + n : s.have >= DART_CAP ? s.have : Math.min(DART_CAP, s.have + n);
+  }
+  const out = { legs: 0, pts: 0, thrown: 0 };
+  if (!throwNow || !s.up.auto || !s.auto) return out;
+  let guard = 5000;
+  while (s.have > 0 && guard-- > 0) {
+    s.have--;
+    const a = aimFor(s.left);
+    const [ax, ay] = fieldPos(a.n, a.mult, s.up);
+    const [x, y] = land(s, ax, ay, statAcc);
+    const r = resolve(s, x, y, extra);
+    if (r.saved) s.have++;
+    out.thrown++;
+    if (r.leg) {
+      out.legs++;
+      out.pts += r.leg;
+    }
+  }
+  return out;
+}

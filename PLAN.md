@@ -71,3 +71,9 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - 10 nových statů (talisman.ts): coll, mgrcd, brawl, visit, golden, gxp, beer (Kostnice + chrám), cultgain, candlesave, weak
   (jen chrám – TEMPLE_STATS). Efekty v PubScene/TempleScene/events.
 - Truhly v chrámu se otevírají až na konci kola (T.pend) s točením kola odměn (chapadla vždy; kosti/krígly/stat/talisman/jackpot ×2).
+- Šipky (src/core/darts.ts, src/scenes/DartsScene.ts; dlaždice v Menu místo Den a noc, Den a noc je tlačítko v Kostnici):
+  hra 301 (přesně na nulu, přestřelený hod se nepočítá), 10 šipek/h (zásoba bez automatu max 60, start 50), dohraná hra = 1 bod.
+  Ručně: táhnout prstem (zaměřovač 70 px nad prstem, houpe se a třese), pustit = hod; čas na hod 6 s.
+  Automat (1 bod) hází sám i offline (max 12 h šipek), jde vypnout. 14 vylepšení terče + 8 do celé hry (+0,9 %/úr.: výdělek,
+  spropitné, kosti, chapadla, síla v chrámu, krígly, sběrač, pivo). Do šipek: Kostnice (přesnost, rychlejší šipky), chrám (bod navíc).
+  Překlady šipek zatím anglicky ve všech jazycích kromě češtiny.
