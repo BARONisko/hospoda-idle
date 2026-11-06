@@ -64,6 +64,8 @@ export interface Save {
   /** verze Kostnice (2 = náhodné hody) a počet hodů */
   ossV?: number;
   ossRolls?: number;
+  /** víkendový chrám R'lyeh */
+  temple?: import('./temple').TempleState;
   /** talismany: úrovně (0 = nemá) */
   talis?: Record<string, number>;
   /** hostinský: zkušenosti, úroveň, koupené dovednosti (zůstává i po hygieně) */

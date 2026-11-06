@@ -4,7 +4,7 @@ import { t } from '../i18n';
 
 export type StatId =
   | 'income' | 'tips' | 'events' | 'bones' | 'brew' | 'offline' | 'krigly' | 'skill' | 'evfreq' | 'cycle'
-  | 'luck' | 'xp' | 'tank' | 'night' | 'guests' | 'crit' | 'staff' | 'decor' | 'daily' | 'nighttips';
+  | 'luck' | 'xp' | 'tank' | 'night' | 'guests' | 'crit' | 'staff' | 'decor' | 'daily' | 'nighttips' | 'temple' | 'tentacles';
 
 /** procenta s jedním desetinným místem (0,5 %) */
 const pct = (v: number) => String(Math.round(v * 1000) / 10).replace('.', ',');
@@ -31,6 +31,8 @@ export const STAT_NAMES: Record<StatId, (v: number) => string> = {
   decor: (v) => t('výzdoba levnější o {v} %', { v: pct(v) }),
   daily: (v) => t('odměny za úkoly +{v} %', { v: pct(v) }),
   nighttips: (v) => t('spropitné v noci +{v} %', { v: pct(v) }),
+  temple: (v) => t('síla v chrámu +{v} %', { v: pct(v) }),
+  tentacles: (v) => t('chapadla +{v} %', { v: pct(v) }),
 };
 
 export const STAT_IDS = Object.keys(STAT_NAMES) as StatId[];
@@ -74,6 +76,8 @@ export interface TalisDef {
   stat: StatId;
   /** přírůstek statu za úroveň */
   per: number;
+  /** jen z chrámu R'lyeh (nepadá v hospodě) */
+  temple?: boolean;
 }
 
 export const TALISMANS: TalisDef[] = [
@@ -87,6 +91,8 @@ export const TALISMANS: TalisDef[] = [
   { id: 'key', name: t('Starý klíč'), atlas: 'obj', frame: 'cKey', stat: 'skill', per: 0.1 },
   { id: 'crown', name: t('Žabí korunka'), atlas: 'obj', frame: 'cCrown', stat: 'evfreq', per: 0.05 },
   { id: 'iceeye', name: t('Ledové oko'), atlas: 'obj', frame: 'cIceEye', stat: 'cycle', per: 0.02 },
+  { id: 'rlyeh', name: t("Modla z R'lyeh"), atlas: 'obj', frame: 'dIdol1', stat: 'temple', per: 0.15, temple: true },
+  { id: 'shell', name: t('Mušle hlubin'), atlas: 'obj', frame: 'gShell', stat: 'tentacles', per: 0.1, temple: true },
 ];
 
 /** cena další úrovně v kostech (roste donekonečna) */

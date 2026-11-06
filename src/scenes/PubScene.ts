@@ -10,6 +10,8 @@ import { season, SEASONS, SEASON_BONUS } from '../core/season';
 import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
 import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward } from '../core/league';
 import { isNight, phaseLeft, bonesFor, nightCfg, nightLen, nightShare, switchPhase, nightCost, nightCostN, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
+import type { TempleHost } from './TempleScene';
+import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave } from '../core/save';
@@ -137,7 +139,7 @@ interface Card {
  * Hlavní obrazovka. 1 hospoda: výhled nahoře, karty stanic pod ním.
  * 2–3 hospody (po prestiži): obrazovka rozdělená na pruhy, každá hospoda žije; „▲ Stanice“ vysune panel s kartami.
  */
-export class PubScene extends Phaser.Scene {
+export class PubScene extends Phaser.Scene implements TempleHost {
   d!: Save;
   views: PubView[] = [];
   cards: Card[] = [];
@@ -443,6 +445,7 @@ export class PubScene extends Phaser.Scene {
       case 'keeper': return (d.klvl ?? 1) >= 2 ? null : t('od 2. úrovně hostinského');
       case 'talis': return Object.keys(d.talis ?? {}).length ? null : t('po nálezu talismanu');
       case 'krigl': return pre ? null : t('po první hygieně');
+      case 'temple': return pre ? null : t('po první hygieně');
       case 'league': return pre ? null : t('po první hygieně');
       case 'bones': return d.pubs.length >= 2 ? null : t('od 2. hospody');
       case 'coll': return d.nightInfo && (d.bones ?? 0) > 0 ? null : t('až budeš mít kosti');
@@ -536,14 +539,68 @@ export class PubScene extends Phaser.Scene {
     return [...mgrs, ...ups].sort((a, b) => a.cost - b.cost).slice(0, 5);
   }
 
-  tab: 'home' | 'shop' | 'tasks' | 'book' | 'krigl' | 'brew' | 'talis' | 'keeper' | 'league' | 'daynight' | 'coll' | 'opts' = 'home';
+  tab: 'home' | 'shop' | 'tasks' | 'book' | 'krigl' | 'temple' | 'brew' | 'talis' | 'keeper' | 'league' | 'daynight' | 'coll' | 'opts' = 'home';
 
   /** má záložka něco nového (červená tečka)? Stejná pravidla rozsvěcují tečku na tlačítku Menu. */
+  // ---------- chrám R'lyeh (víkendová událost) ----------
+  private openTemple() {
+    this.closeShop();
+    this.input.enabled = false;
+    this.scene.launch('Temple', { host: this });
+  }
+
+  templeData(): TempleState {
+    return (this.d.temple = templeState(this.d.temple));
+  }
+
+  templeIncome() {
+    return this.totalRate();
+  }
+
+  templeStats() {
+    const s = this.ts();
+    return { temple: s.temple, tentacles: s.tentacles };
+  }
+
+  templeKriglyGift() {
+    return Math.max(5, Math.round(this.d.krigle * 0.03));
+  }
+
+  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal', n: number): string {
+    if (kind === 'krigle') {
+      this.d.krigle += n;
+      return t('+{k} krígel', { k: n });
+    }
+    if (kind === 'bones') {
+      this.d.bones = (this.d.bones ?? 0) + n;
+      return t('+{n} kostí', { n });
+    }
+    if (kind === 'seal') return t('Pečeť R\'lyeh: výdělek všude +{v} %', { v: Math.round((this.d.temple?.boss ?? 0) * SEAL_BONUS * 100) });
+    const tl = (this.d.talis ??= {});
+    const pool = TALISMANS.filter((x) => x.temple);
+    const d = pool.find((x) => !tl[x.id]) ?? Phaser.Utils.Array.GetRandom(pool);
+    tl[d.id] = (tl[d.id] ?? 0) + 1;
+    this.tsCache = undefined;
+    this.applyKup();
+    return tl[d.id] === 1 ? t('Nalezen talisman: {n}!', { n: d.name }) : t('{n} – úroveň {l}!', { n: d.name, l: tl[d.id] });
+  }
+
+  templeSave() {
+    store(this.d);
+  }
+
+  templeClose() {
+    this.scene.stop('Temple');
+    this.input.enabled = true;
+    this.menuUnlocks();
+  }
+
   private tabAlert(id: string) {
     if (id === 'shop') return this.shopOffer().some((u) => u.cost <= this.d.coins);
     if (id === 'tasks') return this.claimable();
     if (id === 'brew') return this.brewFull();
     if (id === 'keeper') return this.skillPoints() > 0;
+    if (id === 'temple') return isWeekend() && !this.tileLock('temple') && templeState(this.d.temple).used < ROUNDS_PER_DAY;
     return false;
   }
 
@@ -555,6 +612,7 @@ export class PubScene extends Phaser.Scene {
 
   /** dlaždice menu: [záložka, podzáložka obchodu, název, atlas, snímek] */
   private static TILES: [PubScene['tab'], PubScene['shopSub'] | null, string, string, string][] = [
+    ['temple', null, t('Chrám'), 'obj', 'dIdol1'],
     ['shop', 'up', t('Obchod'), 'obj', 'bag'],
     ['tasks', null, t('Úkoly'), 'icons', 'clipboard'],
     ['brew', null, t('Pivovar'), 'obj', 'fermenter'],
@@ -578,6 +636,7 @@ export class PubScene extends Phaser.Scene {
       const lock = this.tileLock(sub && tab === 'shop' ? sub : tab);
       const b = this.btn(x, y, tw, th, () => {
         if (lock) return this.banner(this.views[0].cam, t('{s}: otevře se {c}', { s: label, c: lock }));
+        if (tab === 'temple') return this.openTemple();
         if (sub) this.shopSub = sub;
         this.openShop(tab, false);
         if (tab === 'shop' && sub === 'up') this.tut('tile:shop');
@@ -866,7 +925,7 @@ export class PubScene extends Phaser.Scene {
   /** vzácný nález talismanu (nový = úroveň 1, už ho máš = +1 úroveň zdarma) */
   private tryDrop(chance: number) {
     if (Math.random() >= chance * (1 + this.ts().luck)) return;
-    const d = Phaser.Utils.Array.GetRandom(TALISMANS);
+    const d = Phaser.Utils.Array.GetRandom(TALISMANS.filter((x) => !x.temple));
     const tl = (this.d.talis ??= {});
     tl[d.id] = (tl[d.id] ?? 0) + 1;
     this.applyKup();
@@ -879,20 +938,22 @@ export class PubScene extends Phaser.Scene {
     const bones = this.d.bones ?? 0;
     this.shopObjs.push(this.add.text(20, y0 - 4, t('Vzácné nálezy z událostí, rvaček a návštěv. Vylepšují se za kosti.'), txt(16, PAL.fog)).setDepth(D + 1).setWordWrapWidth(W - 40));
     TALISMANS.forEach((d, i) => {
-      const x = 10 + (i % 2) * 262, y = y0 + 24 + Math.floor(i / 2) * 112;
+      const RT = TALISMANS.length > 10 ? 90 : 112;
+      const x = 10 + (i % 2) * 262, y = y0 + 24 + Math.floor(i / 2) * RT;
       const lvl = tl[d.id] ?? 0;
       const box = this.add.graphics().setDepth(D + 1);
-      box.fillStyle(col(lvl ? 'ink' : 'dusk'), 0.7).fillRoundedRect(x, y, 256, 104, 10);
-      const ic = this.add.image(x + 34, y + 40, d.atlas, d.frame).setScale(3).setDepth(D + 2);
+      box.fillStyle(col(lvl ? 'ink' : 'dusk'), 0.7).fillRoundedRect(x, y, 256, RT - 6, 10);
+      const ic = this.add.image(x + 34, y + 40, d.atlas, d.frame).setDepth(D + 2);
+      ic.setScale(Math.min(3, 52 / Math.max(ic.width, ic.height)));
       if (!lvl) ic.setTintFill(col('slate'));
-      const nm = this.add.text(x + 66, y + 8, lvl ? `${d.name} ${lvl}` : '???', txt(20, lvl ? PAL.gold : PAL.slate)).setDepth(D + 2);
+      const nm = this.add.text(x + 66, y + (RT < 100 ? 4 : 8), lvl ? `${d.name} ${lvl}` : '???', txt(20, lvl ? PAL.gold : PAL.slate)).setDepth(D + 2);
       nm.setScale(Math.min(1, 180 / nm.width));
-      const st = this.add.text(x + 66, y + 34, STAT_NAMES[d.stat](Math.max(1, lvl) * d.per), txt(15, lvl ? PAL.mint : PAL.slate)).setDepth(D + 2);
+      const st = this.add.text(x + 66, y + (RT < 100 ? 26 : 34), STAT_NAMES[d.stat](Math.max(1, lvl) * d.per), txt(15, lvl ? PAL.mint : PAL.slate)).setDepth(D + 2);
       st.setScale(Math.min(1, 182 / st.width));
       this.shopObjs.push(box, ic, nm, st);
       if (!lvl) return;
       const cost = talisCost(lvl);
-      const b = this.btn(x + 66, y + 58, 180, 38, () => {
+      const b = this.btn(x + 66, y + (RT < 100 ? 46 : 58), 180, RT < 100 ? 34 : 38, () => {
         if ((this.d.bones ?? 0) < cost) return sfx.error();
         this.d.bones! -= cost;
         tl[d.id] = lvl + 1;
@@ -1769,7 +1830,7 @@ export class PubScene extends Phaser.Scene {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0));
   }
 
   // ---------- obchod s krígly ----------
