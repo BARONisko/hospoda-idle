@@ -1317,6 +1317,8 @@ export class PubScene extends Phaser.Scene {
 
   // ---------- návštěvníci s rozhodnutím ----------
   visitT = 120;
+  /** otevřený návštěvník: průběžně přebarvuje tlačítka podle coins */
+  visitLive?: () => void;
 
   /** (pro testy) */
   visitList() {
@@ -1355,10 +1357,11 @@ export class PubScene extends Phaser.Scene {
     const close = () => {
       objs.forEach((o) => o.destroy());
       this.awayObjs = [];
+      this.visitLive = undefined;
     };
+    const draws: (() => void)[] = [];
     [v.a, v.b].forEach((ch, i) => {
       const cost = ch.cost(c);
-      const ok = this.d.coins >= cost;
       const b = this.btn(bx + 20 + i * (bw / 2), by + bh - 104, bw / 2 - 40, 84, () => {
         if (this.d.coins < cost) return sfx.error();
         this.d.coins -= cost;
@@ -1369,10 +1372,21 @@ export class PubScene extends Phaser.Scene {
         this.week('visitors');
         store(this.d);
       }, D + 3);
-      this.drawBtn(b, cost ? `${ch.label}\n${big(cost)} coins` : ch.label, ok, i === 0 ? 'green' : 'plum');
-      b.label.setScale(Math.min(1, (b.w - 12) / b.label.width));
+      // dokud nemáš dost, ukazuje kolik chybí; jakmile našetříš, tlačítko se zbarví a jde zaplatit
+      let last = '';
+      const draw = () => {
+        const ok = this.d.coins >= cost;
+        const label = !cost ? ch.label : ok ? `${ch.label}\n${big(cost)} coins` : `${ch.label}\n${t('chybí {n}', { n: big(cost - this.d.coins) })}`;
+        if (label === last) return;
+        last = label;
+        this.drawBtn(b, label, ok, i === 0 ? 'green' : 'plum');
+        b.label.setScale(Math.min(1, (b.w - 12) / b.label.width));
+      };
+      draw();
+      draws.push(draw);
       objs.push(b.bg, b.label, b.zone);
     });
+    this.visitLive = () => draws.forEach((f) => f());
     this.awayObjs = objs;
     sfx.hire();
   }
@@ -2082,6 +2096,7 @@ export class PubScene extends Phaser.Scene {
       else this.drawBrewBar();
     }
     // návštěvník s rozhodnutím (jen když není otevřené jiné okno ani událost)
+    this.visitLive?.();
     this.visitT -= dt;
     if (this.visitT <= 0 && !this.awayObjs.length && !this.shopObjs.length && this.sheet < 0 && !this.ev.active && (this.d.tut ?? -1) < 0) {
       this.visitT = Phaser.Math.Between(180, 360);
