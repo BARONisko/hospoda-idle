@@ -11,7 +11,7 @@ export interface StationState {
 
 /** jedna hospoda; po prestiži přibude další (max 3 – Pajzl, sklepní krčma, Žabákův podnik) */
 export interface PubState {
-  act: 1 | 2 | 3;
+  act: Act;
   st: Record<string, StationState>;
   /** najatý manažer (schopnost „hodina“) */
   mgr?: boolean;
@@ -52,7 +52,11 @@ const extra = () => ({ stats: { tips: 0, levels: 0, events: 0, prestiges: 0 }, d
 
 const KEY = 'pubidle_save_v1';
 
-export const newPub = (act: 1 | 2 | 3): PubState => ({ act, st: { tap: { lvl: act === 1 ? 1 : 0, auto: false, prog: 0 } } });
+export type Act = 1 | 2 | 3 | 4;
+/** nejvíc hospod (po 3. hygieně přibude chrám Cthulhu) */
+export const MAX_PUBS = 4;
+
+export const newPub = (act: Act): PubState => ({ act, st: { tap: { lvl: act === 1 ? 1 : 0, auto: false, prog: 0 } } });
 
 export function fresh(): Save {
   return { v: 2, coins: 0, earned: 0, pubs: [newPub(1)], up: [], run: 0, krigle: 0, ...extra(), at: Date.now() };

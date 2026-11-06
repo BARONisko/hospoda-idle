@@ -244,7 +244,18 @@ const ZABAK_COLORS: Partial<Record<PalKey, PalKey>> = {
  * Pozadí hospody. `act` = dějství: 1 U Zlatého sudu (dřevo), 2 sklepní hospoda (kámen, cihly, starý pult),
  * 3 Žabákův podnik (stejné rozložení, bažinatě zelené barvy).
  */
+/** 4. hospoda (chrám Cthulhu): sklepní kámen přebarvený do hlubin */
+const CTHULHU_COLORS: Partial<Record<PalKey, PalKey>> = {
+  slate: 'indigo', fog: 'sage', mauve: 'plum', tan: 'grave', rust: 'navy', maroon: 'navy', copper: 'plum', ochre: 'indigo',
+  blood: 'navy', red: 'pine', bone: 'ice', sand: 'mint', olive: 'grave', dusk: 'navy',
+};
+
 export function drawPubBackground(tablesLevel: number, act = 1): PixelCanvas {
+  if (act === 4) {
+    const c = drawCellarPubBackground(tablesLevel);
+    recolor(c, CTHULHU_COLORS);
+    return c;
+  }
   if (act === 2) return drawCellarPubBackground(tablesLevel);
   const p = drawPubBackground1(tablesLevel);
   if (act === 3) recolor(p, ZABAK_COLORS);

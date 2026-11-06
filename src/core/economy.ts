@@ -29,8 +29,9 @@ export const STATION_NAMES: Record<number, Record<string, string>> = {
   1: { tap: t('Pípa'), kitchen: t('Kuchyně'), cellar: t('Sklep se sudy'), dice: t('Kostky v rohu') },
   2: { tap: t('Pípa s krví'), kitchen: t('Kotel s guláškem'), cellar: t('Sudomorův sklep'), dice: t('Kostky s kostlivcem') },
   3: { tap: t('Bahenní pípa'), kitchen: t('Žabí kuchyně'), cellar: t('Studna'), dice: t('Pulčí závody') },
+  4: { tap: t('Pípa z hlubin'), kitchen: t('Obětní kotel'), cellar: t('Potopená kaple'), dice: t('Kostky osudu') },
 };
-export const PUB_NAMES: Record<number, string> = { 1: t('Pajzl u Berana'), 2: t('Sklepní krčma'), 3: t('Žabákův podnik') };
+export const PUB_NAMES: Record<number, string> = { 1: t('Pajzl u Berana'), 2: t('Sklepní krčma'), 3: t('Žabákův podnik'), 4: t('Chrám Cthulhu') };
 /** každá další hospoda vydělává řádově víc */
 export const actMult = (act: number) => 50 ** (act - 1);
 
@@ -73,7 +74,7 @@ export interface UpgradeDef {
 
 export const UP_TIERS = 3;
 
-export const UPGRADES: UpgradeDef[] = [1, 2, 3].flatMap((act) =>
+export const UPGRADES: UpgradeDef[] = [1, 2, 3, 4].flatMap((act) =>
   STATIONS.flatMap((d) =>
     Array.from({ length: UP_TIERS }, (_, k) => ({
       id: `${act}_${d.id}_${k + 1}`,
@@ -95,6 +96,7 @@ export const MANAGERS: Record<number, { name: string; skill: string }> = {
   1: { name: t('Hostinský Beran'), skill: t('Šťastná hodina') },
   2: { name: t('Sudomor'), skill: t('Upíří hodina') },
   3: { name: t('Žabák'), skill: t('Žabí hodina') },
+  4: { name: t('Žlutý král'), skill: t('Hodina chapadel') },
 };
 export const mgrCost = (act: number) => 25000 * actMult(act);
 export const BOOST_MULT = 3;

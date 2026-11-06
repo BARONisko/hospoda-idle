@@ -87,4 +87,12 @@ export const GUEST_NAMES: Record<string, string> = {
   ratman: t('Krysák'),
   frogman: t('Žabí muž'),
   zabak: t('Žabák'),
+  cultist0: t('Kultista'),
+  cultist1: t('Kultistka'),
+  cultist2: t('Velekněz'),
+  cultist3: t('Novic'),
+  deep0: t('Hlubinný'),
+  deep1: t('Hlubinná'),
+  deep2: t('Stařešina hlubin'),
+  drowner: t('Utopenec'),
 };

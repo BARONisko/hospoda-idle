@@ -6,7 +6,7 @@ import { big } from '../core/num';
 import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN, KRIGL_SHOP, KriglItem, startCoins } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
-import { Save, PubState, load, store, newPub } from '../core/save';
+import { Save, PubState, load, store, newPub, Act, MAX_PUBS } from '../core/save';
 import { PubView } from '../game/PubView';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
 import { GUESTS } from '../game/PubView';
@@ -14,6 +14,7 @@ import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today } from '
 
 const W = 540;
 const H = 960;
+const T = 16;
 const TOP = 84; // horní lišta s penězi
 const CARD_H = 108;
 /** strop výdělku offline (s) */
@@ -104,8 +105,8 @@ export class PubScene extends Phaser.Scene {
     loadOpts();
     // ladění: ?pubs=2|3 přidá hospody (než bude prestiž)
     const dbg = Number(new URLSearchParams(location.search).get('pubs'));
-    while (dbg && this.d.pubs.length < Math.min(3, dbg)) {
-      const p = newPub((this.d.pubs.length + 1) as 1 | 2 | 3);
+    while (dbg && this.d.pubs.length < Math.min(MAX_PUBS, dbg)) {
+      const p = newPub((this.d.pubs.length + 1) as Act);
       p.st = { tap: { lvl: 10, auto: true, prog: 0.1 }, kitchen: { lvl: 5, auto: true, prog: 0.3 }, cellar: { lvl: 2, auto: false, prog: 0 }, dice: { lvl: 1, auto: false, prog: 0 } };
       this.d.pubs.push(p);
     }
@@ -578,7 +579,7 @@ export class PubScene extends Phaser.Scene {
       objs.push(o);
       return o;
     };
-    const next = this.d.pubs.length < 3 ? PUB_NAMES[this.d.pubs.length + 1] : '';
+    const next = this.d.pubs.length < MAX_PUBS ? PUB_NAMES[this.d.pubs.length + 1] : '';
     tx(by + 24, t('Hygiena!'), 36, PAL.scarlet);
     tx(by + 84, t('Hygienik hospodu zavře. Přijdeš o coins, úrovně, vylepšení i manažery.'), 20, PAL.bone);
     tx(by + 170, t('Dostaneš +{k} krígel', { k }), 30, PAL.gold);
@@ -597,7 +598,7 @@ export class PubScene extends Phaser.Scene {
 
   private prestige() {
     const k = kriglyFor(this.d.run);
-    const n = Math.min(3, this.d.pubs.length + 1);
+    const n = Math.min(MAX_PUBS, this.d.pubs.length + 1);
     this.d.krigle += k;
     this.d.stats.prestiges++;
     this.d.run = 0;
@@ -605,7 +606,7 @@ export class PubScene extends Phaser.Scene {
     this.d.up = [];
     const keep = this.kl('keepMgr') > 0;
     const had = this.d.pubs.map((p) => !!p.mgr);
-    this.d.pubs = Array.from({ length: n }, (_, i) => newPub((i + 1) as 1 | 2 | 3));
+    this.d.pubs = Array.from({ length: n }, (_, i) => newPub((i + 1) as Act));
     if (keep) this.d.pubs.forEach((p, i) => (p.mgr = had[i] ?? false));
     this.d.coins = startCoins(this.kl('start'));
     store(this.d);
@@ -693,20 +694,39 @@ export class PubScene extends Phaser.Scene {
       this.addCards(0, TOP + viewH + 10);
       return;
     }
-    const h = Math.floor((H - TOP) / n);
-    this.views.forEach((v, i) => {
-      const y = TOP + i * h;
-      v.frame(0, y, W, h - 4, 112);
-      const g = this.add.graphics().setDepth(50);
-      g.fillStyle(col('gold')).fillRect(0, y + h - 4, W, 4);
-      g.fillStyle(col('ink'), 0.8).fillRoundedRect(8, y + 8, 260, 36, 8);
-      g.fillStyle(col('ink'), 0.8).fillRoundedRect(W - 150, y + 8, 142, 36, 8);
-      this.add.text(18, y + 12, PUB_NAMES[v.pub.act], txt(24, PAL.gold)).setDepth(51);
-      this.stripRates.push(this.add.text(W - 18, y + 12, '', txt(22, PAL.mint)).setOrigin(1, 0).setDepth(51));
-      const b = this.btn(W - 170, y + h - 64, 156, 48, () => this.openSheet(i), 60);
-      this.drawBtn(b, t('▲ Stanice'), true, 'green');
-      this.skillBtns[i] = this.btn(14, y + h - 64, 200, 48, () => this.useSkill(i), 60);
+    // rámečky hospod: pruhy pod sebou; při 4 hospodách návrhy ?lay=a (4 pruhy) | b (mřížka 2×2) | c (posuvné pruhy)
+    const lay = n === 4 ? new URLSearchParams(location.search).get('lay') ?? 'a' : 'a';
+    const rects = this.views.map((_, i) => {
+      if (lay === 'b') return { x: (i % 2) * (W / 2), y: TOP + Math.floor(i / 2) * ((H - TOP) / 2), w: W / 2, h: (H - TOP) / 2 };
+      if (lay === 'c') return { x: 0, y: TOP + i * 380, w: W, h: 380 };
+      const h = Math.floor((H - TOP) / n);
+      return { x: 0, y: TOP + i * h, w: W, h };
     });
+    this.views.forEach((v, i) => {
+      const { x, y, w, h } = rects[i];
+      const small = w < 400 || h < 260;
+      v.frame(x, y, w - (lay === 'b' && i % 2 === 0 ? 4 : 0), h - 4, 112, lay === 'b' ? (h - 4) / (13 * T) : undefined);
+      const g = this.add.graphics().setDepth(50);
+      g.fillStyle(col('gold')).fillRect(x, y + h - 4, w, 4);
+      if (lay === 'b' && i % 2 === 0) g.fillRect(x + w - 4, y, 4, h);
+      const nm = this.add.text(x + 14, y + 10, PUB_NAMES[v.pub.act], txt(small ? 20 : 24, PAL.gold)).setDepth(51);
+      nm.setScale(Math.min(1, (w - (small ? 30 : 170)) / nm.width));
+      g.fillStyle(col('ink'), 0.8).fillRoundedRect(x + 6, y + 6, nm.displayWidth + 18, small ? 30 : 36, 8);
+      const rt = this.add.text(small ? x + 14 : x + w - 18, small ? y + 40 : y + 12, '', txt(small ? 18 : 22, PAL.mint)).setOrigin(small ? 0 : 1, 0).setDepth(51);
+      this.stripRates.push(rt);
+      if (!small) g.fillStyle(col('ink'), 0.8).fillRoundedRect(x + w - 150, y + 8, 142, 36, 8);
+      const bw = small ? 110 : 156, bh = small ? 42 : 48;
+      const b = this.btn(x + w - bw - 10, y + h - bh - 14, bw, bh, () => this.openSheet(i), 60);
+      this.drawBtn(b, small ? t('▲ Stanice') : t('▲ Stanice'), true, 'green');
+      if (small) b.label.setScale(Math.min(1, (bw - 10) / b.label.width));
+      this.skillBtns[i] = this.btn(x + 10, y + h - bh - 14, small ? 120 : 200, bh, () => this.useSkill(i), 60);
+    });
+    if (lay === 'c') {
+      const g = this.add.graphics().setDepth(55);
+      g.fillStyle(col('ink'), 0.85).fillRoundedRect(W / 2 - 110, H - 50, 220, 40, 10);
+      this.add.text(W / 2, H - 30, t('▼ táhni pro další hospody'), txt(18, PAL.bone)).setOrigin(0.5).setDepth(56);
+      g.fillStyle(col('gold')).fillRoundedRect(W - 10, TOP + 6, 6, 200, 3);
+    }
   }
 
   private openSheet(i: number) {

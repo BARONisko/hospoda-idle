@@ -17,6 +17,7 @@ export const GUESTS: Record<number, string[]> = {
   1: Array.from({ length: 12 }, (_, i) => `guest${i}`),
   2: ['zombie', 'werewolf', 'banshee', 'vampire', 'ghost', 'ratman', 'guest3', 'zombie', 'vampire'],
   3: ['frogman', 'frogman', 'guest1', 'guest5', 'frogman', 'guest8', 'zabak'],
+  4: ['cultist0', 'cultist1', 'cultist2', 'deep0', 'deep1', 'drowner', 'cultist3', 'deep2'],
 };
 
 /** kde stanice stojí (relativně k hospodě) – tam pracuje obsluha a vyskakuje výdělek */
@@ -47,7 +48,7 @@ interface Guest {
 }
 
 /** postava manažera podle hospody */
-const MGR_SPRITE: Record<number, string> = { 1: 'tapster', 2: 'count', 3: 'deep0' };
+const MGR_SPRITE: Record<number, string> = { 1: 'tapster', 2: 'count', 3: 'deep0', 4: 'yellowKing' };
 
 export class PubView {
   /** probuzený Cthulhu (vylepšení z krígel) – kouká do hospody */
@@ -93,7 +94,7 @@ export class PubView {
     }
     // kostky: rezervované místo pro kostlivce s kostkami
     this.seats.find((st) => st.x === SPOT.dice.x && st.y === SPOT.dice.y)!.taken = true;
-    this.keeper = add(s.add.sprite(ox + SPOT.tap.x, SPOT.tap.y, pub.act === 3 ? 'zabak' : 'player', 0).setOrigin(0.5, 1).setDepth(SPOT.tap.y));
+    this.keeper = add(s.add.sprite(ox + SPOT.tap.x, SPOT.tap.y, pub.act === 3 ? 'zabak' : pub.act === 4 ? 'cultist4' : 'player', 0).setOrigin(0.5, 1).setDepth(SPOT.tap.y));
     // hospoda je už rozjetá: pár hostů sedí hned od začátku
     for (let i = 0; i < 4; i++) {
       this.spawn();
@@ -111,8 +112,8 @@ export class PubView {
   }
 
   /** umístí kameru: výřez obrazovky + co ve hospodě ukázat */
-  frame(x: number, y: number, w: number, h: number, cy = 112) {
-    const zoom = w / (17 * T); // šířka interiéru (sloupce 0–16) přes celou šířku výřezu
+  frame(x: number, y: number, w: number, h: number, cy = 112, zoomTo?: number) {
+    const zoom = zoomTo ?? w / (17 * T); // šířka interiéru (sloupce 0–16) přes celou šířku výřezu
     this.cam.setViewport(x, y, w, h).setZoom(zoom);
     const halfH = h / zoom / 2;
     this.cam.centerOn(this.ox + 8.5 * T, Phaser.Math.Clamp(cy, halfH, 14 * T - halfH));
