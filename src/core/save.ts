@@ -47,6 +47,10 @@ export interface Save {
   /** kosti (noční měna) a jejich vylepšení – zůstávají i po hygieně */
   bones?: number;
   bup?: Record<string, number>;
+  /** den a noc: úroveň „Delší noc“, odemčený přepínač, posun cyklu (ms) */
+  dn?: { lvl: number; sw?: boolean; shift?: number };
+  /** pivní akce: happy hour do (ms), noční várka (×2 kosti příští/tuto noc) */
+  fx?: { happy?: number; nightx2?: boolean };
   /** kosti přepočtené na malá čísla (staré uložení ÷ 100) */
   bones2?: boolean;
   /** Kostnice: úrovně statů koupené za kosti */

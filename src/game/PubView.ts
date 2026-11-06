@@ -326,6 +326,18 @@ export class PubView {
     return { x: this.cam.x + (b.centerX - v.x) * this.cam.zoom, y: this.cam.y + (b.top - v.y) * this.cam.zoom };
   }
 
+  /** runda pro všechny: každý sedící host dá spropitné (vrací počet) */
+  tipAll(text: string): number {
+    let n = 0;
+    for (const g of this.guests) {
+      if (g.leaving || g.path.length) continue;
+      n++;
+      this.s.tweens.add({ targets: g.spr, y: g.spr.y - 4, yoyo: true, duration: 120, delay: n * 60 });
+      this.pop(g.spr.x - this.ox, g.spr.y - 26, text, PAL.mint);
+    }
+    return n;
+  }
+
   tipPop(text: string) {
     // poslední trefený host
     const g = [...this.guests].reverse().find((q) => q.tipped);

@@ -19,6 +19,8 @@ export interface LeagueState {
   rival?: number;
   /** kdy se tržba soupeře naposledy dopočítala (ms) */
   rAt?: number;
+  /** pivo pro soupeře: do kdy vydělává jen polovinu (ms) */
+  slowUntil?: number;
 }
 
 const WEEK = 7 * 86400_000;
@@ -58,8 +60,9 @@ export function rivalTick(L: LeagueState, now = Date.now()) {
   }
   const end = Math.min(now, weekEnd(L));
   while (L.rAt < end) {
-    const dt = Math.min(600_000, end - L.rAt);
-    L.rival += rivalSpeed(L, L.rAt + dt / 2) * push(L.me, L.rival, L.rate) * (dt / 1000);
+    const dt = Math.min(60_000, end - L.rAt);
+    const mid = L.rAt + dt / 2;
+    L.rival += rivalSpeed(L, mid) * push(L.me, L.rival, L.rate) * (mid < (L.slowUntil ?? 0) ? 0.5 : 1) * (dt / 1000);
     L.rAt += dt;
   }
   return L.rival;
