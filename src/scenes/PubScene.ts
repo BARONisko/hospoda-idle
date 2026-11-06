@@ -145,6 +145,8 @@ export class PubScene extends Phaser.Scene {
 
     this.layout();
     this.daily();
+    if (this.d.tut === undefined) this.d.tut = this.d.earned < 50 ? 0 : -1;
+    this.tutShow();
     this.ev = new PubEvents(this, {
       views: this.views,
       reward: (secs, view) => {
@@ -179,6 +181,7 @@ export class PubScene extends Phaser.Scene {
           this.gain(tip);
           this.d.stats.tips++;
           this.task('tips', 1);
+          this.tut('tip');
           v.tipPop('+' + big(tip));
           sfx.tip();
         }
@@ -315,6 +318,7 @@ export class PubScene extends Phaser.Scene {
   tab: 'shop' | 'tasks' | 'book' | 'opts' = 'shop';
 
   private openShop(tab = this.tab, toggle = true) {
+    this.tut('menu');
     if (this.shopObjs.length && toggle) return this.closeShop();
     this.closeShop();
     this.closeSheet();
@@ -600,6 +604,56 @@ export class PubScene extends Phaser.Scene {
     this.scene.restart();
   }
 
+  // ---------- návod pro nového hráče ----------
+  tutObjs: Phaser.GameObjects.GameObject[] = [];
+  private static TUT: { text: string; done: string }[] = [
+    { text: t('Ťukni na Pípu – hostinský natočí pivo a vyděláš coins.'), done: 'tap' },
+    { text: t('Za coins kup další úroveň pípy – vydělá víc.'), done: 'buy:tap' },
+    { text: t('Ťukni na hosta v hospodě – dá ti spropitné!'), done: 'tip' },
+    { text: t('Najmi kostlivce – pípa pak točí sama, i když nehraješ.'), done: 'hire' },
+    { text: t('Otevři kuchyni – další zdroj coins.'), done: 'buy:kitchen' },
+    { text: t('V Menu je obchod, úkoly a sbírka hostů. Hodně štěstí, hostinský!'), done: 'menu' },
+  ];
+
+  /** událost hráče posune návod */
+  private tut(ev: string) {
+    const i = this.d.tut ?? -1;
+    if (i < 0 || PubScene.TUT[i].done !== ev) return;
+    this.d.tut = i + 1 >= PubScene.TUT.length ? -1 : i + 1;
+    this.tutShow();
+  }
+
+  private tutShow() {
+    this.tutObjs.forEach((o) => o.destroy());
+    this.tutObjs = [];
+    const i = this.d.tut ?? -1;
+    if (i < 0 || this.views.length > 1) return;
+    const step = PubScene.TUT[i];
+    // kam ukázat
+    const card = (id: string) => this.cards.find((c) => c.def.id === id)!;
+    let tx = 0, ty = 0;
+    if (step.done === 'tap') [tx, ty] = [160, card('tap').y + 30];
+    else if (step.done === 'buy:tap') [tx, ty] = [card('tap').buy.x + 95, card('tap').buy.y];
+    else if (step.done === 'tip') [tx, ty] = [W / 2, TOP + 230];
+    else if (step.done === 'hire') [tx, ty] = [card('tap').staff.x + 95, card('tap').staff.y];
+    else if (step.done === 'buy:kitchen') [tx, ty] = [card('kitchen').buy.x + 95, card('kitchen').buy.y];
+    else [tx, ty] = [this.shopBtn.x + 54, this.shopBtn.y + 50];
+    const D = 420;
+    const bub = this.add.text(W / 2, TOP + 16, step.text, txt(24, PAL.ink)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 80).setDepth(D + 1);
+    const g = this.add.graphics().setDepth(D);
+    g.fillStyle(col('ink'), 0.5).fillRoundedRect(W / 2 - bub.width / 2 - 16, TOP + 10, bub.width + 32, bub.height + 16, 12);
+    g.fillStyle(col('sand')).fillRoundedRect(W / 2 - bub.width / 2 - 18, TOP + 6, bub.width + 36, bub.height + 16, 12);
+    const up = step.done === 'menu';
+    const arrow = this.add.graphics().setDepth(D + 2).setPosition(tx, up ? ty + 30 : ty - 30);
+    const tri = (gr: Phaser.GameObjects.Graphics, c: number, grow: number) =>
+      gr.fillStyle(c).fillTriangle(-22 - grow, -14 - grow, 22 + grow, -14 - grow, 0, 22 + grow).fillRect(-9 - grow, -40 - grow, 18 + grow * 2, 28);
+    tri(arrow, col('ink'), 4);
+    tri(arrow, col('gold'), 0);
+    if (up) arrow.setAngle(180);
+    this.tweens.add({ targets: arrow, y: arrow.y + (up ? -10 : 10), yoyo: true, repeat: -1, duration: 380, ease: 'Sine.inOut' });
+    this.tutObjs.push(g, bub, arrow);
+  }
+
   private drawMode() {
     this.drawBtn(this.modeBtn, this.mode ? `×${this.mode}` : 'MAX', true, 'amber');
   }
@@ -725,6 +779,7 @@ export class PubScene extends Phaser.Scene {
     const s = this.st(this.d.pubs[i], def.id);
     if (s.lvl > 0 && !s.auto && s.prog === 0) {
       s.prog = 0.0001;
+      if (def.id === 'tap') this.tut('tap');
       if (def.id === 'tap') sfx.pour();
       else sfx.click();
     }
@@ -740,6 +795,7 @@ export class PubScene extends Phaser.Scene {
     s.lvl += n;
     this.d.stats.levels += n;
     this.task('levels', n);
+    this.tut('buy:' + def.id);
     sfx.buy();
     if (before && s.lvl >= before) this.milestone(i, def);
     this.views[i].refresh();
@@ -756,6 +812,7 @@ export class PubScene extends Phaser.Scene {
     sfx.hire();
     s.auto = true;
     if (s.prog === 0) s.prog = 0.0001;
+    this.tut('hire');
     this.views[i].refresh();
     this.refresh();
   }

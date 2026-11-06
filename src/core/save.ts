@@ -36,6 +36,8 @@ export interface Save {
   daily: Daily;
   /** vyzvednuté úspěchy (id) */
   ach: string[];
+  /** krok návodu pro nového hráče (-1 = hotovo) */
+  tut?: number;
   /** bestiář: viděné druhy hostů */
   seen: string[];
   /** koupená vylepšení z obchodu (id) */
