@@ -50,6 +50,10 @@ export interface Save {
   bup?: Record<string, number>;
   /** talismany: úrovně (0 = nemá) */
   talis?: Record<string, number>;
+  /** hostinský: zkušenosti, úroveň, koupené dovednosti (zůstává i po hygieně) */
+  xp?: number;
+  klvl?: number;
+  skills?: string[];
   /** krok návodu pro nového hráče (-1 = hotovo) */
   tut?: number;
   /** bestiář: viděné druhy hostů */

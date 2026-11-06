@@ -9,7 +9,7 @@ import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
 import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
 import { isNight, phaseLeft, BONE_RATE, BONE_UPS, boneCost } from '../core/night';
-import { TALISMANS, STAT_NAMES, talisCost, stats } from '../core/talisman';
+import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS } from '../core/save';
 import { PubView } from '../game/PubView';
@@ -184,6 +184,7 @@ export class PubScene extends Phaser.Scene {
         if (!ok) return;
         this.tryDrop(k === 'brawl' ? 0.06 : 0.04);
         this.d.stats.events++;
+        this.xp(20);
         this.task('events', 1);
       },
     });
@@ -213,6 +214,7 @@ export class PubScene extends Phaser.Scene {
           if (this.night) this.d.bones = (this.d.bones ?? 0) + tip * this.boneMult();
           else this.gain(tip);
           this.d.stats.tips++;
+          this.xp(1);
           this.task('tips', 1);
           this.tut('tip');
           v.tipPop('+' + big(this.night ? tip * this.boneMult() : tip));
@@ -355,7 +357,7 @@ export class PubScene extends Phaser.Scene {
     return [...mgrs, ...ups].sort((a, b) => a.cost - b.cost).slice(0, 5);
   }
 
-  tab: 'shop' | 'tasks' | 'book' | 'krigl' | 'brew' | 'talis' | 'opts' = 'shop';
+  tab: 'shop' | 'tasks' | 'book' | 'krigl' | 'brew' | 'talis' | 'keeper' | 'opts' = 'shop';
 
   private openShop(tab = this.tab, toggle = true) {
     this.tut('menu');
@@ -380,7 +382,7 @@ export class PubScene extends Phaser.Scene {
       ['krigl', t('Krígly'), 3, 0],
       ['brew', t('Pivovar'), 0, 1],
       ...this.extraTabs(),
-      ['opts', '', 3, 1],
+      ['opts', '', 3.5, 1],
     ];
     tabs.forEach(([id, label, cx, cy]) => {
       const b = this.btn(10 + cx * 118, y0 + 10 + cy * 48, id === 'opts' ? 54 : 112, 42, () => this.openShop(id, false), D + 5);
@@ -389,7 +391,7 @@ export class PubScene extends Phaser.Scene {
       b.label.setScale(Math.min(1, 102 / Math.max(1, b.label.width)));
       if (id !== tab) b.label.setColor(PAL.bone);
       this.shopObjs.push(b.bg, b.label, b.zone);
-      if ((id === 'tasks' && this.claimable()) || (id === 'brew' && this.brewFull())) {
+      if ((id === 'tasks' && this.claimable()) || (id === 'brew' && this.brewFull()) || (id === 'keeper' && this.skillPoints() > 0)) {
         const dot = this.add.graphics().setDepth(D + 8);
         dot.fillStyle(col('ink')).fillCircle(b.x + b.w - 6, b.y + 4, 10).fillStyle(col('scarlet')).fillCircle(b.x + b.w - 6, b.y + 4, 7);
         this.shopObjs.push(dot);
@@ -405,6 +407,7 @@ export class PubScene extends Phaser.Scene {
     else if (tab === 'krigl') this.kriglTab(cy0, D);
     else if (tab === 'brew') this.brewTab(cy0, D);
     else if (tab === 'talis') this.talisTab(cy0, D);
+    else if (tab === 'keeper') this.keeperTab(cy0, D);
     else this.optsTab(cy0, D);
     sfx.click();
     this.refresh();
@@ -412,12 +415,67 @@ export class PubScene extends Phaser.Scene {
 
   /** další záložky ve 2. řádku (talismany, hostinský) */
   private extraTabs(): [PubScene['tab'], string, number, number][] {
-    return [['talis', t('Talismany'), 1, 1]];
+    return [
+      ['talis', t('Talismany'), 1, 1],
+      ['keeper', t('Hostinský'), 2, 1],
+    ];
   }
 
   // ---------- talismany ----------
   private ts() {
-    return stats(this.d.talis);
+    const a = stats(this.d.talis), b = skillStats(this.d.skills);
+    for (const k of Object.keys(a) as (keyof typeof a)[]) a[k] += b[k];
+    return a;
+  }
+
+  // ---------- hostinský: úroveň a strom dovedností ----------
+  private xp(n: number) {
+    this.d.xp = (this.d.xp ?? 0) + n;
+    this.d.klvl ??= 1;
+    while (this.d.xp >= xpNeed(this.d.klvl)) {
+      this.d.xp -= xpNeed(this.d.klvl);
+      this.d.klvl++;
+      this.banner(this.views[0].cam, t('Hostinský úroveň {n}! +1 bod dovedností', { n: this.d.klvl }), true);
+    }
+  }
+
+  private skillPoints() {
+    return (this.d.klvl ?? 1) - 1 - (this.d.skills?.length ?? 0);
+  }
+
+  private keeperTab(y0: number, D: number) {
+    const lvl = this.d.klvl ?? 1, xp = this.d.xp ?? 0, pts = this.skillPoints();
+    const g = this.add.graphics().setDepth(D + 1);
+    g.fillStyle(col('ink'), 0.6).fillRoundedRect(10, y0, W - 20, 70, 10);
+    g.fillStyle(col('dusk')).fillRoundedRect(26, y0 + 44, W - 52, 14, 6);
+    g.fillStyle(col('gold')).fillRoundedRect(26, y0 + 44, Math.max(10, (W - 52) * Math.min(1, xp / xpNeed(lvl))), 14, 6);
+    this.shopObjs.push(
+      g,
+      this.add.text(26, y0 + 8, t('Hostinský – úroveň {n}', { n: lvl }), txt(24, PAL.gold)).setDepth(D + 2),
+      this.add.text(W - 26, y0 + 12, t('body: {n}', { n: pts }), txt(20, pts > 0 ? PAL.mint : PAL.fog)).setOrigin(1, 0).setDepth(D + 2),
+    );
+    const own = this.d.skills ?? [];
+    BRANCHES.forEach((name, bi) => {
+      const x = 10 + bi * 174;
+      this.shopObjs.push(this.add.text(x + 83, y0 + 82, name, txt(22, PAL.bone)).setOrigin(0.5, 0).setDepth(D + 2));
+      SKILLS.filter((n) => n.branch === bi).forEach((n, i, arr) => {
+        const has = own.includes(n.id);
+        const can = !has && pts > 0 && (i === 0 || own.includes(arr[i - 1].id));
+        const b = this.btn(x, y0 + 114 + i * 94, 166, 82, () => {
+          if (!can) return sfx.error();
+          (this.d.skills ??= []).push(n.id);
+          this.applyKup();
+          sfx.fanfare();
+          store(this.d);
+          this.openShop('keeper', false);
+        }, D + 2);
+        this.drawBtn(b, STAT_NAMES[n.stat](n.val), has || can, has ? 'pine' : 'plum');
+        b.label.setWordWrapWidth(150).setScale(1);
+        b.label.setScale(Math.min(1, 156 / b.label.width, 70 / b.label.height));
+        this.shopObjs.push(b.bg, b.label, b.zone);
+        if (has) this.shopObjs.push(this.add.text(b.x + b.w - 8, b.y + 4, '✓', txt(18, PAL.mint)).setOrigin(1, 0).setDepth(D + 4));
+      });
+    });
   }
 
   /** vzácný nález talismanu (nový = úroveň 1, už ho máš = +1 úroveň zdarma) */
@@ -506,6 +564,7 @@ export class PubScene extends Phaser.Scene {
     const sell = this.btn(10, y0 + 316, 255, 84, () => {
       if (b.stock < 1) return sfx.error();
       b.stock--;
+      this.xp(15);
       this.gain(price);
       sfx.coin(1.2);
       store(this.d);
@@ -843,6 +902,7 @@ export class PubScene extends Phaser.Scene {
         close();
         ch.run(c);
         this.tryDrop(0.03);
+        this.xp(10);
         store(this.d);
       }, D + 3);
       this.drawBtn(b, cost ? `${ch.label}\n${big(cost)} coins` : ch.label, ok, i === 0 ? 'green' : 'plum');
@@ -1154,6 +1214,7 @@ export class PubScene extends Phaser.Scene {
     const before = nextMilestone(s.lvl);
     s.lvl += n;
     this.d.stats.levels += n;
+    this.xp(Math.min(n, 20));
     this.task('levels', n);
     this.tut('buy:' + def.id);
     sfx.buy();
@@ -1386,7 +1447,7 @@ export class PubScene extends Phaser.Scene {
     this.skillBtns.forEach((_, i) => this.drawSkill(i));
     this.stripRates.forEach((r, i) => r.setText(t('+{n} / s', { n: big(this.rate(this.d.pubs[i])) })));
 
-    const cheap = this.shopOffer().some((u) => u.cost <= this.d.coins) || this.claimable() || this.brewFull();
+    const cheap = this.shopOffer().some((u) => u.cost <= this.d.coins) || this.claimable() || this.brewFull() || this.skillPoints() > 0;
     this.shopDot.clear();
     if (cheap) this.shopDot.fillStyle(col('ink')).fillCircle(W - 126, 20, 11).fillStyle(col('scarlet')).fillCircle(W - 126, 20, 8);
     for (const r of this.shopRows) this.drawBtn(r.b, big(r.o.cost), this.d.coins >= r.o.cost, 'green');
