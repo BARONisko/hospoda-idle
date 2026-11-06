@@ -8,6 +8,7 @@ import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
 import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
+import { LEAGUES, RIVALS, LeagueState, weekStart, rivalScore, weekEnd, winReward } from '../core/league';
 import { isNight, phaseLeft, BONE_RATE, nightCfg } from '../core/night';
 import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, ossCost } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
@@ -162,6 +163,7 @@ export class PubScene extends Phaser.Scene {
 
     this.layout();
     this.daily();
+    this.time.delayedCall(700, () => this.leagueCheck());
     if (this.d.bup) {
       const m: Record<string, [string, number]> = { pipe: ['bones', 10], band: ['income', 3], grave: ['staff', 5], moon: ['bones', 10] };
       for (const [k, v] of Object.entries(this.d.bup)) if (m[k]) (this.d.oss ??= {})[m[k][0]] = (this.d.oss?.[m[k][0]] ?? 0) + v * m[k][1];
@@ -237,7 +239,10 @@ export class PubScene extends Phaser.Scene {
     const dc = Number(new URLSearchParams(location.search).get('coins'));
     if (dc) this.d.coins = dc;
     const save = () => {
-      if (document.visibilityState === 'visible') this.offline();
+      if (document.visibilityState === 'visible') {
+        this.offline();
+        this.leagueCheck();
+      }
       else store(this.d);
     };
     document.addEventListener('visibilitychange', save);
@@ -362,7 +367,7 @@ export class PubScene extends Phaser.Scene {
     return [...mgrs, ...ups].sort((a, b) => a.cost - b.cost).slice(0, 5);
   }
 
-  tab: 'shop' | 'tasks' | 'book' | 'krigl' | 'brew' | 'talis' | 'keeper' | 'opts' = 'shop';
+  tab: 'shop' | 'tasks' | 'book' | 'krigl' | 'brew' | 'talis' | 'keeper' | 'league' | 'opts' = 'shop';
 
   private openShop(tab = this.tab, toggle = true) {
     this.tut('menu');
@@ -387,7 +392,7 @@ export class PubScene extends Phaser.Scene {
       ['krigl', t('Krígly'), 3, 0],
       ['brew', t('Pivovar'), 0, 1],
       ...this.extraTabs(),
-      ['opts', '', 3.5, 1],
+      ['opts', '', 4, 1],
     ];
     tabs.forEach(([id, label, cx, cy]) => {
       const b = this.btn(10 + cx * 118, y0 + 10 + cy * 48, id === 'opts' ? 54 : 112, 42, () => this.openShop(id, false), D + 5);
@@ -413,6 +418,7 @@ export class PubScene extends Phaser.Scene {
     else if (tab === 'brew') this.brewTab(cy0, D);
     else if (tab === 'talis') this.talisTab(cy0, D);
     else if (tab === 'keeper') this.keeperTab(cy0, D);
+    else if (tab === 'league') this.leagueTab(cy0, D);
     else this.optsTab(cy0, D);
     sfx.click();
     this.refresh();
@@ -423,6 +429,7 @@ export class PubScene extends Phaser.Scene {
     return [
       ['talis', t('Talismany'), 1, 1],
       ['keeper', t('Hostinský'), 2, 1],
+      ['league', t('Liga'), 3, 1],
     ];
   }
 
@@ -440,6 +447,94 @@ export class PubScene extends Phaser.Scene {
     this.tsCache = a;
     this.tsAt = now;
     return a;
+  }
+
+  // ---------- týdenní liga ----------
+  /** aktuální liga; na začátku nového týdne vyhodnotí ten minulý */
+  private league(): LeagueState {
+    const ws = weekStart();
+    let L = this.d.league;
+    if (!L || L.start !== ws) {
+      let tier = L?.tier ?? 1;
+      if (L) {
+        const rival = rivalScore(L, weekEnd(L));
+        const win = L.me > rival;
+        this.leagueResult = { win, me: L.me, rival, tier };
+        if (win) {
+          this.d.krigle += winReward(tier);
+          this.leagueWinDrop = true;
+          tier = Math.min(LEAGUES.length, tier + 1);
+        } else tier = Math.max(1, tier - 1);
+      }
+      L = { week: String(ws), start: ws, tier, rate: Math.max(1, this.totalRate()), me: 0 };
+      this.d.league = L;
+      store(this.d);
+    }
+    return L;
+  }
+
+  leagueResult?: { win: boolean; me: number; rival: number; tier: number };
+  leagueWinDrop = false;
+
+  /** okno s výsledkem minulého týdne */
+  private leagueCheck() {
+    this.league();
+    const r = this.leagueResult;
+    if (!r || this.awayObjs.length) return;
+    this.leagueResult = undefined;
+    if (this.leagueWinDrop) {
+      this.leagueWinDrop = false;
+      this.tryDrop(1);
+    }
+    const D = 520;
+    const objs: Phaser.GameObjects.GameObject[] = [];
+    objs.push(this.add.rectangle(0, 0, W, H, 0x000000, 0.65).setOrigin(0).setDepth(D).setInteractive());
+    const g = this.add.graphics().setDepth(D + 1);
+    g.fillStyle(col('dusk')).fillRoundedRect(30, 260, W - 60, 380, 16);
+    g.lineStyle(4, col(r.win ? 'gold' : 'scarlet')).strokeRoundedRect(30, 260, W - 60, 380, 16);
+    objs.push(g);
+    const tx = (y: number, s2: string, size: number, c: string) => objs.push(this.add.text(W / 2, y, s2, txt(size, c)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 100).setDepth(D + 2));
+    tx(284, r.win ? t('Vyhrál jsi ligu!') : t('Prohrál jsi ligu…'), 34, r.win ? PAL.gold : PAL.scarlet);
+    tx(344, t('Ty: {a} coins\nSoupeř: {b} coins', { a: big(r.me), b: big(r.rival) }), 22, PAL.bone);
+    tx(420, r.win ? t('Odměna: +{k} krígel a talisman. Postupuješ do: {l}', { k: winReward(r.tier), l: LEAGUES[Math.min(LEAGUES.length, r.tier + 1) - 1] }) : t('Sestupuješ do: {l}', { l: LEAGUES[Math.max(1, r.tier - 1) - 1] }), 22, r.win ? PAL.mint : PAL.fog);
+    const ok = this.btn(W / 2 - 100, 560, 200, 60, () => {
+      objs.forEach((o) => o.destroy());
+      this.awayObjs = [];
+    }, D + 3);
+    this.drawBtn(ok, t('Dál'), true, 'green');
+    objs.push(ok.bg, ok.label, ok.zone);
+    this.awayObjs = objs;
+    if (r.win) sfx.fanfare();
+    else sfx.error();
+  }
+
+  private leagueTab(y0: number, D: number) {
+    const L = this.league();
+    const rv = RIVALS[(L.tier - 1 + Math.floor(L.start / 604800000)) % RIVALS.length];
+    const rival = rivalScore(L);
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
+    const g = add(this.add.graphics().setDepth(D + 1));
+    g.fillStyle(col('ink'), 0.6).fillRoundedRect(10, y0, W - 20, 470, 12);
+    add(this.add.text(W / 2, y0 + 12, `${LEAGUES[L.tier - 1]} (${L.tier}/${LEAGUES.length})`, txt(28, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 2));
+    const left = Math.max(0, weekEnd(L) - Date.now());
+    add(this.add.text(W / 2, y0 + 50, t('do konce týdne: {d} d {h} h', { d: Math.floor(left / 86400000), h: Math.floor((left % 86400000) / 3600000) }), txt(18, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2));
+    add(this.add.sprite(110, y0 + 190, 'player', 1).setOrigin(0.5, 1).setScale(5).setDepth(D + 2));
+    add(this.add.sprite(W - 110, y0 + 190, rv.sprite, 1).setOrigin(0.5, 1).setScale(5).setDepth(D + 2).setFlipX(true));
+    add(this.add.text(W / 2, y0 + 130, 'VS', txt(40, PAL.scarlet)).setOrigin(0.5).setDepth(D + 2));
+    add(this.add.text(110, y0 + 200, t('Ty'), txt(22, PAL.mint)).setOrigin(0.5, 0).setDepth(D + 2));
+    add(this.add.text(W - 110, y0 + 200, rv.name, txt(20, PAL.scarlet)).setOrigin(0.5, 0).setDepth(D + 2));
+    // pruhy tržeb
+    const mx = Math.max(L.me, rival, 1);
+    const bar = (y: number, v: number, c: keyof typeof PAL, label: string) => {
+      g.fillStyle(col('dusk')).fillRoundedRect(30, y, W - 60, 30, 8);
+      g.fillStyle(col(c)).fillRoundedRect(30, y, Math.max(12, (W - 60) * (v / mx)), 30, 8);
+      add(this.add.text(40, y + 4, `${label}: ${big(v)}`, txt(18, PAL.white)).setDepth(D + 2));
+    };
+    bar(y0 + 250, L.me, 'mint', t('Ty'));
+    bar(y0 + 292, rival, 'scarlet', rv.name);
+    const lead = L.me > rival;
+    add(this.add.text(W / 2, y0 + 340, lead ? t('Vedeš! Drž tempo až do neděle.') : t('Soupeř vede! Hraj, vylepšuj a zvládej události.'), txt(20, lead ? PAL.mint : PAL.sand)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 60).setDepth(D + 2));
+    add(this.add.text(W / 2, y0 + 400, t('Výhra: +{k} krígel, talisman a postup. Prohra: sestup.', { k: winReward(L.tier) }), txt(17, PAL.fog)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 60).setDepth(D + 2));
   }
 
   // ---------- hostinský: úroveň a strom dovedností ----------
@@ -1390,6 +1485,7 @@ export class PubScene extends Phaser.Scene {
     this.d.coins += n;
     this.d.earned += n;
     this.d.run += n;
+    if (this.d.league) this.d.league.me += n;
     this.task('earn', n);
   }
 

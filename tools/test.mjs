@@ -91,6 +91,18 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   // 5h) týdenní výzva
   await S(p, (s) => { const w = s.weekly(); w.prog = w.goal; s.openShop('tasks', false); s.shopObjs.filter((o) => o.type === 'Zone').find((z) => z.y > 360).emit('pointerdown'); });
   ok('týdenní výzva: vyzvednuta', await S(p, (s) => s.weekly().claimed));
+  // 5i) liga: výhra → postup a krígly, prohra → sestup
+  const lg = await S(p, (s) => {
+    const k0 = s.d.krigle;
+    let L = s.league(); L.tier = 2; L.start -= 7 * 86400000; L.me = 1e30; s.leagueCheck();
+    const won = s.d.league.tier === 3 && s.d.krigle >= k0 + 10;
+    s.awayObjs.forEach((o) => o.destroy()); s.awayObjs = [];
+    L = s.league(); L.start -= 7 * 86400000; L.me = 0; L.rate = 100; s.leagueCheck();
+    const lost = s.d.league.tier === 2;
+    s.awayObjs.forEach((o) => o.destroy()); s.awayObjs = [];
+    return won && lost;
+  });
+  ok('liga: výhra = postup, prohra = sestup', lg);
   // 6) prestiž
   await S(p, (s) => { s.d.run = 1e8; s.askPrestige(); s.prestige(); });
   await p.waitForTimeout(800);

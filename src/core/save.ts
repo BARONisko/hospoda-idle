@@ -1,5 +1,6 @@
 import type { Stats, Daily, Weekly } from './goals';
 import type { BrewState } from './brewery';
+import type { LeagueState } from './league';
 
 // Uložení hry do localStorage (na mobilu přes Capacitor stejně). Verzované kvůli převodům.
 export interface StationState {
@@ -56,6 +57,8 @@ export interface Save {
   skills?: string[];
   /** týdenní výzva */
   weekly?: Weekly;
+  /** týdenní liga */
+  league?: LeagueState;
   /** krok návodu pro nového hráče (-1 = hotovo) */
   tut?: number;
   /** bestiář: viděné druhy hostů */
