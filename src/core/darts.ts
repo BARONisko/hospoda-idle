@@ -67,14 +67,14 @@ export const DART_UPS: DartUp[] = [
   { id: 'wind', name: t('Méně větru'), desc: (l) => t('vítr stáčí šipky o {v} % méně', { v: 5 * l }), max: 20, cost: grow(1, 1.08) },
   { id: 'extra', name: t('Bod navíc'), desc: (l) => t('šance {v} %, že dohraná hra dá 2 body', { v: l }), max: 30, cost: grow(2, 1.05) },
   // do celé hry
-  { id: 'gIncome', name: t('Terč: výdělek'), desc: (l) => t('výdělek v hospodách +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'income' },
-  { id: 'gTips', name: t('Terč: spropitné'), desc: (l) => t('spropitné +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'tips' },
-  { id: 'gBones', name: t('Terč: kosti'), desc: (l) => t('kosti +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'bones' },
-  { id: 'gTent', name: t('Terč: chapadla'), desc: (l) => t('chapadla v chrámu +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'tentacles' },
-  { id: 'gTemple', name: t('Terč: síla v chrámu'), desc: (l) => t('síla zásahu v chrámu +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'temple' },
-  { id: 'gKrigly', name: t('Terč: krígly'), desc: (l) => t('krígly z hygieny +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'krigly' },
-  { id: 'gColl', name: t('Terč: sběrač'), desc: (l) => t('sběrač bublin rychlejší o {v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'coll' },
-  { id: 'gBeer', name: t('Terč: pivo'), desc: (l) => t('pivo z pivovaru dráž o {v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.05), stat: 'beer' },
+  { id: 'gIncome', name: t('Terč: výdělek'), desc: (l) => t('výdělek v hospodách +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.055), stat: 'income' },
+  { id: 'gTips', name: t('Terč: spropitné'), desc: (l) => t('spropitné +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.055), stat: 'tips' },
+  { id: 'gBones', name: t('Terč: kosti'), desc: (l) => t('kosti +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.055), stat: 'bones' },
+  { id: 'gTent', name: t('Terč: chapadla'), desc: (l) => t('chapadla v chrámu +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.055), stat: 'tentacles' },
+  { id: 'gTemple', name: t('Terč: síla v chrámu'), desc: (l) => t('síla zásahu v chrámu +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.055), stat: 'temple' },
+  { id: 'gKrigly', name: t('Terč: krígly'), desc: (l) => t('krígly z hygieny +{v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.055), stat: 'krigly' },
+  { id: 'gColl', name: t('Terč: sběrač'), desc: (l) => t('sběrač bublin rychlejší o {v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.055), stat: 'coll' },
+  { id: 'gBeer', name: t('Terč: pivo'), desc: (l) => t('pivo z pivovaru dráž o {v} %', { v: pc(0.9 * l) }), max: 100, cost: grow(1, 1.055), stat: 'beer' },
 ];
 export const GAME_PER = 0.009;
 
