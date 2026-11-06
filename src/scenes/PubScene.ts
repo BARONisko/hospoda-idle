@@ -15,7 +15,9 @@ import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today } from '
 const W = 540;
 const H = 960;
 const T = 16;
-const TOP = 84; // horní lišta s penězi
+const TOP = 84;
+/** výška pruhu hospody při posouvání (4 hospody) */
+const STRIP = 380; // horní lišta s penězi
 const CARD_H = 108;
 /** strop výdělku offline (s) */
 const OFFLINE_CAP = 8 * 3600;
@@ -57,6 +59,8 @@ interface Btn {
   h: number;
   enabled: boolean;
   visible: boolean;
+  /** poslední barva (kvůli překreslení při posunu) */
+  c?: keyof typeof PAL;
 }
 
 interface Card {
@@ -118,6 +122,9 @@ export class PubScene extends Phaser.Scene {
     this.cards = [];
     this.stripRates = [];
     this.skillBtns = [];
+    this.strips = [];
+    this.scroll = 0;
+    this.drag = null;
     this.sheet = -1;
     this.cameras.main.setBackgroundColor(PAL.ink);
     // hospody leží ve světě daleko vpravo (x ≥ 2000), aby je UI kamera neviděla; UI kamera je nad nimi
@@ -174,6 +181,7 @@ export class PubScene extends Phaser.Scene {
       if (this.awayObjs.length || this.shopObjs.length) return; // otevřené okno
       for (const v of this.views) {
         const c = v.cam;
+        if (!c.visible || this.drag?.on) continue;
         if (!Phaser.Geom.Rectangle.Contains(new Phaser.Geom.Rectangle(c.x, c.y, c.width, c.height), ptr.x, ptr.y)) continue;
         if (this.sheet >= 0 && ptr.y > this.sheetY()) continue; // pod panelem
         const wp = c.getWorldPoint(ptr.x, ptr.y);
@@ -694,38 +702,74 @@ export class PubScene extends Phaser.Scene {
       this.addCards(0, TOP + viewH + 10);
       return;
     }
-    // rámečky hospod: pruhy pod sebou; při 4 hospodách návrhy ?lay=a (4 pruhy) | b (mřížka 2×2) | c (posuvné pruhy)
-    const lay = n === 4 ? new URLSearchParams(location.search).get('lay') ?? 'a' : 'a';
-    const rects = this.views.map((_, i) => {
-      if (lay === 'b') return { x: (i % 2) * (W / 2), y: TOP + Math.floor(i / 2) * ((H - TOP) / 2), w: W / 2, h: (H - TOP) / 2 };
-      if (lay === 'c') return { x: 0, y: TOP + i * 380, w: W, h: 380 };
-      const h = Math.floor((H - TOP) / n);
-      return { x: 0, y: TOP + i * h, w: W, h };
-    });
+    // 2–3 hospody: pruhy přes celou výšku; 4 hospody: pruhy 380 px, posouvají se prstem
+    this.scrollMax = n === 4 ? n * STRIP - (H - TOP) : 0;
+    const h = n === 4 ? STRIP : Math.floor((H - TOP) / n);
     this.views.forEach((v, i) => {
-      const { x, y, w, h } = rects[i];
-      const small = w < 400 || h < 260;
-      v.frame(x, y, w - (lay === 'b' && i % 2 === 0 ? 4 : 0), h - 4, 112, lay === 'b' ? (h - 4) / (13 * T) : undefined);
+      const y = TOP + i * h;
+      const small = h < 260;
+      const items: Phaser.GameObjects.Components.Transform[] = [];
       const g = this.add.graphics().setDepth(50);
-      g.fillStyle(col('gold')).fillRect(x, y + h - 4, w, 4);
-      if (lay === 'b' && i % 2 === 0) g.fillRect(x + w - 4, y, 4, h);
-      const nm = this.add.text(x + 14, y + 10, PUB_NAMES[v.pub.act], txt(small ? 20 : 24, PAL.gold)).setDepth(51);
-      nm.setScale(Math.min(1, (w - (small ? 30 : 170)) / nm.width));
-      g.fillStyle(col('ink'), 0.8).fillRoundedRect(x + 6, y + 6, nm.displayWidth + 18, small ? 30 : 36, 8);
-      const rt = this.add.text(small ? x + 14 : x + w - 18, small ? y + 40 : y + 12, '', txt(small ? 18 : 22, PAL.mint)).setOrigin(small ? 0 : 1, 0).setDepth(51);
+      g.fillStyle(col('gold')).fillRect(0, y + h - 4, W, 4);
+      const nm = this.add.text(14, y + 10, PUB_NAMES[v.pub.act], txt(small ? 20 : 24, PAL.gold)).setDepth(51);
+      nm.setScale(Math.min(1, (W - 190) / nm.width));
+      g.fillStyle(col('ink'), 0.8).fillRoundedRect(6, y + 6, nm.displayWidth + 18, small ? 30 : 36, 8);
+      const rt = this.add.text(small ? 14 : W - 18, small ? y + 40 : y + 12, '', txt(small ? 18 : 22, PAL.mint)).setOrigin(small ? 0 : 1, 0).setDepth(51);
       this.stripRates.push(rt);
-      if (!small) g.fillStyle(col('ink'), 0.8).fillRoundedRect(x + w - 150, y + 8, 142, 36, 8);
-      const bw = small ? 110 : 156, bh = small ? 42 : 48;
-      const b = this.btn(x + w - bw - 10, y + h - bh - 14, bw, bh, () => this.openSheet(i), 60);
-      this.drawBtn(b, small ? t('▲ Stanice') : t('▲ Stanice'), true, 'green');
-      if (small) b.label.setScale(Math.min(1, (bw - 10) / b.label.width));
-      this.skillBtns[i] = this.btn(x + 10, y + h - bh - 14, small ? 120 : 200, bh, () => this.useSkill(i), 60);
+      if (!small) g.fillStyle(col('ink'), 0.8).fillRoundedRect(W - 150, y + 8, 142, 36, 8);
+      const b = this.btn(W - 170, y + h - 62, 156, 48, () => this.openSheet(i), 60);
+      this.drawBtn(b, t('▲ Stanice'), true, 'green');
+      this.skillBtns[i] = this.btn(14, y + h - 62, 200, 48, () => this.useSkill(i), 60);
+      items.push(g, nm, rt);
+      this.strips.push({ v, y, h, items, btns: [b, this.skillBtns[i]] });
     });
-    if (lay === 'c') {
-      const g = this.add.graphics().setDepth(55);
-      g.fillStyle(col('ink'), 0.85).fillRoundedRect(W / 2 - 110, H - 50, 220, 40, 10);
-      this.add.text(W / 2, H - 30, t('▼ táhni pro další hospody'), txt(18, PAL.bone)).setOrigin(0.5).setDepth(56);
-      g.fillStyle(col('gold')).fillRoundedRect(W - 10, TOP + 6, 6, 200, 3);
+    if (this.scrollMax) {
+      this.scrollBar = this.add.graphics().setDepth(55);
+      this.hint = this.add.text(W / 2, H - 30, t('▼ táhni pro další hospody'), txt(18, PAL.bone)).setOrigin(0.5).setDepth(56).setStroke(PAL.ink, 6);
+      this.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
+        this.drag = { y: p.y, s: this.scroll, on: false };
+      });
+      this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
+        if (!p.isDown || !this.drag || this.sheet >= 0 || this.shopObjs.length || this.awayObjs.length) return;
+        if (!this.drag.on && Math.abs(p.y - this.drag.y) < 12) return;
+        this.drag.on = true;
+        this.setScroll(this.drag.s - (p.y - this.drag.y));
+      });
+      this.input.on('pointerup', () => (this.drag = null));
+    }
+    this.setScroll(this.scroll);
+  }
+
+  // ---------- posuvné pruhy (4 hospody) ----------
+  strips: { v: PubView; y: number; h: number; items: Phaser.GameObjects.Components.Transform[]; btns: Btn[] }[] = [];
+  scroll = 0;
+  scrollMax = 0;
+  drag: { y: number; s: number; on: boolean } | null = null;
+  scrollBar?: Phaser.GameObjects.Graphics;
+  hint?: Phaser.GameObjects.Text;
+
+  private setScroll(v: number) {
+    const prev = this.scroll;
+    this.scroll = Phaser.Math.Clamp(v, 0, this.scrollMax);
+    const dy = this.scroll - prev;
+    for (const st of this.strips) {
+      const y = st.y - this.scroll;
+      st.v.frameClip(0, y, W, st.h - 4, TOP, H, 112);
+      if (dy) {
+        st.items.forEach((o) => (o.y -= dy));
+        st.btns.forEach((b) => {
+          b.y -= dy;
+          b.zone.y -= dy;
+          b.label.y -= dy;
+          this.drawBtn(b, b.label.text, b.enabled, b.c ?? 'green', b.visible);
+        });
+      }
+    }
+    if (this.scrollBar) {
+      const vis = H - TOP, total = vis + this.scrollMax;
+      const bh = (vis * vis) / total, by = TOP + (this.scroll / total) * vis;
+      this.scrollBar.clear().fillStyle(col('ink'), 0.6).fillRoundedRect(W - 9, TOP + 4, 6, vis - 8, 3).fillStyle(col('gold')).fillRoundedRect(W - 9, by + 4, 6, bh - 8, 3);
+      if (this.scroll > 40) this.hint?.setVisible(false);
     }
   }
 
@@ -789,6 +833,7 @@ export class PubScene extends Phaser.Scene {
   }
 
   private drawBtn(b: Btn, text: string, enabled: boolean, c: keyof typeof PAL, visible = true) {
+    b.c = c;
     b.enabled = enabled;
     b.visible = visible;
     b.bg.clear();

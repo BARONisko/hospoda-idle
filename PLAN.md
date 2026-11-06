@@ -39,4 +39,4 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Obchod s krígly (záložka Krígly v Menu): rychlejší kostlivci, startovní kapitál, delší spánek (offline +4 h),
   rušnější hospoda (častější události), věrní manažeři, Probudit Cthulhu (×10 navždy, Cthulhu kouká do hospod).
 - Manažeři jsou vidět za barem (tapster / count / deep0).
-- 4. hospodu (Cthulhu) zatím NE: schválené rozložení má max. 3 pruhy a interiér Cthulhu chybí – Cthulhu je zatím konec hry.
+- 4. hospoda Chrám Cthulhu (po 3. hygieně): rozložení C schváleno – pruhy 380 px posuvné prstem, ukazatel posunu vpravo.

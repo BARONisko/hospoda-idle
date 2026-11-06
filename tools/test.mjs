@@ -74,6 +74,14 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('bez chyb v konzoli (offline)', p.errors.length === 0);
   await p.close();
 }
+// 8) 4 hospody: posuvné pruhy
+{
+  const p = await page('?pubs=4');
+  await S(p, (s) => s.setScroll(9999));
+  ok('4 hospody: posun na konec', await S(p, (s) => s.scroll === s.scrollMax && s.scrollMax > 0 && !s.views[0].cam.visible && s.views[3].cam.visible));
+  ok('bez chyb v konzoli (4 hospody)', p.errors.length === 0);
+  await p.close();
+}
 await b.close();
 await server.close();
 console.log(fails ? `\n${fails} testů selhalo` : '\nvšechny testy prošly');

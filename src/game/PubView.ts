@@ -119,6 +119,20 @@ export class PubView {
     this.cam.centerOn(this.ox + 8.5 * T, Phaser.Math.Clamp(cy, halfH, 14 * T - halfH));
   }
 
+  /** jako frame(), ale rámeček může být zčásti mimo obrazovku (posuvné pruhy) – kamera ukáže jen viditelnou část */
+  frameClip(x: number, y: number, w: number, h: number, top: number, bottom: number, cy = 112) {
+    const zoom = w / (17 * T);
+    const halfH = h / zoom / 2;
+    const c = Phaser.Math.Clamp(cy, halfH, 14 * T - halfH);
+    const y0 = Math.max(y, top), y1 = Math.min(y + h, bottom);
+    if (y1 - y0 < 2) {
+      this.cam.setVisible(false);
+      return;
+    }
+    this.cam.setVisible(true).setViewport(x, y0, w, y1 - y0).setZoom(zoom);
+    this.cam.centerOn(this.ox + 8.5 * T, c + ((y0 + y1) / 2 - (y + h / 2)) / zoom);
+  }
+
   /** stanice se otevřela/najala obsluhu → ukázat vybavení a kostlivce */
   refresh() {
     if (this.pub.mgr && !this.mgr) {
