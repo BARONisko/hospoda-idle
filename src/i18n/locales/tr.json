@@ -119,7 +119,6 @@
  "Delší spánek": "Uzun Uyku",
  "Krígly": "Kupalar",
  "Máš {k} krígel (+{b} % výdělek)": "{k} kupan var (+{b} % gelir)",
- "Najmi kostlivce – pípa pak točí sama, i když nehraješ.": "İskelet tut – musluk sen oynamasan da kendi doldurur.",
  "Otevři kuchyni – další zdroj coins.": "Mutfağı aç – yeni bir coins kaynağı.",
  "Probudit Cthulhu": "Cthulhu'yu Uyandır",
  "Rušnější hospoda": "Kalabalık Meyhane",
@@ -633,7 +632,6 @@
  "+3 kosti, +5 XP hostinského": "+3 kemik, +5 meyhaneci XP",
  "+{n} bodů do šipek": "+{n} dart puanı",
  "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "Musluğa (solda) dokun ve coins topla: {c} / {n}. Sonra sağdan satın al.",
- "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "İskelet kendi dolduruyor – coins bekle: {c} / {n} (ya da misafirlere dokun).",
  "hází samo po 2 s, i když tu nejsi": "sen yokken bile her 2 sn'de kendi atar",
  "Koupit automat\n1 bod": "Otomatik atıcı al\n1 puan",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Tahtaya dokun = atış (nişan otomatik). Tam sıfırda bitir = 1 puan. 1 puanla otomatik atıcıyı al – çevrimdışı bile kendi atar.",
@@ -665,5 +663,12 @@
  "MAX": "MAKS",
  "bar plný – číšníci nestíhají!": "bar dolu – garsonlar yetişemiyor!",
  "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a} ve {b} başladı – birayı masalara taşıyorlar",
- "+1 bod": "+1 puan"
+ "+1 bod": "+1 puan",
+ "Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.": "Musluk için garson tut – musluk kendi doldurur, onlar da birayı taşır, sen yokken bile.",
+ "Najmi číšníky – pípa pak točí sama a oni roznášejí pivo, i když nehraješ.": "Garson tut – musluk kendi doldurur, onlar da birayı taşır, oynamasan bile.",
+ "Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "Musluk kendi dolduruyor – coins bekle: {c} / {n} (ya da müşterilere dokun).",
+ "Číšníci nastoupili!": "Garsonlar işe alındı!",
+ "Číšníci {n}": "Garsonlar {n}",
+ "číšníci ✓": "garsonlar ✓",
+ "Číšníci prodáni – vráceno {n} coins. Najmi je znovu na Pípě.": "Garsonlar satıldı – {n} coins iade edildi. Muslukta onları yeniden işe al."
 }

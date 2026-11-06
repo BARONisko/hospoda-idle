@@ -28,6 +28,8 @@ export interface PubState {
 }
 
 export interface Save {
+  /** číšníci v2 (najímají se místo kostlivce na pípě) – staré číšníky jednou prodat */
+  wv2?: boolean;
   v: 2;
   coins: number;
   /** celkem vyděláno (statistika, později prestiž) */

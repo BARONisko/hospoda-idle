@@ -119,7 +119,6 @@
  "Delší spánek": "長い眠り",
  "Krígly": "ジョッキ",
  "Máš {k} krígel (+{b} % výdělek)": "ジョッキ {k} 個(収入 +{b} %)",
- "Najmi kostlivce – pípa pak točí sama, i když nehraješ.": "ガイコツを雇おう – 遊んでいない間もサーバーが自動で注ぐ。",
  "Otevři kuchyni – další zdroj coins.": "厨房を開こう – coins の新たな収入源。",
  "Probudit Cthulhu": "クトゥルフを起こす",
  "Rušnější hospoda": "にぎわう店",
@@ -633,7 +632,6 @@
  "+3 kosti, +5 XP hostinského": "骨+3、店主XP+5",
  "+{n} bodů do šipek": "ダーツポイント+{n}",
  "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "左のビールサーバーをタップしてcoinsを集めよう：{c} / {n}。その後、右で購入。",
- "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "ガイコツが自動で注ぐ – coinsを待とう：{c} / {n}（客をタップしてもOK）。",
  "hází samo po 2 s, i když tu nejsi": "いない間も2秒ごとに自動で投げる",
  "Koupit automat\n1 bod": "自動投げを購入\n1ポイント",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "ボードをタップ＝投げる（狙いは自動）。ぴったり0で終われば1ポイント。1ポイントで自動投げを購入 – オフラインでも投げ続ける。",
@@ -665,5 +663,12 @@
  "MAX": "最大",
  "bar plný – číšníci nestíhají!": "カウンターが満杯 – ウェイターが追いつかない！",
  "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a}と{b}が働き始めた – ビールをテーブルへ運ぶ",
- "+1 bod": "+1ポイント"
+ "+1 bod": "+1ポイント",
+ "Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.": "蛇口にウェイターを雇おう – 蛇口は自動で注ぎ、彼らがビールを運ぶ。留守中も。",
+ "Najmi číšníky – pípa pak točí sama a oni roznášejí pivo, i když nehraješ.": "ウェイターを雇おう – 蛇口は自動で注ぎ、彼らがビールを運ぶ。遊んでいない間も。",
+ "Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "蛇口が自動で注いでいる – coinsを待とう: {c} / {n}（お客さんをタップしてもOK）。",
+ "Číšníci nastoupili!": "ウェイターを雇った！",
+ "Číšníci {n}": "ウェイター {n}",
+ "číšníci ✓": "ウェイター ✓",
+ "Číšníci prodáni – vráceno {n} coins. Najmi je znovu na Pípě.": "ウェイターを売却 – {n} coins返金。蛇口でもう一度雇おう。"
 }

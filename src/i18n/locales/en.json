@@ -119,7 +119,6 @@
  "Delší spánek": "Longer Sleep",
  "Krígly": "Tankards",
  "Máš {k} krígel (+{b} % výdělek)": "You have {k} tankards (+{b} % income)",
- "Najmi kostlivce – pípa pak točí sama, i když nehraješ.": "Hire a skeleton – the tap pours on its own, even when you're away.",
  "Otevři kuchyni – další zdroj coins.": "Open the kitchen – another source of coins.",
  "Probudit Cthulhu": "Wake Cthulhu",
  "Rušnější hospoda": "Busier Pub",
@@ -633,7 +632,6 @@
  "+3 kosti, +5 XP hostinského": "+3 bones, +5 landlord XP",
  "+{n} bodů do šipek": "+{n} darts points",
  "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "Tap the Beer Tap (left) to collect coins: {c} / {n}. Then buy on the right.",
- "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "The skeleton pours by itself – wait for coins: {c} / {n} (or tap guests).",
  "hází samo po 2 s, i když tu nejsi": "throws by itself every 2 s, even when you're away",
  "Koupit automat\n1 bod": "Buy auto-thrower\n1 point",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Tap the board = throw (aiming is automatic). Finish exactly on zero = 1 point. Spend 1 point on the auto-thrower – it throws by itself, even offline.",
@@ -665,5 +663,12 @@
  "MAX": "MAX",
  "bar plný – číšníci nestíhají!": "bar full – waiters can't keep up!",
  "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a} and {b} started – they carry beer to the tables",
- "+1 bod": "+1 point"
+ "+1 bod": "+1 point",
+ "Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.": "Hire waiters for the Tap – it then pours by itself and they carry the beer, even while you're away.",
+ "Najmi číšníky – pípa pak točí sama a oni roznášejí pivo, i když nehraješ.": "Hire waiters – the tap then pours by itself and they carry the beer, even when you're not playing.",
+ "Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "The tap pours by itself – wait for coins: {c} / {n} (or tap the guests).",
+ "Číšníci nastoupili!": "Waiters hired!",
+ "Číšníci {n}": "Waiters {n}",
+ "číšníci ✓": "waiters ✓",
+ "Číšníci prodáni – vráceno {n} coins. Najmi je znovu na Pípě.": "Waiters sold – {n} coins refunded. Hire them again on the Tap."
 }

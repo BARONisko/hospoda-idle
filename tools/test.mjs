@@ -32,7 +32,7 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('ruční cyklus pípy vydělá', await S(p, (s) => s.d.coins > 0));
   await S(p, (s) => { s.d.coins = 1e6; s.buy(0, s.cards[1].def); s.hire(0, s.cards[0].def); });
   ok('otevření kuchyně a najmutí kostlivce', await S(p, (s) => s.d.pubs[0].st.kitchen.lvl === 1 && s.d.pubs[0].st.tap.auto));
-  ok('číšníci: s kostlivcem nastoupili 2', await S(p, (s) => s.d.pubs[0].w?.length === 2));
+  ok('číšníci: najmutím na pípě nastoupili 2', await S(p, (s) => s.d.pubs[0].w?.length === 2));
   await S(p, (s) => { s.waiterChip(2); s.d.pubs[0].w[0].xp = 200; s.openWaiter(0, 0); s.wPanelBtns[1].b.zone.emit('pointerdown'); s.closeWaiter(); });
   ok('číšníci: najmutí 3. a vylepšení podnosu za bod', await S(p, (s) => s.d.pubs[0].w.length === 3 && s.d.pubs[0].w[0].t === 1));
   await p.waitForTimeout(4000);

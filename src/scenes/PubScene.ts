@@ -175,6 +175,31 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.d.pubs = this.d.pubs.filter((p) => p.act <= 3).slice(0, MAX_PUBS);
     if (!this.d.pubs.length) this.d.pubs = [newPub(1)];
     // číšníci: kdo už má kostlivce na pípě, dostane prvního číšníka
+    // v2: číšníci místo kostlivce na pípě – dosavadní číšníky „prodat“ (vrátit coins za najmutí, vylepšení i kostlivce
+    // na pípě a piva na baru), hráč je koupí znovu
+    if (!this.d.wv2) {
+      let back = 0;
+      for (const p of this.d.pubs) {
+        if (!p.w?.length) continue;
+        const am = actMult(p.act);
+        p.w.forEach((w, k) => {
+          back += (k >= 2 ? [0, 0, 400, 4000][k] : 0) * am;
+          for (let l = 0; l < w.s; l++) back += 30 * 1.5 ** l * am;
+          for (let l = 0; l < w.t; l++) back += 200 * 10 ** l * am;
+          for (let l = 0; l < w.m; l++) back += 100 * 2 ** l * am;
+        });
+        if (p.st.tap?.auto) back += STATIONS[0].staff * am;
+        back += p.bar?.v ?? 0;
+        p.w = undefined;
+        p.bar = undefined;
+        if (p.st.tap) (p.st.tap.auto = false), (p.st.tap.prog = 0);
+      }
+      this.d.wv2 = true;
+      if (back > 0) {
+        this.d.coins += back;
+        this.time.delayedCall(1500, () => this.views[0] && this.banner(this.views[0].cam, t('Číšníci prodáni – vráceno {n} coins. Najmi je znovu na Pípě.', { n: big(back) })));
+      }
+    }
     for (const p of this.d.pubs) {
       if (p.st.tap?.auto && !p.w?.length) p.w = START_CREW();
       // vylepšení koupená dřív za coins zůstanou (zkušenosti aspoň na utracené body)
@@ -1560,7 +1585,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     for (const def of STATIONS) {
       const st = p.st[def.id];
       const cost = def.staff * actMult(p.act) * (1 - this.ts().staff);
-      if (st && st.lvl > 0 && !st.auto && d.coins >= cost) return { text: t('Najmi kostlivce na „{s}“ – pak pracuje sám, i když tu nejsi.', { s: STATION_NAMES[p.act][def.id] }) };
+      if (st && st.lvl > 0 && !st.auto && d.coins >= cost) return { text: def.id === 'tap' ? t('Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.') : t('Najmi kostlivce na „{s}“ – pak pracuje sám, i když tu nejsi.', { s: STATION_NAMES[p.act][def.id] }) };
     }
     const off = this.shopOffer().find((o) => o.cost <= d.coins);
     if (off) return { text: t('V Obchodě si můžeš koupit: {s}.', { s: off.title }), go: open('shop', 'up') };
@@ -1835,7 +1860,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     { text: t('Ťukni na Pípu – hostinský natočí pivo a vyděláš coins.'), done: 'tap' },
     { text: t('Za coins kup další úroveň pípy – vydělá víc.'), done: 'buy:tap' },
     { text: t('Ťukni na hosta v hospodě – dá ti spropitné!'), done: 'tip' },
-    { text: t('Najmi kostlivce – pípa pak točí sama, i když nehraješ.'), done: 'hire' },
+    { text: t('Najmi číšníky – pípa pak točí sama a oni roznášejí pivo, i když nehraješ.'), done: 'hire' },
     { text: t('Otevři kuchyni – další zdroj coins.'), done: 'buy:kitchen' },
     { text: t('Ťukni na Menu – najdeš v něm obchod, úkoly a další.'), done: 'menu' },
     { text: t('Ťukni na Obchod – tady kupuješ vylepšení výdělku.'), done: 'tile:shop' },
@@ -1863,7 +1888,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const manual = !this.st(this.d.pubs[0], 'tap').auto;
       if (need > 0) this.tutBub.setText(manual
         ? t('Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.', { c: Math.floor(this.d.coins), n: need })
-        : t('Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).', { c: Math.floor(this.d.coins), n: need }));
+        : t('Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).', { c: Math.floor(this.d.coins), n: need }));
       return;
     }
     this.tutBub = null;
@@ -1883,7 +1908,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     let text = step.text;
     if (need > 0) text = tapManual
       ? t('Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.', { c: Math.floor(this.d.coins), n: need })
-      : t('Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).', { c: Math.floor(this.d.coins), n: need });
+      : t('Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).', { c: Math.floor(this.d.coins), n: need });
     // dlaždice Obchod v mřížce Menu (stejný výpočet jako menuGrid)
     const menuY0 = H - 6 * 96 - 126, tw = (W - 40) / 3, th = 118;
     const si = PubScene.TILES.findIndex(([tb, sub]) => tb === 'shop' && sub === 'up');
@@ -2261,11 +2286,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const card = this.cards.find((k) => k.pub === i && k.def.id === def.id);
     if (card) {
       confetti(this, card.staff.x + card.staff.w / 2, card.staff.y, 30, 459, 0.7);
-      popText(this, card.staff.x + card.staff.w / 2, card.staff.y - 20, t('Kostlivec nastoupil!'), PAL.bone, 26);
+      popText(this, card.staff.x + card.staff.w / 2, card.staff.y - 20, def.id === 'tap' ? t('Číšníci nastoupili!') : t('Kostlivec nastoupil!'), PAL.bone, 26);
     }
     s.auto = true;
     if (s.prog === 0) s.prog = 0.0001;
-    // s kostlivcem na pípě nastoupí i první číšník – pivo od teď roznáší ke stolům
+    // na pípu se najímají číšníci (Franta a Jarka) – pípa točí sama a oni roznášejí pivo ke stolům
     if (def.id === 'tap' && !p.w?.length) {
       p.w = START_CREW();
       this.time.delayedCall(900, () => this.views[i] && this.banner(this.views[i].cam, t('{a} a {b} nastoupili – roznášejí pivo ke stolům', { a: WAITERS[0].name, b: WAITERS[1].name })));
@@ -2972,8 +2997,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       c.lvl.setText(open ? (ms ? t('úroveň {n} · ×2 na {m}', { n: s.lvl, m: ms }) : t('úroveň {n}', { n: s.lvl })) : t('zavřeno'));
       c.info.setText(open ? t('+{n} / {s} s', { n: big(this.pay(p, c.def)), s: +this.cyc(c.def).toFixed(2) }) : '');
       this.drawBtn(c.buy, open ? `+${n}\n${big(price)}` : t('Otevřít\n{n}', { n: big(price) }), this.d.coins >= price, 'green');
-      this.drawBtn(c.staff, t('Kostlivec {n}', { n: big(staff) }), this.d.coins >= staff, 'plum', open && !s.auto);
-      if (open && s.auto) c.staff.label.setVisible(true).setText(t('kostlivec ✓')).setColor(PAL.mint);
+      const tapW = c.def.id === 'tap';
+      this.drawBtn(c.staff, tapW ? t('Číšníci {n}', { n: big(staff) }) : t('Kostlivec {n}', { n: big(staff) }), this.d.coins >= staff, 'plum', open && !s.auto);
+      if (open && s.auto) c.staff.label.setVisible(true).setText(tapW ? t('číšníci ✓') : t('kostlivec ✓')).setColor(PAL.mint);
       c.bar.clear();
       c.bar.fillStyle(col('dusk')).fillRoundedRect(26, c.y + 72, 270, 18, 6);
       if (open && s.prog > 0) c.bar.fillStyle(col(s.auto ? 'mint' : 'amber')).fillRoundedRect(26, c.y + 72, Math.max(12, 270 * Math.min(1, s.prog)), 18, 6);

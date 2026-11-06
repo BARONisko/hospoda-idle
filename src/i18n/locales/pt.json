@@ -119,7 +119,6 @@
  "Delší spánek": "Sono mais longo",
  "Krígly": "Canecas",
  "Máš {k} krígel (+{b} % výdělek)": "Você tem {k} canecas (+{b} % de renda)",
- "Najmi kostlivce – pípa pak točí sama, i když nehraješ.": "Contrate um esqueleto – o chope serve sozinho, mesmo offline.",
  "Otevři kuchyni – další zdroj coins.": "Abra a cozinha – outra fonte de coins.",
  "Probudit Cthulhu": "Acordar Cthulhu",
  "Rušnější hospoda": "Bar mais cheio",
@@ -633,7 +632,6 @@
  "+3 kosti, +5 XP hostinského": "+3 ossos, +5 XP do taberneiro",
  "+{n} bodů do šipek": "+{n} pontos de dardos",
  "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "Toque na Torneira (esquerda) e junte coins: {c} / {n}. Depois compre à direita.",
- "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "O esqueleto serve sozinho – espere os coins: {c} / {n} (ou toque nos clientes).",
  "hází samo po 2 s, i když tu nejsi": "lança sozinho a cada 2 s, mesmo quando você não está",
  "Koupit automat\n1 bod": "Comprar lançador\n1 ponto",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Toque no alvo = lançar (a mira é automática). Termine exatamente em zero = 1 ponto. Com 1 ponto compre o lançador automático – lança sozinho, até offline.",
@@ -665,5 +663,12 @@
  "MAX": "MÁX",
  "bar plný – číšníci nestíhají!": "balcão cheio – os garçons não dão conta!",
  "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a} e {b} começaram – levam cerveja às mesas",
- "+1 bod": "+1 ponto"
+ "+1 bod": "+1 ponto",
+ "Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.": "Contrate garçons para a Torneira – ela tira sozinha e eles levam a cerveja, mesmo quando você não está.",
+ "Najmi číšníky – pípa pak točí sama a oni roznášejí pivo, i když nehraješ.": "Contrate garçons – a torneira tira sozinha e eles levam a cerveja, mesmo quando você não joga.",
+ "Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "A torneira tira sozinha – espere os coins: {c} / {n} (ou toque nos clientes).",
+ "Číšníci nastoupili!": "Garçons contratados!",
+ "Číšníci {n}": "Garçons {n}",
+ "číšníci ✓": "garçons ✓",
+ "Číšníci prodáni – vráceno {n} coins. Najmi je znovu na Pípě.": "Garçons vendidos – {n} coins devolvidos. Contrate-os de novo na Torneira."
 }

@@ -119,7 +119,6 @@
  "Delší spánek": "更长睡眠",
  "Krígly": "酒杯",
  "Máš {k} krígel (+{b} % výdělek)": "你有 {k} 个酒杯(收入 +{b} %)",
- "Najmi kostlivce – pípa pak točí sama, i když nehraješ.": "雇佣骷髅 – 啤酒头会自动出酒,不玩也行。",
  "Otevři kuchyni – další zdroj coins.": "开放厨房 – 又一个 coins 来源。",
  "Probudit Cthulhu": "唤醒克苏鲁",
  "Rušnější hospoda": "更热闹的酒馆",
@@ -633,7 +632,6 @@
  "+3 kosti, +5 XP hostinského": "骨头+3，店主经验+5",
  "+{n} bodů do šipek": "飞镖点数+{n}",
  "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "点击左边的啤酒龙头收集coins：{c} / {n}。然后在右边购买。",
- "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "骷髅会自己倒酒 – 等待coins：{c} / {n}（或点击客人）。",
  "hází samo po 2 s, i když tu nejsi": "即使你不在，也每2秒自动投掷",
  "Koupit automat\n1 bod": "购买自动投掷\n1点",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "点击镖盘 = 投掷（自动瞄准）。正好归零 = 1点。用1点购买自动投掷 – 离线也会自己投。",
@@ -665,5 +663,12 @@
  "MAX": "最大",
  "bar plný – číšníci nestíhají!": "吧台满了 – 服务员忙不过来！",
  "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a}和{b}上岗了 – 把啤酒送到桌上",
- "+1 bod": "+1点"
+ "+1 bod": "+1点",
+ "Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.": "为酒头雇服务员 – 酒头自动出酒，他们送啤酒，你不在也行。",
+ "Najmi číšníky – pípa pak točí sama a oni roznášejí pivo, i když nehraješ.": "雇服务员 – 酒头自动出酒，他们送啤酒，你不玩也行。",
+ "Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "酒头在自动出酒 – 等待coins：{c} / {n}（或点客人）。",
+ "Číšníci nastoupili!": "服务员上岗了！",
+ "Číšníci {n}": "服务员 {n}",
+ "číšníci ✓": "服务员 ✓",
+ "Číšníci prodáni – vráceno {n} coins. Najmi je znovu na Pípě.": "服务员已卖出 – 退还{n} coins。在酒头处重新雇用。"
 }

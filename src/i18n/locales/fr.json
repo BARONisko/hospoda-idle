@@ -119,7 +119,6 @@
  "Delší spánek": "Sommeil prolongé",
  "Krígly": "Chopes",
  "Máš {k} krígel (+{b} % výdělek)": "Tu as {k} chopes (+{b} % de gains)",
- "Najmi kostlivce – pípa pak točí sama, i když nehraješ.": "Engage un squelette – la pompe tire seule, même hors jeu.",
  "Otevři kuchyni – další zdroj coins.": "Ouvre la cuisine – une autre source de coins.",
  "Probudit Cthulhu": "Réveiller Cthulhu",
  "Rušnější hospoda": "Bar plus animé",
@@ -633,7 +632,6 @@
  "+3 kosti, +5 XP hostinského": "+3 os, +5 XP du patron",
  "+{n} bodů do šipek": "+{n} points de fléchettes",
  "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "Touche la Tireuse (à gauche) pour gagner des coins : {c} / {n}. Puis achète à droite.",
- "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "Le squelette sert tout seul – attends les coins : {c} / {n} (ou touche les clients).",
  "hází samo po 2 s, i když tu nejsi": "lance tout seul toutes les 2 s, même en ton absence",
  "Koupit automat\n1 bod": "Acheter le lanceur\n1 point",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Touche la cible = lancer (la visée est automatique). Finir pile à zéro = 1 point. Avec 1 point, achète le lanceur auto : il lance seul, même hors ligne.",
@@ -665,5 +663,12 @@
  "MAX": "MAX",
  "bar plný – číšníci nestíhají!": "comptoir plein – les serveurs ne suivent pas !",
  "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a} et {b} ont commencé – ils apportent la bière aux tables",
- "+1 bod": "+1 point"
+ "+1 bod": "+1 point",
+ "Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.": "Engage des serveurs pour la Pompe – elle tire alors seule et ils servent la bière, même en ton absence.",
+ "Najmi číšníky – pípa pak točí sama a oni roznášejí pivo, i když nehraješ.": "Engage des serveurs – la pompe tire alors seule et ils servent la bière, même quand tu ne joues pas.",
+ "Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "La pompe tire seule – attends les coins : {c} / {n} (ou touche les clients).",
+ "Číšníci nastoupili!": "Serveurs engagés !",
+ "Číšníci {n}": "Serveurs {n}",
+ "číšníci ✓": "serveurs ✓",
+ "Číšníci prodáni – vráceno {n} coins. Najmi je znovu na Pípě.": "Serveurs vendus – {n} coins remboursés. Réengage-les sur la Pompe."
 }

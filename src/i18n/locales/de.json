@@ -119,7 +119,6 @@
  "Delší spánek": "Längerer Schlaf",
  "Krígly": "Krüge",
  "Máš {k} krígel (+{b} % výdělek)": "Du hast {k} Krüge (+{b} % Einkommen)",
- "Najmi kostlivce – pípa pak točí sama, i když nehraješ.": "Stell ein Skelett ein – der Zapfhahn zapft dann allein, auch offline.",
  "Otevři kuchyni – další zdroj coins.": "Öffne die Küche – noch eine Quelle für coins.",
  "Probudit Cthulhu": "Cthulhu wecken",
  "Rušnější hospoda": "Vollere Kneipe",
@@ -633,7 +632,6 @@
  "+3 kosti, +5 XP hostinského": "+3 Knochen, +5 Wirt-EP",
  "+{n} bodů do šipek": "+{n} Dartpunkte",
  "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "Tippe auf den Zapfhahn (links) und sammle Coins: {c} / {n}. Dann rechts kaufen.",
- "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "Das Skelett zapft allein – warte auf Coins: {c} / {n} (oder tippe auf Gäste).",
  "hází samo po 2 s, i když tu nejsi": "wirft alle 2 s von selbst, auch wenn du weg bist",
  "Koupit automat\n1 bod": "Automat kaufen\n1 Punkt",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Tippe auf die Scheibe = Wurf (gezielt wird automatisch). Genau auf null beenden = 1 Punkt. Für 1 Punkt gibt es den Automaten – er wirft allein, auch offline.",
@@ -665,5 +663,12 @@
  "MAX": "MAX",
  "bar plný – číšníci nestíhají!": "Theke voll – die Kellner kommen nicht hinterher!",
  "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a} und {b} haben angefangen – sie bringen Bier an die Tische",
- "+1 bod": "+1 Punkt"
+ "+1 bod": "+1 Punkt",
+ "Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.": "Stell Kellner für den Zapfhahn ein – er zapft dann von selbst und sie bringen das Bier, auch wenn du weg bist.",
+ "Najmi číšníky – pípa pak točí sama a oni roznášejí pivo, i když nehraješ.": "Stell Kellner ein – der Zapfhahn zapft dann von selbst und sie bringen das Bier, auch wenn du nicht spielst.",
+ "Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "Der Zapfhahn zapft von selbst – warte auf Coins: {c} / {n} (oder tippe auf Gäste).",
+ "Číšníci nastoupili!": "Kellner eingestellt!",
+ "Číšníci {n}": "Kellner {n}",
+ "číšníci ✓": "Kellner ✓",
+ "Číšníci prodáni – vráceno {n} coins. Najmi je znovu na Pípě.": "Kellner verkauft – {n} Coins zurück. Stell sie am Zapfhahn wieder ein."
 }

@@ -119,7 +119,6 @@
  "Delší spánek": "Долгий сон",
  "Krígly": "Кружки",
  "Máš {k} krígel (+{b} % výdělek)": "У тебя {k} кружек (+{b} % дохода)",
- "Najmi kostlivce – pípa pak točí sama, i když nehraješ.": "Найми скелета – кран наливает сам, даже без тебя.",
  "Otevři kuchyni – další zdroj coins.": "Открой кухню – ещё один источник coins.",
  "Probudit Cthulhu": "Разбудить Ктулху",
  "Rušnější hospoda": "Людная пивная",
@@ -633,7 +632,6 @@
  "+3 kosti, +5 XP hostinského": "+3 кости, +5 опыта трактирщика",
  "+{n} bodů do šipek": "+{n} очков дартса",
  "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "Нажимай на Кран (слева) и собирай coins: {c} / {n}. Потом купи справа.",
- "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "Скелет наливает сам – подожди coins: {c} / {n} (или нажимай на гостей).",
  "hází samo po 2 s, i když tu nejsi": "бросает само каждые 2 с, даже когда тебя нет",
  "Koupit automat\n1 bod": "Купить автомат\n1 очко",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Нажми на мишень = бросок (прицел автоматический). Закончи ровно на нуле = 1 очко. За 1 очко купи автомат – бросает сам, даже офлайн.",
@@ -665,5 +663,12 @@
  "MAX": "МАКС",
  "bar plný – číšníci nestíhají!": "стойка полна – официанты не успевают!",
  "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a} и {b} начали работу – носят пиво к столам",
- "+1 bod": "+1 очко"
+ "+1 bod": "+1 очко",
+ "Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.": "Найми официантов к Крану – он будет наливать сам, а они разносить пиво, даже когда тебя нет.",
+ "Najmi číšníky – pípa pak točí sama a oni roznášejí pivo, i když nehraješ.": "Найми официантов – кран будет наливать сам, а они разносить пиво, даже когда ты не играешь.",
+ "Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "Кран наливает сам – жди coins: {c} / {n} (или нажимай на гостей).",
+ "Číšníci nastoupili!": "Официанты наняты!",
+ "Číšníci {n}": "Официанты {n}",
+ "číšníci ✓": "официанты ✓",
+ "Číšníci prodáni – vráceno {n} coins. Najmi je znovu na Pípě.": "Официанты проданы – возвращено {n} coins. Найми их снова у Крана."
 }

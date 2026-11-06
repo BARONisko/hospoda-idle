@@ -116,3 +116,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   denně). Body se utrácí v panelu číšníka („+1 bod“), zelená tečka na liště = volný bod. Číšníci (XP, body, najmutí)
   zůstávají i po hygieně; před kostlivcem na pípě nepracují (hosté dostanou pivo samo). Najímání 3./4. dál za coins.
   Dřív koupená vylepšení zůstala (XP doplněno). Sim: 1. prestiž stejně, 40 krígel ~7 % rychleji.
+- Na Pípě už není kostlivec: tlačítko „Číšníci 50“ najme Frantu a Jarku (pípa pak točí sama, oni roznášejí); 3. a 4.
+  číšník na liště za coins, vylepšení dál za body ze zkušeností. Návod/rádce mluví o číšnících. Migrace wv2: dosavadní
+  číšníci prodáni – vráceny coins za najmutí, vylepšení (staré ceny), kostlivce na pípě a piva na baru; hráč je koupí znovu.

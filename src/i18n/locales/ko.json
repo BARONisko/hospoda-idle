@@ -119,7 +119,6 @@
  "Delší spánek": "더 긴 잠",
  "Krígly": "맥주잔",
  "Máš {k} krígel (+{b} % výdělek)": "맥주잔 {k}개 (수입 +{b} %)",
- "Najmi kostlivce – pípa pak točí sama, i když nehraješ.": "해골을 고용하세요 – 안 놀 때도 맥주탭이 알아서 따릅니다.",
  "Otevři kuchyni – další zdroj coins.": "주방을 여세요 – 새로운 coins 수입원.",
  "Probudit Cthulhu": "크툴루 깨우기",
  "Rušnější hospoda": "더 붐비는 술집",
@@ -633,7 +632,6 @@
  "+3 kosti, +5 XP hostinského": "뼈 +3, 주인 XP +5",
  "+{n} bodů do šipek": "다트 포인트 +{n}",
  "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "왼쪽 맥주 탭을 눌러 coins를 모으세요: {c} / {n}. 그다음 오른쪽에서 구매.",
- "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "해골이 알아서 따릅니다 – coins를 기다리세요: {c} / {n} (손님을 눌러도 돼요).",
  "hází samo po 2 s, i když tu nejsi": "자리에 없어도 2초마다 알아서 던짐",
  "Koupit automat\n1 bod": "자동 던지기 구매\n1점",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "과녁을 탭 = 던지기 (조준은 자동). 정확히 0으로 끝내면 1점. 1점으로 자동 던지기를 사면 오프라인에서도 알아서 던져요.",
@@ -665,5 +663,12 @@
  "MAX": "최대",
  "bar plný – číšníci nestíhají!": "바가 가득 – 웨이터가 따라가지 못해요!",
  "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a}와 {b} 근무 시작 – 테이블로 맥주를 나릅니다",
- "+1 bod": "+1 포인트"
+ "+1 bod": "+1 포인트",
+ "Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.": "탭에 웨이터를 고용하세요 – 탭이 혼자 따르고 웨이터가 맥주를 나릅니다. 자리에 없어도요.",
+ "Najmi číšníky – pípa pak točí sama a oni roznášejí pivo, i když nehraješ.": "웨이터를 고용하세요 – 탭이 혼자 따르고 웨이터가 맥주를 나릅니다. 게임을 안 해도요.",
+ "Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "탭이 혼자 따르는 중 – coins를 기다리세요: {c} / {n} (또는 손님을 탭).",
+ "Číšníci nastoupili!": "웨이터 고용!",
+ "Číšníci {n}": "웨이터 {n}",
+ "číšníci ✓": "웨이터 ✓",
+ "Číšníci prodáni – vráceno {n} coins. Najmi je znovu na Pípě.": "웨이터 판매 – {n} coins 환불. 탭에서 다시 고용하세요."
 }

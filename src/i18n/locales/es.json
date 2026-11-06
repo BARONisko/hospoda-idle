@@ -119,7 +119,6 @@
  "Delší spánek": "Sueño más largo",
  "Krígly": "Jarras",
  "Máš {k} krígel (+{b} % výdělek)": "Tienes {k} jarras (+{b} % ingresos)",
- "Najmi kostlivce – pípa pak točí sama, i když nehraješ.": "Contrata un esqueleto: el grifo sirve solo, aunque no juegues.",
  "Otevři kuchyni – další zdroj coins.": "Abre la cocina: otra fuente de coins.",
  "Probudit Cthulhu": "Despertar a Cthulhu",
  "Rušnější hospoda": "Bar más concurrido",
@@ -633,7 +632,6 @@
  "+3 kosti, +5 XP hostinského": "+3 huesos, +5 XP del tabernero",
  "+{n} bodů do šipek": "+{n} puntos de dardos",
  "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "Toca el Grifo (izquierda) y junta coins: {c} / {n}. Luego compra a la derecha.",
- "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "El esqueleto sirve solo – espera coins: {c} / {n} (o toca a los clientes).",
  "hází samo po 2 s, i když tu nejsi": "lanza solo cada 2 s, aunque no estés",
  "Koupit automat\n1 bod": "Comprar lanzador\n1 punto",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Toca la diana = lanzar (apunta solo). Termina justo en cero = 1 punto. Con 1 punto compra el lanzador automático: lanza solo, incluso sin conexión.",
@@ -665,5 +663,12 @@
  "MAX": "MÁX",
  "bar plný – číšníci nestíhají!": "¡barra llena – los camareros no dan abasto!",
  "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a} y {b} empezaron – llevan cerveza a las mesas",
- "+1 bod": "+1 punto"
+ "+1 bod": "+1 punto",
+ "Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.": "Contrata camareros para el Grifo – servirá solo y ellos llevarán la cerveza, aunque no estés.",
+ "Najmi číšníky – pípa pak točí sama a oni roznášejí pivo, i když nehraješ.": "Contrata camareros – el grifo servirá solo y ellos llevarán la cerveza, aunque no juegues.",
+ "Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "El grifo sirve solo – espera coins: {c} / {n} (o toca a los clientes).",
+ "Číšníci nastoupili!": "¡Camareros contratados!",
+ "Číšníci {n}": "Camareros {n}",
+ "číšníci ✓": "camareros ✓",
+ "Číšníci prodáni – vráceno {n} coins. Najmi je znovu na Pípě.": "Camareros vendidos – se devolvieron {n} coins. Contrátalos de nuevo en el Grifo."
 }

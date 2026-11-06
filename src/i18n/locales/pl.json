@@ -119,7 +119,6 @@
  "Delší spánek": "Dłuższy sen",
  "Krígly": "Kufle",
  "Máš {k} krígel (+{b} % výdělek)": "Masz {k} kufli (+{b} % zarobku)",
- "Najmi kostlivce – pípa pak točí sama, i když nehraješ.": "Zatrudnij szkieleta – nalewak leje sam, nawet gdy nie grasz.",
  "Otevři kuchyni – další zdroj coins.": "Otwórz kuchnię – kolejne źródło coins.",
  "Probudit Cthulhu": "Obudź Cthulhu",
  "Rušnější hospoda": "Tłoczniejsza knajpa",
@@ -633,7 +632,6 @@
  "+3 kosti, +5 XP hostinského": "+3 kości, +5 PD karczmarza",
  "+{n} bodů do šipek": "+{n} punktów do rzutek",
  "Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.": "Stukaj w Nalewak (po lewej) i zbieraj coins: {c} / {n}. Potem kup po prawej.",
- "Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "Szkielet nalewa sam – poczekaj na coins: {c} / {n} (albo stukaj w gości).",
  "hází samo po 2 s, i když tu nejsi": "rzuca samo co 2 s, nawet gdy cię nie ma",
  "Koupit automat\n1 bod": "Kup automat\n1 punkt",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Stuknij tarczę = rzut (celowanie automatyczne). Skończ dokładnie na zerze = 1 punkt. Za 1 punkt kup automat – rzuca sam, także offline.",
@@ -665,5 +663,12 @@
  "MAX": "MAX",
  "bar plný – číšníci nestíhají!": "bar pełny – kelnerzy nie nadążają!",
  "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a} i {b} zaczęli – roznoszą piwo do stolików",
- "+1 bod": "+1 punkt"
+ "+1 bod": "+1 punkt",
+ "Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.": "Zatrudnij kelnerów przy Nalewaku – nalewak leje sam, a oni roznoszą piwo, nawet gdy cię nie ma.",
+ "Najmi číšníky – pípa pak točí sama a oni roznášejí pivo, i když nehraješ.": "Zatrudnij kelnerów – nalewak leje sam, a oni roznoszą piwo, nawet gdy nie grasz.",
+ "Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).": "Nalewak leje sam – czekaj na coins: {c} / {n} (albo stukaj w gości).",
+ "Číšníci nastoupili!": "Kelnerzy zatrudnieni!",
+ "Číšníci {n}": "Kelnerzy {n}",
+ "číšníci ✓": "kelnerzy ✓",
+ "Číšníci prodáni – vráceno {n} coins. Najmi je znovu na Pípě.": "Kelnerzy sprzedani – zwrócono {n} coins. Zatrudnij ich znowu przy Nalewaku."
 }
