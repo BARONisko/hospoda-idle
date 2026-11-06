@@ -308,20 +308,35 @@ export class PubView {
 
   /** ťuknutí do hospody: host = spropitné (vrací true, když se trefil) */
   tap(wx: number, wy: number): boolean {
+    // nejdřív bubliny (leží nad hlavami a překrývají hosty v řadě za nimi), pak postavy
+    for (const g of this.guests) {
+      if (!g.order || g.leaving) continue;
+      if (Phaser.Geom.Rectangle.Contains(Phaser.Geom.Rectangle.Inflate(g.order[0].getBounds(), 5, 5), wx, wy)) return this.tipGuest(g);
+    }
     for (const g of this.guests) {
       if (g.tipped || g.leaving) continue;
-      // trefa = postava nebo bublina nad ní (s rezervou pro prst)
-      const b = Phaser.Geom.Rectangle.Inflate(g.spr.getBounds(), 6, 6);
-      if (g.order) Phaser.Geom.Rectangle.MergeRect(b, Phaser.Geom.Rectangle.Inflate(g.order[0].getBounds(), 4, 4));
-      if (Phaser.Geom.Rectangle.Contains(b, wx, wy)) {
-        g.tipped = true;
-        if (g.order) this.serve(g);
-        this.s.tweens.add({ targets: g.spr, y: g.spr.y - 4, yoyo: true, duration: 100 });
-        return true;
-      }
+      if (Phaser.Geom.Rectangle.Contains(Phaser.Geom.Rectangle.Inflate(g.spr.getBounds(), 6, 6), wx, wy)) return this.tipGuest(g);
     }
     return false;
   }
+
+  /** host dá spropitné; bublina hned zmizí (obslouženo). Bublina dá spropitné vždy. */
+  private tipGuest(g: Guest) {
+    g.tipped = true;
+    this.last = g;
+    if (g.order) {
+      const o = g.order;
+      g.order = undefined;
+      g.next = (g.sat ?? 0) + this.rnd.realInRange(8, 14);
+      this.s.tweens.killTweensOf(o);
+      this.s.tweens.add({ targets: o, scale: 0, alpha: 0, duration: 120, onComplete: () => o.forEach((x) => x.destroy()) });
+    }
+    this.s.tweens.add({ targets: g.spr, y: g.spr.y - 4, yoyo: true, duration: 100 });
+    return true;
+  }
+
+  private last?: Guest;
+
 
   /** obsloužit objednávku: bublina zmizí, příští objednávka za 8–14 s */
   private serve(g: Guest) {
@@ -353,7 +368,7 @@ export class PubView {
 
   tipPop(text: string) {
     // poslední trefený host
-    const g = [...this.guests].reverse().find((q) => q.tipped);
+    const g = this.last ?? [...this.guests].reverse().find((q) => q.tipped);
     if (g) this.pop(g.spr.x - this.ox, g.spr.y - 26, text, PAL.mint);
   }
 
