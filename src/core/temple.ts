@@ -33,10 +33,15 @@ const ymd = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.ge
 const force = () => typeof location !== 'undefined' && new URLSearchParams(location.search).get('temple') === '1';
 
 /** je víkend (sobota/neděle místního času)? */
-export const isWeekend = (now = Date.now()) => force() || [0, 6].includes(new Date(now).getDay());
+/** dřívější otevření na vyzkoušení (přání uživatele): od pátku 6. 11. 2026 do pondělí 9. 11. 0:00 místního času */
+const EARLY_FROM = new Date(2026, 10, 6).getTime(), EARLY_TO = new Date(2026, 10, 9).getTime();
+const early = (now: number) => now >= EARLY_FROM && now < EARLY_TO;
+
+export const isWeekend = (now = Date.now()) => force() || early(now) || [0, 6].includes(new Date(now).getDay());
 
 /** klíč víkendu = datum jeho soboty (ve všední den poslední minulé soboty) */
 export function weekendKey(now = Date.now()) {
+  if (early(now)) return '2026-11-07';
   const d = new Date(now);
   const back = (d.getDay() + 1) % 7; // so=0, ne=1, po=2 …
   d.setDate(d.getDate() - back);
@@ -47,6 +52,7 @@ export const todayKey = (now = Date.now()) => ymd(new Date(now));
 
 /** ms do začátku příští soboty (ve všední den) nebo do konce víkendu (o víkendu) */
 export function msToSwitch(now = Date.now()) {
+  if (early(now)) return EARLY_TO - now;
   const d = new Date(now);
   const day = d.getDay();
   const add = day === 6 ? 2 : day === 0 ? 1 : 6 - day;
