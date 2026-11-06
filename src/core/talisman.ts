@@ -41,7 +41,7 @@ export const TALISMANS: TalisDef[] = [
 ];
 
 /** cena další úrovně v kostech (roste donekonečna) */
-export const talisCost = (lvl: number) => Math.ceil(30 * 2.2 ** lvl);
+export const talisCost = (lvl: number) => Math.ceil(150 * 2.6 ** lvl);
 
 /** součet statů ze všech talismanů */
 export function stats(levels: Record<string, number> = {}): Record<StatId, number> {

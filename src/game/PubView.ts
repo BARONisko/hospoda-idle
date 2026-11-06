@@ -333,7 +333,7 @@ export class PubView {
         // nejdřív si objedná (bublina nad hlavou), pak mu přinesou pivo nebo jídlo
         const food = (g.spr.x * 7 + g.spr.y) % 3 === 0;
         if (!g.order && !g.mug && g.sat < 0.2) {
-          const bx = sp.x + (g.seat.flip ? 8 : -8), by = sp.y - 22;
+          const bx = sp.x, by = sp.y - 18;
           const b = this.s.add.image(bx, by, 'obj', 'bubble').setOrigin(0.5, 1).setDepth(sp.y + 50);
           const ic = this.s.add.image(bx, by - 6, 'obj', food ? FOOD[this.pub.act] : 'mug').setOrigin(0.5, 0.5).setScale(0.6).setDepth(sp.y + 51);
           g.order = [b, ic];
@@ -352,6 +352,8 @@ export class PubView {
         }
         if (g.sitT <= 0) {
           g.leaving = true;
+          g.order?.forEach((o) => o.destroy());
+          g.order = undefined;
           g.tipped = true;
           g.mug?.setFrame('mugEmpty');
           g.path = [{ x: g.seat.x, y: g.seat.aisle }, { x: DOOR.x, y: g.seat.aisle }, { x: DOOR.x, y: DOOR.y + 6 }];

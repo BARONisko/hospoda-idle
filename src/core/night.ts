@@ -4,7 +4,7 @@ import { t } from '../i18n';
 export const DAY_MS = 8 * 60_000;
 export const NIGHT_MS = 4 * 60_000;
 /** kolik kostí za 1 coin výdělku */
-export const BONE_RATE = 0.001;
+export const BONE_RATE = 0.0002;
 
 const forced = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('night') : null;
 
@@ -28,11 +28,11 @@ export interface BoneUp {
   max?: number;
 }
 
-/** vylepšení za kosti – ceny rostou ×3 za úroveň */
+/** vylepšení za kosti – ceny rostou ×4 za úroveň */
 export const BONE_UPS: BoneUp[] = [
-  { id: 'pipe', name: t('Kostěná pípa'), desc: t('v noci kostí +50 %'), base: 50 },
-  { id: 'band', name: t('Kostlivá kapela'), desc: t('přes den výdělek +10 %'), base: 100 },
-  { id: 'grave', name: t('Hřbitovní nábor'), desc: t('kostlivci o 15 % levnější'), base: 200, max: 5 },
-  { id: 'moon', name: t('Měsíční svit'), desc: t('offline kostí +50 %'), base: 80 },
+  { id: 'pipe', name: t('Kostěná pípa'), desc: t('v noci kostí +50 %'), base: 250 },
+  { id: 'band', name: t('Kostlivá kapela'), desc: t('přes den výdělek +10 %'), base: 500 },
+  { id: 'grave', name: t('Hřbitovní nábor'), desc: t('kostlivci o 15 % levnější'), base: 1000, max: 5 },
+  { id: 'moon', name: t('Měsíční svit'), desc: t('offline kostí +50 %'), base: 400 },
 ];
-export const boneCost = (u: BoneUp, lvl: number) => Math.ceil(u.base * 3 ** lvl);
+export const boneCost = (u: BoneUp, lvl: number) => Math.ceil(u.base * 4 ** lvl);
