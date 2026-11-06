@@ -1,17 +1,20 @@
-// Šipky (minihra v Menu místo Den a noc): hra 301, šipky přibývají samy, dohraná hra = bod na vylepšení.
-// Ručně: táhni prstem = míříš (zaměřovač se třese a houpe), pusť = hod. Automat hází sám (i offline, když je zapnutý).
+// Šipky (minihra v Menu místo Den a noc): hra na nulu (301 a s každou hrou víc), šipky přibývají samy,
+// dohraná hra = bod na vylepšení. Hází se jen automaticky (po 2 s), házení jde vypnout; zapnuté hází i offline.
+// Terč i zeď jsou z původní hry P.U.B. (terč se překreslí, když vylepšení zvětší pole).
 import Phaser from 'phaser';
 import { PAL } from '../data/palette';
 import { txt } from '../ui/font';
 import { t } from '../i18n';
 import { big } from '../core/num';
 import { sfx } from '../core/sfx';
-import { DartsState, DART_UPS, DART_MS, DART_CAP, START, NUMS, rings, aimFor, fieldPos, land, resolve, spread, ThrowResult } from '../core/darts';
+import { DartsState, DART_UPS, dartMs, dartCap, START, NUMS, rings, aimFor, fieldPos, land, resolve, ThrowResult, THROW_GAP, migrateDarts } from '../core/darts';
+import { makeDartboard, BOARD_R } from '../gfx/tourneyArt';
 import type { StatId } from '../core/talisman';
 
 const W = 540, H = 960;
 const col = (k: keyof typeof PAL) => Phaser.Display.Color.HexStringToColor(PAL[k]).color;
-const CX = W / 2, CY = 430, R = 200;
+const K = 3, BG_TOP = 116;
+const CX = W / 2, CY = BG_TOP + 78 * K, R = BOARD_R * K;
 
 export interface DartsHost {
   dartsData(): DartsState;
@@ -24,14 +27,12 @@ export class DartsScene extends Phaser.Scene {
   host!: DartsHost;
   S!: DartsState;
   ui: Phaser.GameObjects.GameObject[] = [];
-  board!: Phaser.GameObjects.Graphics;
   fx!: Phaser.GameObjects.Graphics;
   stuck: Phaser.GameObjects.GameObject[] = [];
   mode: 'play' | 'shop' = 'play';
   shopTab: 'darts' | 'game' = 'darts';
-  aim: { x: number; y: number } | null = null;
+  boardImg!: Phaser.GameObjects.Image;
   tm = 0;
-  throwT = 0;
   autoT = 0;
   flying = false;
   hud!: { have: Phaser.GameObjects.Text; left: Phaser.GameObjects.Text; pts: Phaser.GameObjects.Text; info: Phaser.GameObjects.Text; next: Phaser.GameObjects.Text };
@@ -46,54 +47,32 @@ export class DartsScene extends Phaser.Scene {
 
   create() {
     this.S = this.host.dartsData();
+    migrateDarts(this.S);
     this.ui = [];
     this.stuck = [];
     this.mode = 'play';
-    this.add.image(W / 2, H / 2, 'dartsBg0').setDisplaySize(W * 1.8, H).setDepth(0).setTint(0x8a8a8a);
-    const sh = this.add.graphics().setDepth(1);
-    sh.fillStyle(0x000000, 0.35).fillRect(0, 0, W, H);
-    this.board = this.add.graphics().setDepth(5);
+    this.cameras.main.setBackgroundColor(PAL.ink);
+    // zeď s diváky z P.U.B. (terč visí pod lampou)
+    this.add.image(CX - 112 * K, BG_TOP, 'dartsBg0').setOrigin(0).setScale(K).setDepth(0);
+    const fl = this.add.graphics().setDepth(0);
+    fl.fillStyle(col('dusk')).fillRect(0, BG_TOP + 180 * K, W, H);
+    this.boardImg = this.add.image(CX, CY, 'dartboard').setScale(K).setDepth(5);
     this.fx = this.add.graphics().setDepth(30);
     this.drawBoard();
-    this.input.on('pointerdown', (p: Phaser.Input.Pointer) => this.down(p));
-    this.input.on('pointermove', (p: Phaser.Input.Pointer) => this.move(p));
-    this.input.on('pointerup', () => this.up());
     this.play();
   }
 
   // ---------- kreslení ----------
+  /** terč z P.U.B.; po vylepšení (větší bull, širší pole) se překreslí s novými poloměry */
   private drawBoard() {
-    const g = this.board.clear();
     const r = rings(this.S.up);
-    g.fillStyle(col('ink')).fillCircle(CX, CY + 6, R + 34);
-    g.fillStyle(0x1b1b1b).fillCircle(CX, CY, R + 32);
-    const ring = (r0: number, r1: number, odd: number, even: number) => {
-      for (let i = 0; i < 20; i++) {
-        const a0 = ((i - 0.5) / 20) * Math.PI * 2 - Math.PI / 2, a1 = ((i + 0.5) / 20) * Math.PI * 2 - Math.PI / 2;
-        g.fillStyle(i % 2 ? odd : even);
-        g.beginPath();
-        g.arc(CX, CY, r1 * R, a0, a1, false);
-        g.arc(CX, CY, r0 * R, a1, a0, true);
-        g.closePath();
-        g.fillPath();
-      }
-    };
-    ring(r.outer, 1, 0xe8dcc0, 0x1a1a1a);
-    ring(r.d0, r.d1, 0x2e8b57, 0xc0392b);
-    ring(r.t0, r.t1, 0x2e8b57, 0xc0392b);
-    g.fillStyle(0x2e8b57).fillCircle(CX, CY, r.outer * R);
-    g.fillStyle(0xc0392b).fillCircle(CX, CY, r.bull * R);
-    g.lineStyle(1, 0x9a9a9a, 0.6);
-    for (let i = 0; i < 20; i++) {
-      const a = ((i + 0.5) / 20) * Math.PI * 2 - Math.PI / 2;
-      g.lineBetween(CX + Math.cos(a) * r.outer * R, CY + Math.sin(a) * r.outer * R, CX + Math.cos(a) * R, CY + Math.sin(a) * R);
-    }
-    for (const rr of [r.outer, r.t0, r.t1, r.d0, 1]) g.strokeCircle(CX, CY, rr * R);
-    // čísla
+    const key = `dartboard_${r.bull.toFixed(3)}_${r.t0.toFixed(3)}_${r.d0.toFixed(3)}`;
+    if (!this.textures.exists(key)) makeDartboard(this, key, r);
+    this.boardImg.setTexture(key);
     this.children.list.filter((o) => o.getData?.('num')).forEach((o) => o.destroy());
     NUMS.forEach((n, i) => {
       const a = (i / 20) * Math.PI * 2 - Math.PI / 2;
-      this.add.text(CX + Math.cos(a) * (R + 18), CY + Math.sin(a) * (R + 18), String(n), txt(18, PAL.white)).setOrigin(0.5).setDepth(6).setData('num', true);
+      this.add.text(CX + Math.cos(a) * (R + 20), CY + Math.sin(a) * (R + 20), String(n), txt(18, PAL.white)).setOrigin(0.5).setDepth(6).setStroke(PAL.ink, 4).setData('num', true);
     });
   }
 
@@ -140,22 +119,17 @@ export class DartsScene extends Phaser.Scene {
       have: this.text(76, 8, '', 36, PAL.gold),
       next: this.text(78, 52, '', 18, PAL.fog),
       pts: this.text(78, 78, '', 20, PAL.mint),
-      left: this.text(W / 2, 640, '', 64, PAL.white, 0.5),
-      info: this.text(W / 2, 716, '', 20, PAL.bone, 0.5),
+      left: this.text(W / 2, 668, '', 64, PAL.white, 0.5),
+      info: this.text(W / 2, 744, '', 20, PAL.bone, 0.5),
     };
     this.button(W - 120, 22, 104, 64, t('Zpět'), 'blue', true, () => this.leave());
-    this.button(20, 790, 240, 72, t('Vylepšení'), 'plum', true, () => this.shop());
-    const auto = !!S.up.auto;
-    this.button(280, 790, 240, 72, !auto ? t('Automat: kup za 1 bod') : S.auto ? t('Automat: ZAP') : t('Automat: VYP'), S.auto && auto ? 'green' : 'amber', true, () => {
-      if (!auto) {
-        this.shopTab = 'darts';
-        return this.shop();
-      }
+    this.button(20, 800, 240, 72, t('Vylepšení'), 'plum', true, () => this.shop());
+    this.button(280, 800, 240, 72, S.auto ? t('Házení: ZAP') : t('Házení: VYP'), S.auto ? 'green' : 'amber', true, () => {
       S.auto = !S.auto;
       this.host.dartsSave();
       this.play();
     });
-    this.text(W / 2, 880, S.up.auto && S.auto ? t('Automat hází sám – i když tu nejsi.') : t('Táhni prstem po terči a pusť = hod. Hra 301: dohraj přesně na nulu.'), 17, PAL.fog, 0.5).setWordWrapWidth(W - 40).setAlign('center');
+    this.text(W / 2, 888, S.auto ? t('Hází se samo, i když tu nejsi. Dohraj přesně na nulu = 1 bod.') : t('Házení je vypnuté – šipky se šetří do toulce.'), 17, PAL.fog, 0.5).setWordWrapWidth(W - 40).setAlign('center');
     this.hudTick();
   }
 
@@ -163,42 +137,13 @@ export class DartsScene extends Phaser.Scene {
     if (this.mode !== 'play') return;
     const S = this.S, h = this.hud;
     h.have.setText(t('{n} šipek', { n: big(S.have) }));
-    const ms = DART_MS / (1 + (this.host.dartsStats().dspeed ?? 0));
+    const ms = dartMs(S.up, this.host.dartsStats().dspeed ?? 0);
     const left = Math.max(0, Math.ceil((S.at + ms - Date.now()) / 1000));
-    h.next.setText(S.have >= DART_CAP && !(S.up.auto && S.auto) ? t('zásoba plná ({n})', { n: DART_CAP }) : t('další šipka za {m}:{s}', { m: Math.floor(left / 60), s: String(left % 60).padStart(2, '0') }));
+    h.next.setText(S.have >= dartCap(S.up) && !S.auto ? t('zásoba plná ({n})', { n: dartCap(S.up) }) : t('další šipka za {m}:{s}', { m: Math.floor(left / 60), s: String(left % 60).padStart(2, '0') }));
     h.pts.setText(t('body: {p} · dohraných her: {l}', { p: S.pts, l: S.legs }));
     h.left.setText(String(S.left));
     const a = aimFor(S.left);
-    h.info.setText(t('zbývá do nuly · doporučeno: {f}', { f: a.n === 25 ? (a.mult === 2 ? 'BULL' : '25') : `${['', '', 'D', 'T'][a.mult]}${a.n}` }));
-  }
-
-  private down(p: Phaser.Input.Pointer) {
-    sfx.init();
-    if (this.mode !== 'play' || this.flying || (this.S.up.auto && this.S.auto)) return;
-    if (p.y < 120 || p.y > 760) return;
-    if (this.S.have <= 0) return this.toast(t('Došly šipky – další přibude sama.'));
-    this.aim = { x: p.x, y: p.y };
-    this.throwT = 6 + (this.S.up.time ?? 0);
-  }
-
-  private move(p: Phaser.Input.Pointer) {
-    if (this.aim && p.isDown) this.aim = { x: p.x, y: p.y };
-  }
-
-  private up() {
-    if (!this.aim) return;
-    const c = this.cross();
-    this.aim = null;
-    this.throwDart((c.x - CX) / R, (c.y - CY) / R);
-  }
-
-  /** zaměřovač: kolem prstu se houpe a třese (vylepšení zmenšují) */
-  private cross() {
-    const a = this.aim!;
-    const amp = 46 * (1 - 0.025 * (this.S.up.steady ?? 0)), sp = 1 - 0.025 * (this.S.up.slow ?? 0);
-    const k = this.tm * 2.2 * sp;
-    // mířit nad prst (ať ho prst nezakrývá)
-    return { x: a.x + Math.sin(k * 1.3) * amp + Math.sin(k * 7.1) * amp * 0.15, y: a.y - 70 + Math.cos(k) * amp * 0.8 + Math.cos(k * 6.3) * amp * 0.15 };
+    h.info.setText(t('zbývá do nuly (hra {n}) · míří na {f}', { n: S.legs + 1, f: a.n === 25 ? (a.mult === 2 ? 'BULL' : '25') : `${['', '', 'D', 'T'][a.mult]}${a.n}` }));
   }
 
   private throwDart(ax: number, ay: number) {
@@ -256,18 +201,9 @@ export class DartsScene extends Phaser.Scene {
     this.fx.clear();
     if (this.mode !== 'play') return;
     const S = this.S;
-    if (this.aim) {
-      const c = this.cross();
-      this.fx.lineStyle(3, 0xffffff, 0.95).strokeCircle(c.x, c.y, 12).lineBetween(c.x - 18, c.y, c.x + 18, c.y).lineBetween(c.x, c.y - 18, c.x, c.y + 18);
-      // rozptyl: kroužek, kam asi šipka dopadne
-      this.fx.lineStyle(2, 0xffd166, 0.35).strokeCircle(c.x, c.y, spread(S.up, this.host.dartsStats().dacc ?? 0) * R);
-      this.throwT -= dt;
-      this.fx.fillStyle(col('gold')).fillRect(20, 760, (W - 40) * Math.max(0, this.throwT / (6 + (S.up.time ?? 0))), 8);
-      if (this.throwT <= 0) this.up();
-    }
-    // automat hází, když je terč otevřený (jinak hází hospoda na pozadí)
-    if (S.up.auto && S.auto && !this.flying && S.have > 0 && (this.autoT -= dt) <= 0) {
-      this.autoT = 0.9;
+    // hází se samo po 2 s, když je terč otevřený (jinak hází hospoda na pozadí)
+    if (S.auto && !this.flying && S.have > 0 && (this.autoT -= dt) <= 0) {
+      this.autoT = THROW_GAP;
       const a = aimFor(S.left);
       const [fx, fy] = fieldPos(a.n, a.mult, S.up);
       this.throwDart(fx, fy);
@@ -278,7 +214,6 @@ export class DartsScene extends Phaser.Scene {
   // ---------- vylepšení ----------
   private shop() {
     this.mode = 'shop';
-    this.aim = null;
     this.clearUi();
     const S = this.S;
     const g = this.add.graphics().setDepth(49);
@@ -293,7 +228,7 @@ export class DartsScene extends Phaser.Scene {
       this.shop();
     }));
     const list = DART_UPS.filter((u) => (this.shopTab === 'game') === !!u.stat);
-    const rh = this.shopTab === 'game' ? 84 : 56;
+    const rh = this.shopTab === 'game' ? 88 : 64;
     list.forEach((u, i) => {
       const y = 158 + i * rh;
       const lvl = S.up[u.id] ?? 0;
@@ -301,15 +236,21 @@ export class DartsScene extends Phaser.Scene {
       const price = u.cost(lvl);
       const bg = this.add.graphics().setDepth(50);
       bg.fillStyle(col('dusk'), 0.95).fillRoundedRect(10, y, W - 20, rh - 6, 9);
+      // políčka: každá úroveň jedno (u dlouhých vylepšení se plní po desítkách, číslo ukazuje celkem)
+      const n = Math.min(10, u.max), filled = u.max <= 10 ? lvl : max ? 10 : lvl % 10;
+      const pw = 20, gap = 4, py = y + rh - 26;
+      for (let k = 0; k < n; k++) {
+        bg.fillStyle(col('ink')).fillRect(22 + k * (pw + gap), py, pw, 12);
+        bg.fillStyle(col(k < filled ? (u.stat ? 'amber' : 'mint') : 'slate'), k < filled ? 1 : 0.5).fillRect(23 + k * (pw + gap), py + 1, pw - 2, 10);
+      }
       this.ui.push(bg);
-      const a = this.text(22, y + 4, u.name + (u.max > 1 ? ` ${lvl}/${u.max}` : ''), rh > 60 ? 22 : 19, PAL.bone);
+      const a = this.text(22, y + 4, u.name + (u.max > 10 ? ` · ${t('úr.')} ${lvl}/${u.max}` : ''), rh > 70 ? 22 : 19, PAL.bone);
       a.setScale(Math.min(1, 330 / a.width));
-      const b = this.text(22, y + (rh > 60 ? 38 : 28), max ? u.desc(lvl) : lvl ? `${u.desc(lvl)} → ${u.desc(lvl + 1)}` : u.desc(lvl + 1), 14, PAL.fog);
+      const b = this.text(22, y + (rh > 70 ? 34 : 26), max ? u.desc(lvl) : lvl ? `${u.desc(lvl)} → ${u.desc(lvl + 1)}` : u.desc(lvl + 1), 14, PAL.fog);
       b.setScale(Math.min(1, 340 / b.width));
-      this.button(W - 160, y + 4, 140, rh - 16, max ? '✓' : t('{n} b.', { n: price }), u.stat ? 'amber' : 'green', !max && S.pts >= price, () => {
+      this.button(W - 160, y + 6, 140, rh - 20, max ? '✓' : t('{n} b.', { n: price }), u.stat ? 'amber' : 'green', !max && S.pts >= price, () => {
         S.pts -= price;
         S.up[u.id] = lvl + 1;
-        if (u.id === 'auto') S.auto = true;
         sfx.fanfare();
         this.drawBoard();
         this.host.dartsSave();
@@ -324,4 +265,3 @@ export class DartsScene extends Phaser.Scene {
   }
 }
 
-export { START };

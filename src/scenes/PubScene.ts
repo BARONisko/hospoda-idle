@@ -11,7 +11,7 @@ import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
 import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward } from '../core/league';
 import { isNight, phaseLeft, bonesFor, nightCfg, nightLen, nightShare, switchPhase, nightCost, nightCostN, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
 import type { TempleHost } from './TempleScene';
-import { newDarts, tickDarts, dartStats, DartsState, DART_UPS } from '../core/darts';
+import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts } from '../core/darts';
 import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
@@ -580,7 +580,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   dartsData(): DartsState {
-    return (this.d.darts ??= newDarts());
+    const s = (this.d.darts ??= newDarts());
+    migrateDarts(s);
+    return s;
   }
 
   dartsStats() {
@@ -604,6 +606,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private dartsTick(dt: number) {
     if (!this.d.darts || this.dartsOpen || (this.dartsT -= dt) > 0) return;
     this.dartsT = 1;
+    migrateDarts(this.d.darts);
     const s = this.ts();
     const r = tickDarts(this.d.darts, Date.now(), true, s.dacc, s.dspeed, s.dextra);
     if (r.pts) {

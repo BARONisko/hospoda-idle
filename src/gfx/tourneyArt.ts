@@ -175,7 +175,10 @@ function dartsBg(f: number): PixelCanvas {
 
 /** Terč (bez čísel – ta se píšou textem). R = 62 px. */
 export const BOARD_R = 62;
-function dartboard(): PixelCanvas {
+function dartboard(g?: { bull: number; outer: number; t0: number; t1: number; d0: number }): PixelCanvas {
+  // poloměry v px (výchozí jako v P.U.B.; šipky v Idle je zvětšují vylepšeními)
+  const bull = g ? g.bull * BOARD_R : 3.2, outer = g ? g.outer * BOARD_R : 7;
+  const t0 = g ? g.t0 * BOARD_R : 34, t1 = g ? g.t1 * BOARD_R : 39, d0 = g ? g.d0 * BOARD_R : BOARD_R - 6;
   const S = BOARD_R * 2 + 26;
   const p = new PixelCanvas(S, S);
   const cx = S / 2;
@@ -189,17 +192,22 @@ function dartboard(): PixelCanvas {
       if (d > BOARD_R) continue;
       const s = dartSegment(x + 0.5 - cx, y + 0.5 - cy) % 2;
       let c: PalKey = s ? 'bone' : 'ink';
-      if (d > BOARD_R - 6 || (d > 34 && d < 39)) c = s ? 'green' : 'red';
-      if (d < 7) c = 'green';
-      if (d < 3.2) c = 'red';
+      if (d > d0 || (d > t0 && d < t1)) c = s ? 'green' : 'red';
+      if (d < outer) c = 'green';
+      if (d < bull) c = 'red';
       p.set(x, y, c);
     }
   for (let k = 0; k < 20; k++) {
     const a = (k / 20) * Math.PI * 2 - Math.PI / 2 - Math.PI / 20;
-    for (let r = 7; r < BOARD_R; r++) if (r % 3) p.set(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 'fog');
+    for (let r = Math.ceil(outer); r < BOARD_R; r++) if (r % 3) p.set(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 'fog');
   }
-  for (const r of [7, 34, 39, BOARD_R - 6]) for (let a = 0; a < Math.PI * 2; a += 0.02) if (Math.floor(a * 40) % 3) p.set(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 'fog');
+  for (const r of [outer, t0, t1, d0]) for (let a = 0; a < Math.PI * 2; a += 0.02) if (Math.floor(a * 40) % 3) p.set(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 'fog');
   return p;
+}
+
+/** terč pro Idle šipky s poloměry podle vylepšení (zlomky BOARD_R) */
+export function makeDartboard(scene: Phaser.Scene, key: string, g: { bull: number; outer: number; t0: number; t1: number; d0: number }) {
+  addImage(scene, key, dartboard(g));
 }
 
 /** Index výseče (0 = 20 nahoře, po směru hodin). */
