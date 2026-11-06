@@ -651,5 +651,18 @@
  "Jo!": "よし！",
  "+3 kosti, +5 XP": "骨+3、経験値+5",
  "Šipky: hra {n} dohraná!": "ダーツ：ゲーム{n}クリア！",
- "+{n} b. na vylepšení · ťukni a utrať": "強化ポイント+{n} · タップして使う"
+ "+{n} b. na vylepšení · ťukni a utrať": "強化ポイント+{n} · タップして使う",
+ "Rychlost chůze": "歩く速さ",
+ "Podnos": "トレー",
+ "Úsměv": "笑顔",
+ "{n} nastoupil(a)!": "{n}が加わった！",
+ "{n} · úroveň {l}": "{n} · レベル{l}",
+ "roznese {r} piva/s · podnos {n} · spropitné +{m} %": "毎秒{r}杯運ぶ · トレー{n} · チップ +{m} %",
+ "1 pivo naráz": "一度に1杯",
+ "{n} piva naráz": "一度に{n}杯",
+ "cesta {s} s": "往復 {s} 秒",
+ "spropitné +{m} %": "チップ +{m} %",
+ "MAX": "最大",
+ "bar plný – číšníci nestíhají!": "カウンターが満杯 – ウェイターが追いつかない！",
+ "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a}と{b}が働き始めた – ビールをテーブルへ運ぶ"
 }

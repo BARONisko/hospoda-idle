@@ -651,5 +651,18 @@
  "Jo!": "Ja!",
  "+3 kosti, +5 XP": "+3 Knochen, +5 EP",
  "Šipky: hra {n} dohraná!": "Darts: Spiel {n} beendet!",
- "+{n} b. na vylepšení · ťukni a utrať": "+{n} Upgrade-Pkt. · tippen zum Ausgeben"
+ "+{n} b. na vylepšení · ťukni a utrať": "+{n} Upgrade-Pkt. · tippen zum Ausgeben",
+ "Rychlost chůze": "Gehtempo",
+ "Podnos": "Tablett",
+ "Úsměv": "Lächeln",
+ "{n} nastoupil(a)!": "{n} ist dabei!",
+ "{n} · úroveň {l}": "{n} · Stufe {l}",
+ "roznese {r} piva/s · podnos {n} · spropitné +{m} %": "bringt {r} Bier/s · Tablett {n} · Trinkgeld +{m} %",
+ "1 pivo naráz": "1 Bier auf einmal",
+ "{n} piva naráz": "{n} Bier auf einmal",
+ "cesta {s} s": "Weg {s} s",
+ "spropitné +{m} %": "Trinkgeld +{m} %",
+ "MAX": "MAX",
+ "bar plný – číšníci nestíhají!": "Theke voll – die Kellner kommen nicht hinterher!",
+ "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a} und {b} haben angefangen – sie bringen Bier an die Tische"
 }

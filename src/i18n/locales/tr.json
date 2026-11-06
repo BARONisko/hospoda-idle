@@ -651,5 +651,18 @@
  "Jo!": "Evet!",
  "+3 kosti, +5 XP": "+3 kemik, +5 XP",
  "Šipky: hra {n} dohraná!": "Dart: {n}. oyun bitti!",
- "+{n} b. na vylepšení · ťukni a utrať": "+{n} geliştirme puanı · harcamak için dokun"
+ "+{n} b. na vylepšení · ťukni a utrať": "+{n} geliştirme puanı · harcamak için dokun",
+ "Rychlost chůze": "Yürüme hızı",
+ "Podnos": "Tepsi",
+ "Úsměv": "Gülümseme",
+ "{n} nastoupil(a)!": "{n} katıldı!",
+ "{n} · úroveň {l}": "{n} · seviye {l}",
+ "roznese {r} piva/s · podnos {n} · spropitné +{m} %": "{r} bira/sn taşır · tepsi {n} · bahşiş +{m} %",
+ "1 pivo naráz": "tek seferde 1 bira",
+ "{n} piva naráz": "tek seferde {n} bira",
+ "cesta {s} s": "yol {s} sn",
+ "spropitné +{m} %": "bahşiş +{m} %",
+ "MAX": "MAKS",
+ "bar plný – číšníci nestíhají!": "bar dolu – garsonlar yetişemiyor!",
+ "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a} ve {b} başladı – birayı masalara taşıyorlar"
 }

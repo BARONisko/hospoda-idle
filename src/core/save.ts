@@ -21,6 +21,10 @@ export interface PubState {
   boostUntil?: number;
   /** schopnost znovu připravena od (ms) */
   boostReady?: number;
+  /** číšníci (vylepšení každého zvlášť) */
+  w?: import('./waiters').WaiterState[];
+  /** piva čekající na baru: počet a jejich hodnota v coins */
+  bar?: { n: number; v: number };
 }
 
 export interface Save {

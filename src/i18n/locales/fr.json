@@ -651,5 +651,18 @@
  "Jo!": "Ouais !",
  "+3 kosti, +5 XP": "+3 os, +5 XP",
  "Šipky: hra {n} dohraná!": "Fléchettes : partie {n} terminée !",
- "+{n} b. na vylepšení · ťukni a utrať": "+{n} pt d'amélioration · touche pour dépenser"
+ "+{n} b. na vylepšení · ťukni a utrať": "+{n} pt d'amélioration · touche pour dépenser",
+ "Rychlost chůze": "Vitesse de marche",
+ "Podnos": "Plateau",
+ "Úsměv": "Sourire",
+ "{n} nastoupil(a)!": "{n} a rejoint l'équipe !",
+ "{n} · úroveň {l}": "{n} · niveau {l}",
+ "roznese {r} piva/s · podnos {n} · spropitné +{m} %": "sert {r} bières/s · plateau {n} · pourboires +{m} %",
+ "1 pivo naráz": "1 bière à la fois",
+ "{n} piva naráz": "{n} bières à la fois",
+ "cesta {s} s": "trajet {s} s",
+ "spropitné +{m} %": "pourboires +{m} %",
+ "MAX": "MAX",
+ "bar plný – číšníci nestíhají!": "comptoir plein – les serveurs ne suivent pas !",
+ "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a} et {b} ont commencé – ils apportent la bière aux tables"
 }

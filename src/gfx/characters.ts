@@ -597,6 +597,22 @@ export const LOOKS: Record<string, Look> = {
     shirt: 'white', shirtShade: 'bone', pants: 'ink', pantsShade: 'ink', shoes: 'ink',
     vest: 'ink', beard: 'none', hat: null,
   },
+  // číšníci roznášející pivo (Franta = waiter, Jarka, Bořek, Vilma)
+  waiterB: {
+    skin: 'skin', skinShade: 'ochre', hair: 'rust', hairShade: 'blood',
+    shirt: 'white', shirtShade: 'bone', pants: 'blood', pantsShade: 'ink', shoes: 'ink',
+    vest: 'scarlet', longHair: true, lips: true, beard: 'none', hat: null,
+  },
+  waiterC: {
+    skin: 'tan', skinShade: 'mauve', hair: 'olive', hairShade: 'ink',
+    shirt: 'sage', shirtShade: 'pine', pants: 'dusk', pantsShade: 'ink', shoes: 'ink',
+    apron: true, beard: 'full', hat: null,
+  },
+  waiterD: {
+    skin: 'skin', skinShade: 'tan', hair: 'sand', hairShade: 'ochre',
+    shirt: 'sky', shirtShade: 'blue', pants: 'ink', pantsShade: 'ink', shoes: 'ink',
+    apron: true, longHair: true, beard: 'none', hat: 'cap', hatColor: 'scarlet', hatShade: 'red',
+  },
   cleaner: {
     skin: 'skin', skinShade: 'ochre', hair: 'fog', hairShade: 'slate',
     shirt: 'sky', shirtShade: 'blue', pants: 'sky', pantsShade: 'blue', shoes: 'bone',

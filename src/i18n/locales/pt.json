@@ -651,5 +651,18 @@
  "Jo!": "Isso!",
  "+3 kosti, +5 XP": "+3 ossos, +5 XP",
  "Šipky: hra {n} dohraná!": "Dardos: partida {n} concluída!",
- "+{n} b. na vylepšení · ťukni a utrať": "+{n} pt de melhoria · toque para gastar"
+ "+{n} b. na vylepšení · ťukni a utrať": "+{n} pt de melhoria · toque para gastar",
+ "Rychlost chůze": "Velocidade",
+ "Podnos": "Bandeja",
+ "Úsměv": "Sorriso",
+ "{n} nastoupil(a)!": "{n} entrou!",
+ "{n} · úroveň {l}": "{n} · nível {l}",
+ "roznese {r} piva/s · podnos {n} · spropitné +{m} %": "leva {r} cervejas/s · bandeja {n} · gorjetas +{m} %",
+ "1 pivo naráz": "1 cerveja por vez",
+ "{n} piva naráz": "{n} cervejas por vez",
+ "cesta {s} s": "viagem {s} s",
+ "spropitné +{m} %": "gorjetas +{m} %",
+ "MAX": "MÁX",
+ "bar plný – číšníci nestíhají!": "balcão cheio – os garçons não dão conta!",
+ "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a} e {b} começaram – levam cerveja às mesas"
 }

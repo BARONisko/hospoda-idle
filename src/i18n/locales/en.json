@@ -651,5 +651,18 @@
  "Jo!": "Yes!",
  "+3 kosti, +5 XP": "+3 bones, +5 XP",
  "Šipky: hra {n} dohraná!": "Darts: game {n} finished!",
- "+{n} b. na vylepšení · ťukni a utrať": "+{n} upgrade pt · tap to spend"
+ "+{n} b. na vylepšení · ťukni a utrať": "+{n} upgrade pt · tap to spend",
+ "Rychlost chůze": "Walking speed",
+ "Podnos": "Tray",
+ "Úsměv": "Smile",
+ "{n} nastoupil(a)!": "{n} joined!",
+ "{n} · úroveň {l}": "{n} · level {l}",
+ "roznese {r} piva/s · podnos {n} · spropitné +{m} %": "carries {r} beers/s · tray {n} · tips +{m} %",
+ "1 pivo naráz": "1 beer at once",
+ "{n} piva naráz": "{n} beers at once",
+ "cesta {s} s": "trip {s} s",
+ "spropitné +{m} %": "tips +{m} %",
+ "MAX": "MAX",
+ "bar plný – číšníci nestíhají!": "bar full – waiters can't keep up!",
+ "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a} and {b} started – they carry beer to the tables"
 }

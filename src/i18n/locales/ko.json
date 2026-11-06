@@ -651,5 +651,18 @@
  "Jo!": "좋아!",
  "+3 kosti, +5 XP": "뼈 +3, 경험치 +5",
  "Šipky: hra {n} dohraná!": "다트: {n}번째 게임 완료!",
- "+{n} b. na vylepšení · ťukni a utrať": "강화 포인트 +{n} · 탭해서 사용"
+ "+{n} b. na vylepšení · ťukni a utrať": "강화 포인트 +{n} · 탭해서 사용",
+ "Rychlost chůze": "걷는 속도",
+ "Podnos": "쟁반",
+ "Úsměv": "미소",
+ "{n} nastoupil(a)!": "{n} 합류!",
+ "{n} · úroveň {l}": "{n} · 레벨 {l}",
+ "roznese {r} piva/s · podnos {n} · spropitné +{m} %": "초당 {r}잔 운반 · 쟁반 {n} · 팁 +{m} %",
+ "1 pivo naráz": "한 번에 1잔",
+ "{n} piva naráz": "한 번에 {n}잔",
+ "cesta {s} s": "왕복 {s}초",
+ "spropitné +{m} %": "팁 +{m} %",
+ "MAX": "최대",
+ "bar plný – číšníci nestíhají!": "바가 가득 – 웨이터가 따라가지 못해요!",
+ "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a}와 {b} 근무 시작 – 테이블로 맥주를 나릅니다"
 }

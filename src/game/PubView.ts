@@ -7,6 +7,7 @@ import { big } from '../core/num';
 import type { PubState } from '../core/save';
 import { season, SEASONS } from '../core/season';
 import { registerBubble } from './bubbleArt';
+import { WAITERS } from '../core/waiters';
 
 // Jedna živá hospoda: pozadí podle dějství, vybavení, hostinský, kostlivci u stanic, hosté chodí, sedí a odcházejí.
 // Každá hospoda leží ve světě scény na vlastním místě (ox) a má vlastní kameru.
@@ -56,6 +57,8 @@ interface Guest {
   /** kdy (sat) si objednal naposledy / kdy si objedná znovu */
   orderAt?: number;
   next?: number;
+  /** číšník už k němu nese pivo */
+  served?: boolean;
 }
 
 /** přes den má každá hospoda své hosty, v noci chodí do všech kostlivci */
@@ -73,6 +76,15 @@ const LEVEL_DECOR: { id: string; lvl: number; frame: string; x: number; y: numbe
   { id: 'dice', lvl: 25, frame: 'trophy', x: 15 * T + 8, y: 2 * T + 14 },
   { id: 'dice', lvl: 100, frame: 'jukebox0', x: 10 * T + 8, y: 13 * T + 8 }, // u spodní zdi (dřív stál ve dveřích)
 ];
+
+/** kde číšníci čekají před barem a kudy chodí mezi stoly */
+const WAIT_HOME = [
+  { x: 4.5 * T, y: 6 * T + 2 },
+  { x: 5.6 * T, y: 6 * T + 4 },
+  { x: 8.9 * T, y: 6 * T + 2 },
+  { x: 10 * T, y: 6 * T + 4 },
+];
+const CORRIDORS = [7 * T, 12 * T];
 
 /** postava manažera podle hospody */
 const MGR_SPRITE: Record<number, string> = { 1: 'tapster', 2: 'count', 3: 'deep0', 4: 'yellowKing' };
@@ -94,6 +106,10 @@ export class PubView {
   private pourT = 0;
   private staff: Record<string, Phaser.GameObjects.Sprite> = {};
   private props: Record<string, Phaser.GameObjects.Image[]> = {};
+  /** číšníci (postavy) a piva čekající na baru */
+  private waiters: Phaser.GameObjects.Sprite[] = [];
+  private barMugs: Phaser.GameObjects.Image[] = [];
+  private barText?: Phaser.GameObjects.Text;
   private rnd: Phaser.Math.RandomDataGenerator;
 
   constructor(
@@ -340,6 +356,15 @@ export class PubView {
         this.s.tweens.add({ targets: o, scale: { from: 1.6, to: 1 }, duration: 400, ease: 'Back.out' });
       }
     }
+    const nw = this.pub.w?.length ?? 0;
+    for (let i = this.waiters.length; i < Math.min(nw, WAITERS.length); i++) {
+      const h = WAIT_HOME[i];
+      const spr = this.s.add.sprite(this.ox + h.x, h.y, WAITERS[i].key, 0).setOrigin(0.5, 1).setDepth(h.y + 1);
+      this.objs.push(spr);
+      this.waiters.push(spr);
+      this.s.events.emit('pubObj', spr);
+      this.s.tweens.add({ targets: spr, scale: { from: 1.6, to: 1 }, duration: 400, ease: 'Back.out' });
+    }
     for (const [id, list] of Object.entries(this.props)) list.forEach((o) => o.setVisible((st[id]?.lvl ?? 0) > 0));
     for (const id of ['kitchen', 'cellar', 'dice']) {
       const on = id === 'dice' ? (st[id]?.lvl ?? 0) > 0 : !!st[id]?.auto;
@@ -355,9 +380,10 @@ export class PubView {
   }
 
   /** výdělek stanice → animace a „+coins“ */
-  payout(id: string, amount: number, bones = false) {
+  payout(id: string, amount: number, bones = false, toBar = false) {
     const p = SPOT[id];
     if (id === 'tap') this.pourT = 0.5;
+    if (toBar) return; // pivo jde na bar, coins až po doručení číšníkem
     const sk = this.staff[id];
     if (sk && !sk.getData('busy')) {
       // občas (ne každý cyklus) obsluha opravdu něco donese
@@ -454,6 +480,113 @@ export class PubView {
     if (g) this.pop(g.spr.x - this.ox, g.spr.y - 26, text, PAL.mint);
   }
 
+  /** nosí pivo číšníci? (přes den, když hospoda nějaké má) */
+  waiting() {
+    return !this.night && (this.pub.w?.length ?? 0) > 0;
+  }
+
+  /** piva čekající na baru: hrnky na pultu a počet (červeně, když je bar plný) */
+  setBar(n: number, cap: number) {
+    const show = this.waiting() || n > 0 ? Math.min(6, n) : 0;
+    while (this.barMugs.length < show) {
+      const i = this.barMugs.length;
+      const m = this.s.add.image(this.ox + 7.15 * T + (i % 3) * 7, 4 * T + 13 - Math.floor(i / 3) * 4, 'obj', 'mug').setOrigin(0.5, 1).setDepth(5 * T + 7 + i);
+      this.objs.push(m);
+      this.barMugs.push(m);
+      this.s.events.emit('pubObj', m);
+    }
+    while (this.barMugs.length > show) this.barMugs.pop()!.destroy();
+    if (!this.barText) {
+      this.barText = this.s.add.text(this.ox + 7.8 * T, 3 * T + 2, '', txt(9, PAL.gold)).setOrigin(0.5).setDepth(5000).setResolution(3);
+      this.objs.push(this.barText);
+      this.s.events.emit('pubObj', this.barText);
+    }
+    this.barText.setVisible(this.waiting() || n > 0).setText(`${n}/${cap}`).setColor(n >= cap ? PAL.scarlet : PAL.gold);
+  }
+
+  /** číšník i nese n piv ke stolu: tam za dur/2 s, pak zpátky; vrací hosta, kterému pivo nese (kvůli „+coins“) */
+  waiterTrip(i: number, n: number, dur: number) {
+    const spr = this.waiters[i];
+    if (!spr?.active) return;
+    const home = WAIT_HOME[i];
+    const seated = this.guests.filter((q) => q.seat && !q.leaving && !q.path.length);
+    const g = this.rnd.pick(seated.filter((q) => !q.mug && !q.served).length ? seated.filter((q) => !q.mug && !q.served) : seated.length ? seated : [undefined as unknown as Guest]);
+    const seat = g?.seat ?? this.rnd.pick(this.seats);
+    if (g) g.served = true;
+    const cx = CORRIDORS.reduce((a, b) => (Math.abs(b - seat.x) < Math.abs(a - seat.x) ? b : a));
+    const there = [{ x: cx, y: home.y }, { x: cx, y: seat.aisle }, { x: seat.x, y: seat.aisle }];
+    const back = [{ x: cx, y: seat.aisle }, { x: cx, y: home.y }, { x: home.x, y: home.y }];
+    const len = (pts: { x: number; y: number }[]) => {
+      let l = 0, px = home.x, py = home.y;
+      for (const p of pts) (l += Math.abs(p.x - px) + Math.abs(p.y - py)), (px = p.x), (py = p.y);
+      return l;
+    };
+    const walk = Math.max(0.3, dur / 2 - 0.25);
+    const speed = Math.max(len(there), 1) / walk;
+    this.s.tweens.killTweensOf(spr);
+    spr.setPosition(this.ox + home.x, home.y);
+    // podnos s pivy nad hlavou
+    const tray = this.s.add.rectangle(spr.x, spr.y - 17, 16, 2, 0xc8c8d0).setStrokeStyle(1, 0x1a1a24);
+    const mugs = Array.from({ length: Math.min(n, 4) }, () => this.s.add.image(spr.x, spr.y, 'obj', 'mug').setOrigin(0.5, 1).setScale(0.8));
+    const carry = [tray, ...mugs];
+    carry.forEach((o) => (this.objs.push(o), this.s.events.emit('pubObj', o)));
+    const follow = () => {
+      if (!spr.active || !tray.active) return void this.s.events.off('update', follow);
+      tray.setPosition(spr.x, spr.y - 17).setDepth(spr.y + 3);
+      mugs.forEach((m, k) => m.active && m.setPosition(spr.x - (mugs.length - 1) * 3 + k * 6, spr.y - 18).setDepth(spr.y + 4 + k));
+    };
+    this.s.events.on('update', follow);
+    this.walkPath(spr, there, speed, () => {
+      spr.setFrame(13);
+      // pivo na stůl
+      if (g && g.seat && !g.leaving) {
+        if (g.mug) g.mug.setFrame('mug');
+        else {
+          g.mug = this.s.add.image(g.spr.x + (g.seat.flip ? -13 : 13), g.spr.y - 6, 'obj', 'mug').setOrigin(0.5, 1).setDepth(g.spr.y + 4);
+          this.objs.push(g.mug);
+          this.s.events.emit('pubObj', g.mug);
+        }
+        this.s.tweens.add({ targets: g.mug, scale: { from: 1.5, to: 1 }, duration: 200, ease: 'Back.out' });
+      }
+      if (g) g.served = false;
+      mugs.forEach((m) => m.destroy());
+      this.s.time.delayedCall(250, () => {
+        tray.destroy();
+        this.s.events.off('update', follow);
+        this.walkPath(spr, back, speed, () => spr.setFlipX(false).setFrame(0).setDepth(home.y + 1));
+      });
+    });
+  }
+
+  /** „+coins“ nad číšníkem (doručené pivo) */
+  waiterPop(i: number, text: string, color: string) {
+    const spr = this.waiters[i];
+    if (spr?.active) this.pop(spr.x - this.ox, spr.y - 30, text, color);
+  }
+
+  /** postava jde po bodech stálou rychlostí (px/s) */
+  private walkPath(spr: Phaser.GameObjects.Sprite, pts: { x: number; y: number }[], speed: number, done: () => void): void {
+    const p = pts.shift();
+    if (!p || !spr.active) return done();
+    const tx = this.ox + p.x, dx = tx - spr.x, dy = p.y - spr.y;
+    const dist = Math.abs(dx) + Math.abs(dy);
+    if (dist < 0.5) return this.walkPath(spr, pts, speed, done);
+    let f = 0;
+    this.s.tweens.add({
+      targets: spr,
+      x: tx,
+      y: p.y,
+      duration: (dist / speed) * 1000,
+      onUpdate: () => {
+        const a = Math.floor(f++ / 5) % 4;
+        if (Math.abs(dx) > Math.abs(dy)) spr.setFrame(8 + a).setFlipX(dx < 0);
+        else spr.setFrame((dy < 0 ? 4 : 0) + a).setFlipX(false);
+        spr.setDepth(spr.y + 1);
+      },
+      onComplete: () => this.walkPath(spr, pts, speed, done),
+    });
+  }
+
   update(dt: number, busy: number) {
     // hosté: čím víc otevřených stanic, tím víc lidí
     this.spawnT -= dt;
@@ -532,7 +665,8 @@ export class PubView {
         }
         // bublina vydrží 6 s, pak se obslouží sama (ťuknutím hned)
         if (g.order && g.sat - (g.orderAt ?? 0) > 6) this.serve(g);
-        if (!g.mug && !g.order && g.sat > 0.5) {
+        // pivo nosí číšníci (přes den, když nějaké má); jídlo a noc jako dřív
+        if (!g.mug && !g.order && g.sat > 0.5 && (food || !this.waiting())) {
           g.mug = this.s.add.image(sp.x + (g.seat.flip ? -13 : 13), sp.y - 6, 'obj', food ? FOOD[this.pub.act] : g.sitT > 6 ? 'mug' : 'mugDark').setOrigin(0.5, 1).setDepth(sp.y + 4);
           this.objs.push(g.mug);
           this.s.events.emit('pubObj', g.mug);
