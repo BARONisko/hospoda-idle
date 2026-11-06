@@ -401,5 +401,7 @@
  "odemkne se od úrovně {n} Delší noci": "更长的夜晚 {n} 级解锁",
  "Přepnout na den": "切换到白天",
  "Přepnout na noc": "切换到夜晚",
- "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "夜里收集骨头:站点和点击客人。\n可在骨堂和护身符上花掉。"
+ "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "夜里收集骨头:站点和点击客人。\n可在骨堂和护身符上花掉。",
+ "noc trvá {a} · +1 s za úroveň": "夜晚 {a} · 每级 +1 秒",
+ "odemkne se, až noc potrvá {m}": "夜晚达到 {m} 时解锁"
 }

@@ -401,5 +401,7 @@
  "odemkne se od úrovně {n} Delší noci": "Daha uzun gece seviye {n} ile açılır",
  "Přepnout na den": "Gündüze geç",
  "Přepnout na noc": "Geceye geç",
- "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "Kemikleri gece toplarsın: istasyonlar ve misafirlere dokunma.\nKemikhane'de ve tılsımlara harcarsın."
+ "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "Kemikleri gece toplarsın: istasyonlar ve misafirlere dokunma.\nKemikhane'de ve tılsımlara harcarsın.",
+ "noc trvá {a} · +1 s za úroveň": "gece {a} sürer · seviye başına +1 sn",
+ "odemkne se, až noc potrvá {m}": "gece {m} olunca açılır"
 }

@@ -401,5 +401,7 @@
  "odemkne se od úrovně {n} Delší noci": "desbloqueia no nível {n} de Noite mais longa",
  "Přepnout na den": "Mudar para dia",
  "Přepnout na noc": "Mudar para noite",
- "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "Você coleta ossos à noite: estações e toques nos clientes.\nGaste-os no Ossário e em talismãs."
+ "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "Você coleta ossos à noite: estações e toques nos clientes.\nGaste-os no Ossário e em talismãs.",
+ "noc trvá {a} · +1 s za úroveň": "a noite dura {a} · +1 s por nível",
+ "odemkne se, až noc potrvá {m}": "libera quando a noite durar {m}"
 }

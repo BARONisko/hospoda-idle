@@ -401,5 +401,7 @@
  "odemkne se od úrovně {n} Delší noci": "ab Stufe {n} von Längere Nacht",
  "Přepnout na den": "Zum Tag wechseln",
  "Přepnout na noc": "Zur Nacht wechseln",
- "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "Knochen sammelst du nachts: Stationen und Tippen auf Gäste.\nAusgeben kannst du sie im Beinhaus und für Talismane."
+ "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "Knochen sammelst du nachts: Stationen und Tippen auf Gäste.\nAusgeben kannst du sie im Beinhaus und für Talismane.",
+ "noc trvá {a} · +1 s za úroveň": "Nacht dauert {a} · +1 s pro Stufe",
+ "odemkne se, až noc potrvá {m}": "ab {m} Nachtlänge freigeschaltet"
 }

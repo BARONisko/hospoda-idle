@@ -9,7 +9,7 @@ import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
 import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
 import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward } from '../core/league';
-import { isNight, phaseLeft, bonesFor, nightCfg, nightLen, nightShare, switchPhase, nightCost, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
+import { isNight, phaseLeft, bonesFor, nightCfg, nightLen, nightShare, switchPhase, nightCost, nightCostN, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
 import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave } from '../core/save';
@@ -209,6 +209,11 @@ export class PubScene extends Phaser.Scene {
     this.layout();
     this.daily();
     this.time.delayedCall(700, () => this.leagueCheck());
+    // „Delší noc“ byla po 30 s, teď po 1 s → úrovně ×30
+    if (this.d.dn && !this.d.dn.v2) {
+      this.d.dn.lvl *= 30;
+      this.d.dn.v2 = true;
+    }
     // kosti jsou teď malá čísla (ceny i zisky ÷ 100) – staré zásoby přepočítat jednou
     if (!this.d.bones2) {
       this.d.bones = (this.d.bones ?? 0) / 100;
@@ -604,6 +609,7 @@ export class PubScene extends Phaser.Scene {
   /** živé překreslení čísel v záložce Liga (nastaví leagueTab) */
   leagueLive?: () => void;
   leagueLiveT = 0;
+  dnT = 1;
   leagueResult?: { win: boolean; me: number; rival: number; tier: number };
   leagueWinDrop = false;
 
@@ -1649,7 +1655,7 @@ export class PubScene extends Phaser.Scene {
   }
 
   private dayNightTab(y0: number, D: number) {
-    const dn = (this.d.dn ??= { lvl: 0 });
+    const dn = (this.d.dn ??= { lvl: 0, v2: true });
     const bones = this.d.bones ?? 0;
     const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
     const refresh = () => {
@@ -1659,26 +1665,32 @@ export class PubScene extends Phaser.Scene {
     };
     const left = Math.ceil(phaseLeft() / 1000);
     const mins = (ms: number) => Math.round(ms / 6000) / 10;
+    const mmss = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.floor((ms % 60000) / 1000)).padStart(2, '0')}`;
     add(this.add.text(W / 2, y0, (this.night ? t('Je noc – příšery platí kostmi') : t('Je den – lidé platí coins')) + '\n' + t('{p} za {m}:{s}', { p: this.night ? t('Den') : t('Noc'), m: Math.floor(left / 60), s: String(left % 60).padStart(2, '0') }), txt(22, this.night ? PAL.ice : PAL.gold)).setOrigin(0.5, 0).setAlign('center').setDepth(D + 2));
     add(this.add.text(W / 2, y0 + 62, t('máš {n} kostí', { n: big(bones) }), txt(20, PAL.bone)).setOrigin(0.5, 0).setDepth(D + 2));
     const RH = 104;
     // 1) delší noc
     let y = y0 + 100;
-    const max = dn.lvl >= NIGHT_MAX_LVL, c1 = nightCost(dn.lvl);
-    this.row(y, RH, D, t('Delší noc'), max ? t('noc trvá {a} min (maximum)', { a: mins(nightLen()) }) : t('noc trvá {a} min → {b} min', { a: mins(nightLen()), b: mins(nightLen(dn.lvl + 1)) }));
-    const b1 = this.btn(W - 212, y + 16, 190, 62, () => {
-      if (max || (this.d.bones ?? 0) < c1) return sfx.error();
-      this.d.bones! -= c1;
-      dn.lvl++;
-      sfx.buy();
-      refresh();
-    }, D + 2);
-    this.drawBtn(b1, max ? '✓' : t('{n} kostí', { n: big(c1) }), !max && bones >= c1, 'blue');
-    this.shopObjs.push(b1.bg, b1.label, b1.zone);
+    const max = dn.lvl >= NIGHT_MAX_LVL;
+    this.row(y, RH, D, t('Delší noc'), max ? t('noc trvá {a} min (maximum)', { a: mins(nightLen()) }) : t('noc trvá {a} · +1 s za úroveň', { a: mmss(nightLen()) }));
+    // dvě tlačítka: +1 s a +10 s
+    ([1, 10] as const).forEach((n, i) => {
+      const k = Math.min(n, NIGHT_MAX_LVL - dn.lvl), c = nightCostN(dn.lvl, Math.max(1, k));
+      const bt = this.btn(W - 232 + i * 112, y + 16, 102, 62, () => {
+        if (k < 1 || (this.d.bones ?? 0) < c) return sfx.error();
+        this.d.bones! -= c;
+        dn.lvl += k;
+        sfx.buy();
+        refresh();
+      }, D + 2);
+      this.drawBtn(bt, max ? '✓' : `+${k} s\n${t('{n} kostí', { n: big(c) })}`, k > 0 && bones >= c, 'blue');
+      bt.label.setScale(Math.min(1, 94 / bt.label.width));
+      this.shopObjs.push(bt.bg, bt.label, bt.zone);
+    });
     // 2) přepínač dne a noci
     y += RH;
     const can = dn.lvl >= SWITCH_LVL;
-    this.row(y, RH, D, t('Přepínač dne a noci'), dn.sw ? t('přepneš, kdy se ti hodí') : can ? t('ruční přepínání dne a noci') : t('odemkne se od úrovně {n} Delší noci', { n: SWITCH_LVL }));
+    this.row(y, RH, D, t('Přepínač dne a noci'), dn.sw ? t('přepneš, kdy se ti hodí') : can ? t('ruční přepínání dne a noci') : t('odemkne se, až noc potrvá {m}', { m: mmss(60_000 + SWITCH_LVL * 1000) }));
     const b2 = this.btn(W - 212, y + 16, 190, 62, () => {
       if (!dn.sw) {
         if (!can || (this.d.bones ?? 0) < SWITCH_COST) return sfx.error();
@@ -1924,6 +1936,10 @@ export class PubScene extends Phaser.Scene {
       // noční várka platí jen do rána
       if (!nn && this.d.fx?.nightx2) delete this.d.fx.nightx2;
       this.banner(this.views[0].cam, nn ? t('Padla noc – příšery platí kostmi!') : t('Svítá – lidé zase platí coins.'), true);
+    }
+    if (this.tab === 'daynight' && this.shopObjs.length && (this.dnT -= dt) <= 0) {
+      this.dnT = 1;
+      this.openShop('daynight', false);
     }
     if (this.leagueLive && (this.leagueLiveT -= dt) <= 0) {
       this.leagueLiveT = 0.5;

@@ -401,5 +401,7 @@
  "odemkne se od úrovně {n} Delší noci": "unlocks at Longer night level {n}",
  "Přepnout na den": "Switch to day",
  "Přepnout na noc": "Switch to night",
- "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "You collect bones at night: stations and tapping guests.\nSpend them in the Ossuary and on talismans."
+ "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "You collect bones at night: stations and tapping guests.\nSpend them in the Ossuary and on talismans.",
+ "noc trvá {a} · +1 s za úroveň": "night lasts {a} · +1 s per level",
+ "odemkne se, až noc potrvá {m}": "unlocks when the night lasts {m}"
 }

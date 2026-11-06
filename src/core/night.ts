@@ -1,10 +1,10 @@
 // Den a noc: přes den platí lidé coins, v noci příšery kostmi. Kosti mají vlastní vylepšení (zůstávají i po hygieně).
 
 export const DAY_MS = 8 * 60_000;
-/** noc je na začátku krátká (1 min) a vylepšením „Delší noc“ se prodlužuje o 30 s za úroveň */
+/** noc je na začátku krátká (1 min) a vylepšením „Delší noc“ se prodlužuje o 1 s za úroveň */
 export const NIGHT_BASE = 60_000;
-export const NIGHT_STEP = 30_000;
-export const NIGHT_MAX_LVL = 14; // až 8 min
+export const NIGHT_STEP = 1_000;
+export const NIGHT_MAX_LVL = 420; // až 8 min
 /** Kosti jsou malá čísla nezávislá na coins: výplata stanice v noci dá BONE_PER × log10(1 + výplata) kostí
  *  (začátek ~10 kostí za noc, pozdní hra desítky), ťuknutí na hosta v noci 1 kost. */
 export const BONE_PER = 0.02;
@@ -42,7 +42,9 @@ export function switchPhase(toNight: boolean, now = Date.now()) {
 }
 
 /** cena úrovně „Delší noc“ v kostech */
-export const nightCost = (lvl: number) => Math.ceil(2 * 1.55 ** lvl);
+export const nightCost = (lvl: number) => Math.max(1, Math.round(1.012 ** lvl));
+/** cena n úrovní najednou */
+export const nightCostN = (lvl: number, n: number) => Array.from({ length: n }, (_, i) => nightCost(lvl + i)).reduce((a, b) => a + b, 0);
 /** přepínač dne a noci: odemkne se od této úrovně „Delší noc“ a stojí tolik kostí */
-export const SWITCH_LVL = 3;
+export const SWITCH_LVL = 60; // noc aspoň 2 min
 export const SWITCH_COST = 30;

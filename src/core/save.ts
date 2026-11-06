@@ -48,7 +48,7 @@ export interface Save {
   bones?: number;
   bup?: Record<string, number>;
   /** den a noc: úroveň „Delší noc“, odemčený přepínač, posun cyklu (ms) */
-  dn?: { lvl: number; sw?: boolean; shift?: number };
+  dn?: { lvl: number; sw?: boolean; shift?: number; v2?: boolean };
   /** pivní akce: happy hour do (ms), noční várka (×2 kosti příští/tuto noc) */
   fx?: { happy?: number; nightx2?: boolean };
   /** kosti přepočtené na malá čísla (staré uložení ÷ 100) */
