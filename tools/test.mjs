@@ -132,12 +132,12 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('bez chyb v konzoli (noc)', p.errors.length === 0);
   await p.close();
 }
-// 8) 4 hospody: posuvné pruhy
+// 8) 3 hospody: záložky – přepnutí na 3. hospodu ukáže její výhled a karty
 {
-  const p = await page('?pubs=4');
-  await S(p, (s) => s.setScroll(9999));
-  ok('4 hospody: posun na konec', await S(p, (s) => s.scroll === s.scrollMax && s.scrollMax > 0 && !s.views[0].cam.visible && s.views[3].cam.visible));
-  ok('bez chyb v konzoli (4 hospody)', p.errors.length === 0);
+  const p = await page('?pubs=3');
+  await S(p, (s) => s.selectPub(2));
+  ok('3 hospody: záložka přepne hospodu', await S(p, (s) => s.sel === 2 && !s.views[0].cam.visible && s.views[2].cam.visible && s.cards.every((c) => c.pub === 2)));
+  ok('bez chyb v konzoli (3 hospody)', p.errors.length === 0);
   await p.close();
 }
 await b.close();

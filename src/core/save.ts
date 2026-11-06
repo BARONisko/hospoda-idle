@@ -92,7 +92,7 @@ const KEY = 'pubidle_save_v1';
 
 export type Act = 1 | 2 | 3 | 4;
 /** nejvíc hospod (po 3. hygieně přibude chrám Cthulhu) */
-export const MAX_PUBS = 4;
+export const MAX_PUBS = 3;
 
 export const newPub = (act: Act): PubState => ({ act, st: { tap: { lvl: act === 1 ? 1 : 0, auto: false, prog: 0 } } });
 

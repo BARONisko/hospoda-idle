@@ -38,6 +38,9 @@ interface Offer {
 /** nastavení zvuku (zvlášť od uložené hry) */
 /** výška ovládací lišty pod hospodou v režimu více hospod */
 const SBAR = 46;
+/** výhled hospody (1 hospoda) a výška záložek hospod (2–3 hospody) */
+const VIEW_H = 404;
+const TABH = 56;
 const OPTS_KEY = 'pubidle_opts';
 
 /** Stáhne soubor se zálohou hry */
@@ -177,6 +180,7 @@ export class PubScene extends Phaser.Scene {
     this.views = [];
     this.cards = [];
     this.stripRates = [];
+    this.pubTabs = [];
     this.skillBtns = [];
     this.strips = [];
     this.scroll = 0;
@@ -1306,7 +1310,8 @@ export class PubScene extends Phaser.Scene {
   private drawSkill(i: number) {
     const p = this.d.pubs[i];
     const b = this.skillBtns[i];
-    if (!p.mgr) return this.drawBtn(b, '', false, 'amber', false);
+    if (!b) return;
+    if (!p.mgr || (this.views.length > 1 && i !== this.sel)) return this.drawBtn(b, '', false, 'amber', false);
     const now = Date.now();
     const mmss = (ms: number) => {
       const s = Math.ceil(ms / 1000);
@@ -1555,7 +1560,7 @@ export class PubScene extends Phaser.Scene {
   private layout() {
     const n = this.views.length;
     if (n === 1) {
-      const viewH = 404;
+      const viewH = VIEW_H;
       this.views[0].frame(0, TOP, W, viewH, 118);
       // schopnost manažera nahoře u zdi (tam nesedí hosté) – dole by zakrývala bubliny s objednávkami
       this.skillBtns[0] = this.btn(14, TOP + 12, 180, 44, () => this.useSkill(0), 60);
@@ -1565,44 +1570,51 @@ export class PubScene extends Phaser.Scene {
       this.addCards(0, TOP + viewH + 10);
       return;
     }
-    // 2–3 hospody: pruhy přes celou výšku; 4 hospody: pruhy 380 px, posouvají se prstem
-    this.scrollMax = n === 4 ? n * STRIP - (H - TOP) : 0;
-    const h = n === 4 ? STRIP : Math.floor((H - TOP) / n);
+    // 2–3 hospody (návrh A): záložky hospod nahoře, vybraná hospoda velká, pod ní její stanice; přepnutí i tažením do strany
+    const tw = (W - 16) / n;
     this.views.forEach((v, i) => {
-      const y = TOP + i * h;
-      const small = h < 260;
-      const items: Phaser.GameObjects.Components.Transform[] = [];
-      const g = this.add.graphics().setDepth(50);
-      g.fillStyle(col('gold')).fillRect(0, y + h - 4, W, 4);
-      // ovládací lišta pod hospodou (mimo místnost, ať tlačítka nezakrývají hosty a bubliny)
-      g.fillStyle(col('dusk')).fillRect(0, y + h - 4 - SBAR, W, SBAR);
-      const nm = this.add.text(14, y + 10, PUB_NAMES[v.pub.act], txt(small ? 20 : 24, PAL.gold)).setDepth(51);
-      nm.setScale(Math.min(1, (W - 190) / nm.width));
-      g.fillStyle(col('ink'), 0.8).fillRoundedRect(6, y + 6, nm.displayWidth + 18, small ? 30 : 36, 8);
-      const rt = this.add.text(small ? 14 : W - 18, small ? y + 40 : y + 12, '', txt(small ? 18 : 22, PAL.mint)).setOrigin(small ? 0 : 1, 0).setDepth(51);
+      const tb = this.btn(8 + i * tw, TOP + 4, tw - 6, 48, () => this.selectPub(i), 60);
+      const rt = this.add.text(tb.x + tb.w / 2, tb.y + 34, '', txt(14, PAL.mint)).setOrigin(0.5).setDepth(62);
       this.stripRates.push(rt);
-      if (!small) g.fillStyle(col('ink'), 0.8).fillRoundedRect(W - 150, y + 8, 142, 36, 8);
-      const b = this.btn(W - 170, y + h - SBAR, 156, SBAR - 8, () => this.openSheet(i), 60);
-      this.drawBtn(b, t('▲ Stanice'), true, 'green');
-      this.skillBtns[i] = this.btn(14, y + h - SBAR, 180, SBAR - 8, () => this.useSkill(i), 60);
-      items.push(g, nm, rt);
-      this.strips.push({ v, y, h, items, btns: [b, this.skillBtns[i]] });
+      this.pubTabs.push(tb);
+      this.skillBtns[i] = this.btn(14, TOP + TABH + 10, 180, 44, () => this.useSkill(i), 60);
     });
-    if (this.scrollMax) {
-      this.scrollBar = this.add.graphics().setDepth(55);
-      this.hint = this.add.text(W / 2, H - 30, t('▼ táhni pro další hospody'), txt(18, PAL.bone)).setOrigin(0.5).setDepth(56).setStroke(PAL.ink, 6);
-      this.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
-        this.drag = { y: p.y, s: this.scroll, on: false };
-      });
-      this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
-        if (!p.isDown || !this.drag || this.sheet >= 0 || this.shopObjs.length || this.awayObjs.length) return;
-        if (!this.drag.on && Math.abs(p.y - this.drag.y) < 12) return;
-        this.drag.on = true;
-        this.setScroll(this.drag.s - (p.y - this.drag.y));
-      });
-      this.input.on('pointerup', () => (this.drag = null));
-    }
-    this.setScroll(this.scroll);
+    const g = this.add.graphics();
+    g.fillStyle(col('dusk')).fillRect(0, TOP, W, TABH).fillRect(0, TOP + VIEW_H, W, H - TOP - VIEW_H);
+    g.fillStyle(col('gold')).fillRect(0, TOP + VIEW_H, W, 3);
+    this.input.on('pointerdown', (p: Phaser.Input.Pointer) => (this.swipe = p.y > TOP + TABH && p.y < TOP + VIEW_H ? p.x : null));
+    this.input.on('pointerup', (p: Phaser.Input.Pointer) => {
+      if (this.swipe === null || this.shopObjs.length || this.awayObjs.length) return;
+      const dx = p.x - this.swipe;
+      this.swipe = null;
+      if (Math.abs(dx) > 70) this.selectPub(Phaser.Math.Clamp(this.sel + (dx < 0 ? 1 : -1), 0, n - 1));
+    });
+    this.selectPub(Math.min(this.sel, n - 1));
+  }
+
+  /** záložky hospod (2–3 hospody) */
+  pubTabs: Btn[] = [];
+  sel = 0;
+  swipe: number | null = null;
+
+  /** přepne na hospodu i: její výhled, schopnost manažera a karty stanic */
+  private selectPub(i: number) {
+    if (this.views.length < 2) return;
+    this.sel = i;
+    this.views.forEach((v, j) => {
+      v.cam.setVisible(j === i);
+      if (j === i) v.frame(0, TOP + TABH, W, VIEW_H - TABH, 118);
+    });
+    this.pubTabs.forEach((b, j) => {
+      this.drawBtn(b, PUB_NAMES[this.d.pubs[j].act], true, j === i ? 'amber' : 'slate');
+      b.label.setY(b.y + 16).setFontSize(18).setScale(Math.min(1, (b.w - 10) / b.label.width));
+    });
+    this.skillBtns.forEach((_, j) => this.drawSkill(j));
+    for (const c of this.cards)
+      [c.box, c.name, c.lvl, c.bar, c.info, c.tapZone, c.buy.bg, c.buy.label, c.buy.zone, c.staff.bg, c.staff.label, c.staff.zone].forEach((o) => o.destroy());
+    this.cards = [];
+    this.addCards(i, TOP + VIEW_H + 10);
+    this.refresh();
   }
 
   // ---------- posuvné pruhy (4 hospody) ----------
@@ -1655,7 +1667,7 @@ export class PubScene extends Phaser.Scene {
   }
 
   private closeSheet() {
-    if (this.views.length === 1) return;
+    if (this.views.length === 1 || this.sheet < 0) return;
     this.sheetObjs.forEach((o) => o.destroy());
     this.sheetObjs = [];
     for (const c of this.cards)
