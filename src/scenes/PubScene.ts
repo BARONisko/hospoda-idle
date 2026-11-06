@@ -1557,7 +1557,7 @@ export class PubScene extends Phaser.Scene {
     const n = this.views.length;
     if (n === 1) {
       const viewH = VIEW_H;
-      this.views[0].frame(0, TOP, W, viewH, 118);
+      this.views[0].frame(0, TOP, W, viewH, 118, PubView.fitZoom(W, viewH));
       // schopnost manažera nahoře u zdi (tam nesedí hosté) – dole by zakrývala bubliny s objednávkami
       this.skillBtns[0] = this.btn(14, TOP + 12, 180, 44, () => this.useSkill(0), 60);
       const g = this.add.graphics();
@@ -1599,7 +1599,7 @@ export class PubScene extends Phaser.Scene {
     this.sel = i;
     this.views.forEach((v, j) => {
       v.cam.setVisible(j === i);
-      if (j === i) v.frame(0, TOP + TABH, W, VIEW_H - TABH, 118);
+      if (j === i) v.frame(0, TOP + TABH, W, VIEW_H - TABH, 118, PubView.fitZoom(W, VIEW_H - TABH));
     });
     this.pubTabs.forEach((b, j) => {
       this.drawBtn(b, PUB_NAMES[this.d.pubs[j].act], true, j === i ? 'amber' : 'slate');

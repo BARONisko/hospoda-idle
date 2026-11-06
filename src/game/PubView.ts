@@ -153,6 +153,11 @@ export class PubView {
   }
 
   /** umístí kameru: výřez obrazovky + co ve hospodě ukázat */
+  /** přiblížení, při kterém je vidět celá místnost (17 × 14 dlaždic) – na šířku i na výšku */
+  static fitZoom(w: number, h: number) {
+    return Math.min(w / (17 * T), h / (14 * T));
+  }
+
   frame(x: number, y: number, w: number, h: number, cy = 112, zoomTo?: number) {
     const zoom = zoomTo ?? w / (17 * T); // šířka interiéru (sloupce 0–16) přes celou šířku výřezu
     this.cam.setViewport(x, y, w, h).setZoom(zoom);
