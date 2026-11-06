@@ -397,6 +397,71 @@ export class PubScene extends Phaser.Scene {
     sfx.tip();
   }
 
+  menuT = 2;
+
+  /** krátké uvítání v nově otevřené hospodě */
+  private pubIntro(act: number) {
+    this.d.pubIntro = undefined;
+    store(this.d);
+    const D = 500;
+    const shade = this.add.rectangle(0, 0, W, H, 0x000000, 0.65).setOrigin(0).setDepth(D).setInteractive();
+    const bx = 40, by = 250, bw = W - 80, bh = 430;
+    const g0 = this.add.graphics().setDepth(D + 1);
+    g0.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
+    g0.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
+    g0.lineStyle(4, col('gold')).strokeRoundedRect(bx, by, bw, bh, 16);
+    const objs: Phaser.GameObjects.GameObject[] = [shade, g0];
+    const tx = (y: number, s: string, size: number, c: string) =>
+      objs.push(this.add.text(W / 2, y, s, txt(size, c)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(bw - 50).setDepth(D + 2));
+    const about: Record<number, string> = {
+      2: t('Pod městem, ve vlhkém sklepení. Platí tu kostlivci a ztracené duše.'),
+      3: t('Bažina, žáby a bahenní pivo. Žabák nalévá, dokud nekuňká.'),
+      4: t('Hluboko pod mořem se otevírají dveře chrámu. Kultisté platí zlatem… a duší.'),
+    };
+    tx(by + 24, t('Nová hospoda!'), 34, PAL.gold);
+    tx(by + 74, PUB_NAMES[act], 28, PAL.mint);
+    tx(by + 124, about[act] ?? '', 21, PAL.bone);
+    tx(by + 220, t('Vydělává {m}× víc než ta předchozí a běží vedle ostatních.', { m: 50 }), 20, PAL.sand);
+    if (act === 2) tx(by + 284, t('V menu se otevřela Kostnice.'), 20, PAL.ice);
+    const ok = this.btn(W / 2 - 110, by + bh - 90, 220, 64, () => {
+      this.awayObjs.forEach((o) => o.destroy());
+      this.awayObjs = [];
+    }, D + 3);
+    this.drawBtn(ok, t('Jdeme na to!'), true, 'green');
+    objs.push(ok.bg, ok.label, ok.zone);
+    this.awayObjs = objs;
+    sfx.fanfare();
+  }
+
+  /** kdy se dlaždice menu odemkne (null = hned); vrací text podmínky, dokud je zamčená */
+  private tileLock(name: string): string | null {
+    const d = this.d, pre = d.stats.prestiges > 0;
+    const opened = (id: string) => pre || d.pubs.some((p) => (p.st[id]?.lvl ?? 0) > 0);
+    switch (name) {
+      case 'brew': return opened('kitchen') ? null : t('po otevření kuchyně');
+      case 'decor': return opened('cellar') ? null : t('po otevření sklepa');
+      case 'daynight': return d.nightInfo ? null : t('po první noci');
+      case 'keeper': return (d.klvl ?? 1) >= 2 ? null : t('od 2. úrovně hostinského');
+      case 'talis': return Object.keys(d.talis ?? {}).length ? null : t('po nálezu talismanu');
+      case 'krigl': return pre ? null : t('po první hygieně');
+      case 'league': return pre ? null : t('po první hygieně');
+      case 'bones': return d.pubs.length >= 2 ? null : t('od 2. hospody');
+      default: return null;
+    }
+  }
+
+  /** nově odemčené dlaždice oznámit */
+  private menuUnlocks() {
+    const known = (this.d.menuOpen ??= []);
+    const first = known.length === 0;
+    for (const [tab, sub, label] of PubScene.TILES) {
+      const key = sub && tab === 'shop' ? sub : tab;
+      if (known.includes(key) || this.tileLock(key)) continue;
+      known.push(key);
+      if (!first && this.views[0]) this.banner(this.views[0].cam, t('Nové v menu: {s}', { s: label }));
+    }
+  }
+
   /** okno při první noci: coins teď nebudou, platí se kostmi */
   private nightIntro() {
     this.d.nightInfo = true;
@@ -509,16 +574,25 @@ export class PubScene extends Phaser.Scene {
     const tw = (W - 40) / 3, th = 118;
     PubScene.TILES.forEach(([tab, sub, label, atlas, frame], i) => {
       const x = 10 + (i % 3) * (tw + 10), y = y0 + 64 + Math.floor(i / 3) * (th + 8);
+      const lock = this.tileLock(sub && tab === 'shop' ? sub : tab);
       const b = this.btn(x, y, tw, th, () => {
+        if (lock) return this.banner(this.views[0].cam, t('{s}: otevře se {c}', { s: label, c: lock }));
         if (sub) this.shopSub = sub;
         this.openShop(tab, false);
       }, D + 2);
-      this.drawBtn(b, '', true, 'slate');
+      this.drawBtn(b, '', true, lock ? 'ink' : 'slate');
       const img = this.add.image(x + tw / 2, y + 50, atlas, frame).setDepth(D + 4);
       img.setScale(Math.min(5, 64 / Math.max(img.width, img.height)));
-      const lb = this.add.text(x + tw / 2, y + th - 24, label, txt(20, PAL.bone)).setOrigin(0.5).setDepth(D + 4);
+      if (lock) img.setTintFill(col('dusk'));
+      const lb = this.add.text(x + tw / 2, y + th - 24, label, txt(20, lock ? PAL.slate : PAL.bone)).setOrigin(0.5).setDepth(D + 4);
+      if (lock) lb.setText(lock).setFontSize(15).setWordWrapWidth(tw - 10).setAlign('center');
       lb.setScale(Math.min(1, (tw - 12) / lb.width));
       this.shopObjs.push(b.bg, b.label, b.zone, img, lb);
+      if (lock) {
+        const lk = this.add.image(x + tw / 2, y + 50, 'icons', 'lock').setScale(3).setDepth(D + 5);
+        this.shopObjs.push(lk);
+        return;
+      }
       if (!sub && this.tabAlert(tab) || (sub === 'up' && this.tabAlert('shop'))) {
         const dot = this.add.graphics().setDepth(D + 8);
         dot.fillStyle(col('ink')).fillCircle(x + tw - 6, y + 4, 11).fillStyle(col('scarlet')).fillCircle(x + tw - 6, y + 4, 8);
@@ -1313,7 +1387,11 @@ export class PubScene extends Phaser.Scene {
     tx(by + 84, t('Hygienik hospodu zavře. Přijdeš o coins, úrovně, vylepšení i manažery.'), 20, PAL.bone);
     tx(by + 170, t('Dostaneš +{k} krígel', { k }), 30, PAL.gold);
     tx(by + 212, t('každý krígl = +{b} % výdělek navždy', { b: KRIGL_BONUS * 100 }), 18, PAL.fog);
-    if (next) tx(by + 252, t('a otevřeš novou hospodu: {n}', { n: next }), 22, PAL.mint);
+    // o kolik se zlepší výdělek: bonus z krígel teď → po hygieně, a kolikrát víc
+    const cur = this.d.krigle * KRIGL_BONUS, nw = (this.d.krigle + k) * KRIGL_BONUS;
+    tx(by + 240, t('výdělek z krígel: +{a} % → +{b} %', { a: Math.round(cur * 100), b: Math.round(nw * 100) }), 22, PAL.mint);
+    tx(by + 270, t('= vyděláváš ×{m} víc', { m: ((1 + nw) / (1 + cur)).toFixed(2) }), 22, PAL.gold);
+    if (next) tx(by + 310, t('a otevřeš novou hospodu: {n}', { n: next }), 22, PAL.mint);
     const close = () => objs.forEach((o) => o.destroy());
     const no = this.btn(bx + 24, by + bh - 88, 180, 64, () => close(), D + 3);
     this.drawBtn(no, t('Ještě ne'), true, 'slate');
@@ -1328,6 +1406,7 @@ export class PubScene extends Phaser.Scene {
   private prestige() {
     const k = this.kriglyNow();
     const n = Math.min(MAX_PUBS, this.d.pubs.length + 1);
+    if (n > this.d.pubs.length) this.d.pubIntro = n;
     this.d.krigle += k;
     this.d.stats.prestiges++;
     this.d.run = 0;
@@ -1943,6 +2022,11 @@ export class PubScene extends Phaser.Scene {
     this.ev.update(dt);
     // první noc: jednou vysvětlit, že teď místo coins chodí kosti (až nebude otevřené jiné okno)
     if (this.night && !this.d.nightInfo && !this.awayObjs.length) this.nightIntro();
+    if (this.d.pubIntro && !this.awayObjs.length) this.pubIntro(this.d.pubIntro);
+    if ((this.menuT -= dt) <= 0) {
+      this.menuT = 2;
+      this.menuUnlocks();
+    }
     const nn = isNight();
     if (nn !== this.night) {
       this.night = nn;
@@ -1994,7 +2078,7 @@ export class PubScene extends Phaser.Scene {
     this.skillBtns.forEach((_, i) => this.drawSkill(i));
     this.stripRates.forEach((r, i) => r.setText(t('+{n} / s', { n: big(this.rate(this.d.pubs[i])) })));
 
-    const cheap = ['shop', 'tasks', 'brew', 'keeper'].some((id) => this.tabAlert(id));
+    const cheap = ['shop', 'tasks', 'brew', 'keeper'].some((id) => this.tabAlert(id) && !this.tileLock(id));
     this.shopDot.clear();
     if (cheap) this.shopDot.fillStyle(col('ink')).fillCircle(W - 126, 20, 11).fillStyle(col('scarlet')).fillCircle(W - 126, 20, 8);
     for (const r of this.shopRows) this.drawBtn(r.b, big(r.o.cost), this.d.coins >= r.o.cost, 'green');
