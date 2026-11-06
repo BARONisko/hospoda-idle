@@ -39,8 +39,6 @@ export interface Save {
   ach: string[];
   /** obchod s krígly: úrovně koupených položek */
   kup?: Record<string, number>;
-  /** denní specialita {den, id} */
-  special?: { day: string; id: string };
   /** koupená výzdoba (id) – zůstává i po hygieně */
   decor?: string[];
   /** pivovar (zůstává i po hygieně) */
