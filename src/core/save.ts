@@ -62,6 +62,8 @@ export interface Save {
   weekly?: Weekly;
   /** týdenní liga */
   league?: LeagueState;
+  /** historie lig: [liga, výhra] posledních týdnů */
+  leagueHist?: [number, boolean][];
   /** krok návodu pro nového hráče (-1 = hotovo) */
   tut?: number;
   /** bestiář: viděné druhy hostů */

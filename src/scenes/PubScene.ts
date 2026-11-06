@@ -8,7 +8,7 @@ import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
 import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
-import { LEAGUES, RIVALS, LeagueState, weekStart, rivalScore, weekEnd, winReward } from '../core/league';
+import { LEAGUES, LeagueState, weekStart, rivalScore, weekEnd, winReward } from '../core/league';
 import { isNight, phaseLeft, BONE_RATE, nightCfg } from '../core/night';
 import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
@@ -467,6 +467,7 @@ export class PubScene extends Phaser.Scene {
         const rival = rivalScore(L, weekEnd(L));
         const win = L.me > rival;
         this.leagueResult = { win, me: L.me, rival, tier };
+        this.d.leagueHist = [...(this.d.leagueHist ?? []), [tier, win] as [number, boolean]].slice(-8);
         if (win) {
           this.d.krigle += winReward(tier);
           this.leagueWinDrop = true;
@@ -502,7 +503,7 @@ export class PubScene extends Phaser.Scene {
     objs.push(g);
     const tx = (y: number, s2: string, size: number, c: string) => objs.push(this.add.text(W / 2, y, s2, txt(size, c)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 100).setDepth(D + 2));
     tx(284, r.win ? t('Vyhrál jsi ligu!') : t('Prohrál jsi ligu…'), 34, r.win ? PAL.gold : PAL.scarlet);
-    tx(344, t('Ty: {a} coins\nSoupeř: {b} coins', { a: big(r.me), b: big(r.rival) }), 22, PAL.bone);
+    tx(344, t('Tvoje tržba: {a} coins\nCíl týdne: {b} coins', { a: big(r.me), b: big(r.rival) }), 22, PAL.bone);
     tx(420, r.win ? t('Odměna: +{k} krígel a talisman. Postupuješ do: {l}', { k: winReward(r.tier), l: LEAGUES[Math.min(LEAGUES.length, r.tier + 1) - 1] }) : t('Sestupuješ do: {l}', { l: LEAGUES[Math.max(1, r.tier - 1) - 1] }), 22, r.win ? PAL.mint : PAL.fog);
     const ok = this.btn(W / 2 - 100, 560, 200, 60, () => {
       objs.forEach((o) => o.destroy());
@@ -517,31 +518,62 @@ export class PubScene extends Phaser.Scene {
 
   private leagueTab(y0: number, D: number) {
     const L = this.league();
-    const rv = RIVALS[(L.tier - 1 + Math.floor(L.start / 604800000)) % RIVALS.length];
-    const rival = rivalScore(L);
+    const goal = rivalScore(L, weekEnd(L));
+    const pace = rivalScore(L);
     const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
     const g = add(this.add.graphics().setDepth(D + 1));
-    g.fillStyle(col('ink'), 0.6).fillRoundedRect(10, y0, W - 20, 470, 12);
-    add(this.add.text(W / 2, y0 + 12, `${LEAGUES[L.tier - 1]} (${L.tier}/${LEAGUES.length})`, txt(28, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 2));
+    // žebříček lig
+    const n = LEAGUES.length;
+    const step = (W - 120) / (n - 1);
+    for (let i = 0; i < n - 1; i++) g.fillStyle(col(i + 1 < L.tier ? 'gold' : 'slate')).fillRect(60 + i * step, y0 + 27, step, 6);
+    for (let i = 0; i < n; i++) {
+      const cx = 60 + i * step, cy = y0 + 30, cur = i + 1 === L.tier;
+      g.fillStyle(col('ink')).fillCircle(cx, cy + 3, cur ? 26 : 20);
+      g.fillStyle(col(i + 1 < L.tier ? 'gold' : cur ? 'amber' : 'slate')).fillCircle(cx, cy, cur ? 26 : 20);
+      add(this.add.text(cx, cy, String(i + 1), txt(cur ? 28 : 22, i + 1 <= L.tier ? PAL.ink : PAL.fog)).setOrigin(0.5).setDepth(D + 2));
+      if (cur) {
+        const ring = add(this.add.circle(cx, cy, 30).setStrokeStyle(3, col('gold')).setDepth(D + 1));
+        this.tweens.add({ targets: ring, scale: { from: 0.9, to: 1.2 }, alpha: { from: 1, to: 0 }, repeat: -1, duration: 1200 });
+      }
+    }
+    add(this.add.text(W / 2, y0 + 66, LEAGUES[L.tier - 1], txt(30, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 2));
     const left = Math.max(0, weekEnd(L) - Date.now());
-    add(this.add.text(W / 2, y0 + 50, t('do konce týdne: {d} d {h} h', { d: Math.floor(left / 86400000), h: Math.floor((left % 86400000) / 3600000) }), txt(18, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2));
-    add(this.add.sprite(110, y0 + 190, 'player', 1).setOrigin(0.5, 1).setScale(5).setDepth(D + 2));
-    add(this.add.sprite(W - 110, y0 + 190, rv.sprite, 1).setOrigin(0.5, 1).setScale(5).setDepth(D + 2).setFlipX(true));
-    add(this.add.text(W / 2, y0 + 130, 'VS', txt(40, PAL.scarlet)).setOrigin(0.5).setDepth(D + 2));
-    add(this.add.text(110, y0 + 200, t('Ty'), txt(22, PAL.mint)).setOrigin(0.5, 0).setDepth(D + 2));
-    add(this.add.text(W - 110, y0 + 200, rv.name, txt(20, PAL.scarlet)).setOrigin(0.5, 0).setDepth(D + 2));
-    // pruhy tržeb
-    const mx = Math.max(L.me, rival, 1);
-    const bar = (y: number, v: number, c: keyof typeof PAL, label: string) => {
-      g.fillStyle(col('dusk')).fillRoundedRect(30, y, W - 60, 30, 8);
-      g.fillStyle(col(c)).fillRoundedRect(30, y, Math.max(12, (W - 60) * (v / mx)), 30, 8);
-      add(this.add.text(40, y + 4, `${label}: ${big(v)}`, txt(18, PAL.white)).setDepth(D + 2));
-    };
-    bar(y0 + 250, L.me, 'mint', t('Ty'));
-    bar(y0 + 292, rival, 'scarlet', rv.name);
-    const lead = L.me > rival;
-    add(this.add.text(W / 2, y0 + 340, lead ? t('Vedeš! Drž tempo až do neděle.') : t('Soupeř vede! Hraj, vylepšuj a zvládej události.'), txt(20, lead ? PAL.mint : PAL.sand)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 60).setDepth(D + 2));
-    add(this.add.text(W / 2, y0 + 400, t('Výhra: +{k} krígel, talisman a postup. Prohra: sestup.', { k: winReward(L.tier) }), txt(17, PAL.fog)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 60).setDepth(D + 2));
+    const d = Math.floor(left / 86400000), h = Math.floor((left % 86400000) / 3600000), m = Math.floor((left % 3600000) / 60000);
+    add(this.add.text(W / 2, y0 + 104, t('do konce týdne: {d} d {h} h {m} min', { d, h, m }), txt(17, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2));
+    // karta: cíl týdne a moje tržba
+    const done = L.me >= goal, ahead = L.me >= pace;
+    g.fillStyle(col('ink'), 0.7).fillRoundedRect(10, y0 + 132, W - 20, 232, 14);
+    g.lineStyle(3, col(done ? 'mint' : 'amber')).strokeRoundedRect(10, y0 + 132, W - 20, 232, 14);
+    add(this.add.text(30, y0 + 146, t('CÍL TÝDNE'), txt(18, PAL.fog)).setDepth(D + 2));
+    add(this.add.text(30, y0 + 166, big(goal), txt(44, PAL.gold)).setDepth(D + 2));
+    add(this.add.text(W - 30, y0 + 146, t('TVOJE TRŽBA'), txt(18, PAL.fog)).setOrigin(1, 0).setDepth(D + 2));
+    add(this.add.text(W - 30, y0 + 166, big(L.me), txt(44, PAL.mint)).setOrigin(1, 0).setDepth(D + 2));
+    const bx = 30, bw = W - 60, by = y0 + 236;
+    const pMe = Math.min(1, L.me / Math.max(1, goal)), pPace = Math.min(1, pace / Math.max(1, goal));
+    g.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, 34, 10);
+    g.fillStyle(col(ahead ? 'mint' : 'amber')).fillRoundedRect(bx, by, Math.max(16, bw * pMe), 34, 10);
+    g.fillStyle(col('white')).fillRect(bx + bw * pPace - 2, by - 8, 4, 50);
+    add(this.add.text(Phaser.Math.Clamp(bx + bw * pPace, 50, W - 50), by + 44, t('tempo'), txt(14, PAL.bone)).setOrigin(0.5, 0).setDepth(D + 2));
+    add(this.add.text(bx + 12, by + 6, `${Math.floor(pMe * 100)} %`, txt(20, PAL.ink)).setDepth(D + 3));
+    const msg = done ? t('Cíl splněn! Výhra je jistá.') : ahead ? t('Jsi před tempem – drž to!') : t('Za tempem o {n} coins', { n: big(pace - L.me) });
+    add(this.add.text(W / 2, y0 + 304, msg, txt(20, done || ahead ? PAL.mint : PAL.sand)).setOrigin(0.5, 0).setDepth(D + 2));
+    add(this.add.text(W / 2, y0 + 332, t('Počítá se vše, co tento týden vyděláš.'), txt(15, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2));
+    // odměny
+    g.fillStyle(col('pine'), 0.8).fillRoundedRect(10, y0 + 376, W / 2 - 15, 76, 12);
+    g.fillStyle(col('blood'), 0.8).fillRoundedRect(W / 2 + 5, y0 + 376, W / 2 - 15, 76, 12);
+    add(this.add.text(W / 4 + 2, y0 + 384, t('VÝHRA'), txt(18, PAL.mint)).setOrigin(0.5, 0).setDepth(D + 2));
+    add(this.add.text(W / 4 + 2, y0 + 408, t('+{k} krígel, talisman\na postup', { k: winReward(L.tier) }), txt(16, PAL.bone)).setOrigin(0.5, 0).setAlign('center').setDepth(D + 2));
+    add(this.add.text((W * 3) / 4 - 2, y0 + 384, t('PROHRA'), txt(18, PAL.scarlet)).setOrigin(0.5, 0).setDepth(D + 2));
+    add(this.add.text((W * 3) / 4 - 2, y0 + 408, L.tier > 1 ? t('sestup do ligy {n}', { n: L.tier - 1 }) : t('zůstaneš v 1. lize'), txt(16, PAL.bone)).setOrigin(0.5, 0).setDepth(D + 2));
+    // historie posledních týdnů
+    const hist = this.d.leagueHist ?? [];
+    add(this.add.text(20, y0 + 468, t('Minulé týdny:'), txt(16, PAL.fog)).setDepth(D + 2));
+    if (!hist.length) add(this.add.text(140, y0 + 468, t('zatím žádné'), txt(16, PAL.slate)).setDepth(D + 2));
+    hist.forEach(([tier, win], i) => {
+      const cx = 140 + i * 46;
+      g.fillStyle(col(win ? 'green' : 'red')).fillRoundedRect(cx, y0 + 460, 40, 32, 8);
+      add(this.add.text(cx + 20, y0 + 476, `${win ? '✓' : '✗'}${tier}`, txt(16, PAL.white)).setOrigin(0.5).setDepth(D + 2));
+    });
   }
 
   // ---------- hostinský: úroveň a strom dovedností ----------

@@ -1,15 +1,8 @@
-// Týdenní liga: každý týden soupeřova hospoda. Kdo vydělá za týden víc coins, vyhrává.
+// Týdenní liga: soupeřova hospoda je jen číselný cíl týdne (tržba), který musíš překonat.
 // Výhra = postup do vyšší ligy + krígly + talisman, prohra = sestup. Soupeř roste každý den a vyšší liga je silnější.
 import { t } from '../i18n';
 
 export const LEAGUES = [t('Okresní přebor'), t('Krajská liga'), t('Národní liga'), t('Pivní mistrovství'), t('Liga hlubin')];
-export const RIVALS = [
-  { name: t('U Zlámané lahve'), sprite: 'rivalThug' },
-  { name: t('Kuchař Šimon'), sprite: 'rivalChef' },
-  { name: t('Hospoda U Ropuchy'), sprite: 'frogman' },
-  { name: t('Hrabě Vampýr'), sprite: 'count' },
-  { name: t('Kult Dagona'), sprite: 'cultist2' },
-];
 
 export interface LeagueState {
   week: string;
