@@ -1716,7 +1716,7 @@ export class PubScene extends Phaser.Scene {
       for (const def of STATIONS) {
         const s = p.st[def.id];
         if (!s || s.lvl === 0 || (autoOnly && !s.auto)) continue;
-        r += bonesFor(this.pay(p, def)) / this.cyc(def);
+        r += bonesFor(s.lvl) / this.cyc(def);
       }
     return r * this.boneMult();
   }
@@ -1910,7 +1910,7 @@ export class PubScene extends Phaser.Scene {
           let g = this.pay(p, def) * this.happyMult();
           if (Math.random() < this.ts().crit) g *= 2;
           if (this.night) {
-            const b = bonesFor(g) * this.boneMult();
+            const b = bonesFor(p.st[def.id]!.lvl) * this.boneMult();
             this.d.bones = (this.d.bones ?? 0) + b;
             this.views[i].payout(def.id, b, true);
           } else {
