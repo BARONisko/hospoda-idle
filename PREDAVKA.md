@@ -26,3 +26,24 @@
 - Ladění v URL: ?coins=N, ?away=<s>, ?pubs=2|3. Testovací skripty v tools/_tmp (Playwright, ťukání přes touchscreen).
 - Nezkoušet znovu: nahrávat soubory přes GitHub API (push_files) – nahrál se placeholder; když git push padá
   („fatal error in commit_refs“), jen opakovat push v cyklu na pozadí (do pár minut projde).
+
+## hospoda 52 → 53 (druhá, platná předávka – první „hospoda 53“ byla zrušena, uživatel chtěl pokračovat v 52)
+- Hra běží na https://baronisko.github.io/hospoda-idle/ (repo je veřejné, LICENSE = všechna práva vyhrazena,
+  Pages přes Actions, deploy po každém pushi do main). Návod pro uživatele: NAVOD-MOBIL.md.
+- Hotovo v 52 navíc k plánu: návod pro nové hráče, obchod s krígly, Cthulhu (×10), 4. hospoda Chrám Cthulhu s posuvnými
+  pruhy (rozložení C schváleno), objednávky hostů, vybavení podle úrovní, sezóny, 5 návštěvníků s volbou, výzdoba
+  (8 drahých předmětů), rvačka (bez vyhazovače – hosté odcházejí, dokud hráč neťuká na rváče), pivovar (pomalý, prodat
+  / vložit do vylepšení), den a noc (kosti), talismany (10, vzácné, vylepšení za kosti), hostinský na úrovni + strom
+  dovedností, týdenní výzva, 20 statů + Kostnice (staty za kosti, src/core/talisman.ts OSSUARY), týdenní liga
+  (src/core/league.ts, 5 lig, postup/sestup). Denní specialitu uživatel ZRUŠIL („k ničemu“) – nevracet.
+- Kosti mají být vzácné a vylepšení drahá (přání uživatele) – BONE_RATE 0.0002, ossCost 400·1.8^lvl, talisCost 150·2.6^lvl.
+- ROZPRACOVÁNO: 35 nových textů (staty, Kostnice, liga) chybí v překladech – seznam vygeneruj skriptem jako dřív
+  (grep t('…') v src/scenes/PubScene.ts src/game src/core vs. en.json) a nech přeložit do 11 jazyků (subagent).
+- Čeká na uživatele: soupeřova hospoda – navrženo 5 variant (souboj o hosty, sabotáž/poctivost, liga = HOTOVO,
+  převzetí soupeře, souboj stanic); dojmy z hraní (tempo pivovaru, den/noc, talismany).
+- Kontroly: `npx tsc --noEmit`, `npm run build`, `npm test` (headless test celé hry, běží ve dne ?night=0),
+  `npm run sim`. Ladění v URL: ?coins=N ?away=s ?pubs=1-4 ?ev=gold|frogs|bat|banshee|brawl ?visit=0-4 ?season=…
+  ?night=0|1 ?talis=1 ?fakeads=1. Snímky: tools/shot.mjs; pomocný JS pro vypnutí návodu: tools/_tmp/prep.js (lokální).
+- Vite dev server po přidání nového locale souboru restartovat (import.meta.glob se načte při startu).
+- Nezkoušet: nahrávat soubory přes GitHub API (push_files) – nahrál se placeholder. Při „fatal error in commit_refs“
+  jen opakovat git push na pozadí.
