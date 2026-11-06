@@ -2,8 +2,10 @@
 
 export const DAY_MS = 8 * 60_000;
 export const NIGHT_MS = 4 * 60_000;
-/** kolik kostí za 1 coin výdělku */
-export const BONE_RATE = 0.0002;
+/** Kosti jsou malá čísla nezávislá na coins: výplata stanice v noci dá BONE_PER × log10(1 + výplata) kostí
+ *  (začátek ~10 kostí za noc, pozdní hra desítky), ťuknutí na hosta v noci 1 kost. */
+export const BONE_PER = 0.02;
+export const bonesFor = (pay: number) => BONE_PER * Math.log10(1 + Math.max(0, pay));
 
 const forced = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('night') : null;
 

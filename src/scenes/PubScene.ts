@@ -9,7 +9,7 @@ import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
 import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
 import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward } from '../core/league';
-import { isNight, phaseLeft, BONE_RATE, nightCfg, NIGHT_MS } from '../core/night';
+import { isNight, phaseLeft, bonesFor, nightCfg, NIGHT_MS } from '../core/night';
 import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS } from '../core/save';
@@ -175,6 +175,11 @@ export class PubScene extends Phaser.Scene {
     this.layout();
     this.daily();
     this.time.delayedCall(700, () => this.leagueCheck());
+    // kosti jsou teď malá čísla (ceny i zisky ÷ 100) – staré zásoby přepočítat jednou
+    if (!this.d.bones2) {
+      this.d.bones = (this.d.bones ?? 0) / 100;
+      this.d.bones2 = true;
+    }
     if (this.d.bup) {
       const m: Record<string, [string, number]> = { pipe: ['bones', 10], band: ['income', 3], grave: ['staff', 5], moon: ['bones', 10] };
       for (const [k, v] of Object.entries(this.d.bup)) if (m[k]) (this.d.oss ??= {})[m[k][0]] = (this.d.oss?.[m[k][0]] ?? 0) + v * m[k][1];
@@ -236,14 +241,14 @@ export class PubScene extends Phaser.Scene {
         if (this.ev.tap(this.views.indexOf(v), wp.x, wp.y)) return;
         if (v.tap(wp.x, wp.y)) {
           const tip = Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (1 + this.ts().tips)));
-          if (this.night) this.d.bones = (this.d.bones ?? 0) + tip * this.boneMult() * (1 + this.ts().nighttips);
+          if (this.night) this.d.bones = (this.d.bones ?? 0) + this.boneMult() * (1 + this.ts().nighttips);
           else this.gain(tip);
           this.d.stats.tips++;
           this.week('tips');
           this.xp(1);
           this.task('tips', 1);
           this.tut('tip');
-          v.tipPop('+' + big(this.night ? tip * this.boneMult() : tip));
+          v.tipPop(this.night ? '+' + big(this.boneMult() * (1 + this.ts().nighttips)) : '+' + big(tip));
           sfx.tip();
         }
       }
@@ -283,7 +288,7 @@ export class PubScene extends Phaser.Scene {
     if (secs < OFFLINE_MIN || g < 1 || this.awayObjs.length) return;
     // třetinu času byla noc: místo coins kosti
     const coins = Math.floor((g * 2) / 3);
-    const bones = (g / 3) * this.boneMult();
+    const bones = (secs / 3) * this.bonesPerSec(true);
     this.gain(coins);
     this.d.bones = (this.d.bones ?? 0) + bones;
     store(this.d);
@@ -1507,8 +1512,21 @@ export class PubScene extends Phaser.Scene {
     return this.d.bup?.[id] ?? 0;
   }
 
+  /** násobek kostí ze statů (talismany, Kostnice…) */
   private boneMult() {
-    return BONE_RATE * (1 + this.ts().bones);
+    return 1 + this.ts().bones;
+  }
+
+  /** kolik kostí za sekundu dají v noci stanice (jen s kostlivcem = offline) */
+  private bonesPerSec(autoOnly = false) {
+    let r = 0;
+    for (const p of this.d.pubs)
+      for (const def of STATIONS) {
+        const s = p.st[def.id];
+        if (!s || s.lvl === 0 || (autoOnly && !s.auto)) continue;
+        r += bonesFor(this.pay(p, def)) / this.cyc(def);
+      }
+    return r * this.boneMult();
   }
 
   ossLast?: string;
@@ -1698,7 +1716,7 @@ export class PubScene extends Phaser.Scene {
           let g = this.pay(p, def);
           if (Math.random() < this.ts().crit) g *= 2;
           if (this.night) {
-            const b = g * this.boneMult();
+            const b = bonesFor(g) * this.boneMult();
             this.d.bones = (this.d.bones ?? 0) + b;
             this.views[i].payout(def.id, b, true);
           } else {
@@ -1751,7 +1769,7 @@ export class PubScene extends Phaser.Scene {
     const total = this.d.pubs.reduce((a, p) => a + this.rate(p), 0);
     this.coinsText.setText(`${big(this.d.coins)} coins`);
     this.coinsText.setScale(Math.min(1, 226 / this.coinsText.width));
-    this.rateText.setText(this.night ? t('+{n} kostí / s', { n: big(total * this.boneMult()) }) : t('+{n} / s', { n: big(total) }));
+    this.rateText.setText(this.night ? t('+{n} kostí / s', { n: this.bonesPerSec() < 1 ? this.bonesPerSec().toFixed(2) : big(this.bonesPerSec()) }) : t('+{n} / s', { n: big(total) }));
     this.rateText.setColor(this.night ? PAL.ice : PAL.mint).setScale(Math.min(1, 220 / this.rateText.width));
     const left = Math.ceil(phaseLeft() / 1000);
     this.infoText.setText(

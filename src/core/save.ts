@@ -47,6 +47,8 @@ export interface Save {
   /** kosti (noční měna) a jejich vylepšení – zůstávají i po hygieně */
   bones?: number;
   bup?: Record<string, number>;
+  /** kosti přepočtené na malá čísla (staré uložení ÷ 100) */
+  bones2?: boolean;
   /** Kostnice: úrovně statů koupené za kosti */
   oss?: Record<string, number>;
   /** verze Kostnice (2 = náhodné hody) a počet hodů */

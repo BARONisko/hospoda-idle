@@ -59,7 +59,7 @@ export const OSSUARY: { stat: StatId; per: number; cap?: number }[] = [
   { stat: 'nighttips', per: 0.005 },
 ];
 /** cena jednoho hodu kostkou (kosti) – zdražuje se s každým hodem */
-export const rollCost = (rolls: number) => Math.ceil(300 * 1.06 ** rolls);
+export const rollCost = (rolls: number) => Math.ceil(3 * 1.06 ** rolls);
 /** staré úrovně Kostnice (před náhodnými hody) – převod */
 export const OLD_OSS_PER: Partial<Record<StatId, number>> = {
   income: 0.03, tips: 0.1, events: 0.05, bones: 0.05, brew: 0.02, offline: 0.5, krigly: 0.02, skill: 0.05, evfreq: 0.02, cycle: 0.01,
@@ -90,7 +90,7 @@ export const TALISMANS: TalisDef[] = [
 ];
 
 /** cena další úrovně v kostech (roste donekonečna) */
-export const talisCost = (lvl: number) => Math.ceil(150 * 2.6 ** lvl);
+export const talisCost = (lvl: number) => Math.ceil(1.5 * 2.6 ** lvl);
 
 /** součet statů ze všech talismanů */
 export function stats(levels: Record<string, number> = {}): Record<StatId, number> {

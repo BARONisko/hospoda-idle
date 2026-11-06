@@ -52,8 +52,8 @@ interface Guest {
   sat?: number;
 }
 
-/** v noci chodí do všech hospod příšery */
-const NIGHT_GUESTS = ['zombie', 'ghost', 'vampire', 'werewolf', 'banshee', 'ratman', 'drowner'];
+/** přes den má každá hospoda své hosty, v noci chodí do všech kostlivci */
+const NIGHT_GUESTS = ['skeleton'];
 
 /** jídlo podle hospody (objednávky hostů) */
 const FOOD: Record<number, string> = { 1: 'dGoulash', 2: 'dKnee', 3: 'dFried', 4: 'dSmoked' };
@@ -176,6 +176,8 @@ export class PubView {
 
   setNight(on: boolean) {
     if (on === this.night && this.dark) return;
+    // při změně dne a noci se sedící hosté postupně zvednou a odejdou (přijdou noví – lidé nebo kostlivci)
+    if (on !== this.night) for (const g of this.guests) if (!g.leaving && !g.path.length) g.sitT = Math.min(g.sitT, this.rnd.realInRange(0.5, 6));
     this.night = on;
     if (!this.dark) {
       this.dark = this.s.add.rectangle(this.ox - 20, -20, 17 * T + 60, 14 * T + 60, 0x10122a, 0).setOrigin(0).setDepth(3990);
@@ -257,8 +259,15 @@ export class PubView {
     if (id === 'tap') this.pourT = 0.5;
     const sk = this.staff[id];
     if (sk) this.s.tweens.add({ targets: sk, y: p.y - 3, yoyo: true, duration: 120 });
-    this.pop(p.x, p.y - 22, '+' + big(amount), bones ? PAL.ice : PAL.gold);
+    if (!bones) return this.pop(p.x, p.y - 22, '+' + big(amount), PAL.gold);
+    // kosti chodí po zlomcích – ukázat až celou kost
+    const acc = (this.boneAcc[id] ?? 0) + amount;
+    const whole = Math.floor(acc);
+    this.boneAcc[id] = acc - whole;
+    if (whole > 0) this.pop(p.x, p.y - 22, '+' + big(whole), PAL.ice);
   }
+
+  private boneAcc: Record<string, number> = {};
 
   pop(x: number, y: number, text: string, color: string) {
     const tx = this.s.add.text(this.ox + x, y, text, txt(10, color)).setOrigin(0.5).setDepth(5000).setResolution(3);
@@ -317,7 +326,7 @@ export class PubView {
     if (!free.length) return;
     const seat = this.rnd.pick(free);
     seat.taken = true;
-    const key = season && this.rnd.frac() < 0.15 ? SEASONS[season].guest : this.rnd.pick(this.night ? NIGHT_GUESTS : GUESTS[this.pub.act]);
+    const key = this.night ? this.rnd.pick(NIGHT_GUESTS) : season && this.rnd.frac() < 0.15 ? SEASONS[season].guest : this.rnd.pick(GUESTS[this.pub.act]);
     this.s.events.emit('guestSeen', key);
     const spr = this.s.add.sprite(this.ox + DOOR.x, DOOR.y, key, 4).setOrigin(0.5, 1).setDepth(DOOR.y);
     this.objs.push(spr);
