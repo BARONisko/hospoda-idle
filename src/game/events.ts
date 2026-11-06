@@ -8,14 +8,16 @@ import { sfx } from '../core/sfx';
 import { big } from '../core/num';
 import type { PubView } from './PubView';
 
-export type EventKind = 'gold' | 'frogs' | 'bat' | 'banshee';
-export const EVENT_KINDS: EventKind[] = ['gold', 'frogs', 'bat', 'banshee'];
+export type EventKind = 'gold' | 'frogs' | 'bat' | 'banshee' | 'brawl';
+export const EVENT_KINDS: EventKind[] = ['gold', 'frogs', 'bat', 'banshee', 'brawl'];
 
 /** co událost potřebuje od scény */
 export interface EventHost {
   views: PubView[];
   /** odměna = tolik sekund výdělku; vrací částku */
   reward(secs: number, view: number): number;
+  /** pokuta = tolik sekund výdělku; vrací částku */
+  fine(secs: number, view: number): number;
   banner(c: Phaser.Cameras.Scene2D.Camera, text: string, top?: boolean): void;
   /** upíří hodina: ×2 výdělek do (ms) */
   boostAll(ms: number): void;
@@ -131,6 +133,27 @@ export class PubEvents {
         },
       });
       this.host.banner(v.cam, t('Netopýr! Chyť ho!'), true);
+    } else if (kind === 'brawl') {
+      a.dur = 8;
+      const need = 8;
+      const cx = Phaser.Math.Between(x0 + 30, x1 - 30), cy = Phaser.Math.Between(y0 + 40, y1 - 10);
+      const cloud = add(this.s.add.image(cx, cy, 'obj', 'dust').setOrigin(0.5, 1).setDepth(4000).setScale(3));
+      this.s.tweens.add({ targets: cloud, angle: { from: -10, to: 10 }, scaleX: { from: 2.7, to: 3.3 }, yoyo: true, repeat: -1, duration: 160 });
+      const ang = add(this.s.add.image(cx + 10, cy - 40, 'obj', 'anger').setDepth(4001).setScale(1.5));
+      this.s.tweens.add({ targets: ang, y: cy - 46, yoyo: true, repeat: -1, duration: 200 });
+      targets.push({
+        spr: cloud,
+        hit: () => {
+          a.hits++;
+          sfx.click();
+          if (a.hits >= need) {
+            const n = this.host.reward(30, view);
+            this.host.banner(v.cam, t('Rvačka rozehnána! +{n}', { n: big(n) }));
+            this.end(true);
+          }
+        },
+      });
+      this.host.banner(v.cam, t('Rvačka! Rozežeň ji ťukáním!'), true);
     } else {
       a.dur = 9;
       const need = 12;
@@ -176,6 +199,10 @@ export class PubEvents {
     const a = this.active;
     if (!a) return;
     this.active = null;
+    if (!ok && a.kind === 'brawl') {
+      const n = this.host.fine(60, a.view);
+      this.host.banner(this.host.views[a.view].cam, t('Rozbité židle! −{n}', { n: big(n) }));
+    }
     this.host.onEvent?.(a.kind, ok);
     a.off.forEach((f) => f());
     for (const o of a.objs) {

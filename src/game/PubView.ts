@@ -45,7 +45,24 @@ interface Guest {
   t: number;
   tipped: boolean;
   mug?: Phaser.GameObjects.Image;
+  /** bublina s objednávkou nad hlavou */
+  order?: Phaser.GameObjects.Image[];
+  /** jak dlouho sedí (s) */
+  sat?: number;
 }
+
+/** jídlo podle hospody (objednávky hostů) */
+const FOOD: Record<number, string> = { 1: 'dGoulash', 2: 'dKnee', 3: 'dFried', 4: 'dSmoked' };
+
+/** vybavení, které přibude s úrovní stanice */
+const LEVEL_DECOR: { id: string; lvl: number; frame: string; x: number; y: number }[] = [
+  { id: 'tap', lvl: 25, frame: 'keg', x: 5 * T + 2, y: 4 * T + 10 },
+  { id: 'tap', lvl: 100, frame: 'kegGold', x: 6 * T + 4, y: 4 * T + 10 },
+  { id: 'kitchen', lvl: 25, frame: 'kOven', x: 13 * T + 8, y: 4 * T + 12 },
+  { id: 'cellar', lvl: 25, frame: 'barrels', x: 2 * T + 12, y: 3 * T + 15 },
+  { id: 'dice', lvl: 25, frame: 'trophy', x: 15 * T + 8, y: 2 * T + 14 },
+  { id: 'dice', lvl: 100, frame: 'jukebox0', x: 15 * T + 4, y: 13 * T + 8 },
+];
 
 /** postava manažera podle hospody */
 const MGR_SPRITE: Record<number, string> = { 1: 'tapster', 2: 'count', 3: 'deep0', 4: 'yellowKing' };
@@ -55,6 +72,7 @@ export class PubView {
   cthulhu = false;
   private cth?: Phaser.GameObjects.Sprite;
   private mgr?: Phaser.GameObjects.Sprite;
+  private decor: Record<string, Phaser.GameObjects.Image> = {};
   readonly cam: Phaser.Cameras.Scene2D.Camera;
   readonly objs: Phaser.GameObjects.GameObject[] = [];
   private guests: Guest[] = [];
@@ -150,6 +168,16 @@ export class PubView {
       this.s.tweens.add({ targets: this.cth, y: y - 4, yoyo: true, repeat: -1, duration: 1400, ease: 'Sine.inOut' });
     }
     const st = this.pub.st;
+    for (const d of LEVEL_DECOR) {
+      const k = `${d.id}${d.lvl}`;
+      if ((st[d.id]?.lvl ?? 0) >= d.lvl && !this.decor[k]) {
+        const o = this.s.add.image(this.ox + d.x, d.y, 'obj', d.frame).setOrigin(0.5, 1).setDepth(d.y);
+        this.decor[k] = o;
+        this.objs.push(o);
+        this.s.events.emit('pubObj', o);
+        this.s.tweens.add({ targets: o, scale: { from: 1.6, to: 1 }, duration: 400, ease: 'Back.out' });
+      }
+    }
     for (const [id, list] of Object.entries(this.props)) list.forEach((o) => o.setVisible((st[id]?.lvl ?? 0) > 0));
     for (const id of ['kitchen', 'cellar', 'dice']) {
       const on = id === 'dice' ? (st[id]?.lvl ?? 0) > 0 : !!st[id]?.auto;
@@ -243,9 +271,26 @@ export class PubView {
         sp.setFrame(12).setFlipX(g.seat.flip);
         g.sitT -= dt;
         // po chvíli dostane pivo na stůl (v krčmě krev, u Žabáka bahno – zatím stejný půllitr)
-        if (!g.mug && g.t > 1.2) {
-          g.mug = this.s.add.image(sp.x + (g.seat.flip ? -13 : 13), sp.y - 6, 'obj', g.sitT > 6 ? 'mug' : 'mugDark').setOrigin(0.5, 1).setDepth(sp.y + 4);
+        g.sat = (g.sat ?? 0) + dt;
+        // nejdřív si objedná (bublina nad hlavou), pak mu přinesou pivo nebo jídlo
+        const food = (g.spr.x * 7 + g.spr.y) % 3 === 0;
+        if (!g.order && !g.mug && g.sat < 0.2) {
+          const bx = sp.x + (g.seat.flip ? 8 : -8), by = sp.y - 22;
+          const b = this.s.add.image(bx, by, 'obj', 'bubble').setOrigin(0.5, 1).setDepth(sp.y + 50);
+          const ic = this.s.add.image(bx, by - 6, 'obj', food ? FOOD[this.pub.act] : 'mug').setOrigin(0.5, 0.5).setScale(0.6).setDepth(sp.y + 51);
+          g.order = [b, ic];
+          g.order.forEach((o) => {
+            this.objs.push(o);
+            this.s.events.emit('pubObj', o);
+          });
+          this.s.tweens.add({ targets: g.order, y: '-=2', yoyo: true, repeat: -1, duration: 300 });
+        }
+        if (!g.mug && g.sat > 2.5) {
+          g.order?.forEach((o) => o.destroy());
+          g.order = undefined;
+          g.mug = this.s.add.image(sp.x + (g.seat.flip ? -13 : 13), sp.y - 6, 'obj', food ? FOOD[this.pub.act] : g.sitT > 6 ? 'mug' : 'mugDark').setOrigin(0.5, 1).setDepth(sp.y + 4);
           this.objs.push(g.mug);
+          this.s.events.emit('pubObj', g.mug);
         }
         if (g.sitT <= 0) {
           g.leaving = true;
@@ -258,6 +303,7 @@ export class PubView {
       // odešel
       if (g.seat) g.seat.taken = false;
       g.mug?.destroy();
+      g.order?.forEach((o) => o.destroy());
       sp.destroy();
       this.guests.splice(this.guests.indexOf(g), 1);
       return;

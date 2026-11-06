@@ -164,6 +164,12 @@ export class PubScene extends Phaser.Scene {
         return n;
       },
       banner: (c, text, top) => this.banner(c, text, top),
+      fine: (secs, view) => {
+        const p = this.d.pubs[view];
+        const n = Math.min(this.d.coins, Math.round(Math.max(this.rate(p), this.pay(p, STATIONS[0]) / STATIONS[0].cycle) * secs));
+        this.d.coins -= n;
+        return n;
+      },
       boostAll: (ms) => (this.evBoostUntil = Date.now() + ms),
       onEvent: (_k, ok) => {
         if (!ok) return;
