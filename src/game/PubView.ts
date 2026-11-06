@@ -188,6 +188,32 @@ export class PubView {
     this.s.tweens.add({ targets: this.dark, fillAlpha: on ? 0.55 : 0, duration: 1500 });
   }
 
+  /** kostlivec u stanice nestojí jako socha: přejde kousek vedle, chvíli „pracuje“ (ruce nahoře) a zase zpátky */
+  private staffWork(spr: Phaser.GameObjects.Sprite, x0: number) {
+    const step = () => {
+      if (!spr.active) return;
+      const tx = x0 + this.rnd.between(-10, 10);
+      const dist = Math.abs(tx - spr.x);
+      spr.setFlipX(tx < spr.x);
+      let f = 0;
+      this.s.tweens.add({
+        targets: spr,
+        x: tx,
+        duration: Math.max(200, dist * 60),
+        onUpdate: () => spr.setFrame(8 + (Math.floor(f++ / 6) % 4)),
+        onComplete: () => {
+          if (!spr.active) return;
+          spr.setFlipX(false).setFrame(this.rnd.frac() < 0.4 ? 13 : 4);
+          this.s.time.delayedCall(this.rnd.between(1500, 4000), () => {
+            if (spr.active) spr.setFrame(4);
+            this.s.time.delayedCall(this.rnd.between(300, 1200), step);
+          });
+        },
+      });
+    };
+    this.s.time.delayedCall(this.rnd.between(500, 2500), step);
+  }
+
   /** druhy hostů této hospody (pro rváče) */
   guestKeys() {
     return GUESTS[this.pub.act];
@@ -250,6 +276,7 @@ export class PubView {
         this.objs.push(spr);
         this.staff[id] = spr;
         this.s.events.emit('pubObj', spr);
+        if (id !== 'dice') this.staffWork(spr, this.ox + p.x);
       }
     }
   }
