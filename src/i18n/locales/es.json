@@ -437,5 +437,14 @@
  "Najmout\n{n} kostí": "Contratar\n{n} huesos",
  "rychlost\nmax": "velocidad\nmáx",
  "rychleji\n{n}": "más rápido\n{n}",
- "+1 bublina\n{n}": "+1 pedido\n{n}"
+ "+1 bublina\n{n}": "+1 pedido\n{n}",
+ "cykly kratší o {v} %": "ciclos {v} % más cortos",
+ "start s {c} coins": "empiezas con {c} coins",
+ "offline +{h} h": "offline +{h} h",
+ "události o {v} % častěji": "eventos {v} % más frecuentes",
+ "Štědří hosté": "Clientes generosos",
+ "Hlubší sklep": "Bodega más honda",
+ "manažeři po hygieně odejdou": "los gerentes se van tras la inspección",
+ "výdělek všude ×{v}": "ganancias en todas partes ×{v}",
+ "úr.": "nv."
 }

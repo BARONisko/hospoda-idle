@@ -437,5 +437,14 @@
  "Najmout\n{n} kostí": "雇う\n骨 {n}",
  "rychlost\nmax": "速さ\n最大",
  "rychleji\n{n}": "速く\n{n}",
- "+1 bublina\n{n}": "+1つ\n{n}"
+ "+1 bublina\n{n}": "+1つ\n{n}",
+ "cykly kratší o {v} %": "サイクル {v} % 短縮",
+ "start s {c} coins": "{c} coinsでスタート",
+ "offline +{h} h": "オフライン +{h} 時間",
+ "události o {v} % častěji": "イベント {v} % 増加",
+ "Štědří hosté": "気前のいい客",
+ "Hlubší sklep": "深い地下室",
+ "manažeři po hygieně odejdou": "衛生検査後にマネージャーは去る",
+ "výdělek všude ×{v}": "全収入 ×{v}",
+ "úr.": "Lv."
 }

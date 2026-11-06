@@ -437,5 +437,14 @@
  "Najmout\n{n} kostí": "Zatrudnij\n{n} kości",
  "rychlost\nmax": "szybkość\nmaks",
  "rychleji\n{n}": "szybciej\n{n}",
- "+1 bublina\n{n}": "+1 dymek\n{n}"
+ "+1 bublina\n{n}": "+1 dymek\n{n}",
+ "cykly kratší o {v} %": "cykle krótsze o {v} %",
+ "start s {c} coins": "start z {c} coins",
+ "offline +{h} h": "offline +{h} h",
+ "události o {v} % častěji": "wydarzenia o {v} % częściej",
+ "Štědří hosté": "Hojni goście",
+ "Hlubší sklep": "Głębsza piwnica",
+ "manažeři po hygieně odejdou": "menedżerowie po sanepidzie odejdą",
+ "výdělek všude ×{v}": "zarobek wszędzie ×{v}",
+ "úr.": "poz."
 }

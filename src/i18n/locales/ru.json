@@ -437,5 +437,14 @@
  "Najmout\n{n} kostí": "Нанять\n{n} костей",
  "rychlost\nmax": "скорость\nмакс",
  "rychleji\n{n}": "быстрее\n{n}",
- "+1 bublina\n{n}": "+1 пузырь\n{n}"
+ "+1 bublina\n{n}": "+1 пузырь\n{n}",
+ "cykly kratší o {v} %": "циклы короче на {v} %",
+ "start s {c} coins": "старт с {c} coins",
+ "offline +{h} h": "офлайн +{h} ч",
+ "události o {v} % častěji": "события на {v} % чаще",
+ "Štědří hosté": "Щедрые гости",
+ "Hlubší sklep": "Глубокий погреб",
+ "manažeři po hygieně odejdou": "менеджеры уйдут после санинспекции",
+ "výdělek všude ×{v}": "доход везде ×{v}",
+ "úr.": "ур."
 }

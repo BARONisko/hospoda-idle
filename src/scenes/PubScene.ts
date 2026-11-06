@@ -3,7 +3,7 @@ import { PAL } from '../data/palette';
 import { t, lang, LANGS, AVAILABLE, setLang } from '../i18n';
 import { txt } from '../ui/font';
 import { big } from '../core/num';
-import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR } from '../core/economy';
+import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kTips, kKrigly, kMaxed } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
@@ -1769,7 +1769,7 @@ export class PubScene extends Phaser.Scene {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * (this.kl('cthulhu') ? 10 : 1) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income);
   }
 
   // ---------- obchod s krígly ----------
@@ -1779,11 +1779,11 @@ export class PubScene extends Phaser.Scene {
   }
 
   private cyc(def: StationDef) {
-    return def.cycle * 0.9 ** this.kl('speed') * (this.has('aquarium') ? 0.9 : 1) / (1 + this.ts().cycle);
+    return def.cycle * kSpeed(this.kl('speed')) * (this.has('aquarium') ? 0.9 : 1) / (1 + this.ts().cycle);
   }
 
   private offCap() {
-    return OFFLINE_CAP + (this.kl('offline') + (this.has('cuckoo') ? 1 : 0)) * 4 * 3600 + this.ts().offline * 3600;
+    return OFFLINE_CAP + (kOffline(this.kl('offline')) + (this.has('cuckoo') ? 4 : 0)) * 3600 + this.ts().offline * 3600;
   }
 
   /** úroveň vylepšení za kosti */
@@ -1798,7 +1798,7 @@ export class PubScene extends Phaser.Scene {
 
   /** odměna za spropitné (ťuknutí nebo sběrač): přes den coins, v noci kost */
   private tipReward(v: PubView) {
-    const tip = Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (1 + this.ts().tips) * this.happyMult()));
+    const tip = Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (1 + this.ts().tips + kTips(this.kl('tips'))) * this.happyMult()));
     const bone = this.boneMult() * (1 + this.ts().nighttips);
     if (this.night) this.d.bones = (this.d.bones ?? 0) + bone;
     else this.gain(tip);
@@ -2035,7 +2035,7 @@ export class PubScene extends Phaser.Scene {
 
   /** krígly za hygienu teď (se Zlatou modlou +25 %) */
   private kriglyNow() {
-    return Math.floor(kriglyFor(this.d.run) * (this.has('idol') ? 1.25 : 1) * (1 + this.ts().krigly));
+    return Math.floor(kriglyFor(this.d.run) * (this.has('idol') ? 1.25 : 1) * (1 + this.ts().krigly + kKrigly(this.kl('krigly'))));
   }
 
   shopSub: 'up' | 'decor' | 'bones' = 'up';
@@ -2073,13 +2073,15 @@ export class PubScene extends Phaser.Scene {
       this.add.text(20, y0 - 2, t('Máš {k} krígel (+{b} % výdělek)', { k: this.d.krigle, b: Math.round(this.d.krigle * KRIGL_BONUS * 100) }), txt(22, PAL.gold)).setDepth(D + 1),
       this.add.text(20, y0 + 24, t('Utracené krígly už bonus nedávají.'), txt(16, PAL.fog)).setDepth(D + 1),
     );
+    const RH2 = 63;
     KRIGL_SHOP.forEach((it, i) => {
-      const y = y0 + 52 + i * RH;
+      const y = y0 + 44 + i * RH2;
       const lvl = this.kl(it.id);
-      const max = lvl >= it.costs.length;
-      const price = it.costs[lvl];
-      this.row(y, RH, D, it.name + (it.costs.length > 1 ? ` ${lvl}/${it.costs.length}` : ''), it.desc, it.id === 'cthulhu' ? 'pine' : 'ink');
-      const b = this.btn(W - 192, y + 10, 170, 60, () => {
+      const max = kMaxed(it, lvl);
+      const price = it.cost(lvl);
+      const sub = max ? it.eff(lvl) : lvl ? `${it.eff(lvl)} → ${it.eff(lvl + 1)}` : it.eff(lvl + 1);
+      this.row(y, RH2, D, it.name + (it.max === 1 ? '' : ` ${t('úr.')} ${lvl}`), sub, it.id === 'cthulhu' ? 'pine' : 'ink');
+      const b = this.btn(W - 172, y + 5, 150, 46, () => {
         if (max || this.d.krigle < price) return sfx.error();
         this.d.krigle -= price;
         (this.d.kup ??= {})[it.id] = lvl + 1;
@@ -2089,14 +2091,14 @@ export class PubScene extends Phaser.Scene {
         if (it.id === 'cthulhu') this.views.forEach((v) => v.refresh());
         this.openShop('krigl', false);
       }, D + 2);
-      this.drawBtn(b, max ? '✓' : t('{k} krígel', { k: price }), !max && this.d.krigle >= price, 'amber');
+      this.drawBtn(b, max ? '✓' : t('{k} krígel', { k: big(price) }), !max && this.d.krigle >= price, 'amber');
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
   }
 
   /** promítne vylepšení z krígel do systémů */
   private applyKup() {
-    this.ev.freq = 0.75 ** this.kl('events') / (1 + this.ts().evfreq);
+    this.ev.freq = kEvents(this.kl('events')) / (1 + this.ts().evfreq);
     brewCfg.speed = 1 + this.ts().brew;
     brewCfg.tank = Math.floor(this.ts().tank);
     nightCfg.mult = 1 + this.ts().night;

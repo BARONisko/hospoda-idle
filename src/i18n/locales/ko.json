@@ -437,5 +437,14 @@
  "Najmout\n{n} kostí": "고용\n뼈 {n}개",
  "rychlost\nmax": "속도\n최대",
  "rychleji\n{n}": "더 빠르게\n{n}",
- "+1 bublina\n{n}": "+1개\n{n}"
+ "+1 bublina\n{n}": "+1개\n{n}",
+ "cykly kratší o {v} %": "주기 {v} % 단축",
+ "start s {c} coins": "{c} coins로 시작",
+ "offline +{h} h": "오프라인 +{h}시간",
+ "události o {v} % častěji": "이벤트 {v} % 더 자주",
+ "Štědří hosté": "후한 손님",
+ "Hlubší sklep": "더 깊은 지하실",
+ "manažeři po hygieně odejdou": "위생 점검 후 매니저가 떠남",
+ "výdělek všude ×{v}": "모든 수입 ×{v}",
+ "úr.": "Lv."
 }

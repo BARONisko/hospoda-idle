@@ -437,5 +437,14 @@
  "Najmout\n{n} kostí": "İşe al\n{n} kemik",
  "rychlost\nmax": "hız\nmaks",
  "rychleji\n{n}": "daha hızlı\n{n}",
- "+1 bublina\n{n}": "+1 balon\n{n}"
+ "+1 bublina\n{n}": "+1 balon\n{n}",
+ "cykly kratší o {v} %": "döngüler %{v} daha kısa",
+ "start s {c} coins": "{c} coins ile başla",
+ "offline +{h} h": "çevrimdışı +{h} sa",
+ "události o {v} % častěji": "olaylar %{v} daha sık",
+ "Štědří hosté": "Cömert Misafirler",
+ "Hlubší sklep": "Daha Derin Mahzen",
+ "manažeři po hygieně odejdou": "müdürler denetimden sonra ayrılır",
+ "výdělek všude ×{v}": "her yerde kazanç ×{v}",
+ "úr.": "sv."
 }

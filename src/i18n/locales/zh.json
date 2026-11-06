@@ -437,5 +437,14 @@
  "Najmout\n{n} kostí": "雇用\n{n} 骨头",
  "rychlost\nmax": "速度\n最大",
  "rychleji\n{n}": "更快\n{n}",
- "+1 bublina\n{n}": "+1 个\n{n}"
+ "+1 bublina\n{n}": "+1 个\n{n}",
+ "cykly kratší o {v} %": "周期缩短 {v} %",
+ "start s {c} coins": "开局 {c} coins",
+ "offline +{h} h": "离线 +{h} 小时",
+ "události o {v} % častěji": "事件频率 +{v} %",
+ "Štědří hosté": "慷慨的客人",
+ "Hlubší sklep": "更深的地窖",
+ "manažeři po hygieně odejdou": "卫生检查后经理离开",
+ "výdělek všude ×{v}": "所有收入 ×{v}",
+ "úr.": "等级"
 }

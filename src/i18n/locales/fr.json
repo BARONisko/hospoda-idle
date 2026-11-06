@@ -437,5 +437,14 @@
  "Najmout\n{n} kostí": "Engager\n{n} os",
  "rychlost\nmax": "vitesse\nmax",
  "rychleji\n{n}": "plus vite\n{n}",
- "+1 bublina\n{n}": "+1 bulle\n{n}"
+ "+1 bublina\n{n}": "+1 bulle\n{n}",
+ "cykly kratší o {v} %": "cycles {v} % plus courts",
+ "start s {c} coins": "départ avec {c} coins",
+ "offline +{h} h": "hors ligne +{h} h",
+ "události o {v} % častěji": "événements {v} % plus fréquents",
+ "Štědří hosté": "Clients généreux",
+ "Hlubší sklep": "Cave plus profonde",
+ "manažeři po hygieně odejdou": "les gérants partent après l'inspection",
+ "výdělek všude ×{v}": "revenus partout ×{v}",
+ "úr.": "niv."
 }

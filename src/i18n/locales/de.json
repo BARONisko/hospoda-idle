@@ -437,5 +437,14 @@
  "Najmout\n{n} kostí": "Anheuern\n{n} Knochen",
  "rychlost\nmax": "Tempo\nmax",
  "rychleji\n{n}": "schneller\n{n}",
- "+1 bublina\n{n}": "+1 Blase\n{n}"
+ "+1 bublina\n{n}": "+1 Blase\n{n}",
+ "cykly kratší o {v} %": "Zyklen {v} % kürzer",
+ "start s {c} coins": "Start mit {c} coins",
+ "offline +{h} h": "offline +{h} h",
+ "události o {v} % častěji": "Ereignisse {v} % häufiger",
+ "Štědří hosté": "Großzügige Gäste",
+ "Hlubší sklep": "Tieferer Keller",
+ "manažeři po hygieně odejdou": "Manager gehen nach der Hygiene",
+ "výdělek všude ×{v}": "Einnahmen überall ×{v}",
+ "úr.": "St."
 }

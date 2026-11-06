@@ -437,5 +437,14 @@
  "Najmout\n{n} kostí": "Hire\n{n} bones",
  "rychlost\nmax": "speed\nmax",
  "rychleji\n{n}": "faster\n{n}",
- "+1 bublina\n{n}": "+1 bubble\n{n}"
+ "+1 bublina\n{n}": "+1 bubble\n{n}",
+ "cykly kratší o {v} %": "cycles {v} % shorter",
+ "start s {c} coins": "start with {c} coins",
+ "offline +{h} h": "offline +{h} h",
+ "události o {v} % častěji": "events {v} % more often",
+ "Štědří hosté": "Generous Guests",
+ "Hlubší sklep": "Deeper Cellar",
+ "manažeři po hygieně odejdou": "managers leave after the inspection",
+ "výdělek všude ×{v}": "income everywhere ×{v}",
+ "úr.": "lv."
 }

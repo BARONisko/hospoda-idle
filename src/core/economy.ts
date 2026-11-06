@@ -2,6 +2,7 @@
 // Cena další úrovně = base · growth^úroveň (klasická idle křivka), výdělek roste lineárně s úrovní
 // a skokově (×2) na milnících 25, 50, 100, … úrovní.
 import { t } from '../i18n';
+import { big } from './num';
 
 export interface StationDef {
   id: string;
@@ -111,21 +112,42 @@ export const PRESTIGE_MIN = 10;
 export const PRESTIGE_FIRST = 4;
 export const prestigeMin = (prestiges: number) => (prestiges > 0 ? PRESTIGE_MIN : PRESTIGE_FIRST);
 
-/** obchod s krígly: trvalá vylepšení (přežijí hygienu), platí se krígly */
+/** obchod s krígly: trvalá vylepšení (přežijí hygienu), platí se krígly; většina jde donekonečna (cena roste exponenciálně) */
+export type KriglId = 'speed' | 'start' | 'offline' | 'events' | 'keepMgr' | 'cthulhu' | 'tips' | 'krigly';
 export interface KriglItem {
-  id: 'speed' | 'start' | 'offline' | 'events' | 'keepMgr' | 'cthulhu';
+  id: KriglId;
   name: string;
-  desc: string;
-  costs: number[];
+  /** cena další úrovně (lvl = současná úroveň) */
+  cost: (lvl: number) => number;
+  /** strop úrovní (undefined = donekonečna) */
+  max?: number;
+  /** popis účinku na dané úrovni (pro „teď → další“) */
+  eff: (lvl: number) => string;
 }
+const exp = (base: number, g: number) => (l: number) => Math.ceil(base * g ** l);
+const pc = (v: number) => String(Math.round(v * 10) / 10).replace('.', ',');
+/** násobek délky cyklů: prvních 5 úrovní −10 %, dál −3 % za úroveň */
+export const kSpeed = (n: number) => 0.9 ** Math.min(n, 5) * 0.97 ** Math.max(0, n - 5);
+/** hodiny navíc offline: prvních 4 úrovně +4 h, dál +1 h */
+export const kOffline = (n: number) => 4 * Math.min(n, 4) + Math.max(0, n - 4);
+/** násobek intervalu událostí (nejméně 0,25) */
+export const kEvents = (n: number) => Math.max(0.25, 0.75 ** Math.min(n, 2) * 0.95 ** Math.max(0, n - 2));
+/** Cthulhu: 1. úroveň ×10, každá další ×2 */
+export const kCthulhu = (n: number) => (n ? 10 * 2 ** (n - 1) : 1);
+export const kTips = (n: number) => 0.15 * n;
+export const kKrigly = (n: number) => 0.05 * n;
 export const KRIGL_SHOP: KriglItem[] = [
-  { id: 'speed', name: t('Rychlejší kostlivci'), desc: t('všechny cykly o 10 % kratší'), costs: [5, 10, 20, 40, 80] },
-  { id: 'start', name: t('Startovní kapitál'), desc: t('po hygieně začneš s coins'), costs: [5, 25, 100] },
-  { id: 'offline', name: t('Delší spánek'), desc: t('výdělek offline o 4 h déle'), costs: [10, 20, 40, 80] },
-  { id: 'events', name: t('Rušnější hospoda'), desc: t('události o 25 % častěji'), costs: [15, 45] },
-  { id: 'keepMgr', name: t('Věrní manažeři'), desc: t('manažeři zůstanou i po hygieně'), costs: [30] },
-  { id: 'cthulhu', name: t('Probudit Cthulhu'), desc: t('×10 výdělek všude navždy'), costs: [300] },
+  { id: 'speed', name: t('Rychlejší kostlivci'), cost: exp(5, 2), eff: (n) => t('cykly kratší o {v} %', { v: pc(100 - kSpeed(n) * 100) }) },
+  { id: 'start', name: t('Startovní kapitál'), cost: (n) => (n < 3 ? [5, 25, 100][n] : Math.ceil(100 * 5 ** (n - 2))), eff: (n) => t('start s {c} coins', { c: big(startCoins(n)) }) },
+  { id: 'offline', name: t('Delší spánek'), cost: exp(10, 2), eff: (n) => t('offline +{h} h', { h: kOffline(n) }) },
+  { id: 'events', name: t('Rušnější hospoda'), cost: (n) => (n < 2 ? [15, 45][n] : Math.ceil(45 * 3 ** (n - 1))), eff: (n) => t('události o {v} % častěji', { v: Math.round((1 / kEvents(n) - 1) * 100) }) },
+  { id: 'tips', name: t('Štědří hosté'), cost: exp(20, 2), eff: (n) => t('spropitné +{v} %', { v: Math.round(kTips(n) * 100) }) },
+  { id: 'krigly', name: t('Hlubší sklep'), cost: exp(40, 2.5), eff: (n) => t('krígly z hygieny +{v} %', { v: Math.round(kKrigly(n) * 100) }) },
+  { id: 'keepMgr', name: t('Věrní manažeři'), cost: () => 30, max: 1, eff: (n) => (n ? t('manažeři zůstanou i po hygieně') : t('manažeři po hygieně odejdou')) },
+  { id: 'cthulhu', name: t('Probudit Cthulhu'), cost: exp(300, 6), eff: (n) => t('výdělek všude ×{v}', { v: big(kCthulhu(n)) }) },
 ];
+/** je položka na maximu (strop úrovní nebo už nic nepřidá) */
+export const kMaxed = (it: KriglItem, n: number) => (it.max !== undefined && n >= it.max) || (it.id === 'events' && kEvents(n) <= 0.25);
 /** startovní coins po hygieně podle úrovně „Startovní kapitál“ */
 export const startCoins = (lvl: number) => (lvl ? 1000 * 100 ** (lvl - 1) : 0);
 
