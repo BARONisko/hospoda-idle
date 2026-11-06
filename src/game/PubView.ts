@@ -69,7 +69,7 @@ const LEVEL_DECOR: { id: string; lvl: number; frame: string; x: number; y: numbe
   { id: 'kitchen', lvl: 25, frame: 'kOven', x: 13 * T + 8, y: 4 * T + 12 },
   { id: 'cellar', lvl: 25, frame: 'barrels', x: 2 * T + 12, y: 3 * T + 15 },
   { id: 'dice', lvl: 25, frame: 'trophy', x: 15 * T + 8, y: 2 * T + 14 },
-  { id: 'dice', lvl: 100, frame: 'jukebox0', x: 15 * T + 4, y: 13 * T + 8 },
+  { id: 'dice', lvl: 100, frame: 'jukebox0', x: 10 * T + 8, y: 13 * T + 8 }, // u spodní zdi (dřív stál ve dveřích)
 ];
 
 /** postava manažera podle hospody */

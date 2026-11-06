@@ -228,7 +228,7 @@ export class TempleScene extends Phaser.Scene {
       this.chestsGot++;
       const n = Math.round(chestTen(this.T.boss) * this.tenMult());
       this.addTen(n, ALTAR.x, 300);
-      this.flash(t('Truhla! +{n} chapadel', { n }), PAL.gold);
+      this.flash(t('Truhla! +{n} chapadel', { n: big(n) }), PAL.gold);
     }
     if (this.T.hp <= 0) this.defeat();
   }
@@ -529,10 +529,10 @@ export class TempleScene extends Phaser.Scene {
     this.text(W / 2, 244, t('síla zásahu: {n}', { n: big(Math.round(this.power())) }), 20, PAL.mint, 0.5);
     const kult = T.up.kult ?? 0;
     this.text(W / 2, 274, kult ? t('kultistů: {n} – sekají chapadla a sbírají i bez tebe', { n: kult }) : t('kultistu najmeš v Obchodě'), 18, PAL.fog, 0.5);
-    if (idle > 0) this.text(W / 2, 302, t('Kultisté mezitím nasbírali {n} chapadel', { n: idle }), 20, PAL.mint, 0.5);
+    if (idle > 0) this.text(W / 2, 302, t('Kultisté mezitím nasbírali {n} chapadel', { n: big(idle) }), 20, PAL.mint, 0.5);
     if (T.rot) {
       const r = T.rot;
-      this.text(W / 2, 326, r.bones ? t('V pondělí shnilo {n} chapadel (sůl zachránila {b} kostí)', { n: r.ten, b: r.bones }) : t('V pondělí shnilo {n} chapadel', { n: r.ten }), 18, PAL.scarlet, 0.5);
+      this.text(W / 2, 326, r.bones ? t('V pondělí shnilo {n} chapadel (sůl zachránila {b} kostí)', { n: big(r.ten), b: big(r.bones) }) : t('V pondělí shnilo {n} chapadel', { n: big(r.ten) }), 18, PAL.scarlet, 0.5);
       if (r.bones) this.host.templeReward('bones', r.bones);
       T.rot = undefined;
     }
@@ -672,7 +672,7 @@ export class TempleScene extends Phaser.Scene {
     this.text(20, y, t('HNED'), 22, PAL.gold); y += 28;
     const tc = Math.ceil(600 * 1.5 ** (T.up.talb ?? 0));
     row(t('Talisman hlubin'), t('Modla z R\'lyeh nebo Mušle hlubin (+1 úroveň)'), tc, can(tc), '', () => { T.ten -= tc; T.up.talb = (T.up.talb ?? 0) + 1; this.toast(this.host.templeReward('talis', 1)); this.shop(); }, ['obj', 'dIdol1']);
-    row(t('Krígly'), t('+{n} krígel', { n: this.kriglyGift() }), 400, can(400), '', () => { T.ten -= 400; this.toast(this.host.templeReward('krigle', this.kriglyGift())); this.shop(); }, ['obj', 'krigl0']);
+    row(t('Krígly'), t('+{n} krígel', { n: big(this.kriglyGift()) }), 400, can(400), '', () => { T.ten -= 400; this.toast(this.host.templeReward('krigle', this.kriglyGift())); this.shop(); }, ['obj', 'krigl0']);
     row(t('Kosti'), t('+30 kostí do Kostnice a na talismany'), 250, can(250), '', () => { T.ten -= 250; this.toast(this.host.templeReward('bones', 30)); this.shop(); }, ['obj', 'dSkulls']);
     this.text(20, y, t('NAPOŘÁD (pro všechny další víkendy)'), 22, PAL.ice); y += 28;
     for (const u of TEMPLE_UPS) {
