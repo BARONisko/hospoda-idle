@@ -36,6 +36,8 @@ interface Offer {
   buy: () => void;
 }
 /** nastavení zvuku (zvlášť od uložené hry) */
+/** výška ovládací lišty pod hospodou v režimu více hospod */
+const SBAR = 46;
 const OPTS_KEY = 'pubidle_opts';
 
 /** Stáhne soubor se zálohou hry */
@@ -1555,7 +1557,8 @@ export class PubScene extends Phaser.Scene {
     if (n === 1) {
       const viewH = 404;
       this.views[0].frame(0, TOP, W, viewH, 118);
-      this.skillBtns[0] = this.btn(14, TOP + viewH - 60, 200, 48, () => this.useSkill(0), 60);
+      // schopnost manažera nahoře u zdi (tam nesedí hosté) – dole by zakrývala bubliny s objednávkami
+      this.skillBtns[0] = this.btn(14, TOP + 12, 180, 44, () => this.useSkill(0), 60);
       const g = this.add.graphics();
       g.fillStyle(col('dusk')).fillRect(0, TOP + viewH, W, H - TOP - viewH);
       g.fillStyle(col('gold')).fillRect(0, TOP + viewH, W, 3);
@@ -1571,15 +1574,17 @@ export class PubScene extends Phaser.Scene {
       const items: Phaser.GameObjects.Components.Transform[] = [];
       const g = this.add.graphics().setDepth(50);
       g.fillStyle(col('gold')).fillRect(0, y + h - 4, W, 4);
+      // ovládací lišta pod hospodou (mimo místnost, ať tlačítka nezakrývají hosty a bubliny)
+      g.fillStyle(col('dusk')).fillRect(0, y + h - 4 - SBAR, W, SBAR);
       const nm = this.add.text(14, y + 10, PUB_NAMES[v.pub.act], txt(small ? 20 : 24, PAL.gold)).setDepth(51);
       nm.setScale(Math.min(1, (W - 190) / nm.width));
       g.fillStyle(col('ink'), 0.8).fillRoundedRect(6, y + 6, nm.displayWidth + 18, small ? 30 : 36, 8);
       const rt = this.add.text(small ? 14 : W - 18, small ? y + 40 : y + 12, '', txt(small ? 18 : 22, PAL.mint)).setOrigin(small ? 0 : 1, 0).setDepth(51);
       this.stripRates.push(rt);
       if (!small) g.fillStyle(col('ink'), 0.8).fillRoundedRect(W - 150, y + 8, 142, 36, 8);
-      const b = this.btn(W - 170, y + h - 62, 156, 48, () => this.openSheet(i), 60);
+      const b = this.btn(W - 170, y + h - SBAR, 156, SBAR - 8, () => this.openSheet(i), 60);
       this.drawBtn(b, t('▲ Stanice'), true, 'green');
-      this.skillBtns[i] = this.btn(14, y + h - 62, 200, 48, () => this.useSkill(i), 60);
+      this.skillBtns[i] = this.btn(14, y + h - SBAR, 180, SBAR - 8, () => this.useSkill(i), 60);
       items.push(g, nm, rt);
       this.strips.push({ v, y, h, items, btns: [b, this.skillBtns[i]] });
     });
@@ -1614,7 +1619,7 @@ export class PubScene extends Phaser.Scene {
     const dy = this.scroll - prev;
     for (const st of this.strips) {
       const y = st.y - this.scroll;
-      st.v.frameClip(0, y, W, st.h - 4, TOP, H, 112);
+      st.v.frameClip(0, y, W, st.h - 4 - SBAR, TOP, H, 112);
       if (dy) {
         st.items.forEach((o) => (o.y -= dy));
         st.btns.forEach((b) => {
