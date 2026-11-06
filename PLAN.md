@@ -107,7 +107,7 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   pípa s kostlivcem točí piva na bar (src/core/waiters.ts), coins až po doručení ke stolu; bar max 12 piv, plný bar = pípa
   stojí („bar plný – číšníci nestíhají!“ na kartě Pípy). Piv za cyklus = 1 + počet milníků pípy (25, 50, 100 …).
   S kostlivcem na pípě nastoupí zadarmo Franta a Jarka, 3. Bořek 400, 4. Vilma 4 000 (× násobek hospody). Každý má vlastní
-  vylepšení: Rychlost chůze (20 úr.), Podnos (1→4 piva), Úsměv (+2 % spropitné/úr., 10 úr.). Lišta 4 číšníků dole
+  vylepšení: Rychlost chůze (20 úr.), Podnos (1→4 piva), Úsměv (+1 % spropitné/úr., 10 úr.). Lišta 4 číšníků dole
   v hospodě (PubScene.addWaiterChips/openWaiter), postavy chodí bar → ulička → host (PubView.waiterTrip), hrnky na baru
   + „n/12“. Noc beze změny (kosti rovnou, číšníci stojí). Offline = min(výroba, kapacita roznosu). Ruční ťukání na pípu
-  (před kostlivcem) vydělá hned. Sim: začátek ~stejně, prestiž ~10 % rychleji (spropitné); návod: čekání na 60 coins 45→55 s.
+  (před kostlivcem) vydělá hned. Sim: začátek ~stejně, prestiž ~5 % rychleji (uživatel chtěl 5 %; Úsměv +1 %/úr.); návod: čekání na 60 coins 45→55 s.

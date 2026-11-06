@@ -27,7 +27,7 @@ export const WALK_S = 3;
 export const SPD_MAX = 20;
 export const TRAY_MAX = 3;
 export const SMILE_MAX = 10;
-export const SMILE_STEP = 0.02;
+export const SMILE_STEP = 0.01;
 
 export const tray = (w: WaiterState) => 1 + w.t;
 export const tripTime = (w: WaiterState) => PICK_S + WALK_S / (1 + 0.15 * w.s);
