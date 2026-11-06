@@ -638,5 +638,16 @@
  "Koupit automat\n1 bod": "Купить автомат\n1 очко",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Нажми на мишень = бросок (прицел автоматический). Закончи ровно на нуле = 1 очко. За 1 очко купи автомат – бросает сам, даже офлайн.",
  "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "Броски выключены – дротики копятся в колчане. Нажми на мишень = бросок.",
- "ŤUKNI SEM": "НАЖМИ СЮДА"
+ "ŤUKNI SEM": "НАЖМИ СЮДА",
+ "ÚROVEŇ {n}!": "УРОВЕНЬ {n}!",
+ "+{n} úr.": "+{n} ур.",
+ "Kostlivec nastoupil!": "Скелет нанят!",
+ "KOMBO ×{n}": "КОМБО ×{n}",
+ "PŘESNĚ NA NULU!": "РОВНО В НОЛЬ!",
+ "+{n} bod": "+{n} очко",
+ "Hurá!": "Ура!",
+ "Bravo!": "Браво!",
+ "Na nulu!": "В ноль!",
+ "Jo!": "Да!",
+ "+3 kosti, +5 XP": "+3 кости, +5 опыта"
 }

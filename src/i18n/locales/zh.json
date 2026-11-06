@@ -638,5 +638,16 @@
  "Koupit automat\n1 bod": "购买自动投掷\n1点",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "点击镖盘 = 投掷（自动瞄准）。正好归零 = 1点。用1点购买自动投掷 – 离线也会自己投。",
  "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "投掷已关闭 – 飞镖存进箭袋。点击镖盘 = 投掷。",
- "ŤUKNI SEM": "点这里"
+ "ŤUKNI SEM": "点这里",
+ "ÚROVEŇ {n}!": "等级 {n}！",
+ "+{n} úr.": "+{n} 级",
+ "Kostlivec nastoupil!": "骷髅已雇佣！",
+ "KOMBO ×{n}": "连击 ×{n}",
+ "PŘESNĚ NA NULU!": "正好归零！",
+ "+{n} bod": "+{n} 点",
+ "Hurá!": "好耶！",
+ "Bravo!": "漂亮！",
+ "Na nulu!": "正中！",
+ "Jo!": "耶！",
+ "+3 kosti, +5 XP": "骨头 +3，经验 +5"
 }

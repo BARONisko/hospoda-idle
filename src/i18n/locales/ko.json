@@ -638,5 +638,16 @@
  "Koupit automat\n1 bod": "자동 던지기 구매\n1점",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "과녁을 탭 = 던지기 (조준은 자동). 정확히 0으로 끝내면 1점. 1점으로 자동 던지기를 사면 오프라인에서도 알아서 던져요.",
  "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "던지기 꺼짐 – 다트는 화살통에 모입니다. 과녁을 탭 = 던지기.",
- "ŤUKNI SEM": "여기를 탭"
+ "ŤUKNI SEM": "여기를 탭",
+ "ÚROVEŇ {n}!": "레벨 {n}!",
+ "+{n} úr.": "+{n} 레벨",
+ "Kostlivec nastoupil!": "해골 고용!",
+ "KOMBO ×{n}": "콤보 ×{n}",
+ "PŘESNĚ NA NULU!": "정확히 0!",
+ "+{n} bod": "+{n}점",
+ "Hurá!": "만세!",
+ "Bravo!": "브라보!",
+ "Na nulu!": "딱 맞았다!",
+ "Jo!": "좋아!",
+ "+3 kosti, +5 XP": "뼈 +3, 경험치 +5"
 }

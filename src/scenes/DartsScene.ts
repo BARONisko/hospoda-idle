@@ -4,6 +4,7 @@
 import Phaser from 'phaser';
 import { PAL } from '../data/palette';
 import { txt } from '../ui/font';
+import { confetti, bigText, popText } from '../ui/juice';
 import { t } from '../i18n';
 import { big } from '../core/num';
 import { sfx } from '../core/sfx';
@@ -207,21 +208,48 @@ export class DartsScene extends Phaser.Scene {
     this.tweens.add({ targets: o, y: y - 80, alpha: 0, duration: 900, onComplete: () => o.destroy() });
     if (r.leg) {
       this.host.dartsLeg(1);
-      sfx.fanfare();
-      this.cameras.main.flash(300, 255, 220, 120);
-      this.toast(t('Hra dohraná! +{n} bod', { n: r.leg }) + (r.leg > 1 ? t(' (bod navíc!)') : '') + '\n' + t('+3 kosti, +5 XP hostinského'));
+      this.celebrate(r, x, y);
+      // vítězná šipka zůstane v terči, dokud oslava nedoběhne
+      const last = this.stuck.pop();
       this.stuck.forEach((o) => o.destroy());
       this.stuck = [];
+      if (last) this.time.delayedCall(2000, () => last.destroy());
       // první bod → rozsvítit „Koupit automat“
       if (!this.S.up.auto && this.mode === 'play') this.play();
     }
   }
 
-  private toast(s: string) {
-    const o = this.add.text(W / 2, 300, s, txt(30, PAL.gold)).setOrigin(0.5).setDepth(60).setStroke(PAL.ink, 6).setAlign('center');
-    o.setScale(Math.min(1, (W - 30) / o.width));
-    this.tweens.add({ targets: o, y: 260, alpha: 0, delay: 1200, duration: 500, onComplete: () => o.destroy() });
+  /** dohraná hra (efekty A + diváci z B): konfety z vítězné šipky, zlatý kruh s polem, velký nápis, diváci jásají */
+  private celebrate(r: ThrowResult, x: number, y: number) {
+    sfx.fanfare();
+    sfx.cheer();
+    sfx.pop();
+    this.cameras.main.flash(250, 255, 220, 120);
+    confetti(this, x, y, 90, 58, 1.1);
+    const ring = this.add.graphics().setDepth(57).setPosition(x, y);
+    ring.lineStyle(6, col('gold')).strokeCircle(0, 0, 26).lineStyle(3, 0xffffff, 0.7).strokeCircle(0, 0, 40);
+    ring.setScale(0.3);
+    this.tweens.add({ targets: ring, scale: 1, duration: 300, ease: 'Back.out' });
+    this.tweens.add({ targets: ring, alpha: 0, delay: 1600, duration: 500, onComplete: () => ring.destroy() });
+    popText(this, x, y - 56, r.label, PAL.gold, 34, 59);
+    bigText(this, W / 2, 500, t('PŘESNĚ NA NULU!'), t('+{n} bod', { n: r.leg }) + (r.leg > 1 ? t(' (bod navíc!)') : '') + ' · ' + t('+3 kosti, +5 XP'), 60, PAL.gold);
+    // diváci pod terčem jásají v bublinách
+    [t('Hurá!'), t('Bravo!'), t('Na nulu!'), t('Jo!')].forEach((s, i) => {
+      const bx = 66 + i * 136, by = 640 - (i % 2) * 16;
+      const g = this.add.graphics().setDepth(56);
+      g.fillStyle(0xffffff).fillRoundedRect(-52, -22, 104, 40, 10).fillTriangle(-8, 18, 8, 18, 0, 30);
+      const tx = this.add.text(0, -2, s, txt(24, PAL.ink)).setOrigin(0.5);
+      const c = this.add.container(bx, by, [g, tx]).setDepth(56).setScale(0);
+      this.tweens.add({ targets: c, scale: 1, duration: 260, delay: 150 + i * 110, ease: 'Back.out' });
+      this.tweens.add({ targets: c, y: by - 10, duration: 220, delay: 450 + i * 110, yoyo: true, repeat: 2 });
+      this.tweens.add({ targets: c, alpha: 0, delay: 1900, duration: 400, onComplete: () => c.destroy() });
+    });
+    // zbytek „0“ zezlátne
+    this.hud.left.setText('0').setColor(PAL.gold);
+    this.time.delayedCall(1800, () => this.hud?.left?.setColor(PAL.white));
   }
+
+
 
   update(_t: number, dms: number) {
     const dt = Math.min(0.05, dms / 1000);

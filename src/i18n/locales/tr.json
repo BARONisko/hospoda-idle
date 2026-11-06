@@ -638,5 +638,16 @@
  "Koupit automat\n1 bod": "Otomatik atıcı al\n1 puan",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Tahtaya dokun = atış (nişan otomatik). Tam sıfırda bitir = 1 puan. 1 puanla otomatik atıcıyı al – çevrimdışı bile kendi atar.",
  "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "Atış kapalı – oklar sadakta birikir. Tahtaya dokun = atış.",
- "ŤUKNI SEM": "BURAYA DOKUN"
+ "ŤUKNI SEM": "BURAYA DOKUN",
+ "ÚROVEŇ {n}!": "SEVİYE {n}!",
+ "+{n} úr.": "+{n} sv.",
+ "Kostlivec nastoupil!": "İskelet işe alındı!",
+ "KOMBO ×{n}": "KOMBO ×{n}",
+ "PŘESNĚ NA NULU!": "TAM SIFIR!",
+ "+{n} bod": "+{n} puan",
+ "Hurá!": "Yaşasın!",
+ "Bravo!": "Bravo!",
+ "Na nulu!": "Tam isabet!",
+ "Jo!": "Evet!",
+ "+3 kosti, +5 XP": "+3 kemik, +5 XP"
 }

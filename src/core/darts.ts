@@ -1,7 +1,7 @@
 // Šipky: hra na nulu (odečítá se, přestřelený hod se nepočítá). Začíná na 301 a každá dohraná hra cíl zvedne
 // (body ze začátku rychle, pak pomaleji). Šipky přibývají samy (10 za hodinu), dohraná hra = 1 bod na vylepšení.
 // Ručně se nemíří: bez automatu se hází ťuknutím na terč (jen když je otevřený); koupený automat (1 bod) hází
-// sám po 2 s i offline a jde vypnout. Na malý zbytek hází přesně (nepřestřelí – při zbytku 1 hodí jedničku).
+// sám po 2 s i offline a jde vypnout. Přestřelený hod se nepočítá.
 import { t } from '../i18n';
 import type { StatId } from './talisman';
 
@@ -136,16 +136,11 @@ export const spread = (up: Record<string, number>, statAcc = 0) => (0.3 * 0.96 *
 
 const gauss = () => Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2 * Math.PI * Math.random());
 
-/** zbytek, od kterého se hází přesně (hod, který by přestřelil, dopadne do mířeného pole) */
-export const SURE_LEFT = 60;
-
-/** hod na pole, kam míří automat: na malý zbytek nikdy nepřestřelí – když by přestřelil, trefí mířené pole
- *  (zbývá 1 → hodí opravdu jedničku); vedle terče se ale trefit dá dál */
+/** hod na pole, kam míří automat (přestřelený hod se nepočítá – rozhodnutí uživatele) */
 export function aimLand(s: DartsState, statAcc = 0): [number, number] {
   const a = aimFor(s.left);
   const [ax, ay] = fieldPos(a.n, a.mult, s.up);
   const [x, y] = land(s, ax, ay, statAcc);
-  if (s.left <= SURE_LEFT && Math.hypot(x, y) <= 1 && score(x, y, s.up).pts > s.left) return [ax, ay];
   return [x, y];
 }
 

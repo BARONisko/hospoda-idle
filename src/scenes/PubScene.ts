@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { PAL } from '../data/palette';
 import { t, lang, LANGS, AVAILABLE, setLang } from '../i18n';
 import { txt } from '../ui/font';
+import { confetti, rays, bigText, coinFountain, popText, punch, flashRect } from '../ui/juice';
 import { big, dur } from '../core/num';
 import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H } from '../core/economy';
 import { sfx } from '../core/sfx';
@@ -222,7 +223,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const top = this.add.graphics().setDepth(100);
     top.fillStyle(col('dusk')).fillRect(0, 0, W, TOP);
     top.fillStyle(col('gold')).fillRect(0, TOP - 3, W, 3);
-    this.add.image(40, 40, 'obj', 'coin').setScale(4).setDepth(101);
+    this.coinIcon = this.add.image(40, 40, 'obj', 'coin').setScale(4).setDepth(101);
     this.coinsText = this.add.text(76, 12, '', txt(40, PAL.gold)).setDepth(101);
     this.rateText = this.add.text(78, 50, '', txt(22, PAL.mint)).setDepth(101);
     this.infoText = this.add.text(16, 80, '', txt(19, PAL.bone)).setDepth(101);
@@ -521,8 +522,30 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   /** oslava milníku stanice */
+  coinIcon!: Phaser.GameObjects.Image;
+  private comboN = 0;
+  private comboT = 0;
+  private punchT = 0;
+
+  /** milník (25, 50, 100 …): paprsky, velký nápis, konfety, mince do počítadla, otřes, zvuk (efekty B) */
   private milestone(i: number, def: StationDef) {
-    this.banner(this.views[i].cam, t('{s}: výdělek ×2!', { s: STATION_NAMES[this.d.pubs[i].act][def.id] }));
+    const c = this.views[i].cam, cx = c.x + c.width / 2, cy = c.y + c.height / 2;
+    const lvl = this.st(this.d.pubs[i], def.id).lvl;
+    rays(this, cx, cy);
+    bigText(this, cx, cy - 20, t('ÚROVEŇ {n}!', { n: lvl }), t('{s}: výdělek ×2!', { s: STATION_NAMES[this.d.pubs[i].act][def.id] }));
+    confetti(this, cx, cy + 40, 70);
+    const card = this.cards.find((k) => k.pub === i && k.def.id === def.id);
+    coinFountain(this, card ? 160 : cx, card ? card.y + 40 : cy, 18, [40, 40], 462, () => this.bumpCoins());
+    this.cameras.main.shake(260, 0.008);
+    sfx.levelUp();
+    sfx.pop();
+  }
+
+  /** počítadlo coins poskočí (nejvýš ~7× za s) */
+  private bumpCoins() {
+    if (this.punchT > 0) return;
+    this.punchT = 0.14;
+    punch(this, [this.coinIcon], 1.18);
   }
 
   private banner(c: Phaser.Cameras.Scene2D.Camera, text: string, top = false) {
@@ -2133,6 +2156,20 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (def.id === 'tap') sfx.pour();
       else sfx.click();
     }
+    // kombo: rychlé ťukání za sebou (jen efekt a zvuk)
+    if (s.lvl > 0 && !s.auto) {
+      this.comboN = this.comboT > 0 ? this.comboN + 1 : 1;
+      this.comboT = 0.9;
+      const card = this.cards.find((k) => k.pub === i && k.def.id === def.id);
+      if (this.comboN >= 3 && card) {
+        sfx.combo(this.comboN);
+        popText(this, 160 + Phaser.Math.Between(-60, 60), card.y + 20, t('KOMBO ×{n}', { n: this.comboN }), this.comboN >= 10 ? PAL.gold : PAL.white, this.comboN >= 10 ? 30 : 24);
+        if (this.comboN % 10 === 0) {
+          confetti(this, 160, card.y + 40, 20, 459, 0.6);
+          this.cameras.main.shake(120, 0.004);
+        }
+      }
+    }
   }
 
   private buy(i: number, def: StationDef) {
@@ -2148,6 +2185,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.task('levels', n);
     this.tut('buy:' + def.id);
     sfx.buy();
+    const card = this.cards.find((k) => k.pub === i && k.def.id === def.id);
+    if (card) {
+      flashRect(this, 10, card.y, W - 20, CARD_H - 8);
+      popText(this, card.buy.x + card.buy.w / 2, card.buy.y - 6, t('+{n} úr.', { n }), PAL.mint);
+      confetti(this, card.buy.x + card.buy.w / 2, card.buy.y + 10, 10, 459, 0.45);
+    }
     if (before && s.lvl >= before) this.milestone(i, def);
     this.views[i].refresh();
     this.refresh();
@@ -2161,6 +2204,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (this.d.coins < c) return sfx.error();
     this.d.coins -= c;
     sfx.hire();
+    sfx.pop();
+    const card = this.cards.find((k) => k.pub === i && k.def.id === def.id);
+    if (card) {
+      confetti(this, card.staff.x + card.staff.w / 2, card.staff.y, 30, 459, 0.7);
+      popText(this, card.staff.x + card.staff.w / 2, card.staff.y - 20, t('Kostlivec nastoupil!'), PAL.bone, 26);
+    }
     s.auto = true;
     if (s.prog === 0) s.prog = 0.0001;
     this.tut('hire');
@@ -2538,6 +2587,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   update(_t: number, dms: number) {
     const dt = Math.min(dms / 1000, 0.25);
+    this.comboT -= dt;
+    this.punchT -= dt;
     this.tutFollow?.();
     this.tutTick();
     this.coinT -= dt;
@@ -2559,6 +2610,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
           } else {
             this.gain(g);
             this.views[i].payout(def.id, g);
+            this.bumpCoins();
           }
           if (this.coinT <= 0) {
             sfx.coin(1 + i * 0.12);

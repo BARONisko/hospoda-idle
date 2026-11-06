@@ -180,6 +180,34 @@ class Sfx {
     const sc = [523, 587, 659, 698, 784, 880, 988, 1046];
     this.tone(sc[i % sc.length], 0.14, 'triangle', 0.07);
   }
+  /** velký milník: buben, stoupající arpeggio a třpyt */
+  levelUp() {
+    this.tone(110, 0.25, 'sine', 0.2, 55);
+    this.hiss(0.25, 2500, 0.08, 6000);
+    [392, 523, 659, 784, 1046, 1319].forEach((f, i) => this.tone(f, 0.12, 'square', 0.07, undefined, 0.05 + i * 0.06));
+    this.tone(1568, 0.5, 'triangle', 0.06, undefined, 0.45);
+    [2093, 2637, 3136, 2637, 3520].forEach((f, i) => this.tone(f, 0.08, 'sine', 0.03, undefined, 0.5 + i * 0.07));
+  }
+  /** prasknutí konfet */
+  pop() {
+    this.hiss(0.12, 1800, 0.12, 400);
+    this.tone(320, 0.08, 'square', 0.05, 640);
+  }
+  /** déšť mincí: n cinknutí za sebou */
+  coinRain(n = 6) {
+    for (let i = 0; i < n; i++) this.tone(1500 + ((i * 337) % 900), 0.06, 'triangle', 0.035, undefined, i * 0.045);
+  }
+  /** kombo ťukání: čím delší řada, tím vyšší tón */
+  combo(n: number) {
+    const f = 440 * 2 ** (Math.min(n, 24) / 12);
+    this.tone(f, 0.06, 'square', 0.05);
+    if (n % 10 === 0) this.tone(f * 1.5, 0.15, 'triangle', 0.06, undefined, 0.05);
+  }
+  /** jásot diváků (šipky) */
+  cheer() {
+    for (let i = 0; i < 3; i++) this.hiss(0.6, 900 + i * 500, 0.05, 1400 + i * 400, i * 0.08);
+    [659, 784, 1046].forEach((f, i) => this.tone(f, 0.18, 'triangle', 0.05, undefined, 0.15 + i * 0.1));
+  }
   hire() {
     this.tone(220, 0.12, 'square', 0.07, 440);
     this.tone(330, 0.2, 'square', 0.06, 660, 0.1);

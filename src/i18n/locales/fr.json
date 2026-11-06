@@ -638,5 +638,16 @@
  "Koupit automat\n1 bod": "Acheter le lanceur\n1 point",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Touche la cible = lancer (la visée est automatique). Finir pile à zéro = 1 point. Avec 1 point, achète le lanceur auto : il lance seul, même hors ligne.",
  "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "Lancer désactivé – les fléchettes restent dans le carquois. Touche la cible = lancer.",
- "ŤUKNI SEM": "TOUCHE ICI"
+ "ŤUKNI SEM": "TOUCHE ICI",
+ "ÚROVEŇ {n}!": "NIVEAU {n} !",
+ "+{n} úr.": "+{n} niv.",
+ "Kostlivec nastoupil!": "Squelette embauché !",
+ "KOMBO ×{n}": "COMBO ×{n}",
+ "PŘESNĚ NA NULU!": "PILE À ZÉRO !",
+ "+{n} bod": "+{n} point",
+ "Hurá!": "Hourra !",
+ "Bravo!": "Bravo !",
+ "Na nulu!": "Pile !",
+ "Jo!": "Ouais !",
+ "+3 kosti, +5 XP": "+3 os, +5 XP"
 }

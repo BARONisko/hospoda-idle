@@ -638,5 +638,16 @@
  "Koupit automat\n1 bod": "Automat kaufen\n1 Punkt",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Tippe auf die Scheibe = Wurf (gezielt wird automatisch). Genau auf null beenden = 1 Punkt. Für 1 Punkt gibt es den Automaten – er wirft allein, auch offline.",
  "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "Werfen ist aus – Pfeile bleiben im Köcher. Tippe auf die Scheibe = Wurf.",
- "ŤUKNI SEM": "HIER TIPPEN"
+ "ŤUKNI SEM": "HIER TIPPEN",
+ "ÚROVEŇ {n}!": "STUFE {n}!",
+ "+{n} úr.": "+{n} St.",
+ "Kostlivec nastoupil!": "Skelett eingestellt!",
+ "KOMBO ×{n}": "KOMBO ×{n}",
+ "PŘESNĚ NA NULU!": "GENAU AUF NULL!",
+ "+{n} bod": "+{n} Punkt",
+ "Hurá!": "Hurra!",
+ "Bravo!": "Bravo!",
+ "Na nulu!": "Genau!",
+ "Jo!": "Ja!",
+ "+3 kosti, +5 XP": "+3 Knochen, +5 EP"
 }

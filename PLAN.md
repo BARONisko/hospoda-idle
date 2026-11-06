@@ -95,3 +95,9 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Obchod (dřív na zamčenou 1. dlaždici – návod se zasekl). Bez peněz na kostlivce: „Ťukej na Pípu … 2 / 100“.
 - Hospoda vyplní celou šířku (přiblížení na šířku, střed na sloupcích 1–17): zmizel černý pruh vlevo (vnější zeď) i useknutý
   pravý okraj; nahoře/dole se ořízne jen kousek zdi.
+- Hospoda 56 (pokr.): první kostlivec na pípě stojí 50 coins (dřív 100). Šipky: zrušen přesný dohoz – přestřelený hod
+  se zase jen nepočítá (tak to uživatel myslel). Efekty B (src/ui/juice.ts: confetti, rays, bigText, coinFountain, popText,
+  punch, flashRect) + zvuky (sfx.levelUp, pop, coinRain, combo, cheer): milník = paprsky, „ÚROVEŇ 25!“, konfety, mince
+  do počítadla, otřes; nákup = záblesk karty, „+1 úr.“, jiskry; kostlivec = konfety; rychlé ťukání = KOMBO ×N (stoupající
+  tón, každých 10 konfety); počítadlo coins poskočí při výdělku. Šipky – oslava dohrané hry (A + diváci z B): konfety
+  z vítězné šipky, zlatý kruh, „PŘESNĚ NA NULU!“ s odměnami, diváci v bublinách, fanfára + jásot.

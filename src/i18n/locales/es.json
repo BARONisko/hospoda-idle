@@ -638,5 +638,16 @@
  "Koupit automat\n1 bod": "Comprar lanzador\n1 punto",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Toca la diana = lanzar (apunta solo). Termina justo en cero = 1 punto. Con 1 punto compra el lanzador automático: lanza solo, incluso sin conexión.",
  "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "Lanzar está apagado – los dardos se guardan en el carcaj. Toca la diana = lanzar.",
- "ŤUKNI SEM": "TOCA AQUÍ"
+ "ŤUKNI SEM": "TOCA AQUÍ",
+ "ÚROVEŇ {n}!": "¡NIVEL {n}!",
+ "+{n} úr.": "+{n} niv.",
+ "Kostlivec nastoupil!": "¡Esqueleto contratado!",
+ "KOMBO ×{n}": "COMBO ×{n}",
+ "PŘESNĚ NA NULU!": "¡JUSTO A CERO!",
+ "+{n} bod": "+{n} punto",
+ "Hurá!": "¡Hurra!",
+ "Bravo!": "¡Bravo!",
+ "Na nulu!": "¡Exacto!",
+ "Jo!": "¡Sí!",
+ "+3 kosti, +5 XP": "+3 huesos, +5 XP"
 }

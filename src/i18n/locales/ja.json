@@ -638,5 +638,16 @@
  "Koupit automat\n1 bod": "自動投げを購入\n1ポイント",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "ボードをタップ＝投げる（狙いは自動）。ぴったり0で終われば1ポイント。1ポイントで自動投げを購入 – オフラインでも投げ続ける。",
  "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "投げはオフ – ダーツは矢筒にたまる。ボードをタップ＝投げる。",
- "ŤUKNI SEM": "ここをタップ"
+ "ŤUKNI SEM": "ここをタップ",
+ "ÚROVEŇ {n}!": "レベル{n}！",
+ "+{n} úr.": "+{n}レベル",
+ "Kostlivec nastoupil!": "ガイコツを雇った！",
+ "KOMBO ×{n}": "コンボ ×{n}",
+ "PŘESNĚ NA NULU!": "ぴったりゼロ！",
+ "+{n} bod": "+{n}ポイント",
+ "Hurá!": "やった！",
+ "Bravo!": "ブラボー！",
+ "Na nulu!": "ぴったり！",
+ "Jo!": "よし！",
+ "+3 kosti, +5 XP": "骨+3、経験値+5"
 }

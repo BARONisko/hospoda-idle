@@ -638,5 +638,16 @@
  "Koupit automat\n1 bod": "Buy auto-thrower\n1 point",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Tap the board = throw (aiming is automatic). Finish exactly on zero = 1 point. Spend 1 point on the auto-thrower – it throws by itself, even offline.",
  "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "Throwing is off – darts are saved in the quiver. Tap the board = throw.",
- "ŤUKNI SEM": "TAP HERE"
+ "ŤUKNI SEM": "TAP HERE",
+ "ÚROVEŇ {n}!": "LEVEL {n}!",
+ "+{n} úr.": "+{n} lvl",
+ "Kostlivec nastoupil!": "Skeleton hired!",
+ "KOMBO ×{n}": "COMBO ×{n}",
+ "PŘESNĚ NA NULU!": "EXACTLY ZERO!",
+ "+{n} bod": "+{n} point",
+ "Hurá!": "Hooray!",
+ "Bravo!": "Bravo!",
+ "Na nulu!": "Spot on!",
+ "Jo!": "Yes!",
+ "+3 kosti, +5 XP": "+3 bones, +5 XP"
 }
