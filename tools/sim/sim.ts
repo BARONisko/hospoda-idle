@@ -1,6 +1,6 @@
 // Simulace průběhu hry: „chamtivý“ hráč kupuje vždy to, co se nejrychleji vrátí (úroveň, kostlivec, vylepšení).
 // Spuštění: node tools/sim/run.mjs   → časy do milníků (1K, 1M, první prestiž…) pro 1.–3. hospodu.
-import { crew, beersPerCycle, START_CREW, hireCost, upCost, UP_MAX, WAITER_MAX, type WaiterState, type WaiterUp } from '../../src/core/waiters';
+import { crew, beersPerCycle, START_CREW, hireCost, freePoints, UP_MAX, WAITER_MAX, type WaiterState, type WaiterUp } from '../../src/core/waiters';
 import { milestoneCount } from '../../src/core/economy';
 import { STATIONS, StationDef, payout, cost, actMult, UPGRADES, upMult, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN, PRESTIGE_FIRST } from '../../src/core/economy';
 
@@ -47,7 +47,6 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
       if (WAITERS_ON) ws.forEach((list, p) => {
         if (!list.length) return;
         if (list.length < WAITER_MAX) consider(hireCost(list.length) * actMult(p + 1), () => list.push({ s: 0, t: 0, m: 0 }), () => list.pop());
-        for (const w of list) for (const k of ['s', 't', 'm'] as WaiterUp[]) if (w[k] < UP_MAX[k]) consider(upCost(k, w[k]) * actMult(p + 1), () => w[k]++, () => w[k]--);
       });
       for (const u of UPGRADES) {
         if (u.act > pubs || up.includes(u.id)) continue;
@@ -70,6 +69,28 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
         coins -= price;
         tap.auto = true;
         if (WAITERS_ON) ws[p].push(...START_CREW());
+      }
+    });
+    // číšníci: 1 XP za sekundu práce, body hned utratí za nejlepší vylepšení
+    if (WAITERS_ON) ws.forEach((list, p) => {
+      const tap = st[p][0];
+      if (!list.length || !tap.auto) return;
+      const busy = Math.min(1, beersPerCycle(milestoneCount(tap.lvl)) / STATIONS[0].cycle / crew(list).rate);
+      for (const w of list) {
+        w.xp = (w.xp ?? 0) + busy;
+        while (freePoints(w) > 0) {
+          const r0 = rate();
+          let bk: WaiterUp | null = null, bg = -1;
+          for (const k of ['s', 't', 'm'] as WaiterUp[]) {
+            if (w[k] >= UP_MAX[k]) continue;
+            w[k]++;
+            const g = rate() - r0;
+            w[k]--;
+            if (g > bg) (bg = g), (bk = k);
+          }
+          if (!bk) break;
+          w[bk]++;
+        }
       }
     });
     const r = rate();

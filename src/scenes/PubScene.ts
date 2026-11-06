@@ -4,7 +4,7 @@ import { t, lang, LANGS, AVAILABLE, setLang } from '../i18n';
 import { txt } from '../ui/font';
 import { confetti, rays, bigText, coinFountain, popText, punch, flashRect } from '../ui/juice';
 import { big, dur } from '../core/num';
-import { WAITERS, WAITER_MAX, BAR_CAP, crew, tripTime, smileBonus, hireCost as wHireCost, upCost as wUpCost, UP_MAX as W_UP_MAX, upName as wUpName, waiterLvl, waiterRate, tray, SMILE_STEP, START_CREW, beersPerCycle, type WaiterUp } from '../core/waiters';
+import { WAITERS, WAITER_MAX, BAR_CAP, crew, tripTime, smileBonus, hireCost as wHireCost, UP_MAX as W_UP_MAX, freePoints, xpProgress, xpFor, spent as wSpent, earned as wEarned, upName as wUpName, waiterLvl, waiterRate, tray, SMILE_STEP, START_CREW, beersPerCycle, type WaiterUp } from '../core/waiters';
 import { milestoneCount } from '../core/economy';
 import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H } from '../core/economy';
 import { sfx } from '../core/sfx';
@@ -175,7 +175,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.d.pubs = this.d.pubs.filter((p) => p.act <= 3).slice(0, MAX_PUBS);
     if (!this.d.pubs.length) this.d.pubs = [newPub(1)];
     // číšníci: kdo už má kostlivce na pípě, dostane prvního číšníka
-    for (const p of this.d.pubs) if (p.st.tap?.auto && !p.w?.length) p.w = START_CREW();
+    for (const p of this.d.pubs) {
+      if (p.st.tap?.auto && !p.w?.length) p.w = START_CREW();
+      // vylepšení koupená dřív za coins zůstanou (zkušenosti aspoň na utracené body)
+      for (const w of p.w ?? []) w.xp = Math.max(w.xp ?? 0, wSpent(w) ? xpFor(wSpent(w)) + 1e-6 : 0);
+    }
     this.wrun = this.d.pubs.map(() => []);
     loadOpts();
     // ladění: ?pubs=2|3 přidá hospody (než bude prestiž)
@@ -364,6 +368,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const rate = this.d.pubs.reduce((a, p) => a + this.rate(p), 0);
     const g = Math.floor(rate * secs);
     this.d.at = Date.now();
+    // číšníci sbírají zkušenosti i offline (jen přes den, podle toho, jak moc mají práce)
+    const daySecs = secs * (1 - nightShare());
+    for (const p of this.d.pubs) {
+      if (!p.st.tap?.auto || !p.w?.length) continue;
+      const tap = STATIONS[0];
+      const busy = Math.min(1, this.beers(p) / this.cyc(tap) / crew(p.w).rate);
+      for (const w of p.w) w.xp = (w.xp ?? 0) + daySecs * busy;
+    }
     if (secs < OFFLINE_MIN || g < 1 || this.awayObjs.length) return;
     // část času byla noc: místo coins kosti
     const ns = nightShare();
@@ -1805,7 +1817,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.d.up = [];
     const keep = this.kl('keepMgr') > 0;
     const had = this.d.pubs.map((p) => !!p.mgr);
+    const crews = this.d.pubs.map((p) => p.w);
     this.d.pubs = Array.from({ length: n }, (_, i) => newPub((i + 1) as Act));
+    // číšníci (zkušenosti a body) zůstávají i po hygieně
+    this.d.pubs.forEach((p, i) => crews[i] && (p.w = crews[i]));
     if (keep) this.d.pubs.forEach((p, i) => (p.mgr = had[i] ?? false));
     this.d.coins = startCoins(this.kl('start'));
     store(this.d);
@@ -2638,6 +2653,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   wChipKey = '';
   wPanel: Phaser.GameObjects.GameObject[] = [];
   wPanelBtns: { b: Btn; cost: number; max: boolean }[] = [];
+  /** získané body číšníka v otevřeném panelu (při nové úrovni se panel překreslí) */
+  wPanelPts = -1;
   wSel = -1;
 
   /** hospoda, jejíž lišta číšníků je vidět */
@@ -2670,7 +2687,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const ws = p?.w ?? [];
     const price = p ? this.wHirePrice(p) : 0;
     const hidden = !ws.length || this.night || this.shopObjs.length > 0;
-    const key = `${pi}|${hidden}|${ws.map(waiterLvl).join(',')}|${this.d.coins >= price}|${this.wSel}`;
+    const key = `${pi}|${hidden}|${ws.map((w) => waiterLvl(w) + ':' + freePoints(w)).join(',')}|${this.d.coins >= price}|${this.wSel}`;
     if (key === this.wChipKey) return;
     this.wChipKey = key;
     const y = TOP + VIEW_H - 74;
@@ -2690,6 +2707,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       c.bg.lineStyle(3, col(this.wSel === k ? 'gold' : has ? 'mauve' : 'slate')).strokeRoundedRect(x, y, 64, 66, 9);
       if (has) {
         c.bg.fillStyle(col('gold')).fillRoundedRect(x + 48, y - 8, 26, 20, 9);
+        // volný bod na vylepšení = zelená tečka
+        if (freePoints(ws[k])) c.bg.fillStyle(col('ink')).fillCircle(x + 6, y + 6, 9).fillStyle(col('mint')).fillCircle(x + 6, y + 6, 7);
         c.lvl.setText(String(waiterLvl(ws[k])));
         c.name.setText(WAITERS[k].name).setColor(PAL.bone).setFontSize(14).setY(y + 58);
       } else {
@@ -2731,6 +2750,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.wSel = k;
     const p = this.d.pubs[pi];
     const w = p.w![k];
+    this.wPanelPts = wEarned(w);
     const D = 300;
     const y0 = TOP + VIEW_H + 4;
     const objs = this.wPanel;
@@ -2742,7 +2762,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     objs.push(this.add.image(42, y0 + 44, WAITERS[k].key, 0).setScale(2.5).setDepth(D + 1));
     objs.push(this.add.text(74, y0 + 12, t('{n} · úroveň {l}', { n: WAITERS[k].name, l: waiterLvl(w) }), txt(28, PAL.gold)).setDepth(D + 1));
     const r = waiterRate(w);
-    objs.push(this.add.text(74, y0 + 48, t('roznese {r} piva/s · podnos {n} · spropitné +{m} %', { r: r.toFixed(2).replace('.', ','), n: tray(w), m: Math.round(smileBonus(w) * 100) }), txt(17, PAL.fog)).setDepth(D + 1));
+    const free = freePoints(w);
+    const xb = this.add.graphics().setDepth(D + 1);
+    xb.fillStyle(col('ink')).fillRoundedRect(74, y0 + 72, W - 160, 10, 4).fillStyle(col('mint')).fillRoundedRect(74, y0 + 72, Math.max(6, (W - 160) * xpProgress(w)), 10, 4);
+    objs.push(xb);
+    objs.push(this.add.text(W - 80, y0 + 77, free ? t('body: {n}', { n: free }) : '', txt(18, PAL.gold)).setOrigin(1, 0.5).setDepth(D + 2));
+    objs.push(this.add.text(74, y0 + 44, t('roznese {r} piva/s · podnos {n} · spropitné +{m} %', { r: r.toFixed(2).replace('.', ','), n: tray(w), m: Math.round(smileBonus(w) * 100) }), txt(17, PAL.fog)).setDepth(D + 1));
     const close = this.btn(W - 66, y0 + 10, 50, 44, () => this.closeWaiter(), D + 2);
     this.drawBtn(close, '✕', true, 'red');
     objs.push(close.bg, close.label, close.zone);
@@ -2754,25 +2779,23 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       { k: 'm', now: t('spropitné +{m} %', { m: Math.round(w.m * SMILE_STEP * 100) }), next: t('spropitné +{m} %', { m: Math.round((w.m + 1) * SMILE_STEP * 100) }) },
     ];
     rows.forEach((row, j) => {
-      const y = y0 + 84 + j * 112;
+      const y = y0 + 96 + j * 110;
       const lvl = w[row.k], max = lvl >= W_UP_MAX[row.k];
-      const cost = wUpCost(row.k, lvl) * actMult(p.act);
       const box = this.add.graphics().setDepth(D + 1);
       box.fillStyle(col('ink'), 0.6).fillRoundedRect(16, y, W - 32, 100, 10);
       objs.push(box);
       objs.push(this.add.text(32, y + 10, `${wUpName(row.k)} ${lvl}/${W_UP_MAX[row.k]}`, txt(24, PAL.bone)).setDepth(D + 1));
       objs.push(this.add.text(32, y + 46, max ? row.now : `${row.now} → ${row.next}`, txt(18, PAL.fog)).setDepth(D + 1));
       const b = this.btn(W - 190, y + 20, 160, 60, () => {
-        if (max || this.d.coins < cost) return sfx.error();
-        this.d.coins -= cost;
+        if (max || freePoints(w) < 1) return sfx.error();
         w[row.k]++;
         sfx.buy();
         confetti(this, W - 110, y + 40, 12, 459, 0.45);
         this.wChipKey = '';
         this.openWaiter(pi, k);
       }, D + 2);
-      this.drawBtn(b, max ? t('MAX') : big(cost), !max && this.d.coins >= cost, 'green');
-      this.wPanelBtns.push({ b, cost, max });
+      this.drawBtn(b, max ? t('MAX') : t('+1 bod'), !max && free > 0, 'green');
+      this.wPanelBtns.push({ b, cost: 0, max });
       objs.push(b.bg, b.label, b.zone);
     });
   }
@@ -2795,6 +2818,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const r = (run[k] ??= { t: 0, dur: 0, v: 0, paid: true });
       if (r.t > 0) {
         r.t -= dt;
+        w.xp = (w.xp ?? 0) + dt;
         if (!r.paid && r.t <= r.dur / 2) {
           r.paid = true;
           const g = r.v * (1 + smileBonus(w));
@@ -2959,6 +2983,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       else c.info.setColor(PAL.white);
     }
     this.drawWaiterChips();
-    for (const { b, cost, max } of this.wPanelBtns) if (!max && b.enabled !== this.d.coins >= cost) this.drawBtn(b, big(cost), this.d.coins >= cost, 'green');
+    // panel číšníka: nový bod za zkušenosti → překreslit
+    if (this.wSel >= 0 && this.wPanel.length) {
+      const w = this.d.pubs[this.wPub()]?.w?.[this.wSel];
+      if (w && wEarned(w) !== this.wPanelPts) this.openWaiter(this.wPub(), this.wSel);
+    }
   }
 }

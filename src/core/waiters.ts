@@ -9,6 +9,8 @@ export interface WaiterState {
   t: number;
   /** úroveň úsměvu (spropitné) */
   m: number;
+  /** zkušenosti = sekundy práce (roznášení); za každou úroveň 1 bod na vylepšení */
+  xp?: number;
 }
 
 export const WAITER_MAX = 4;
@@ -34,7 +36,26 @@ export const tripTime = (w: WaiterState) => PICK_S + WALK_S / (1 + 0.15 * w.s);
 /** kolik piv za sekundu číšník roznese */
 export const waiterRate = (w: WaiterState) => tray(w) / tripTime(w);
 export const smileBonus = (w: WaiterState) => SMILE_STEP * w.m;
-export const waiterLvl = (w: WaiterState) => 1 + w.s + w.t + w.m;
+/** body utracené za vylepšení */
+export const spent = (w: WaiterState) => w.s + w.t + w.m;
+
+// Zkušenosti: 1 XP = 1 s roznášení (i offline). Úroveň L → L+1 stojí XP_A · XP_R^L.
+// Všech 33 bodů (rychlost 20 + podnos 3 + úsměv 10) ≈ 9 milionů s práce ≈ rok hraní (~10 h výroby denně).
+export const XP_A = 55;
+export const XP_R = 1.4;
+export const MAX_POINTS = SPD_MAX + TRAY_MAX + SMILE_MAX;
+/** XP potřebné na dosažení `pts` bodů (úroveň 1 + pts) */
+export const xpFor = (pts: number) => (XP_A * (XP_R ** pts - 1)) / (XP_R - 1);
+/** získané body podle zkušeností */
+export const earned = (w: WaiterState) => Math.min(MAX_POINTS, Math.floor(Math.log(((w.xp ?? 0) * (XP_R - 1)) / XP_A + 1) / Math.log(XP_R) + 1e-9));
+export const freePoints = (w: WaiterState) => Math.max(0, earned(w) - spent(w));
+export const waiterLvl = (w: WaiterState) => 1 + earned(w);
+/** postup k další úrovni 0–1 */
+export const xpProgress = (w: WaiterState) => {
+  const e = earned(w);
+  if (e >= MAX_POINTS) return 1;
+  return ((w.xp ?? 0) - xpFor(e)) / (xpFor(e + 1) - xpFor(e));
+};
 
 /** cena najmutí n-tého číšníka (první dva nastoupí zadarmo s kostlivcem na pípě) */
 export const hireCost = (i: number) => [0, 0, 400, 4000][i] ?? Infinity;
@@ -45,7 +66,6 @@ export const beersPerCycle = (milestones: number) => 1 + milestones;
 
 export type WaiterUp = 's' | 't' | 'm';
 export const UP_MAX: Record<WaiterUp, number> = { s: SPD_MAX, t: TRAY_MAX, m: SMILE_MAX };
-export const upCost = (k: WaiterUp, lvl: number) => (k === 's' ? 30 * 1.5 ** lvl : k === 't' ? 200 * 10 ** lvl : 100 * 2 ** lvl);
 export const upName = (k: WaiterUp) => (k === 's' ? t('Rychlost chůze') : k === 't' ? t('Podnos') : t('Úsměv'));
 
 /** roznos všech číšníků: piva/s a průměrné spropitné (vážené podle toho, kolik kdo roznese) */

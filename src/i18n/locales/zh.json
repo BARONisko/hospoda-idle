@@ -269,7 +269,7 @@
  "Vyřeš {n} návštěvníků": "接待 {n} 位访客",
  "Vzácné nálezy z událostí, rvaček a návštěv. Vylepšují se za kosti.": "来自事件、斗殴和来访的稀有物品。用骨头升级。",
  "Výčep": "吧台",
- "body: {n}": "点数:{n}",
+ "body: {n}": "点数：{n}",
  "coins a {n} kostí": "coins 和 {n} 骨头",
  "hotovo – další v pondělí": "完成 – 下周一再来",
  "kosti +{v} %": "骨头 +{v} %",
@@ -664,5 +664,6 @@
  "spropitné +{m} %": "小费 +{m} %",
  "MAX": "最大",
  "bar plný – číšníci nestíhají!": "吧台满了 – 服务员忙不过来！",
- "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a}和{b}上岗了 – 把啤酒送到桌上"
+ "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a}和{b}上岗了 – 把啤酒送到桌上",
+ "+1 bod": "+1点"
 }

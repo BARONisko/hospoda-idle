@@ -111,3 +111,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   v hospodě (PubScene.addWaiterChips/openWaiter), postavy chodí bar → ulička → host (PubView.waiterTrip), hrnky na baru
   + „n/12“. Noc beze změny (kosti rovnou, číšníci stojí). Offline = min(výroba, kapacita roznosu). Ruční ťukání na pípu
   (před kostlivcem) vydělá hned. Sim: začátek ~stejně, prestiž ~5 % rychleji (uživatel chtěl 5 %; Úsměv +1 %/úr.); návod: čekání na 60 coins 45→55 s.
+- Číšníci: vylepšení už NE za coins, ale za body ze zkušeností (přání uživatele): 1 XP = 1 s roznášení (i offline,
+  jen přes den, podle vytížení); úroveň L→L+1 stojí 55·1,4^L XP, všech 33 bodů ≈ 9 mil. s práce ≈ rok (~10 h výroby
+  denně). Body se utrácí v panelu číšníka („+1 bod“), zelená tečka na liště = volný bod. Číšníci (XP, body, najmutí)
+  zůstávají i po hygieně; před kostlivcem na pípě nepracují (hosté dostanou pivo samo). Najímání 3./4. dál za coins.
+  Dřív koupená vylepšení zůstala (XP doplněno). Sim: 1. prestiž stejně, 40 krígel ~7 % rychleji.

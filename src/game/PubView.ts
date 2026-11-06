@@ -482,7 +482,7 @@ export class PubView {
 
   /** nosí pivo číšníci? (přes den, když hospoda nějaké má) */
   waiting() {
-    return !this.night && (this.pub.w?.length ?? 0) > 0;
+    return !this.night && (this.pub.w?.length ?? 0) > 0 && !!this.pub.st.tap?.auto;
   }
 
   /** piva čekající na baru: hrnky na pultu a počet (červeně, když je bar plný) */

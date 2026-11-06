@@ -269,7 +269,7 @@
  "Vyřeš {n} návštěvníků": "訪問者を {n} 人対応",
  "Vzácné nálezy z událostí, rvaček a návštěv. Vylepšují se za kosti.": "イベント、ケンカ、訪問で手に入るレアアイテム。骨で強化。",
  "Výčep": "カウンター",
- "body: {n}": "ポイント:{n}",
+ "body: {n}": "ポイント: {n}",
  "coins a {n} kostí": "coins と骨 {n} 個",
  "hotovo – další v pondělí": "完了 – 次は月曜日",
  "kosti +{v} %": "骨 +{v} %",
@@ -664,5 +664,6 @@
  "spropitné +{m} %": "チップ +{m} %",
  "MAX": "最大",
  "bar plný – číšníci nestíhají!": "カウンターが満杯 – ウェイターが追いつかない！",
- "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a}と{b}が働き始めた – ビールをテーブルへ運ぶ"
+ "{a} a {b} nastoupili – roznášejí pivo ke stolům": "{a}と{b}が働き始めた – ビールをテーブルへ運ぶ",
+ "+1 bod": "+1ポイント"
 }
