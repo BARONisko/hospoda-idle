@@ -87,3 +87,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   jakmile coins stačí, přepne se na nákup. Šipky: od zbytku 60 hod, který by přestřelil, dopadne do mířeného pole
   (zbývá 1 → opravdu hodí jedničku; vedle terče jde hodit dál). Automat se zase kupuje (1 bod, „Koupit automat“ na
   terči i v obchodě); bez něj se hází ťuknutím na terč (míří se samo), offline nic. Dosavadní hráči automat dostali (darts v3).
+- Návod: nový hráč začíná s 6 coins (hned koupí 2. úroveň pípy); u ťukání na pípu je zvýrazněná přesně levá část karty,
+  šipka nad ní a pulzující kruhy s nápisem „ŤUKNI SEM“ přímo na pruhu karty.

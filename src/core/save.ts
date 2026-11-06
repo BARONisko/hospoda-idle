@@ -109,7 +109,8 @@ export const MAX_PUBS = 3;
 export const newPub = (act: Act): PubState => ({ act, st: { tap: { lvl: act === 1 ? 1 : 0, auto: false, prog: 0 } } });
 
 export function fresh(): Save {
-  return { v: 2, coins: 0, earned: 0, pubs: [newPub(1)], up: [], run: 0, krigle: 0, ...extra(), at: Date.now() };
+  // nový hráč začíná s 6 coins – hned si koupí 2. úroveň pípy (návod)
+  return { v: 2, coins: 6, earned: 0, pubs: [newPub(1)], up: [], run: 0, krigle: 0, ...extra(), at: Date.now() };
 }
 
 export function load(): Save {

@@ -637,5 +637,6 @@
  "hází samo po 2 s, i když tu nejsi": "자리에 없어도 2초마다 알아서 던짐",
  "Koupit automat\n1 bod": "자동 던지기 구매\n1점",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "과녁을 탭 = 던지기 (조준은 자동). 정확히 0으로 끝내면 1점. 1점으로 자동 던지기를 사면 오프라인에서도 알아서 던져요.",
- "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "던지기 꺼짐 – 다트는 화살통에 모입니다. 과녁을 탭 = 던지기."
+ "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "던지기 꺼짐 – 다트는 화살통에 모입니다. 과녁을 탭 = 던지기.",
+ "ŤUKNI SEM": "여기를 탭"
 }

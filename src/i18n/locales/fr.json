@@ -637,5 +637,6 @@
  "hází samo po 2 s, i když tu nejsi": "lance tout seul toutes les 2 s, même en ton absence",
  "Koupit automat\n1 bod": "Acheter le lanceur\n1 point",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Touche la cible = lancer (la visée est automatique). Finir pile à zéro = 1 point. Avec 1 point, achète le lanceur auto : il lance seul, même hors ligne.",
- "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "Lancer désactivé – les fléchettes restent dans le carquois. Touche la cible = lancer."
+ "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "Lancer désactivé – les fléchettes restent dans le carquois. Touche la cible = lancer.",
+ "ŤUKNI SEM": "TOUCHE ICI"
 }

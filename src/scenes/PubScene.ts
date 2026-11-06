@@ -1805,8 +1805,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       ? t('Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.', { c: Math.floor(this.d.coins), n: need })
       : t('Kostlivec točí sám – počkej na coins: {c} / {n} (nebo ťukej na hosty).', { c: Math.floor(this.d.coins), n: need });
     let tx = 0, ty = 0;
-    if (need > 0 && tapManual) [tx, ty] = [160, card('tap').y + 30];
-    else if (step.done === 'tap') [tx, ty] = [160, card('tap').y + 30];
+    // ťukání na pípu: šipka nad kartou, zvýrazněná přesně levá část karty (kde se ťuká)
+    const tapHere = (need > 0 && tapManual) || step.done === 'tap';
+    if (tapHere) [tx, ty] = [160, card('tap').y + 2];
     else if (step.done === 'buy:tap') [tx, ty] = [card('tap').buy.x + 95, card('tap').buy.y];
     else if (step.done === 'hire') [tx, ty] = [card('tap').staff.x + 95, card('tap').staff.y];
     else if (step.done === 'buy:kitchen') [tx, ty] = [card('kitchen').buy.x + 95, card('kitchen').buy.y];
@@ -1820,6 +1821,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       let [hx, hy] = step.done === 'menu' ? [this.shopBtn.x - 6, this.shopBtn.y - 6] : [tx - hw / 2, ty - 6];
       let [w2, h2] = step.done === 'menu' ? [120, 62] : [hw, hh];
       // bez peněz: světlá celá karta (vlevo ťukání, vpravo nákup), ať je vidět obojí
+      if (tapHere && need <= 0) [hx, hy, w2, h2] = [6, card('tap').y - 4, 308, CARD_H];
       if (need > 0) {
         const cy = card(tapManual ? 'tap' : step.done === 'buy:kitchen' ? 'kitchen' : 'tap').y;
         [hx, hy, w2, h2] = [6, cy - 4, W - 12, CARD_H];
@@ -1848,6 +1850,19 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (up) arrow.setAngle(180);
     this.tweens.add({ targets: arrow, y: arrow.y + (up ? -10 : 10), yoyo: true, repeat: -1, duration: 380, ease: 'Sine.inOut' });
     this.tutObjs.push(g, bub, holder);
+    // kde ťukat: pulzující kruhy a „ŤUKNI“ přímo na pruhu karty Pípa
+    if (tapHere) {
+      const cx = 160, cy = card('tap').y + 81;
+      for (let k = 0; k < 2; k++) {
+        const ring = this.add.graphics().setDepth(D + 1).setPosition(cx, cy);
+        ring.lineStyle(5, col('gold')).strokeCircle(0, 0, 26);
+        this.tweens.add({ targets: ring, scale: { from: 0.6, to: 2.2 }, alpha: { from: 1, to: 0 }, duration: 1100, delay: k * 550, repeat: -1 });
+        this.tutObjs.push(ring);
+      }
+      const hand = this.add.text(cx, cy, t('ŤUKNI SEM'), txt(26, PAL.gold)).setOrigin(0.5).setDepth(D + 2).setBackgroundColor(PAL.ink).setPadding(10, 2, 10, 2);
+      this.tweens.add({ targets: hand, scale: 1.15, yoyo: true, repeat: -1, duration: 420, ease: 'Sine.inOut' });
+      this.tutObjs.push(hand);
+    }
     if (step.done === 'tip') {
       this.tutFollow = () => {
         const p = this.views[0]?.tipTarget();

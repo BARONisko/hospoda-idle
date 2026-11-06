@@ -637,5 +637,6 @@
  "hází samo po 2 s, i když tu nejsi": "throws by itself every 2 s, even when you're away",
  "Koupit automat\n1 bod": "Buy auto-thrower\n1 point",
  "Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.": "Tap the board = throw (aiming is automatic). Finish exactly on zero = 1 point. Spend 1 point on the auto-thrower – it throws by itself, even offline.",
- "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "Throwing is off – darts are saved in the quiver. Tap the board = throw."
+ "Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.": "Throwing is off – darts are saved in the quiver. Tap the board = throw.",
+ "ŤUKNI SEM": "TAP HERE"
 }
