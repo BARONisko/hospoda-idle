@@ -88,6 +88,9 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('hostinský: úroveň 2 a bod', await S(p, (s) => s.d.klvl === 2 && s.skillPoints() === 1));
   await S(p, (s) => s.shopObjs.filter((o) => o.type === 'Zone').find((z) => z.y > 450).emit('pointerdown'));
   ok('hostinský: koupená dovednost', await S(p, (s) => s.d.skills.length === 1 && s.ts().tips >= 0.25));
+  // 5h) týdenní výzva
+  await S(p, (s) => { const w = s.weekly(); w.prog = w.goal; s.openShop('tasks', false); s.shopObjs.filter((o) => o.type === 'Zone').find((z) => z.y > 360).emit('pointerdown'); });
+  ok('týdenní výzva: vyzvednuta', await S(p, (s) => s.weekly().claimed));
   // 6) prestiž
   await S(p, (s) => { s.d.run = 1e8; s.askPrestige(); s.prestige(); });
   await p.waitForTimeout(800);

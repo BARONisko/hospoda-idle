@@ -104,3 +104,36 @@ export const SPECIALS: { id: string; name: string; desc: string; mult: Record<st
   { id: 'cellar', name: t('Den otevřených sklepů'), desc: t('sklep ×3'), mult: { cellar: 3 } },
   { id: 'gamble', name: t('Hazardní den'), desc: t('kostky ×6, pípa ×½'), mult: { dice: 6, tap: 0.5 } },
 ];
+
+/** týdenní výzva: jedna větší výzva na týden, odměna = jistý talisman + krígly */
+export type WeekKind = 'events' | 'brawls' | 'beers' | 'visitors' | 'tips';
+export interface Weekly {
+  week: string;
+  kind: WeekKind;
+  goal: number;
+  prog: number;
+  claimed: boolean;
+}
+const WEEK_GOALS: Record<WeekKind, number> = { events: 15, brawls: 5, beers: 6, visitors: 8, tips: 300 };
+export const weekText = (k: WeekKind, n: number) =>
+  ({
+    events: t('Zvládni {n} událostí', { n }),
+    brawls: t('Rozežeň {n} rvaček', { n }),
+    beers: t('Uvař a prodej nebo vlož {n} piv', { n }),
+    visitors: t('Vyřeš {n} návštěvníků', { n }),
+    tips: t('Vyber spropitné od {n} hostů', { n }),
+  })[k];
+/** číslo týdne (pondělí–neděle) */
+export function weekId(d = new Date()) {
+  const x = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = x.getUTCDay() || 7;
+  x.setUTCDate(x.getUTCDate() + 4 - day);
+  const y0 = new Date(Date.UTC(x.getUTCFullYear(), 0, 1));
+  return `${x.getUTCFullYear()}-${Math.ceil(((+x - +y0) / 86400000 + 1) / 7)}`;
+}
+export function newWeekly(): Weekly {
+  const w = weekId();
+  const kinds = Object.keys(WEEK_GOALS) as WeekKind[];
+  const kind = kinds[w.split('-').reduce((a, b) => a + Number(b), 0) % kinds.length];
+  return { week: w, kind, goal: WEEK_GOALS[kind], prog: 0, claimed: false };
+}

@@ -15,7 +15,7 @@ import { Save, PubState, load, store, newPub, Act, MAX_PUBS } from '../core/save
 import { PubView } from '../game/PubView';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
 import { GUESTS } from '../game/PubView';
-import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today, SPECIALS } from '../core/goals';
+import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today, SPECIALS, WeekKind, newWeekly, weekId, weekText } from '../core/goals';
 
 const W = 540;
 const H = 960;
@@ -184,6 +184,7 @@ export class PubScene extends Phaser.Scene {
         if (!ok) return;
         this.tryDrop(k === 'brawl' ? 0.06 : 0.04);
         this.d.stats.events++;
+        this.week(k === 'brawl' ? 'brawls' : 'events');
         this.xp(20);
         this.task('events', 1);
       },
@@ -214,6 +215,7 @@ export class PubScene extends Phaser.Scene {
           if (this.night) this.d.bones = (this.d.bones ?? 0) + tip * this.boneMult();
           else this.gain(tip);
           this.d.stats.tips++;
+          this.week('tips');
           this.xp(1);
           this.task('tips', 1);
           this.tut('tip');
@@ -565,6 +567,7 @@ export class PubScene extends Phaser.Scene {
       if (b.stock < 1) return sfx.error();
       b.stock--;
       this.xp(15);
+      this.week('beers');
       this.gain(price);
       sfx.coin(1.2);
       store(this.d);
@@ -575,6 +578,7 @@ export class PubScene extends Phaser.Scene {
       if (b.stock < 1) return sfx.error();
       b.stock--;
       b.inv++;
+      this.week('beers');
       if (b.inv >= lvlCost(b)) {
         b.inv = 0;
         b.lvl++;
@@ -661,16 +665,43 @@ export class PubScene extends Phaser.Scene {
 
   /** je co vyzvednout (úkol nebo úspěch)? */
   private claimable() {
-    return this.daily().tasks.some((k) => !k.claimed && k.prog >= k.goal) || ACHIEVEMENTS.some((a) => !this.d.ach.includes(a.id) && a.done(this.d));
+    return (this.weekly().prog >= this.weekly().goal && !this.weekly().claimed) || this.daily().tasks.some((k) => !k.claimed && k.prog >= k.goal) || ACHIEVEMENTS.some((a) => !this.d.ach.includes(a.id) && a.done(this.d));
   }
 
   private taskReward() {
     return Math.max(100, Math.round(Math.max(this.totalRate(), this.pay(this.d.pubs[0], STATIONS[0]) / STATIONS[0].cycle) * 300));
   }
 
+  private weekly() {
+    if (this.d.weekly?.week !== weekId()) this.d.weekly = newWeekly();
+    return this.d.weekly!;
+  }
+
+  private week(kind: WeekKind, n = 1) {
+    const w = this.weekly();
+    if (w.kind === kind && !w.claimed) w.prog = Math.min(w.goal, w.prog + n);
+  }
+
   private tasksTab(y0: number, D: number) {
     const RH = 80;
     const head = (y: number, s: string) => this.shopObjs.push(this.add.text(20, y, s, txt(24, PAL.gold)).setDepth(D + 1));
+    // týdenní výzva
+    {
+      const w = this.weekly();
+      const done = w.prog >= w.goal;
+      this.row(y0 - 4, RH, D, t('Týdenní výzva: {s}', { s: weekText(w.kind, w.goal) }), w.claimed ? t('hotovo – další v pondělí') : `${w.prog} / ${w.goal} · ${t('odměna: talisman + 5 krígel')}`, 'plum', PAL.sand);
+      const b = this.btn(W - 172, y0 + 6, 150, 54, () => {
+        if (w.claimed || w.prog < w.goal) return sfx.error();
+        w.claimed = true;
+        this.d.krigle += 5;
+        this.tryDrop(1);
+        store(this.d);
+        this.openShop('tasks', false);
+      }, D + 2);
+      this.drawBtn(b, w.claimed ? '✓' : done ? t('Vybrat') : `${Math.floor((w.prog / w.goal) * 100)} %`, done && !w.claimed, 'green');
+      this.shopObjs.push(b.bg, b.label, b.zone);
+      y0 += RH + 4;
+    }
     head(y0, t('Denní úkoly'));
     this.daily().tasks.forEach((tk, i) => {
       const y = y0 + 34 + i * RH;
@@ -692,7 +723,7 @@ export class PubScene extends Phaser.Scene {
     const got = this.d.ach.length;
     head(y1, t('Úspěchy {a} / {b}  (odměna 1 krígl)', { a: got, b: ACHIEVEMENTS.length }));
     // nejdřív k vyzvednutí, pak nesplněné
-    const list = ACHIEVEMENTS.filter((a) => !this.d.ach.includes(a.id)).sort((a, b) => Number(b.done(this.d)) - Number(a.done(this.d))).slice(0, 3);
+    const list = ACHIEVEMENTS.filter((a) => !this.d.ach.includes(a.id)).sort((a, b) => Number(b.done(this.d)) - Number(a.done(this.d))).slice(0, 2);
     if (!list.length) head(y1 + 50, t('Všechny úspěchy splněny!'));
     list.forEach((a, i) => {
       const y = y1 + 34 + i * RH;
@@ -903,6 +934,7 @@ export class PubScene extends Phaser.Scene {
         ch.run(c);
         this.tryDrop(0.03);
         this.xp(10);
+        this.week('visitors');
         store(this.d);
       }, D + 3);
       this.drawBtn(b, cost ? `${ch.label}\n${big(cost)} coins` : ch.label, ok, i === 0 ? 'green' : 'plum');
