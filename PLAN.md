@@ -52,7 +52,7 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Hra do složky (offline): složka `HRA/` v repu (HRA/index.html dvojklikem; po pushi ji aktualizuje workflow Pages), `npm run build:offline` → `dist/PUB-Idle.zip` (složka PUB-Idle, celá hra v jednom index.html,
   spustí se dvojklikem z disku). Na Pages ke stažení v ⚙ „Hra do složky“. Postup se ukládá zvlášť od webové verze.
 - Krígly v2 (hospoda 55): Delší spánek +30 s/úroveň, spánek celkem max 12 h; Rušnější hospoda po 2 úrovních jen −1 %/úr.;
-  „Probudit Cthulhu“ → Zlatý výčep (×1,5, ×1,75, ×2 …, cena 300·3^n; Cthulhu kouká do hospod až po 1. bossovi v chrámu);
+  „Probudit Cthulhu“ → Zlatý výčep (×1,5, ×1,75, ×2 …, cena 300·3^n; Cthulhu v hospodách zrušen);
   Štědří hosté → Věrnost hostů (1 XP za příchod hosta, max úr. 10, 1. úr. 20 000 příchodů, ×1,3; +5 % spropitného/úr.;
   d.gxp). Staré krígly za spánek a Štědré hosty vráceny (d.kup2). Kostlivci obsluhy občas donesou jídlo hostovi / sud k pípě.
   Rvačka jen na podlaze (ne u horní zdi). Stará 4. hospoda Chrám Cthulhu se ze starých uložení odebere (chrám = víkendová událost).

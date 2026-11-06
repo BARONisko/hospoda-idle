@@ -2194,13 +2194,6 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     nightCfg.lvl = this.d.dn?.lvl ?? 0;
     nightCfg.shift = this.d.dn?.shift ?? 0;
     PubView.extraGuests = Math.floor(this.ts().guests);
-    // Cthulhu kouká do hospod, když v chrámu padl 1. boss
-    const cth = (this.d.temple?.boss ?? 0) > 0;
-    this.views.forEach((v) => {
-      if (v.cthulhu === cth) return;
-      v.cthulhu = cth;
-      v.refresh();
-    });
   }
 
   private gain(n: number) {
