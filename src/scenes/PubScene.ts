@@ -3,7 +3,7 @@ import { PAL } from '../data/palette';
 import { t, lang, LANGS, AVAILABLE, setLang } from '../i18n';
 import { txt } from '../ui/font';
 import { big } from '../core/num';
-import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN, KRIGL_SHOP, KriglItem, startCoins, DECOR } from '../core/economy';
+import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
@@ -1060,7 +1060,8 @@ export class PubScene extends Phaser.Scene {
     const k = this.kriglyNow();
     this.row(y0, RH, D, t('Zavolat hygienu'), t('krígly: {k} (+{b} % výdělek)', { k: this.d.krigle, b: Math.round(this.d.krigle * KRIGL_BONUS * 100) }), 'blood', PAL.sand);
     const pb = this.btn(W - 212, y0 + 12, 190, 62, () => this.askPrestige(), D + 2);
-    this.drawBtn(pb, k >= PRESTIGE_MIN ? t('+{k} krígel', { k }) : t('{k} / {m} krígel', { k, m: PRESTIGE_MIN }), k >= PRESTIGE_MIN, 'red');
+    const pm = prestigeMin(this.d.stats.prestiges);
+    this.drawBtn(pb, k >= pm ? t('+{k} krígel', { k }) : t('{k} / {m} krígel', { k, m: pm }), k >= pm, 'red');
     this.shopObjs.push(pb.bg, pb.label, pb.zone);
     if (!offer.length) this.shopObjs.push(this.add.text(W / 2, y0 + 150, t('Teď tu nic není.\nOtevři další stanice.'), txt(22, PAL.fog)).setOrigin(0.5).setAlign('center').setDepth(D + 1));
     offer.forEach((o, i) => {
@@ -1379,7 +1380,7 @@ export class PubScene extends Phaser.Scene {
   // ---------- prestiž: hygiena ----------
   private askPrestige() {
     const k = this.kriglyNow();
-    if (k < PRESTIGE_MIN) return sfx.error();
+    if (k < prestigeMin(this.d.stats.prestiges)) return sfx.error();
     this.closeShop();
     const D = 520;
     const objs: Phaser.GameObjects.GameObject[] = [];

@@ -1,6 +1,6 @@
 // Simulace průběhu hry: „chamtivý“ hráč kupuje vždy to, co se nejrychleji vrátí (úroveň, kostlivec, vylepšení).
 // Spuštění: node tools/sim/run.mjs   → časy do milníků (1K, 1M, první prestiž…) pro 1.–3. hospodu.
-import { STATIONS, StationDef, payout, cost, actMult, UPGRADES, upMult, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN } from '../../src/core/economy';
+import { STATIONS, StationDef, payout, cost, actMult, UPGRADES, upMult, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN, PRESTIGE_FIRST } from '../../src/core/economy';
 
 interface St { lvl: number; auto: boolean }
 const fmt = (s: number) => (s < 3600 ? `${(s / 60).toFixed(1)} min` : `${(s / 3600).toFixed(2)} h`);
@@ -56,6 +56,7 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
     run += r;
     t += 1;
     for (const [name, v] of [['1K', 1e3], ['1M', 1e6], ['1B', 1e9]] as const) if (run >= v && !(name in marks)) marks[name] = t;
+    if (kriglyFor(run) >= PRESTIGE_FIRST && !('1. hygiena' in marks)) marks['1. hygiena'] = t;
     if (kriglyFor(run) >= PRESTIGE_MIN && !('prestiž' in marks)) marks['prestiž'] = t;
     if (kriglyFor(run) >= 4 * PRESTIGE_MIN && !('40 krígel' in marks)) marks['40 krígel'] = t;
   }
