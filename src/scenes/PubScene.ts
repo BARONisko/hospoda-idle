@@ -579,6 +579,7 @@ export class PubScene extends Phaser.Scene {
         if (lock) return this.banner(this.views[0].cam, t('{s}: otevře se {c}', { s: label, c: lock }));
         if (sub) this.shopSub = sub;
         this.openShop(tab, false);
+        if (tab === 'shop' && sub === 'up') this.tut('tile:shop');
       }, D + 2);
       this.drawBtn(b, '', true, lock ? 'ink' : 'slate');
       const img = this.add.image(x + tw / 2, y + 50, atlas, frame).setDepth(D + 4);
@@ -603,15 +604,24 @@ export class PubScene extends Phaser.Scene {
 
   private openShop(tab = this.tab, toggle = true) {
     this.tut('menu');
-    if (this.shopObjs.length && toggle) return this.closeShop();
+    if (this.shopObjs.length && toggle) {
+      this.closeShop();
+      return this.tut('close');
+    }
     this.closeShop();
     this.closeSheet();
-    this.tutObjs.forEach((o) => (o as unknown as Phaser.GameObjects.Components.Visible).setVisible(false));
+    // návod se v menu skryje – kromě kroků, které ukazují právě do menu
+    const menuStep = ['tile:shop', 'close'].includes(PubScene.TUT[this.d.tut ?? -1]?.done ?? '');
+    if (!menuStep) this.tutObjs.forEach((o) => (o as unknown as Phaser.GameObjects.Components.Visible).setVisible(false));
     this.tab = tab;
     const D = 300, RH = 96;
     const y0 = H - 6 * RH - 126;
     const block = this.add.rectangle(0, TOP, W, H - TOP, 0x000000, 0.55).setOrigin(0).setDepth(D).setInteractive();
-    block.on('pointerdown', (ptr: Phaser.Input.Pointer) => ptr.y < y0 && this.closeShop());
+    block.on('pointerdown', (ptr: Phaser.Input.Pointer) => {
+      if (ptr.y >= y0) return;
+      this.closeShop();
+      this.tut('close');
+    });
     const g = this.add.graphics().setDepth(D);
     g.fillStyle(col('dusk'), 0.98).fillRoundedRect(0, y0, W, H - y0 + 20, 16);
     g.fillStyle(col('gold')).fillRect(0, y0, W, 3);
@@ -625,7 +635,10 @@ export class PubScene extends Phaser.Scene {
       title.setScale(Math.min(1, 260 / title.width));
       this.shopObjs.push(back.bg, back.label, back.zone, title);
     }
-    const close = this.btn(W - 62, y0 + 10, 52, 42, () => this.closeShop(), D + 5);
+    const close = this.btn(W - 62, y0 + 10, 52, 42, () => {
+      this.closeShop();
+      this.tut('close');
+    }, D + 5);
     this.drawBtn(close, '✕', true, 'red');
     this.shopObjs.push(close.bg, close.label, close.zone);
     const cy0 = y0 + 112;
@@ -1431,7 +1444,9 @@ export class PubScene extends Phaser.Scene {
     { text: t('Ťukni na hosta v hospodě – dá ti spropitné!'), done: 'tip' },
     { text: t('Najmi kostlivce – pípa pak točí sama, i když nehraješ.'), done: 'hire' },
     { text: t('Otevři kuchyni – další zdroj coins.'), done: 'buy:kitchen' },
-    { text: t('V Menu je obchod, úkoly a sbírka hostů. Hodně štěstí, hostinský!'), done: 'menu' },
+    { text: t('Ťukni na Menu – najdeš v něm obchod, úkoly a další.'), done: 'menu' },
+    { text: t('Ťukni na Obchod – tady kupuješ vylepšení výdělku.'), done: 'tile:shop' },
+    { text: t('Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!'), done: 'close' },
   ];
 
   /** událost hráče posune návod */
@@ -1456,12 +1471,26 @@ export class PubScene extends Phaser.Scene {
     else if (step.done === 'buy:tap') [tx, ty] = [card('tap').buy.x + 95, card('tap').buy.y];
     else if (step.done === 'hire') [tx, ty] = [card('tap').staff.x + 95, card('tap').staff.y];
     else if (step.done === 'buy:kitchen') [tx, ty] = [card('kitchen').buy.x + 95, card('kitchen').buy.y];
+    else if (step.done === 'tile:shop') [tx, ty] = [10 + (W - 40) / 6, H - 6 * 96 - 126 + 64];
+    else if (step.done === 'close') [tx, ty] = [W - 36, H - 6 * 96 - 126 + 10];
     else [tx, ty] = [this.shopBtn.x + 54, this.shopBtn.y + 50];
     const D = 420;
-    const bub = this.add.text(W / 2, TOP + 16, step.text, txt(24, PAL.ink)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 80).setDepth(D + 1);
+    // ztmavení okolí: světlý zůstane jen cíl (u hosta ne – ten se hýbe)
+    if (step.done !== 'tip') {
+      const [hw, hh] = step.done === 'tile:shop' ? [180, 126] : step.done === 'close' ? [66, 54] : [260, 96];
+      const [hx, hy] = step.done === 'menu' ? [this.shopBtn.x - 6, this.shopBtn.y - 6] : [tx - hw / 2, ty - 6];
+      const [w2, h2] = step.done === 'menu' ? [120, 62] : [hw, hh];
+      const dim = this.add.graphics().setDepth(D - 1);
+      dim.fillStyle(0x000000, 0.6);
+      dim.fillRect(0, 0, W, hy).fillRect(0, hy + h2, W, H - hy - h2).fillRect(0, hy, hx, h2).fillRect(hx + w2, hy, W - hx - w2, h2);
+      dim.lineStyle(3, col('gold')).strokeRoundedRect(hx, hy, w2, h2, 10);
+      this.tutObjs.push(dim);
+    }
+    const by = TOP + (step.done === 'menu' ? 90 : 16); // u Menu níž, ať ji nepřekryje šipka
+    const bub = this.add.text(W / 2, by, step.text, txt(24, PAL.ink)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 80).setDepth(D + 1);
     const g = this.add.graphics().setDepth(D);
-    g.fillStyle(col('ink'), 0.5).fillRoundedRect(W / 2 - bub.width / 2 - 16, TOP + 10, bub.width + 32, bub.height + 16, 12);
-    g.fillStyle(col('sand')).fillRoundedRect(W / 2 - bub.width / 2 - 18, TOP + 6, bub.width + 36, bub.height + 16, 12);
+    g.fillStyle(col('ink'), 0.5).fillRoundedRect(W / 2 - bub.width / 2 - 16, by - 6, bub.width + 32, bub.height + 16, 12);
+    g.fillStyle(col('sand')).fillRoundedRect(W / 2 - bub.width / 2 - 18, by - 10, bub.width + 36, bub.height + 16, 12);
     const up = step.done === 'menu';
     // šipka v kontejneru: kontejner jde za cílem (u hosta každý snímek), šipka v něm houpe
     const holder = this.add.container(tx, ty).setDepth(D + 2);

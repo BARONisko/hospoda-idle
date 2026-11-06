@@ -424,5 +424,8 @@
  "{s}: otevře se {c}": "{s}:解锁 {c}",
  "výdělek z krígel: +{a} % → +{b} %": "酒杯收入:+{a} % → +{b} %",
  "= vyděláváš ×{m} víc": "= 收入 ×{m}",
- "Další": "下一个"
+ "Další": "下一个",
+ "Ťukni na Menu – najdeš v něm obchod, úkoly a další.": "点击菜单——里面有商店、任务等。",
+ "Ťukni na Obchod – tady kupuješ vylepšení výdělku.": "点击商店——在这里购买收入升级。",
+ "Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!": "完成！其余菜单会在游戏中解锁。关闭菜单——祝你好运，店主！"
 }

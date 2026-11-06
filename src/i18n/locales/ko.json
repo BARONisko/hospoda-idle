@@ -424,5 +424,8 @@
  "{s}: otevře se {c}": "{s}: {c} 오픈",
  "výdělek z krígel: +{a} % → +{b} %": "맥주잔 수입: +{a} % → +{b} %",
  "= vyděláváš ×{m} víc": "= 수입 ×{m}",
- "Další": "다음"
+ "Další": "다음",
+ "Ťukni na Menu – najdeš v něm obchod, úkoly a další.": "메뉴를 탭하세요 – 상점, 임무 등이 있어요.",
+ "Ťukni na Obchod – tady kupuješ vylepšení výdělku.": "상점을 탭하세요 – 여기서 수입 업그레이드를 사요.",
+ "Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!": "완료! 나머지 메뉴는 플레이하며 열려요. 메뉴를 닫으세요 – 행운을 빌어요, 주인장!"
 }

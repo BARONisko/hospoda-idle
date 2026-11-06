@@ -424,5 +424,8 @@
  "{s}: otevře se {c}": "{s}:{c} が開く",
  "výdělek z krígel: +{a} % → +{b} %": "ジョッキの収入:+{a} % → +{b} %",
  "= vyděláváš ×{m} víc": "= 収入 ×{m}",
- "Další": "次へ"
+ "Další": "次へ",
+ "Ťukni na Menu – najdeš v něm obchod, úkoly a další.": "メニューをタップ – ショップや任務などがある。",
+ "Ťukni na Obchod – tady kupuješ vylepšení výdělku.": "ショップをタップ – 収入の強化はここで買う。",
+ "Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!": "完了！メニューの他の部分はプレイ中に解放される。メニューを閉じて – 頑張れ、店主！"
 }

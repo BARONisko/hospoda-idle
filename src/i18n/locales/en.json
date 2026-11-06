@@ -424,5 +424,8 @@
  "{s}: otevře se {c}": "{s}: unlocks {c}",
  "výdělek z krígel: +{a} % → +{b} %": "income from tankards: +{a} % → +{b} %",
  "= vyděláváš ×{m} víc": "= you earn ×{m} more",
- "Další": "Next"
+ "Další": "Next",
+ "Ťukni na Menu – najdeš v něm obchod, úkoly a další.": "Tap Menu – it has the shop, tasks and more.",
+ "Ťukni na Obchod – tady kupuješ vylepšení výdělku.": "Tap Shop – this is where you buy income upgrades.",
+ "Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!": "Done! More of the menu unlocks as you play. Close the menu – good luck, landlord!"
 }
