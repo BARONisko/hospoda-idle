@@ -37,6 +37,16 @@ interface Offer {
 }
 /** nastavení zvuku (zvlášť od uložené hry) */
 const OPTS_KEY = 'pubidle_opts';
+
+/** Stáhne offline verzi hry (složka PUB-Idle s index.html v zipu; sestavuje tools/offline.mjs). */
+function downloadOffline() {
+  const a = document.createElement('a');
+  a.href = './PUB-Idle.zip';
+  a.download = 'PUB-Idle.zip';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
 function loadOpts() {
   try {
     const o = JSON.parse(localStorage.getItem(OPTS_KEY) ?? '{}') as { snd?: boolean; mus?: boolean };
@@ -896,9 +906,12 @@ export class PubScene extends Phaser.Scene {
       [t('Hudba'), sfx.musicOn ? t('zapnuto') : t('vypnuto'), () => sfx.setMusic(!sfx.musicOn)],
       [t('Jazyk / Language'), LANGS[lang], () => setLang(AVAILABLE[(AVAILABLE.indexOf(lang) + 1) % AVAILABLE.length])],
     ];
+    // offline verze do složky (zip s index.html) – nabízí se jen na webu, ne ve hře spuštěné z disku
+    const web = location.protocol.startsWith('http');
+    if (web) rows.push([t('Hra do složky'), t('Stáhnout'), downloadOffline]);
     rows.forEach(([title, val, fn], i) => {
       const y = y0 + i * RH;
-      this.row(y, RH, D, title, '');
+      this.row(y, RH, D, title, i === 3 ? t('spustíš ji z disku bez internetu') : '');
       const b = this.btn(W - 232, y + 14, 210, 60, () => {
         fn();
         saveOpts();
@@ -907,7 +920,7 @@ export class PubScene extends Phaser.Scene {
       this.drawBtn(b, val, true, 'plum');
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
-    this.shopObjs.push(this.add.text(W / 2, y0 + 3 * RH + 30, 'P.U.B. Idle – Pajzl Tycoon', txt(18, PAL.slate)).setOrigin(0.5).setDepth(D + 1));
+    this.shopObjs.push(this.add.text(W / 2, y0 + rows.length * RH + 30, 'P.U.B. Idle – Pajzl Tycoon', txt(18, PAL.slate)).setOrigin(0.5).setDepth(D + 1));
   }
 
   // ---------- bestiář ----------
