@@ -49,6 +49,9 @@ export interface Save {
   bup?: Record<string, number>;
   /** Kostnice: úrovně statů koupené za kosti */
   oss?: Record<string, number>;
+  /** verze Kostnice (2 = náhodné hody) a počet hodů */
+  ossV?: number;
+  ossRolls?: number;
   /** talismany: úrovně (0 = nemá) */
   talis?: Record<string, number>;
   /** hostinský: zkušenosti, úroveň, koupené dovednosti (zůstává i po hygieně) */

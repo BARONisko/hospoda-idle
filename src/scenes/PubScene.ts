@@ -10,7 +10,7 @@ import { season, SEASONS, SEASON_BONUS } from '../core/season';
 import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
 import { LEAGUES, RIVALS, LeagueState, weekStart, rivalScore, weekEnd, winReward } from '../core/league';
 import { isNight, phaseLeft, BONE_RATE, nightCfg } from '../core/night';
-import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, ossCost } from '../core/talisman';
+import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS } from '../core/save';
 import { PubView } from '../game/PubView';
@@ -169,6 +169,13 @@ export class PubScene extends Phaser.Scene {
       for (const [k, v] of Object.entries(this.d.bup)) if (m[k]) (this.d.oss ??= {})[m[k][0]] = (this.d.oss?.[m[k][0]] ?? 0) + v * m[k][1];
       delete this.d.bup;
     }
+    if (this.d.oss && this.d.ossV !== 2) {
+      for (const o of OSSUARY) {
+        const lvl = this.d.oss[o.stat] ?? 0;
+        if (lvl) this.d.oss[o.stat] = Math.round((lvl * (OLD_OSS_PER[o.stat] ?? o.per)) / o.per);
+      }
+    }
+    this.d.ossV = 2;
     if (this.d.tut === undefined) this.d.tut = this.d.earned < 50 ? 0 : -1;
     this.tutShow();
     this.ev = new PubEvents(this, {
@@ -1367,42 +1374,82 @@ export class PubScene extends Phaser.Scene {
     return BONE_RATE * (1 + this.ts().bones);
   }
 
-  ossPage = 0;
+  ossLast?: string;
+  ossBusy = false;
 
-  /** Kostnice: všechny staty za kosti, po stránkách */
+  /** Kostnice: zaplatíš kostňákovi, ten hodí kostkou a náhodný stat se trochu zvedne */
   private bonesTab(y0: number, D: number) {
-    const RH = 62, PER = 7;
-    const pages = Math.ceil(OSSUARY.length / PER);
-    this.shopObjs.push(this.add.text(20, y0, t('Kostnice – máš {n} kostí', { n: big(this.d.bones ?? 0) }), txt(20, PAL.ice)).setDepth(D + 1));
-    OSSUARY.slice(this.ossPage * PER, this.ossPage * PER + PER).forEach((o, i) => {
-      const y = y0 + 30 + i * RH;
+    const bones = this.d.bones ?? 0;
+    const rolls = this.d.ossRolls ?? 0;
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
+    const g = add(this.add.graphics().setDepth(D + 1));
+    g.fillStyle(col('navy'), 0.8).fillRoundedRect(10, y0, W - 20, 150, 12);
+    add(this.add.sprite(70, y0 + 132, 'skeleton', 12).setOrigin(0.5, 1).setScale(5).setDepth(D + 2));
+    add(this.add.text(130, y0 + 10, t('Kostňák'), txt(26, PAL.ice)).setDepth(D + 2));
+    add(this.add.text(130, y0 + 42, t('„Zaplať kostmi a já hodím. Co padne, to zesílí.“'), txt(16, PAL.bone)).setDepth(D + 2).setWordWrapWidth(250));
+    add(this.add.text(130, y0 + 90, t('máš {n} kostí', { n: big(bones) }), txt(20, PAL.gold)).setDepth(D + 2));
+    // kostka
+    const die = add(this.add.graphics().setDepth(D + 3));
+    const dx = W - 90, dy = y0 + 75;
+    const face = (n: number) => {
+      die.clear().fillStyle(col('ink')).fillRoundedRect(dx - 38, dy - 34, 76, 76, 12).fillStyle(col('bone')).fillRoundedRect(dx - 38, dy - 38, 76, 76, 12);
+      const P: Record<number, number[][]> = { 1: [[0, 0]], 2: [[-1, -1], [1, 1]], 3: [[-1, -1], [0, 0], [1, 1]], 4: [[-1, -1], [1, -1], [-1, 1], [1, 1]], 5: [[-1, -1], [1, -1], [0, 0], [-1, 1], [1, 1]], 6: [[-1, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [1, 1]] };
+      die.fillStyle(col('ink'));
+      for (const [px, py] of P[n]) die.fillCircle(dx + px * 20, dy + py * 20, 7);
+    };
+    face(6);
+    // hody
+    const roll = (n: number) => {
+      const cost = Array.from({ length: n }, (_, i) => rollCost(rolls + i)).reduce((a, b) => a + b, 0);
+      if (this.ossBusy || (this.d.bones ?? 0) < cost) return sfx.error();
+      this.d.bones! -= cost;
+      this.ossBusy = true;
+      const got: Record<string, number> = {};
+      for (let i = 0; i < n; i++) {
+        const free = OSSUARY.filter((o) => o.cap === undefined || ((this.d.oss?.[o.stat] ?? 0) + 1) * o.per <= o.cap + 1e-9);
+        const o = Phaser.Utils.Array.GetRandom(free);
+        (this.d.oss ??= {})[o.stat] = (this.d.oss[o.stat] ?? 0) + 1;
+        got[o.stat] = (got[o.stat] ?? 0) + 1;
+      }
+      this.d.ossRolls = rolls + n;
+      this.ossLast = Object.keys(got)[0];
+      store(this.d);
+      let k = 0;
+      this.time.addEvent({
+        delay: 70,
+        repeat: 11,
+        callback: () => {
+          face(Phaser.Math.Between(1, 6));
+          sfx.click();
+          if (++k === 12) {
+            this.ossBusy = false;
+            this.applyKup();
+            sfx.fanfare();
+            const text = Object.entries(got)
+              .map(([st, c]) => STAT_NAMES[st as keyof typeof STAT_NAMES](c * OSSUARY.find((o) => o.stat === st)!.per))
+              .join(', ');
+            this.banner(this.views[0].cam, text, true);
+            if (this.shopObjs.length && this.tab === 'shop' && this.shopSub === 'bones') this.openShop('shop', false);
+          }
+        },
+      });
+    };
+    const c1 = rollCost(rolls);
+    const c10 = Array.from({ length: 10 }, (_, i) => rollCost(rolls + i)).reduce((a, b) => a + b, 0);
+    const b1 = this.btn(10, y0 + 162, 255, 64, () => roll(1), D + 2);
+    this.drawBtn(b1, t('Hodit kostkou\n{n} kostí', { n: big(c1) }), bones >= c1, 'blue');
+    const b10 = this.btn(275, y0 + 162, 255, 64, () => roll(10), D + 2);
+    this.drawBtn(b10, t('10 hodů\n{n} kostí', { n: big(c10) }), bones >= c10, 'plum');
+    this.shopObjs.push(b1.bg, b1.label, b1.zone, b10.bg, b10.label, b10.zone);
+    // přehled statů z Kostnice
+    add(this.add.text(20, y0 + 236, t('Zesíleno kostňákem ({n} hodů):', { n: rolls }), txt(18, PAL.gold)).setDepth(D + 2));
+    OSSUARY.forEach((o, i) => {
       const lvl = this.d.oss?.[o.stat] ?? 0;
-      const max = o.max !== undefined && lvl >= o.max;
-      const cost = ossCost(lvl);
-      this.row(y, RH, D, STAT_NAMES[o.stat](lvl * o.per), t('úroveň {n}', { n: lvl }) + (o.max ? ` / ${o.max}` : '') + ' · ' + t('další: {s}', { s: STAT_NAMES[o.stat](o.per) }));
-      const b = this.btn(W - 182, y + 6, 160, 44, () => {
-        if (max || (this.d.bones ?? 0) < cost) return sfx.error();
-        this.d.bones! -= cost;
-        (this.d.oss ??= {})[o.stat] = lvl + 1;
-        this.applyKup();
-        sfx.buy();
-        store(this.d);
-        this.openShop('shop', false);
-      }, D + 2);
-      this.drawBtn(b, max ? '✓' : t('{n} kostí', { n: big(cost) }), !max && (this.d.bones ?? 0) >= cost, 'blue');
-      this.shopObjs.push(b.bg, b.label, b.zone);
+      const capped = o.cap !== undefined && (lvl + 1) * o.per > o.cap + 1e-9;
+      const x = 20 + (i % 2) * 262, y = y0 + 262 + Math.floor(i / 2) * 26;
+      const tx = add(this.add.text(x, y, STAT_NAMES[o.stat](lvl * o.per) + (capped ? ' (max)' : ''), txt(15, o.stat === this.ossLast ? PAL.gold : lvl ? PAL.mint : PAL.slate)).setDepth(D + 2));
+      tx.setScale(Math.min(1, 250 / tx.width));
     });
-    // stránkování
-    const py = y0 + 30 + PER * RH + 2;
-    ([[-1, '◀'], [1, '▶']] as const).forEach(([dir, lab], i) => {
-      const b = this.btn(i ? W - 110 : 10, py, 100, 40, () => {
-        this.ossPage = (this.ossPage + dir + pages) % pages;
-        this.openShop('shop', false);
-      }, D + 2);
-      this.drawBtn(b, lab, true, 'slate');
-      this.shopObjs.push(b.bg, b.label, b.zone);
-    });
-    this.shopObjs.push(this.add.text(W / 2, py + 20, `${this.ossPage + 1} / ${pages}`, txt(20, PAL.bone)).setOrigin(0.5).setDepth(D + 2));
   }
 
   /** koupená výzdoba */
@@ -1475,9 +1522,9 @@ export class PubScene extends Phaser.Scene {
   private applyKup() {
     this.ev.freq = 0.75 ** this.kl('events') / (1 + this.ts().evfreq);
     brewCfg.speed = 1 + this.ts().brew;
-    brewCfg.tank = this.ts().tank;
+    brewCfg.tank = Math.floor(this.ts().tank);
     nightCfg.mult = 1 + this.ts().night;
-    PubView.extraGuests = this.ts().guests;
+    PubView.extraGuests = Math.floor(this.ts().guests);
     this.views.forEach((v) => (v.cthulhu = this.kl('cthulhu') > 0));
   }
 
