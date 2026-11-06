@@ -33,3 +33,10 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
    ikona na plochu, příprava Capacitor (capacitor.config.json, návod v README), rozhraní reklam src/core/ads.ts (×2 offline).
 10. **Balanc a testy** ✅ – `npm run sim` (chamtivý hráč: 1. prestiž ~34 min ideálně, další běhy 7–9 min),
    `npm test` (headless test celé hry: nákupy, Menu, obchod, manažer, události, úkoly, prestiž, offline).
+
+## Po plánu (rozšíření)
+- Návod pro nového hráče (6 kroků, bublina + šipka) – `d.tut`.
+- Obchod s krígly (záložka Krígly v Menu): rychlejší kostlivci, startovní kapitál, delší spánek (offline +4 h),
+  rušnější hospoda (častější události), věrní manažeři, Probudit Cthulhu (×10 navždy, Cthulhu kouká do hospod).
+- Manažeři jsou vidět za barem (tapster / count / deep0).
+- 4. hospodu (Cthulhu) zatím NE: schválené rozložení má max. 3 pruhy a interiér Cthulhu chybí – Cthulhu je zatím konec hry.

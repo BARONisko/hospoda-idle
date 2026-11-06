@@ -105,3 +105,21 @@ export const BOOST_CD = 300;
 export const kriglyFor = (run: number) => Math.floor(Math.sqrt(run / 1e5));
 export const KRIGL_BONUS = 0.02;
 export const PRESTIGE_MIN = 10;
+
+/** obchod s krígly: trvalá vylepšení (přežijí hygienu), platí se krígly */
+export interface KriglItem {
+  id: 'speed' | 'start' | 'offline' | 'events' | 'keepMgr' | 'cthulhu';
+  name: string;
+  desc: string;
+  costs: number[];
+}
+export const KRIGL_SHOP: KriglItem[] = [
+  { id: 'speed', name: t('Rychlejší kostlivci'), desc: t('všechny cykly o 10 % kratší'), costs: [5, 10, 20, 40, 80] },
+  { id: 'start', name: t('Startovní kapitál'), desc: t('po hygieně začneš s coins'), costs: [5, 25, 100] },
+  { id: 'offline', name: t('Delší spánek'), desc: t('výdělek offline o 4 h déle'), costs: [10, 20, 40, 80] },
+  { id: 'events', name: t('Rušnější hospoda'), desc: t('události o 25 % častěji'), costs: [15, 45] },
+  { id: 'keepMgr', name: t('Věrní manažeři'), desc: t('manažeři zůstanou i po hygieně'), costs: [30] },
+  { id: 'cthulhu', name: t('Probudit Cthulhu'), desc: t('×10 výdělek všude navždy'), costs: [300] },
+];
+/** startovní coins po hygieně podle úrovně „Startovní kapitál“ */
+export const startCoins = (lvl: number) => (lvl ? 1000 * 100 ** (lvl - 1) : 0);

@@ -46,7 +46,14 @@ interface Guest {
   mug?: Phaser.GameObjects.Image;
 }
 
+/** postava manažera podle hospody */
+const MGR_SPRITE: Record<number, string> = { 1: 'tapster', 2: 'count', 3: 'deep0' };
+
 export class PubView {
+  /** probuzený Cthulhu (vylepšení z krígel) – kouká do hospody */
+  cthulhu = false;
+  private cth?: Phaser.GameObjects.Sprite;
+  private mgr?: Phaser.GameObjects.Sprite;
   readonly cam: Phaser.Cameras.Scene2D.Camera;
   readonly objs: Phaser.GameObjects.GameObject[] = [];
   private guests: Guest[] = [];
@@ -113,6 +120,20 @@ export class PubView {
 
   /** stanice se otevřela/najala obsluhu → ukázat vybavení a kostlivce */
   refresh() {
+    if (this.pub.mgr && !this.mgr) {
+      const x = this.ox + 8 * T, y = 4 * T + 10;
+      this.mgr = this.s.add.sprite(x, y, MGR_SPRITE[this.pub.act], 1).setOrigin(0.5, 1).setDepth(y + 1);
+      this.objs.push(this.mgr);
+      this.s.events.emit('pubObj', this.mgr);
+      this.s.tweens.add({ targets: this.mgr, y: y - 2, yoyo: true, repeat: -1, duration: 600, ease: 'Sine.inOut' });
+    }
+    if (this.cthulhu && !this.cth) {
+      const x = this.ox + 15.2 * T, y = 10.6 * T;
+      this.cth = this.s.add.sprite(x, y, 'cthulhu', 0).setOrigin(0.5, 1).setDepth(y + 2).setAlpha(0.9);
+      this.objs.push(this.cth);
+      this.s.events.emit('pubObj', this.cth);
+      this.s.tweens.add({ targets: this.cth, y: y - 4, yoyo: true, repeat: -1, duration: 1400, ease: 'Sine.inOut' });
+    }
     const st = this.pub.st;
     for (const [id, list] of Object.entries(this.props)) list.forEach((o) => o.setVisible((st[id]?.lvl ?? 0) > 0));
     for (const id of ['kitchen', 'cellar', 'dice']) {

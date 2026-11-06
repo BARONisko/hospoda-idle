@@ -36,6 +36,8 @@ export interface Save {
   daily: Daily;
   /** vyzvednuté úspěchy (id) */
   ach: string[];
+  /** obchod s krígly: úrovně koupených položek */
+  kup?: Record<string, number>;
   /** krok návodu pro nového hráče (-1 = hotovo) */
   tut?: number;
   /** bestiář: viděné druhy hostů */

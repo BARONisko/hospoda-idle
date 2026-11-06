@@ -3,7 +3,7 @@ import { PAL } from '../data/palette';
 import { t, lang, LANGS, AVAILABLE, setLang } from '../i18n';
 import { txt } from '../ui/font';
 import { big } from '../core/num';
-import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN } from '../core/economy';
+import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, UPGRADES, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN, KRIGL_SHOP, KriglItem, startCoins } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { Save, PubState, load, store, newPub } from '../core/save';
@@ -165,6 +165,7 @@ export class PubScene extends Phaser.Scene {
     });
     const evq = new URLSearchParams(location.search).get('ev') as EventKind | null;
     if (evq && EVENT_KINDS.includes(evq)) this.time.delayedCall(800, () => this.ev.start(evq, 0));
+    this.applyKup();
 
     // ťuknutí do hospody → spropitné od hosta
     this.input.on('pointerdown', (ptr: Phaser.Input.Pointer) => {
@@ -210,14 +211,15 @@ export class PubScene extends Phaser.Scene {
   /** výdělek za dobu nepřítomnosti (běží jen stanice s kostlivcem), strop 8 h */
   private offline() {
     const raw = Math.max(0, (Date.now() - this.d.at) / 1000);
-    const secs = Math.min(OFFLINE_CAP, raw);
+    const cap = this.offCap();
+    const secs = Math.min(cap, raw);
     const rate = this.d.pubs.reduce((a, p) => a + this.rate(p), 0);
     const g = Math.floor(rate * secs);
     this.d.at = Date.now();
     if (secs < OFFLINE_MIN || g < 1 || this.awayObjs.length) return;
     this.gain(g);
     store(this.d);
-    this.awayPopup(g, secs, raw > OFFLINE_CAP);
+    this.awayPopup(g, secs, raw > cap);
   }
 
   awayObjs: Phaser.GameObjects.GameObject[] = [];
@@ -238,7 +240,7 @@ export class PubScene extends Phaser.Scene {
       objs.push(this.add.text(W / 2, y, s, txt(size, c)).setOrigin(0.5).setAlign('center').setDepth(D + 2));
     tx(by + 44, t('Zatímco jsi byl pryč…'), 30, PAL.gold);
     tx(by + 96, t('kostlivci točili {d}', { d: dur }), 22, PAL.fog);
-    if (capped) tx(by + 126, t('(víc než 8 h se nepočítá)'), 18, PAL.fog);
+    if (capped) tx(by + 126, t('(víc než {h} h se nepočítá)', { h: this.offCap() / 3600 }), 18, PAL.fog);
     const amt = this.add.text(0, by + 190, `+${big(g)}`, txt(44, PAL.gold)).setOrigin(0, 0.5).setDepth(D + 2);
     const x0 = W / 2 - (amt.width + 46) / 2;
     amt.setX(x0 + 46);
@@ -315,7 +317,7 @@ export class PubScene extends Phaser.Scene {
     return [...mgrs, ...ups].sort((a, b) => a.cost - b.cost).slice(0, 5);
   }
 
-  tab: 'shop' | 'tasks' | 'book' | 'opts' = 'shop';
+  tab: 'shop' | 'tasks' | 'book' | 'krigl' | 'opts' = 'shop';
 
   private openShop(tab = this.tab, toggle = true) {
     this.tut('menu');
@@ -335,12 +337,14 @@ export class PubScene extends Phaser.Scene {
       ['shop', t('Obchod')],
       ['tasks', t('Úkoly')],
       ['book', t('Sbírka')],
+      ['krigl', t('Krígly')],
       ['opts', ''],
     ];
     tabs.forEach(([id, label], i) => {
-      const b = this.btn(10 + i * 118, y0 + 10, id === 'opts' ? 60 : 110, 42, () => this.openShop(id, false), D + 5);
-      if (id === 'opts') this.shopObjs.push(this.add.image(b.x + 30, b.y + 21, 'icons', 'gear').setScale(2).setDepth(D + 7));
+      const b = this.btn(10 + i * 102, y0 + 10, id === 'opts' ? 54 : 96, 42, () => this.openShop(id, false), D + 5);
+      if (id === 'opts') this.shopObjs.push(this.add.image(b.x + 27, b.y + 21, 'icons', 'gear').setScale(2).setDepth(D + 7));
       this.drawBtn(b, label, true, id === tab ? 'amber' : 'slate');
+      b.label.setScale(Math.min(1, 88 / Math.max(1, b.label.width)));
       if (id !== tab) b.label.setColor(PAL.bone);
       this.shopObjs.push(b.bg, b.label, b.zone);
       if (id === 'tasks' && this.claimable()) {
@@ -349,12 +353,13 @@ export class PubScene extends Phaser.Scene {
         this.shopObjs.push(dot);
       }
     });
-    const close = this.btn(W - 76, y0 + 10, 62, 42, () => this.closeShop(), D + 5);
+    const close = this.btn(W - 62, y0 + 10, 52, 42, () => this.closeShop(), D + 5);
     this.drawBtn(close, '✕', true, 'red');
     this.shopObjs.push(close.bg, close.label, close.zone);
     if (tab === 'shop') this.shopTab(y0 + 64, D, RH);
     else if (tab === 'tasks') this.tasksTab(y0 + 64, D);
     else if (tab === 'book') this.bookTab(y0 + 64, D);
+    else if (tab === 'krigl') this.kriglTab(y0 + 64, D);
     else this.optsTab(y0 + 64, D);
     sfx.click();
     this.refresh();
@@ -479,7 +484,7 @@ export class PubScene extends Phaser.Scene {
   // ---------- bestiář ----------
   private bookTab(y0: number, D: number) {
     const all = [...new Set(Object.values(GUESTS).flat())];
-    this.shopObjs.push(this.add.text(W - 90, y0 - 50, `${this.d.seen.length}/${all.length}`, txt(22, PAL.gold)).setOrigin(1, 0).setDepth(D + 6));
+    this.shopObjs.push(this.add.text(W - 20, y0 + 586, `${this.d.seen.length}/${all.length}`, txt(22, PAL.gold)).setOrigin(1, 0).setDepth(D + 6));
     all.forEach((key, i) => {
       const cx = 10 + (i % 5) * 104 + 52;
       const y = y0 + Math.floor(i / 5) * 140;
@@ -517,6 +522,7 @@ export class PubScene extends Phaser.Scene {
     p.mgr = true;
     const i = this.d.pubs.indexOf(p);
     this.openShop('shop', false);
+    this.views[i].refresh();
     this.banner(this.views[i].cam, t('{n} nastoupil!', { n: MANAGERS[p.act].name }));
     this.skillBtns[i] && this.drawSkill(i);
     store(this.d);
@@ -597,7 +603,11 @@ export class PubScene extends Phaser.Scene {
     this.d.run = 0;
     this.d.coins = 0;
     this.d.up = [];
+    const keep = this.kl('keepMgr') > 0;
+    const had = this.d.pubs.map((p) => !!p.mgr);
     this.d.pubs = Array.from({ length: n }, (_, i) => newPub((i + 1) as 1 | 2 | 3));
+    if (keep) this.d.pubs.forEach((p, i) => (p.mgr = had[i] ?? false));
+    this.d.coins = startCoins(this.kl('start'));
     store(this.d);
     sfx.fanfare();
     this.awayObjs = [];
@@ -820,7 +830,54 @@ export class PubScene extends Phaser.Scene {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * (this.kl('cthulhu') ? 10 : 1);
+  }
+
+  // ---------- obchod s krígly ----------
+  /** úroveň položky z obchodu s krígly */
+  private kl(id: KriglItem['id']) {
+    return this.d.kup?.[id] ?? 0;
+  }
+
+  private cyc(def: StationDef) {
+    return def.cycle * 0.9 ** this.kl('speed');
+  }
+
+  private offCap() {
+    return OFFLINE_CAP + this.kl('offline') * 4 * 3600;
+  }
+
+  private kriglTab(y0: number, D: number) {
+    const RH = 86;
+    this.shopObjs.push(
+      this.add.text(20, y0 - 2, t('Máš {k} krígel (+{b} % výdělek)', { k: this.d.krigle, b: Math.round(this.d.krigle * KRIGL_BONUS * 100) }), txt(22, PAL.gold)).setDepth(D + 1),
+      this.add.text(20, y0 + 24, t('Utracené krígly už bonus nedávají.'), txt(16, PAL.fog)).setDepth(D + 1),
+    );
+    KRIGL_SHOP.forEach((it, i) => {
+      const y = y0 + 52 + i * RH;
+      const lvl = this.kl(it.id);
+      const max = lvl >= it.costs.length;
+      const price = it.costs[lvl];
+      this.row(y, RH, D, it.name + (it.costs.length > 1 ? ` ${lvl}/${it.costs.length}` : ''), it.desc, it.id === 'cthulhu' ? 'pine' : 'ink');
+      const b = this.btn(W - 192, y + 10, 170, 60, () => {
+        if (max || this.d.krigle < price) return sfx.error();
+        this.d.krigle -= price;
+        (this.d.kup ??= {})[it.id] = lvl + 1;
+        this.applyKup();
+        sfx.fanfare();
+        store(this.d);
+        if (it.id === 'cthulhu') this.views.forEach((v) => v.refresh());
+        this.openShop('krigl', false);
+      }, D + 2);
+      this.drawBtn(b, max ? '✓' : t('{k} krígel', { k: price }), !max && this.d.krigle >= price, 'amber');
+      this.shopObjs.push(b.bg, b.label, b.zone);
+    });
+  }
+
+  /** promítne vylepšení z krígel do systémů */
+  private applyKup() {
+    this.ev.freq = 0.75 ** this.kl('events');
+    this.views.forEach((v) => (v.cthulhu = this.kl('cthulhu') > 0));
   }
 
   private gain(n: number) {
@@ -834,7 +891,7 @@ export class PubScene extends Phaser.Scene {
     let r = 0;
     for (const def of STATIONS) {
       const s = p.st[def.id];
-      if (s?.auto) r += this.pay(p, def) / def.cycle;
+      if (s?.auto) r += this.pay(p, def) / this.cyc(def);
     }
     return r;
   }
@@ -849,7 +906,7 @@ export class PubScene extends Phaser.Scene {
         if (!s || s.lvl === 0) continue;
         open++;
         if (s.prog === 0) continue;
-        s.prog += dt / def.cycle;
+        s.prog += dt / this.cyc(def);
         if (s.prog >= 1) {
           const g = this.pay(p, def);
           this.gain(g);
@@ -894,7 +951,7 @@ export class PubScene extends Phaser.Scene {
       c.name.setText(STATION_NAMES[p.act][c.def.id]).setAlpha(open ? 1 : 0.55);
       const ms = nextMilestone(s.lvl);
       c.lvl.setText(open ? (ms ? t('úroveň {n} · ×2 na {m}', { n: s.lvl, m: ms }) : t('úroveň {n}', { n: s.lvl })) : t('zavřeno'));
-      c.info.setText(open ? t('+{n} / {s} s', { n: big(this.pay(p, c.def)), s: c.def.cycle }) : '');
+      c.info.setText(open ? t('+{n} / {s} s', { n: big(this.pay(p, c.def)), s: +this.cyc(c.def).toFixed(2) }) : '');
       this.drawBtn(c.buy, open ? `+${n}\n${big(price)}` : t('Otevřít\n{n}', { n: big(price) }), this.d.coins >= price, 'green');
       this.drawBtn(c.staff, t('Kostlivec {n}', { n: big(staff) }), this.d.coins >= staff, 'plum', open && !s.auto);
       if (open && s.auto) c.staff.label.setVisible(true).setText(t('kostlivec ✓')).setColor(PAL.mint);

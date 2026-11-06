@@ -31,6 +31,8 @@ interface Target {
 export class PubEvents {
   /** do další události (s) */
   next = 40;
+  /** násobek intervalu mezi událostmi (vylepšení z krígel) */
+  freq = 1;
   active: { kind: EventKind; view: number; t: number; dur: number; targets: Target[]; objs: Phaser.GameObjects.GameObject[]; off: (() => void)[]; hits: number } | null = null;
 
   constructor(private s: Phaser.Scene, private host: EventHost) {}
@@ -181,7 +183,7 @@ export class PubEvents {
       this.s.tweens.killTweensOf(o);
       this.s.tweens.add({ targets: o, alpha: 0, duration: 300, onComplete: () => o.destroy() });
     }
-    this.next = Phaser.Math.Between(90, 180);
+    this.next = Phaser.Math.Between(90, 180) * this.freq;
   }
 }
 

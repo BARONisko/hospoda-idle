@@ -54,10 +54,15 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   // 5) úkoly a úspěch
   await S(p, (s) => { s.d.daily.tasks.forEach((k) => (k.prog = k.goal)); s.openShop('tasks', false); });
   ok('úkoly a úspěchy k vyzvednutí', await S(p, (s) => s.claimable()));
+  // 5b) obchod s krígly
+  await S(p, (s) => { s.d.krigle = 400; s.openShop('krigl', false); s.shopObjs.filter((o) => o.type === 'Zone').at(-1); });
+  await S(p, (s) => { s.d.kup = { start: 1, keepMgr: 1, speed: 2 }; s.applyKup(); });
+  ok('krígly: rychlejší cyklus', await S(p, (s) => Math.abs(s.cyc(s.cards[0].def) - 1.5 * 0.81) < 1e-9));
   // 6) prestiž
   await S(p, (s) => { s.d.run = 1e8; s.askPrestige(); s.prestige(); });
   await p.waitForTimeout(800);
   ok('prestiž: 2 hospody a krígly', await S(p, (s) => s.d.pubs.length === 2 && s.d.krigle >= 31 && s.views.length === 2));
+  ok('prestiž: startovní kapitál a věrní manažeři', await S(p, (s) => s.d.coins >= 1000 && s.d.pubs[0].mgr === true));
   ok('bez chyb v konzoli', p.errors.length === 0);
   if (p.errors.length) console.log(p.errors);
   await p.close();
