@@ -9,7 +9,7 @@ import { ads } from '../core/ads';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
 import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
 import { LEAGUES, LeagueState, weekStart, rivalScore, weekEnd, winReward } from '../core/league';
-import { isNight, phaseLeft, BONE_RATE, nightCfg } from '../core/night';
+import { isNight, phaseLeft, BONE_RATE, nightCfg, NIGHT_MS } from '../core/night';
 import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS } from '../core/save';
@@ -338,6 +338,33 @@ export class PubScene extends Phaser.Scene {
     sfx.tip();
   }
 
+  /** okno při první noci: coins teď nebudou, platí se kostmi */
+  private nightIntro() {
+    this.d.nightInfo = true;
+    store(this.d);
+    const D = 500;
+    const shade = this.add.rectangle(0, 0, W, H, 0x000000, 0.65).setOrigin(0).setDepth(D).setInteractive();
+    const bx = 40, by = 230, bw = W - 80, bh = 470;
+    const g0 = this.add.graphics().setDepth(D + 1);
+    g0.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
+    g0.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
+    g0.lineStyle(4, col('ice')).strokeRoundedRect(bx, by, bw, bh, 16);
+    const objs: Phaser.GameObjects.GameObject[] = [shade, g0];
+    const tx = (y: number, s: string, size: number, c: string) =>
+      objs.push(this.add.text(W / 2, y, s, txt(size, c)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(bw - 50).setDepth(D + 2));
+    tx(by + 26, t('Padla noc!'), 34, PAL.ice);
+    tx(by + 84, t('V noci chodí příšery a platí kostmi – coins teď nepřibývají.'), 22, PAL.bone);
+    tx(by + 170, t('Coins se vrátí ráno. Noc trvá {m} min.', { m: Math.round(NIGHT_MS / 60000) }), 22, PAL.mint);
+    tx(by + 236, t('Kosti utratíš v Obchodě (Kostnice) a za vylepšení talismanů.'), 22, PAL.gold);
+    const ok = this.btn(W / 2 - 110, by + bh - 90, 220, 64, () => {
+      this.awayObjs.forEach((o) => o.destroy());
+      this.awayObjs = [];
+    }, D + 3);
+    this.drawBtn(ok, t('Rozumím'), true, 'blue');
+    objs.push(ok.bg, ok.label, ok.zone);
+    this.awayObjs = objs;
+  }
+
   /** oslava milníku stanice */
   private milestone(i: number, def: StationDef) {
     this.banner(this.views[i].cam, t('{s}: výdělek ×2!', { s: STATION_NAMES[this.d.pubs[i].act][def.id] }));
@@ -579,8 +606,9 @@ export class PubScene extends Phaser.Scene {
     g.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, 34, 10);
     g.fillStyle(col(ahead ? 'mint' : 'amber')).fillRoundedRect(bx, by, Math.max(16, bw * pMe), 34, 10);
     g.fillStyle(col('white')).fillRect(bx + bw * pPace - 2, by - 8, 4, 50);
-    add(this.add.text(Phaser.Math.Clamp(bx + bw * pPace, 50, W - 50), by + 44, t('tempo'), txt(14, PAL.bone)).setOrigin(0.5, 0).setDepth(D + 2));
-    add(this.add.text(bx + 12, by + 6, `${Math.floor(pMe * 100)} %`, txt(20, PAL.ink)).setDepth(D + 3));
+    add(this.add.text(Phaser.Math.Clamp(bx + bw * pPace, 50, W - 50), by + 44, t('tempo'), txt(16, PAL.bone)).setOrigin(0.5, 0).setDepth(D + 2));
+    // procenta světle s obrysem na pravém konci proužku – čitelná na tmavém pozadí i na výplni
+    add(this.add.text(bx + bw - 12, by + 17, `${Math.floor(pMe * 100)} %`, txt(24, PAL.white)).setOrigin(1, 0.5).setDepth(D + 3));
     const msg = done ? t('Cíl splněn! Výhra je jistá.') : ahead ? t('Jsi před tempem – drž to!') : t('Za tempem o {n} coins', { n: big(pace - L.me) });
     add(this.add.text(W / 2, y0 + 304, msg, txt(20, done || ahead ? PAL.mint : PAL.sand)).setOrigin(0.5, 0).setDepth(D + 2));
     add(this.add.text(W / 2, y0 + 332, t('Počítá se vše, co tento týden vyděláš.'), txt(15, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2));
@@ -1679,6 +1707,8 @@ export class PubScene extends Phaser.Scene {
       this.views[i].update(dt, open);
     });
     this.ev.update(dt);
+    // první noc: jednou vysvětlit, že teď místo coins chodí kosti (až nebude otevřené jiné okno)
+    if (this.night && !this.d.nightInfo && !this.awayObjs.length) this.nightIntro();
     const nn = isNight();
     if (nn !== this.night) {
       this.night = nn;

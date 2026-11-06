@@ -66,6 +66,8 @@ export interface Save {
   leagueHist?: [number, boolean][];
   /** krok návodu pro nového hráče (-1 = hotovo) */
   tut?: number;
+  /** už viděl vysvětlení první noci (kosti místo coins) */
+  nightInfo?: boolean;
   /** bestiář: viděné druhy hostů */
   seen: string[];
   /** koupená vylepšení z obchodu (id) */
