@@ -16,7 +16,7 @@ const page = async (q = '') => {
   const p = await b.newPage({ viewport: { width: 405, height: 720 }, isMobile: true, hasTouch: true });
   p.errors = [];
   p.on('pageerror', (e) => p.errors.push(e.message));
-  await p.goto(url + q);
+  await p.goto(url + (q.includes('night') ? q : q ? q + '&night=0' : '?night=0'));
   await p.waitForFunction(() => window.game?.scene?.getScene('Pub')?.d, null, { timeout: 15000 });
   await p.waitForTimeout(300);
   return p;
