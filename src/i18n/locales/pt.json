@@ -649,5 +649,7 @@
  "Bravo!": "Bravo!",
  "Na nulu!": "Na mosca!",
  "Jo!": "Isso!",
- "+3 kosti, +5 XP": "+3 ossos, +5 XP"
+ "+3 kosti, +5 XP": "+3 ossos, +5 XP",
+ "Šipky: hra {n} dohraná!": "Dardos: partida {n} concluída!",
+ "+{n} b. na vylepšení · ťukni a utrať": "+{n} pt de melhoria · toque para gastar"
 }

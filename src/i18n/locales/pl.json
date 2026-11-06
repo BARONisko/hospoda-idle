@@ -649,5 +649,7 @@
  "Bravo!": "Brawo!",
  "Na nulu!": "Na zero!",
  "Jo!": "Tak!",
- "+3 kosti, +5 XP": "+3 kości, +5 XP"
+ "+3 kosti, +5 XP": "+3 kości, +5 XP",
+ "Šipky: hra {n} dohraná!": "Rzutki: gra {n} ukończona!",
+ "+{n} b. na vylepšení · ťukni a utrať": "+{n} pkt ulepszeń · stuknij, by wydać"
 }

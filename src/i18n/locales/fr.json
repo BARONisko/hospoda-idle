@@ -649,5 +649,7 @@
  "Bravo!": "Bravo !",
  "Na nulu!": "Pile !",
  "Jo!": "Ouais !",
- "+3 kosti, +5 XP": "+3 os, +5 XP"
+ "+3 kosti, +5 XP": "+3 os, +5 XP",
+ "Šipky: hra {n} dohraná!": "Fléchettes : partie {n} terminée !",
+ "+{n} b. na vylepšení · ťukni a utrať": "+{n} pt d'amélioration · touche pour dépenser"
 }

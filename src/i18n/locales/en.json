@@ -649,5 +649,7 @@
  "Bravo!": "Bravo!",
  "Na nulu!": "Spot on!",
  "Jo!": "Yes!",
- "+3 kosti, +5 XP": "+3 bones, +5 XP"
+ "+3 kosti, +5 XP": "+3 bones, +5 XP",
+ "Šipky: hra {n} dohraná!": "Darts: game {n} finished!",
+ "+{n} b. na vylepšení · ťukni a utrať": "+{n} upgrade pt · tap to spend"
 }

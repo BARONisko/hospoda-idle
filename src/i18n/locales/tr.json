@@ -649,5 +649,7 @@
  "Bravo!": "Bravo!",
  "Na nulu!": "Tam isabet!",
  "Jo!": "Evet!",
- "+3 kosti, +5 XP": "+3 kemik, +5 XP"
+ "+3 kosti, +5 XP": "+3 kemik, +5 XP",
+ "Šipky: hra {n} dohraná!": "Dart: {n}. oyun bitti!",
+ "+{n} b. na vylepšení · ťukni a utrať": "+{n} geliştirme puanı · harcamak için dokun"
 }

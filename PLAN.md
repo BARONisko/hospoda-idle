@@ -101,3 +101,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   do počítadla, otřes; nákup = záblesk karty, „+1 úr.“, jiskry; kostlivec = konfety; rychlé ťukání = KOMBO ×N (stoupající
   tón, každých 10 konfety); počítadlo coins poskočí při výdělku. Šipky – oslava dohrané hry (A + diváci z B): konfety
   z vítězné šipky, zlatý kruh, „PŘESNĚ NA NULU!“ s odměnami, diváci v bublinách, fanfára + jásot.
+- Šipky v hospodě: když automat dohraje hru a hráč je v hospodě, shora vyjede karta „Šipky: hra 7 dohraná! +1 b. na
+  vylepšení · ťukni a utrať“ s konfetami a jásotem (5,5 s); ťuknutí otevře šipky (PubScene.dartsNotice).

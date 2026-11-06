@@ -641,8 +641,33 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (r.pts) {
       this.dartsLeg(r.legs);
       this.tsCache = undefined;
-      this.banner(this.views[0].cam, t('Šipky: dohraná hra! +{n} bod', { n: r.pts }), true);
+      this.dartsNotice(r.pts);
     }
+  }
+
+  /** automat v šipkách dohrál hru, zatímco hráč je v hospodě: karta shora s konfetami, ťuknutí otevře šipky */
+  private dartsNoticeObjs: Phaser.GameObjects.GameObject[] = [];
+  private dartsNotice(pts: number) {
+    this.dartsNoticeObjs.forEach((o) => o.destroy());
+    const D = 470, x = 20, y = TOP + 8, w = W - 40, h = 92;
+    const box = this.add.graphics().setDepth(D);
+    box.fillStyle(col('ink'), 0.96).fillRoundedRect(0, 0, w, h, 14).lineStyle(4, col('gold')).strokeRoundedRect(0, 0, w, h, 14);
+    const ic = this.add.image(46, h / 2, 'tourney', 'dartRed').setScale(4);
+    const a = this.add.text(90, 14, t('Šipky: hra {n} dohraná!', { n: this.d.darts?.legs ?? 0 }), txt(28, PAL.gold));
+    const b = this.add.text(90, 52, t('+{n} b. na vylepšení · ťukni a utrať', { n: pts }), txt(20, PAL.mint));
+    [a, b].forEach((o) => o.setScale(Math.min(1, (w - 104) / o.width)));
+    const c = this.add.container(x, y - 140, [box, ic, a, b]).setDepth(D).setSize(w, h);
+    c.setInteractive(new Phaser.Geom.Rectangle(w / 2, h / 2, w, h), Phaser.Geom.Rectangle.Contains);
+    c.on('pointerdown', () => {
+      c.destroy();
+      this.openDarts();
+    });
+    this.dartsNoticeObjs = [c];
+    this.tweens.add({ targets: c, y, duration: 380, ease: 'Back.out', onComplete: () => confetti(this, x + w / 2, y + h, 40, D - 1, 0.8) });
+    this.tweens.add({ targets: ic, angle: { from: -25, to: 15 }, duration: 300, yoyo: true, repeat: 3 });
+    this.tweens.add({ targets: c, y: y - 140, delay: 5500, duration: 400, ease: 'Quad.in', onComplete: () => c.destroy() });
+    sfx.cheer();
+    sfx.pop();
   }
 
   // ---------- chrám R'lyeh (víkendová událost) ----------

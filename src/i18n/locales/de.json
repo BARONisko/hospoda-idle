@@ -649,5 +649,7 @@
  "Bravo!": "Bravo!",
  "Na nulu!": "Genau!",
  "Jo!": "Ja!",
- "+3 kosti, +5 XP": "+3 Knochen, +5 EP"
+ "+3 kosti, +5 XP": "+3 Knochen, +5 EP",
+ "Šipky: hra {n} dohraná!": "Darts: Spiel {n} beendet!",
+ "+{n} b. na vylepšení · ťukni a utrať": "+{n} Upgrade-Pkt. · tippen zum Ausgeben"
 }

@@ -649,5 +649,7 @@
  "Bravo!": "漂亮！",
  "Na nulu!": "正中！",
  "Jo!": "耶！",
- "+3 kosti, +5 XP": "骨头 +3，经验 +5"
+ "+3 kosti, +5 XP": "骨头 +3，经验 +5",
+ "Šipky: hra {n} dohraná!": "飞镖：第{n}局完成！",
+ "+{n} b. na vylepšení · ťukni a utrať": "+{n} 升级点 · 点击使用"
 }
