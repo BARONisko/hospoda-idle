@@ -58,6 +58,9 @@ export interface Save {
   kup3?: boolean;
   /** ekonomika v2: menší čísla (hospody 10× místo 50×, krígly ze 4. odmocniny) – přepočteno */
   eco2?: boolean;
+  /** průvodce novinkami: čekající (id) a už ukázané */
+  guideQ?: string[];
+  guides?: string[];
   /** hvězdy stanic: klíč `${act}_${stanice}` → počet (0–5) */
   stars?: Record<string, number>;
   /** koupená výzdoba (id) – zůstává i po hygieně */

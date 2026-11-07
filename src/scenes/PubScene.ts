@@ -6,7 +6,7 @@ import { confetti, rays, bigText, coinFountain, popText, punch, flashRect } from
 import { big, dur } from '../core/num';
 import { WAITERS, WAITER_MAX, BAR_CAP, crew, tripTime, smileBonus, hireCost as wHireCost, UP_MAX as W_UP_MAX, freePoints, xpProgress, xpFor, spent as wSpent, earned as wEarned, MAX_POINTS, upName as wUpName, waiterLvl, waiterRate, tray, SMILE_STEP, START_CREW, beersPerCycle, type WaiterUp } from '../core/waiters';
 import { milestoneCount } from '../core/economy';
-import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H, STYLES, pubStyle, styleGap, styleCount, hasStyle, styleSupplyMult, supplyIn, supplyOut, STYLE_MIX, STAR_LVL, STAR_MAX, starsOf, starMult, starCost, starKey } from '../core/economy';
+import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H, STYLES, pubStyle, styleGap, styleCount, hasStyle, styleSupplyMult, supplyIn, supplyOut, STYLE_MIX, STAR_LVL, STAR_MAX, starsOf, starMult, starCost, starKey, ACT_STEP } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { iap, ProductId, PRODUCTS } from '../core/shop';
@@ -579,7 +579,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     tx(by + 24, t('Nová hospoda!'), 34, PAL.gold);
     tx(by + 74, PUB_NAMES[act], 28, PAL.mint);
     tx(by + 124, about[act] ?? '', 21, PAL.bone);
-    tx(by + 220, t('Vydělává {m}× víc než ta předchozí a běží vedle ostatních.', { m: 50 }), 20, PAL.sand);
+    tx(by + 220, t('Vydělává {m}× víc než ta předchozí a běží vedle ostatních.', { m: ACT_STEP }), 20, PAL.sand);
     if (act === 2) tx(by + 284, t('V menu se otevřela Kostnice.'), 20, PAL.ice);
     const ok = this.btn(W / 2 - 110, by + bh - 90, 220, 64, () => {
       this.awayObjs.forEach((o) => o.destroy());
@@ -619,7 +619,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const key = sub && tab === 'shop' ? sub : tab;
       if (known.includes(key) || this.tileLock(key)) continue;
       known.push(key);
-      if (!first && this.views[0]) this.banner(this.views[0].cam, t('Nové v menu: {s}', { s: label }));
+      if (!first && this.views[0]) this.guideAdd('tile:' + key);
     }
   }
 
@@ -921,11 +921,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const lock = this.tileLock(sub && tab === 'shop' ? sub : tab);
       const b = this.btn(x, y, tw, th, () => {
         if (lock) return this.banner(this.views[0].cam, t('{s}: otevře se {c}', { s: label, c: lock }));
-        if (tab === 'temple') return this.openTemple();
-        if (tab === 'darts') return this.openDarts();
+        if (tab === 'temple') return this.guideEv('tile:temple'), this.openTemple();
+        if (tab === 'darts') return this.guideEv('tile:darts'), this.openDarts();
         if (sub) this.shopSub = sub;
         this.openShop(tab, false);
         if (tab === 'shop' && sub === 'up') this.tut('tile:shop');
+        this.guideEv('tile:' + (sub && tab === 'shop' ? sub : tab));
       }, D + 2);
       this.drawBtn(b, '', true, lock ? 'ink' : 'slate');
       const img = this.add.image(x + tw / 2, y + 50, atlas, frame).setDepth(D + 4);
@@ -2446,7 +2447,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         if (n < STAR_MAX && (p.st[def.id]?.lvl ?? 0) >= STAR_LVL[def.id]) (this.d.stars ??= {})[starKey(p.act, def.id)] = n + 1;
       }
     const n = Math.min(MAX_PUBS, this.d.pubs.length + 1);
-    if (n > this.d.pubs.length) this.d.pubIntro = n;
+    if (n > this.d.pubs.length) (this.d.pubIntro = n), ((this.d.guideQ ??= []).push('pub' + n));
     this.d.krigle += k;
     this.d.stats.prestiges++;
     this.d.run = 0;
@@ -2481,6 +2482,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** událost hráče posune návod */
   private tut(ev: string) {
+    this.guideEv(ev);
     const i = this.d.tut ?? -1;
     if (i < 0 || PubScene.TUT[i].done !== ev) return;
     this.d.tut = i + 1 >= PubScene.TUT.length ? -1 : i + 1;
@@ -2738,6 +2740,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       b.label.setY(b.y + 16).setFontSize(18).setScale(Math.min(1, (b.w - 10) / b.label.width));
     });
     this.skillBtns.forEach((_, j) => this.drawSkill(j));
+    this.time.delayedCall(0, () => this.guideEv('pub:' + i));
     for (const c of this.cards)
       [c.box, c.name, c.lvl, c.bar, c.info, c.tapZone, c.buy.bg, c.buy.label, c.buy.zone, c.staff.bg, c.staff.label, c.staff.zone, c.tag].forEach((o) => o.destroy());
     this.cards = [];
@@ -3539,6 +3542,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.comboT -= dt;
     this.punchT -= dt;
     this.tutFollow?.();
+    this.guideFollow?.();
     this.tutTick();
     this.vipTick(dt);
     this.coinT -= dt;
@@ -3591,7 +3595,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // během návodu nezačínají události (rvačka, žáby…) – nový hráč by nevěděl, co dělat
     if ((this.d.tut ?? -1) < 0 || this.ev.active) this.ev.update(dt);
     // první noc: jednou vysvětlit, že teď místo coins chodí kosti (až nebude otevřené jiné okno)
-    if (this.night && !this.d.nightInfo && !this.awayObjs.length) this.nightIntro();
+    if (this.night && !this.d.nightInfo && !this.awayObjs.length) {
+      this.d.nightInfo = true;
+      this.guideAdd('night');
+    }
+    if ((this.guideT -= dt) <= 0) {
+      this.guideT = 0.5;
+      this.guideStart();
+    }
     if (this.d.pubIntro && !this.awayObjs.length) this.pubIntro(this.d.pubIntro);
     if ((this.menuT -= dt) <= 0) {
       this.menuT = 2;
@@ -3635,6 +3646,157 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.hintTick(dt);
     this.dartsTick(dt);
     this.refresh();
+  }
+
+  // ---------- průvodce: novinky ukázat šipkou (velký pokyn + krátké vysvětlení, jako návod) ----------
+  guideT = 0;
+  guideObjs: Phaser.GameObjects.GameObject[] = [];
+  guideFollow: (() => void) | null = null;
+  guideCur: { id: string; i: number } | null = null;
+
+  private guideAdd(id: string) {
+    const q = (this.d.guideQ ??= []), seen = (this.d.guides ??= []);
+    if (!q.includes(id) && !seen.includes(id)) q.push(id);
+  }
+
+  /** kroky průvodce: pokyn, vysvětlení, čím se splní (událost nebo „ok“ = tlačítko), kam ukázat */
+  private guideSteps(id: string): { head: string; text: string; done: string; at?: () => number[] | null }[] {
+    const card = (sid: string, what: 'buy' | 'staff') => () => {
+      const c = this.cards.find((k) => k.def.id === sid)?.[what];
+      return c ? [c.x, c.y, c.w, c.h] : null;
+    };
+    const menuBtn = () => [this.shopBtn.x, this.shopBtn.y, this.shopBtn.w, this.shopBtn.h];
+    const tile = (key: string) => () => {
+      if (!this.shopObjs.length || this.tab !== 'home') return null;
+      const k = PubScene.TILES.findIndex(([tb, sub]) => (sub && tb === 'shop' ? sub : tb) === key);
+      const y0 = H - 6 * 96 - 126, tw = (W - 40) / 3;
+      return [10 + (k % 3) * (tw + 10), y0 + 64 + Math.floor(k / 3) * 126, tw, 118];
+    };
+    if (id.startsWith('pub')) {
+      const n = Number(id.slice(3)), name = PUB_NAMES[this.d.pubs[n - 1]?.act ?? n];
+      const tab = () => (this.pubTabs[n - 1] ? [this.pubTabs[n - 1].x, this.pubTabs[n - 1].y, this.pubTabs[n - 1].w, this.pubTabs[n - 1].h] : null);
+      return [
+        { head: t('NOVÁ HOSPODA!'), text: t('ťukni nahoře na „{n}“', { n: name }), done: 'pub:' + (n - 1), at: tab },
+        { head: t('OTEVŘI PÍPU'), text: t('i tady začínáš pípou – kup ji', { n: name }), done: 'buy:tap', at: card('tap', 'buy') },
+        { head: t('NAJMI ČÍŠNÍKY'), text: t('pak tahle hospoda vydělává sama'), done: 'hire', at: card('tap', 'staff') },
+        { head: t('HOSPODY BĚŽÍ NARÁZ'), text: t('všechny vydělávají pořád. Přepínej záložkami nahoře nebo táhni prstem do strany.'), done: 'ok' },
+      ];
+    }
+    if (id === 'night')
+      return [
+        { head: t('PADLA NOC!'), text: t('v noci chodí příšery a platí KOSTMI – coins se vrátí ráno'), done: 'ok' },
+        { head: t('ŤUKNI NA PŘÍŠERU'), text: t('dá ti kost'), done: 'tip', at: () => { const p = this.views[this.views.length > 1 ? this.sel : 0]?.tipTarget(); return p ? [p.x - 30, p.y - 10, 60, 60] : null; } },
+        { head: t('KOSTI SBÍREJ'), text: t('utratíš je v Menu: Kostnice, Sběrač a talismany. Ráno se zase vydělávají coins.'), done: 'ok' },
+      ];
+    const key = id.slice(5);
+    const row = PubScene.TILES.find(([tb, sub]) => (sub && tb === 'shop' ? sub : tb) === key);
+    const about: Record<string, string> = {
+      brew: t('vař pivo: hotové pivo dává bonus k výdělku nebo ho prodáš za coins'),
+      decor: t('drahé ozdoby hospody – každá dává trvalý bonus, zůstane i po hygieně'),
+      darts: t('házej šipky na terč – body dávají odměny, šipky přibývají samy'),
+      daynight: t('nastavení dne a noci'),
+      keeper: t('za úrovně hostinského dostáváš body – dej je do vylepšení'),
+      talis: t('talismany z chrámu – nasaď je a vylepšuj kostmi'),
+      krigl: t('za krígly z hygieny tu kupuješ trvalá vylepšení'),
+      temple: t('bojuj v chrámu – získáš talismany, krígly a truhly'),
+      league: t('týdenní soutěž s ostatními hospodskými – kdo víc vydělá, postoupí'),
+      bones: t('za kosti hoď kostkou – náhodně zlepší jednu vlastnost natrvalo'),
+      coll: t('sběrač ťuká na bubliny hostů za tebe – kup ho za kosti'),
+    };
+    if (!row) return [];
+    return [
+      { head: t('NOVÉ V MENU: {s}', { s: row[2].toUpperCase() }), text: t('ťukni na Menu'), done: 'menu', at: menuBtn },
+      { head: t('ŤUKNI NA: {s}', { s: row[2].toUpperCase() }), text: about[key] ?? '', done: 'tile:' + key, at: tile(key) },
+      { head: row[2].toUpperCase(), text: about[key] ?? '', done: 'ok' },
+    ];
+  }
+
+  /** spustí další průvodce z fronty, když nic jiného neběží */
+  private guideStart() {
+    if (this.guideCur || this.awayObjs.length || (this.d.tut ?? -1) >= 0 || this.d.pubIntro) return;
+    const id = this.d.guideQ?.[0];
+    if (!id) return;
+    const steps = this.guideSteps(id);
+    // „nové v menu“ přeskočit krok Menu, když už je menu otevřené
+    this.guideCur = { id, i: steps[0]?.done === 'menu' && this.shopObjs.length && this.tab === 'home' ? 1 : 0 };
+    this.guideShow();
+  }
+
+  private guideEv(ev: string) {
+    const g = this.guideCur;
+    if (!g) return;
+    const steps = this.guideSteps(g.id);
+    if (steps[g.i]?.done !== ev) {
+      // jiná akce (třeba otevřené menu) – jen překreslit šipku
+      this.time.delayedCall(30, () => this.guideCur === g && this.guideShow());
+      return;
+    }
+    g.i++;
+    if (g.i >= steps.length) return this.guideEnd();
+    this.time.delayedCall(250, () => this.guideCur === g && this.guideShow());
+  }
+
+  private guideEnd() {
+    const g = this.guideCur;
+    this.guideObjs.forEach((o) => o.destroy());
+    this.guideObjs = [];
+    this.guideFollow = null;
+    this.guideCur = null;
+    if (!g) return;
+    this.d.guideQ = (this.d.guideQ ?? []).filter((x) => x !== g.id);
+    (this.d.guides ??= []).push(g.id);
+    store(this.d);
+  }
+
+  private guideShow() {
+    this.guideObjs.forEach((o) => o.destroy());
+    this.guideObjs = [];
+    this.guideFollow = null;
+    const g = this.guideCur;
+    if (!g) return;
+    const steps = this.guideSteps(g.id), st = steps[g.i];
+    if (!st) return this.guideEnd();
+    const D = 440;
+    // cíl nahoře (Menu, záložky hospod) → šipka míří nahoru, cedule o kus níž, ať ji šipka nepřekryje
+    const r0 = st.at?.();
+    const by = TOP + (this.views.length > 1 ? TABH : 0) + 16 + (r0 && r0[1] < TOP + TABH ? 80 : 0);
+    const hd = this.add.text(W / 2, by + 6, st.head, txt(42, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 1);
+    hd.setScale(Math.min(1, (W - 110) / hd.width));
+    const tx = this.add.text(W / 2, by + 56, st.text, { fontFamily: 'Arial, Helvetica, sans-serif', fontStyle: 'bold', fontSize: '22px', color: PAL.white, align: 'center', wordWrap: { width: W - 90 } }).setOrigin(0.5, 0).setDepth(D + 1);
+    let bh = 56 + Math.max(tx.height, 30) + 22;
+    const objs: Phaser.GameObjects.GameObject[] = [hd, tx];
+    if (st.done === 'ok') {
+      const ok = this.btn(W / 2 - 100, by + bh - 4, 200, 56, () => this.guideEv('ok'), D + 2);
+      this.drawBtn(ok, g.i + 1 >= steps.length ? t('Rozumím') : t('Dál'), true, 'green');
+      objs.push(ok.bg, ok.label, ok.zone);
+      bh += 66;
+    }
+    const box = this.add.graphics().setDepth(D);
+    box.fillStyle(col('ink'), 0.96).fillRoundedRect(40, by - 12, W - 80, bh, 12);
+    box.lineStyle(4, col('gold')).strokeRoundedRect(40, by - 12, W - 80, bh, 12);
+    objs.unshift(box);
+    // šipka a zlatý rámeček kolem cíle (cíl se může hýbat → každý snímek)
+    if (st.at) {
+      const hl = this.add.graphics().setDepth(D + 2);
+      const arrow = this.add.graphics().setDepth(D + 3);
+      const tri = (c: number, gr: number) => arrow.fillStyle(c).fillTriangle(-22 - gr, -14 - gr, 22 + gr, -14 - gr, 0, 22 + gr).fillRect(-9 - gr, -40 - gr, 18 + gr * 2, 28);
+      tri(col('ink'), 4);
+      tri(col('gold'), 0);
+      let ph = 0;
+      this.guideFollow = () => {
+        const r = st.at!();
+        hl.clear();
+        arrow.setVisible(!!r);
+        if (!r) return;
+        ph += 0.12;
+        const [x, y, w, h] = r, up = y < TOP + TABH;
+        hl.lineStyle(4, col('gold'), 0.6 + 0.4 * Math.sin(ph * 2)).strokeRoundedRect(x - 6, y - 6, w + 12, h + 12, 10);
+        arrow.setAngle(up ? 180 : 0).setPosition(x + w / 2, up ? y + h + 44 + Math.sin(ph) * 8 : y - 30 - Math.sin(ph) * 8);
+      };
+      this.guideFollow();
+      objs.push(hl, arrow);
+    }
+    this.guideObjs = objs;
   }
 
   /** text vedle pruhu karty: vede styl / zásobuje vyšší hospody / dostává zásoby / kolik chybí ke stylu */

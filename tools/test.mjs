@@ -151,6 +151,13 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('zásobování: pípa v Žabákovi vydělává víc', await S(p, (s, r) => s.pay(s.d.pubs[2], s.cards[0].def) > r * 1.25, r0));
   await S(p, (s) => { s.d.pubs[1].st.dice.lvl = 50; s.refresh(); });
   ok('styly: 2 různé styly = +25 % všude', await S(p, (s) => s.styleSign.b.text.includes('25')));
+  // průvodce: nová hospoda – záložka, nákup pípy, číšníci, rozumím
+  await S(p, (s) => { s.d.tut = -1; s.d.guideQ = ['pub2']; s.d.pubs[1].st.tap = { lvl: 0, auto: false, prog: 0 }; s.selectPub(0); s.guideStart(); s.selectPub(1); });
+  await p.waitForTimeout(400);
+  await S(p, (s) => { s.d.coins = 1e9; s.buy(1, s.cards[0].def); s.hire(1, s.cards[0].def); });
+  await p.waitForTimeout(400);
+  await S(p, (s) => s.guideEv('ok'));
+  ok('průvodce: nová hospoda projde a uloží se', await S(p, (s) => !s.guideCur && s.d.guides.includes('pub2') && !s.d.guideQ.length));
   ok('bez chyb v konzoli (3 hospody)', p.errors.length === 0);
   await p.close();
 }

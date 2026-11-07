@@ -212,3 +212,9 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   (TUT.head, 46 px) a pod ním vysvětlení běžným tučným písmem (Arial 22 px, bílé). Bez peněz „SBÍREJ COINS: c / n“.
   Během návodu karty bez řádků stylu/zásob; „chybí N milníků“ až od prvního milníku, „★ 500“ až od půlky cesty.
 - ČEKÁ: kamarád uživatele neví, co dělat po návodu → návrh lepšího vedení (viz odpověď v chatu, hospoda 59).
+- HOTOVO (přání uživatele „kamarád neví, co dělat“): průvodce novinkami (PubScene guide*: fronta d.guideQ, ukázané
+  d.guides). Stejný vzhled jako návod C + šipka a pulzující zlatý rámeček kolem cíle, kroky čekají na akci hráče
+  (nebo tlačítko Dál/Rozumím). Spouští se: po hygieně nová hospoda (záložka → kup pípu → najmi číšníky → hospody
+  běží naráz), první noc (místo okna: noc = kosti → ťukni na příšeru → kde kosti utratit), každá nově odemčená
+  dlaždice menu (místo banneru: ťukni na Menu → ťukni na dlaždici + co to dělá → Rozumím).
+- Číšníci na pípě 50 → 15 coins (přání: ~10 ťuknutí a pak automat). Okno nové hospody: „{m}×“ = ACT_STEP.
