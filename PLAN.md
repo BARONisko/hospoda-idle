@@ -165,3 +165,7 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   - VIP host (návrh C): poprvé 20 min po návodu, pak každých 6 h; čeká 30–60 min v uličce vpravo s reflektorem
     a hvězdou, pruh nahoře s odpočtem. Ťuknutí na něj (nebo na pruh) = 2 h výdělku. Nestihne-li se, odejde.
   - Upozornění: + „Přišel VIP host!“ (id 5) a „Denní truhla je připravená“ (zítra 10:00, id 3).
+- NÁVRH (čeká na výběr uživatele): prémiová měna za peníze – A „Zlaťáky“ (obchod: Urychlení/Automatika/Speciální/Koupit,
+  časoskoky, turbo, dovařit pivovar), B „Štamgast“ (předplatné 99 Kč/30 dní + Pivní sezóna s pasem, známky jen bonus),
+  C „Diamanty“ (trvalé automaty: úrovně, hygiena, truhla, VIP vrátný, noční směna 24 h). Doporučeno A+C (jedna měna,
+  záložka Automatika = trvalé věci). Zdarma po troškách (7. den truhly, VIP, úspěchy). Liga bez vlivu časoskoků.
