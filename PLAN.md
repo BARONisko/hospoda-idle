@@ -136,3 +136,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Šipky v reálném čase (přání uživatele): automat na pozadí hází nejvýš 1 šipku za 2 s (DartsState.tat), po zavření
   terče naváže od teď – zásoba se nikdy neodhází najednou (dřív 71 šipek při návratu do hospody). Automatické házení je
   první vylepšení: ostatní (i „Do celé hry“) mají „nejdřív automat“, dokud ho hráč nekoupí.
+- Chrám: zisk truhly v boji má velký efekt (TempleScene.chestFx: „TRUHLA!“, paprsky, konfety, truhla vyskočí a odletí
+  nahoru, otřes, záblesk, levelUp + jásot); otevření truhly navíc paprsky, 2× konfety, otřes, déšť mincí a jásot.

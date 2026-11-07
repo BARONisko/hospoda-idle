@@ -6,6 +6,7 @@ import { txt } from '../ui/font';
 import { t } from '../i18n';
 import { big } from '../core/num';
 import { sfx } from '../core/sfx';
+import { confetti, rays, bigText } from '../ui/juice';
 import { STAT_NAMES, OSSUARY, TEMPLE_STATS, type StatId } from '../core/talisman';
 import {
   TempleState, templeState, cultIdle, isWeekend, msToSwitch, ROUNDS_PER_DAY, ROUND_S, bossHp, DIFFS, DIFF_REW, DIFF_NAMES, setDiff, ALTAR_PER, altarCost, weekendKey, tapPower, chestTen, TEMPLE_UPS, SEAL_BONUS,
@@ -242,8 +243,25 @@ export class TempleScene extends Phaser.Scene {
       // truhla se otevře až na konci kola (s točením)
       (this.T.pend ??= []).push(this.diff());
       this.flash(t('Truhla! Otevřeš ji na konci kola.'), PAL.gold);
+      this.chestFx();
     }
     if (this.T.hp <= 0) this.defeat();
+  }
+
+  /** zisk truhly v boji: velký nápis, paprsky, konfety, truhla vyskočí a odletí nahoru, otřes a fanfára */
+  private chestFx() {
+    const x = W / 2, y = 360, D = 470;
+    rays(this, x, y, D - 5, 300);
+    bigText(this, x, y - 120, t('TRUHLA!'), '', D + 2);
+    confetti(this, x, y, 50, D + 1, 0.9);
+    const c = this.add.image(x, y + 40, 'obj', 'chest').setScale(1).setDepth(D);
+    this.tweens.add({ targets: c, scale: 7, duration: 380, ease: 'Back.out' });
+    this.tweens.add({ targets: c, angle: { from: -10, to: 10 }, yoyo: true, repeat: 3, duration: 90, delay: 380 });
+    this.tweens.add({ targets: c, x: W - 60, y: 40, scale: 2, alpha: 0.2, delay: 1100, duration: 500, ease: 'Quad.in', onComplete: () => c.destroy() });
+    this.cameras.main.shake(260, 0.012);
+    this.cameras.main.flash(180, 255, 220, 120);
+    sfx.levelUp();
+    sfx.cheer();
   }
 
   private defeat() {
@@ -708,7 +726,13 @@ export class TempleScene extends Phaser.Scene {
       if (this.mode !== 'chest') return;
       chest.setFrame('chestOpen');
       sfx.coin(1.4);
-      this.cameras.main.flash(200, 255, 220, 120);
+      this.cameras.main.flash(260, 255, 220, 120);
+      this.cameras.main.shake(220, 0.01);
+      rays(this, W / 2, 330, 54, 380);
+      confetti(this, W / 2, 400, 60, 58, 1.1);
+      this.time.delayedCall(250, () => this.mode === 'chest' && confetti(this, W / 2, 400, 40, 58, 0.8));
+      sfx.coinRain(8);
+      sfx.cheer();
       // odměna vyskočí z truhly (bez točení – žádné hazardní kolo)
       const [ia, ifr] = icons[kind];
       const ic = this.add.image(W / 2, 400, ia, ifr).setDepth(57).setAngle(kind === 'ten2' ? -60 : 0);
