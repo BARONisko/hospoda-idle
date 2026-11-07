@@ -231,3 +231,4 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   obrazovce; v otevřeném menu jen šipka a rámeček na dlaždici, po ťuknutí konec (krok „Rozumím“ zrušen, vysvětlení
   je už v ceduli s „ťukni na Menu“). Průvodce s cedulí (nová hospoda, noc) počká na zavřené menu.
 - HOTOVO (přání): cedule stylu hospody (PIVNICE…) vpravo v rohu, pod truhlou, když je vidět.
+- HOTOVO (hlášení: nápis vlevo nahoře jen z půlky): banner a oslava milníku vždy uprostřed výhledu hospody (dřív podle kamery 1. hospody, která při jiné vybrané hospodě mohla mít špatný rámeček), dlouhý text se zalomí a zmenší.

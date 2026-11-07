@@ -660,7 +660,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** milník (25, 50, 100 …): paprsky, velký nápis, konfety, mince do počítadla, otřes, zvuk (efekty B) */
   private milestone(i: number, def: StationDef) {
-    const c = this.views[i].cam, cx = c.x + c.width / 2, cy = c.y + c.height / 2;
+    const cx = W / 2, cy = TOP + VIEW_H / 2;
     const lvl = this.st(this.d.pubs[i], def.id).lvl;
     rays(this, cx, cy);
     bigText(this, cx, cy - 20, t('ÚROVEŇ {n}!', { n: lvl }), t('{s}: výdělek ×2!', { s: STATION_NAMES[this.d.pubs[i].act][def.id] }));
@@ -681,12 +681,16 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   private banner(c: Phaser.Cameras.Scene2D.Camera, text: string, top = false) {
     sfx.fanfare();
+    // vždy uprostřed výhledu hospody (kamera skryté hospody mohla mít nesmyslný rámeček → nápis vlevo nahoře)
+    // a dlouhý text se zalomí a zmenší, aby nepřetekl mimo obrazovku
+    void c;
     const tx = this.add
-      .text(c.x + c.width / 2, top ? c.y + 70 : c.y + c.height / 2, text, txt(30, PAL.gold))
+      .text(W / 2, top ? TOP + (this.views.length > 1 ? TABH : 0) + 70 : TOP + VIEW_H / 2, text, { ...txt(30, PAL.gold), align: 'center', wordWrap: { width: W - 40 } })
       .setOrigin(0.5)
       .setStroke(PAL.ink, 8)
       .setDepth(450);
-    this.tweens.add({ targets: tx, scale: { from: 0.4, to: 1 }, duration: 260, ease: 'Back.out' });
+    tx.setScale(Math.min(1, (W - 24) / tx.width));
+    this.tweens.add({ targets: tx, scale: { from: 0.4 * tx.scale, to: tx.scale }, duration: 260, ease: 'Back.out' });
     this.tweens.add({ targets: tx, y: tx.y - 40, alpha: 0, delay: 1300, duration: 600, onComplete: () => tx.destroy() });
   }
 
