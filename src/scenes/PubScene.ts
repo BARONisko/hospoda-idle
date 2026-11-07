@@ -3901,12 +3901,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       league: t('týdenní soutěž s ostatními hospodskými – kdo víc vydělá, postoupí'),
       bones: t('za kosti hoď kostkou – náhodně zlepší jednu vlastnost natrvalo'),
       coll: t('sběrač ťuká na bubliny hostů za tebe – kup ho za kosti'),
+      special: t('každý den truhla zdarma'),
     };
     if (!row) return [];
     return [
-      { head: t('NOVÉ V MENU: {s}', { s: row[2].toUpperCase() }), text: t('ťukni na Menu'), done: 'menu', at: menuBtn },
-      { head: t('ŤUKNI NA: {s}', { s: row[2].toUpperCase() }), text: about[key] ?? '', done: 'tile:' + key, at: tile(key) },
-      { head: row[2].toUpperCase(), text: about[key] ?? '', done: 'ok' },
+      // v menu už jen šipka na dlaždici (žádná cedule ani „Rozumím“ – přání uživatele)
+      { head: t('NOVÉ V MENU: {s}', { s: row[2].toUpperCase() }), text: (about[key] ? about[key] + '\n' : '') + t('ťukni na Menu'), done: 'menu', at: menuBtn },
+      { head: '', text: '', done: 'tile:' + key, at: tile(key) },
     ];
   }
 
@@ -3916,6 +3917,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const id = this.d.guideQ?.[0];
     if (!id) return;
     const steps = this.guideSteps(id);
+    // průvodce s cedulí (nová hospoda, noc) počká, až bude menu zavřené
+    if (this.shopObjs.length && steps[0]?.done !== 'menu') return;
     // „nové v menu“ přeskočit krok Menu, když už je menu otevřené
     this.guideCur = { id, i: steps[0]?.done === 'menu' && this.shopObjs.length && this.tab === 'home' ? 1 : 0 };
     this.guideShow();
@@ -3956,6 +3959,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const steps = this.guideSteps(g.id), st = steps[g.i];
     if (!st) return this.guideEnd();
     const D = 440;
+    // velká cedule jen na hlavní obrazovce – v otevřeném menu jen šipka
+    const bare = !st.head || (this.shopObjs.length > 0 && st.done !== 'ok');
     // cíl nahoře (Menu, záložky hospod) → šipka míří nahoru, cedule o kus níž, ať ji šipka nepřekryje
     const r0 = st.at?.();
     const by = TOP + (this.views.length > 1 ? TABH : 0) + 16 + (r0 && r0[1] < TOP + TABH ? 80 : 0);
@@ -3971,8 +3976,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       bh += 66;
     }
     const box = this.add.graphics().setDepth(D);
-    box.fillStyle(col('ink'), 0.96).fillRoundedRect(40, by - 12, W - 80, bh, 12);
-    box.lineStyle(4, col('gold')).strokeRoundedRect(40, by - 12, W - 80, bh, 12);
+    if (bare) objs.forEach((o) => (o as Phaser.GameObjects.Text).setVisible(false));
+    else {
+      box.fillStyle(col('ink'), 0.96).fillRoundedRect(40, by - 12, W - 80, bh, 12);
+      box.lineStyle(4, col('gold')).strokeRoundedRect(40, by - 12, W - 80, bh, 12);
+    }
     objs.unshift(box);
     // šipka a zlatý rámeček kolem cíle (cíl se může hýbat → každý snímek)
     if (st.at) {

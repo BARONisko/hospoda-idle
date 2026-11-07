@@ -227,3 +227,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   karta / host), po splnění zelená „VYBER +N“. Uložení d.q (hotové), d.qTiles (navštívené dlaždice). Staré hry:
   při prvním načtení se splněné úkoly označí bez odměny. Schopnost manažera, truhla a cedule stylu se posunou o lištu.
   Lišta skrytá během návodu a průvodce novinkami.
+- HOTOVO (stížnost uživatele „v menu otravná cedule SPECIÁLNÍ NABÍDKA + Rozumím“): velká cedule průvodce jen na hlavní
+  obrazovce; v otevřeném menu jen šipka a rámeček na dlaždici, po ťuknutí konec (krok „Rozumím“ zrušen, vysvětlení
+  je už v ceduli s „ťukni na Menu“). Průvodce s cedulí (nová hospoda, noc) počká na zavřené menu.
