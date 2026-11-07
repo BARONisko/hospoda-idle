@@ -150,3 +150,7 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   automatu) a „Víkend v chrámu začíná“ (sobota 9:00, když je chrám odemčený); při návratu se zruší. Aplikace (Capacitor):
   plugin LocalNotifications přes window.Capacitor (přijdou i při zavřené hře – plugin @capacitor/local-notifications
   bude potřeba přidat při stavbě aplikace). Web/PWA: Notification API + časovač, jen dokud prohlížeč stránku nechá žít.
+- ÚKOL (uživatel schválil přes hospodu 57): VIP host – přijde zhruba každé 4 h, čeká 30–60 min s odpočtem v bublině,
+  obslouží se ťuknutím na něj (velká odměna, např. 2 h výdělku), při příchodu upozornění na mobilu (notify.ts, id 5).
+  Není to o náhodě – jde o vrátit se včas. Návrhy vzhledu A/B/C (korunka + kroužek / koberec + cedule / reflektor +
+  pruh nahoře) poslány uživateli, čeká se na výběr. Čekají i výběry denní truhly A/B/C a nabídky za reklamu A/B/C.
