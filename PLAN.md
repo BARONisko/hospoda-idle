@@ -150,7 +150,18 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   automatu) a „Víkend v chrámu začíná“ (sobota 9:00, když je chrám odemčený); při návratu se zruší. Aplikace (Capacitor):
   plugin LocalNotifications přes window.Capacitor (přijdou i při zavřené hře – plugin @capacitor/local-notifications
   bude potřeba přidat při stavbě aplikace). Web/PWA: Notification API + časovač, jen dokud prohlížeč stránku nechá žít.
-- ÚKOL (uživatel schválil přes hospodu 57): VIP host – přijde zhruba každé 4 h, čeká 30–60 min s odpočtem v bublině,
+- (HOTOVO níže) VIP host – přijde zhruba každé 4 h, čeká 30–60 min s odpočtem v bublině,
   obslouží se ťuknutím na něj (velká odměna, např. 2 h výdělku), při příchodu upozornění na mobilu (notify.ts, id 5).
   Není to o náhodě – jde o vrátit se včas. Návrhy vzhledu A/B/C (korunka + kroužek / koberec + cedule / reflektor +
   pruh nahoře) poslány uživateli, čeká se na výběr. Čekají i výběry denní truhly A/B/C a nabídky za reklamu A/B/C.
+- HOTOVO (výběr uživatele: truhla A, reklama C, VIP C po 6 h) – src/core/special.ts + PubScene (speciální nabídka):
+  - Menu → „Speciální nabídka“ (dlaždice před Nastavením): Reklamní kampaň (zhlédnutí = výdělek ×1,2 na 4 h, každé
+    zhlédnutí +0,02 do násobku (max +0,4), „Lepší reklama“ za krígly 10/30/90/270 po +0,1 (4×) → max ×2; další zhlédnutí
+    prodlouží o 4 h, nejvýš 12 h dopředu; platí i offline jen po dobu běhu), Denní truhla, „Bez reklam“ a „Balík krígel“
+    (zatím „brzy“). Na webu bez reklamní sítě: „jen v mobilní aplikaci“ (?fakeads=1 pro ladění).
+  - Denní truhla (kalendář 7 dní): 1. 2 h výdělku, 2. 5 kostí, 3. 20 šipek, 4. 4 h výdělku, 5. 10 kostí, 6. 1 krígl,
+    7. zlatá: +1 bod číšníkovi s nejméně body + 3 krígly. Vynechaný den = série od 1. ×2 za reklamu. Ikona truhly
+    v hospodě vpravo nahoře (jen když je připravená, po návodu), tečka na Menu.
+  - VIP host (návrh C): poprvé 20 min po návodu, pak každých 6 h; čeká 30–60 min v uličce vpravo s reflektorem
+    a hvězdou, pruh nahoře s odpočtem. Ťuknutí na něj (nebo na pruh) = 2 h výdělku. Nestihne-li se, odejde.
+  - Upozornění: + „Přišel VIP host!“ (id 5) a „Denní truhla je připravená“ (zítra 10:00, id 3).

@@ -104,6 +104,10 @@ export interface Save {
   seen: string[];
   /** koupená vylepšení z obchodu (id) */
   up: string[];
+  /** speciální nabídka: denní truhla, reklamní kampaň, VIP host */
+  chest?: import('./special').ChestState;
+  adv?: import('./special').AdvState;
+  vip?: import('./special').VipState;
   /** čas posledního uložení (ms) – pro výdělek offline */
   at: number;
 }

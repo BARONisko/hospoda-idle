@@ -4,7 +4,7 @@ import { t, lang, LANGS, AVAILABLE, setLang } from '../i18n';
 import { txt } from '../ui/font';
 import { confetti, rays, bigText, coinFountain, popText, punch, flashRect } from '../ui/juice';
 import { big, dur } from '../core/num';
-import { WAITERS, WAITER_MAX, BAR_CAP, crew, tripTime, smileBonus, hireCost as wHireCost, UP_MAX as W_UP_MAX, freePoints, xpProgress, xpFor, spent as wSpent, earned as wEarned, upName as wUpName, waiterLvl, waiterRate, tray, SMILE_STEP, START_CREW, beersPerCycle, type WaiterUp } from '../core/waiters';
+import { WAITERS, WAITER_MAX, BAR_CAP, crew, tripTime, smileBonus, hireCost as wHireCost, UP_MAX as W_UP_MAX, freePoints, xpProgress, xpFor, spent as wSpent, earned as wEarned, MAX_POINTS, upName as wUpName, waiterLvl, waiterRate, tray, SMILE_STEP, START_CREW, beersPerCycle, type WaiterUp } from '../core/waiters';
 import { milestoneCount } from '../core/economy';
 import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H } from '../core/economy';
 import { sfx } from '../core/sfx';
@@ -16,6 +16,7 @@ import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, nightLen, nightShare, s
 import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
 import { notify, NOTE, Note } from '../core/notify';
+import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey } from '../core/special';
 import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
@@ -58,6 +59,13 @@ const SBAR = 46;
 const VIEW_H = 404;
 const TABH = 56;
 const OPTS_KEY = 'pubidle_opts';
+/** násobek česky: 1.2 → „1,2“ */
+const xf = (m: number) => m.toFixed(2).replace(/\.?0+$/, '').replace('.', ',');
+/** zbývající čas h:mm:ss */
+const hms = (ms: number) => {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  return `${Math.floor(s / 3600)}:${String(Math.floor(s / 60) % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+};
 /** upozornění na mobilu zapnutá (nastavení) */
 let notesOn = false;
 
@@ -305,6 +313,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.idleS = 0;
     if (this.hintMode === 'a') this.hintBtn = this.btn(W - 66, this.hintY() - 52, 52, 44, () => (this.hintObjs.length ? this.hideHint() : this.showHint(this.hintY(), false)), 60);
     this.daily();
+    this.chestHudDraw();
     this.time.delayedCall(700, () => this.leagueCheck());
     // „Delší noc“ byla po 30 s, teď po 1 s → úrovně ×30
     if (this.d.dn && !this.d.dn.v2) {
@@ -376,6 +385,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         if (this.sheet >= 0 && ptr.y > this.sheetY()) continue; // pod panelem
         if (this.wChips.some((c) => c.zone.visible && c.zone.getBounds().contains(ptr.x, ptr.y))) continue; // lišta číšníků
         const wp = c.getWorldPoint(ptr.x, ptr.y);
+        if (this.chestHud?.zone.visible && this.chestHud.zone.getBounds().contains(ptr.x, ptr.y)) continue; // ikona truhly
+        if (this.vipBar?.zone.getBounds().contains(ptr.x, ptr.y)) continue; // pruh VIP
+        if (this.vipTap(this.views.indexOf(v), wp.x, wp.y)) return;
         if (this.ev.tap(this.views.indexOf(v), wp.x, wp.y)) return;
         if (v.tap(wp.x, wp.y)) {
           this.tipReward(v);
@@ -419,6 +431,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const ds = this.d.darts;
     if (ds && this.d.nightInfo && !autoOn(ds) && ds.have < dartCap(ds.up))
       out.push({ id: NOTE.darts, at: now + (dartCap(ds.up) - ds.have) * dartMs(ds.up, this.ts().dspeed), title: t('Toulec je plný'), body: t('Šipky čekají na hod – další už nepřibývají.') });
+    const vip = this.d.vip;
+    if (vip && (this.d.tut ?? -1) < 0)
+      out.push({ id: NOTE.vip, at: vip.next, title: t('Přišel VIP host!'), body: t('Čeká nejvýš hodinu – obsluž ho ťuknutím a dostaneš {h} h výdělku.', { h: VIP_H }) });
+    if (!chestReady(this.d.chest, now)) {
+      const m = new Date(now);
+      m.setDate(m.getDate() + 1);
+      m.setHours(10, 0, 0, 0);
+      out.push({ id: NOTE.chest, at: m.getTime(), title: t('Denní truhla je připravená'), body: t('Otevři ji a nepřeruš sérii – 7. den zlatá truhla!') });
+    }
     if (!this.tileLock('temple') && !isWeekend(now)) {
       const sat = new Date(now);
       sat.setDate(sat.getDate() + ((6 - sat.getDay() + 7) % 7));
@@ -435,7 +456,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const cap = this.offCap();
     const secs = Math.min(cap, raw);
     const rate = this.d.pubs.reduce((a, p) => a + this.rate(p), 0);
-    const g = Math.floor(rate * secs);
+    // reklamní kampaň platí jen po dobu, kdy běžela
+    const base = rate / adMult(this.d.adv);
+    const g = Math.floor(base * (secs + (adPower(this.d.adv) - 1) * adOverlap(this.d.adv, leftAt, leftAt + secs * 1000)));
     this.d.at = Date.now();
     // číšníci sbírají zkušenosti i offline (jen přes den, podle toho, jak moc mají práce)
     const daySecs = secs * (1 - nightShare());
@@ -679,7 +702,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return [...mgrs, ...ups].sort((a, b) => a.cost - b.cost).slice(0, 5);
   }
 
-  tab: 'home' | 'shop' | 'tasks' | 'book' | 'krigl' | 'temple' | 'brew' | 'talis' | 'keeper' | 'league' | 'daynight' | 'darts' | 'coll' | 'opts' = 'home';
+  tab: 'home' | 'shop' | 'tasks' | 'book' | 'krigl' | 'temple' | 'brew' | 'talis' | 'keeper' | 'league' | 'daynight' | 'darts' | 'coll' | 'opts' | 'special' | 'chest' = 'home';
 
   /** má záložka něco nového (červená tečka)? Stejná pravidla rozsvěcují tečku na tlačítku Menu. */
   // ---------- šipky ----------
@@ -843,6 +866,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (id === 'tasks') return this.claimable();
     if (id === 'brew') return this.brewFull();
     if (id === 'keeper') return this.skillPoints() > 0;
+    if (id === 'special') return chestReady(this.d.chest) && (this.d.tut ?? -1) < 0;
     if (id === 'darts') return !!this.d.darts && DART_UPS.some((u) => (this.d.darts!.up[u.id] ?? 0) < u.max && u.cost(this.d.darts!.up[u.id] ?? 0) <= this.d.darts!.pts);
     if (id === 'temple') return isWeekend() && !this.tileLock('temple') && templeState(this.d.temple).used < ROUNDS_PER_DAY;
     return false;
@@ -869,6 +893,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     ['krigl', null, t('Krígly'), 'obj', 'krigl0'],
     ['book', null, t('Sbírka'), 'icons', 'book'],
     ['shop', 'decor', t('Výzdoba'), 'obj', 'plant'],
+    ['special', null, t('Speciální nabídka'), 'obj', 'chest'],
     ['opts', null, t('Nastavení'), 'icons', 'gear'],
   ];
 
@@ -938,7 +963,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const back = this.btn(10, y0 + 10, 130, 42, () => (dn ? ((this.shopSub = 'bones'), this.openShop('shop', false)) : this.openShop('home', false)), D + 5);
       this.drawBtn(back, dn ? t('← Kostnice') : t('← Menu'), true, 'plum');
       const tile = PubScene.TILES.find(([tb, sub]) => tb === tab && (tab !== 'shop' || sub === this.shopSub));
-      const title = this.add.text(W / 2 + 30, y0 + 31, dn ? t('Den a noc') : tile?.[2] ?? '', txt(28, PAL.gold)).setOrigin(0.5).setDepth(D + 5);
+      const title = this.add.text(W / 2 + 30, y0 + 31, dn ? t('Den a noc') : tab === 'chest' ? t('Denní truhla') : tile?.[2] ?? '', txt(28, PAL.gold)).setOrigin(0.5).setDepth(D + 5);
       title.setScale(Math.min(1, 260 / title.width));
       this.shopObjs.push(back.bg, back.label, back.zone, title);
     }
@@ -960,6 +985,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     else if (tab === 'talis') this.talisTab(cy0, D);
     else if (tab === 'keeper') this.keeperTab(cy0, D);
     else if (tab === 'league') this.leagueTab(cy0, D);
+    else if (tab === 'special') this.specialTab(y0, D);
+    else if (tab === 'chest') this.chestTab(y0, D);
     else this.optsTab(cy0, D);
     sfx.click();
     this.refresh();
@@ -1559,7 +1586,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     rows.forEach(([title, val, fn], i) => {
       i += vols.length + 1;
       const y = y0 + i * RH;
-      this.row(y, RH, D, title, title === t('Hra do složky') ? t('spustíš ji z disku bez internetu') : title === t('Upozornění') ? t('plná hospoda, víkend v chrámu') : '');
+      this.row(y, RH, D, title, title === t('Hra do složky') ? t('spustíš ji z disku bez internetu') : title === t('Upozornění') ? t('plná hospoda, VIP host, truhla, chrám') : '');
       const b = this.btn(W - 232, y + 14, 210, 60, () => {
         fn();
         saveOpts();
@@ -1569,6 +1596,337 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
     this.shopObjs.push(this.add.text(W / 2, y0 + (vols.length + 1 + rows.length) * RH + 30, 'P.U.B. Idle – Pajzl Tycoon', txt(18, PAL.slate)).setOrigin(0.5).setDepth(D + 1));
+  }
+
+  // ---------- speciální nabídka: denní truhla, reklamní kampaň, VIP host ----------
+  /** výdělek za h hodin (odměny truhly a VIP; aspoň něco i na začátku hry) */
+  private hoursIncome(h: number) {
+    const r = this.d.pubs.reduce((a, p) => a + Math.max(this.rate(p), this.pay(p, STATIONS[0]) / STATIONS[0].cycle), 0);
+    return Math.max(50 * h, Math.round(r * h * 3600));
+  }
+
+  private krigleTxt(n: number) {
+    return n === 1 ? t('{n} krígl', { n }) : n < 5 ? t('{n} krígly', { n }) : t('{n} krígel', { n });
+  }
+
+  /** popis odměny truhly (x = násobek za reklamu) */
+  private chestRewText(r: ChestRew, x = 1): string {
+    switch (r.k) {
+      case 'coins': return t('{h} h výdělku', { h: r.h * x });
+      case 'bones': return t('{n} kostí', { n: r.n * x });
+      case 'darts': return t('{n} šipek', { n: r.n * x });
+      case 'krigle': return this.krigleTxt(r.n * x);
+      case 'gold': return t('+{p} bod pro číšníka + {k}', { p: x, k: this.krigleTxt(GOLD_KRIGLE * x) });
+    }
+  }
+
+  /** dá odměnu truhly, vrátí text na oslavu */
+  private chestGive(r: ChestRew, x: number): string {
+    if (r.k === 'coins') {
+      const n = this.hoursIncome(r.h * x);
+      this.gain(n);
+      return t('+{n} coins', { n: big(n) });
+    }
+    if (r.k === 'bones') this.d.bones = (this.d.bones ?? 0) + r.n * x;
+    else if (r.k === 'darts') this.dartsData().have += r.n * x;
+    else if (r.k === 'krigle') this.d.krigle += r.n * x;
+    else {
+      // zlatá truhla: bod číšníkovi s nejméně body (bez číšníků 8 h výdělku) + krígly
+      this.d.krigle += GOLD_KRIGLE * x;
+      for (let i = 0; i < x; i++) {
+        const ws = this.d.pubs.flatMap((p) => p.w ?? []).filter((w) => wEarned(w) < MAX_POINTS);
+        if (!ws.length) {
+          this.gain(this.hoursIncome(8));
+          continue;
+        }
+        const w = ws.reduce((a, b) => (wEarned(b) < wEarned(a) ? b : a));
+        w.xp = Math.max(w.xp ?? 0, xpFor(wEarned(w) + 1));
+      }
+    }
+    return (r.k === 'gold' ? '' : '+') + this.chestRewText(r, x);
+  }
+
+  /** otevře denní truhlu (x2 = za reklamu) */
+  private async chestOpen(x2: boolean) {
+    if (!chestReady(this.d.chest)) return;
+    if (x2 && !(await ads.rewarded())) return this.banner(this.views[0].cam, t('Reklama se nepřehrála'));
+    if (!chestReady(this.d.chest)) return;
+    const { st, day } = openChest(this.d.chest);
+    this.d.chest = st;
+    const txt1 = this.chestGive(CHEST_REW[day - 1], x2 ? 2 : 1);
+    store(this.d);
+    this.tsCache = undefined;
+    const x = W / 2, y = 420, D = 470;
+    rays(this, x, y, D - 5, 300);
+    bigText(this, x, y - 130, day === 7 ? t('ZLATÁ TRUHLA!') : t('TRUHLA DNE!'), txt1, D + 2);
+    confetti(this, x, y, day === 7 ? 70 : 40, D + 1, 0.9);
+    const c = this.add.image(x, y + 30, 'obj', 'chest').setScale(1).setDepth(D);
+    if (day === 7) c.setTint(col('gold'));
+    this.tweens.add({ targets: c, scale: 7, duration: 380, ease: 'Back.out' });
+    this.tweens.add({ targets: c, alpha: 0, delay: 1600, duration: 400, onComplete: () => c.destroy() });
+    this.cameras.main.shake(200, 0.01);
+    sfx.levelUp();
+    sfx.cheer();
+    if (this.tab === 'chest' && this.shopObjs.length) this.openShop('chest', false);
+    this.chestHudDraw();
+  }
+
+  /** ikona truhly v hospodě (jen když je připravená) */
+  chestBg?: Phaser.GameObjects.Graphics;
+  chestHud?: { img: Phaser.GameObjects.Image; dot: Phaser.GameObjects.Graphics; zone: Phaser.GameObjects.Zone };
+  private chestHudDraw() {
+    const y = TOP + (this.d.pubs.length > 1 ? TABH : 0) + 40;
+    if (!this.chestHud) {
+      const bg = this.add.graphics().setDepth(59);
+      const img = this.add.image(W - 40, y, 'obj', 'chest').setScale(3).setDepth(60);
+      const dot = this.add.graphics().setDepth(61);
+      this.chestBg = bg;
+      const zone = this.add.zone(W - 72, y - 32, 64, 64).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(62);
+      zone.on('pointerdown', () => {
+        if (!zone.visible) return;
+        sfx.init();
+        this.openShop('chest', false);
+      });
+      this.tweens.add({ targets: img, angle: { from: -6, to: 6 }, yoyo: true, repeat: -1, duration: 500, ease: 'Sine.inOut' });
+      this.chestHud = { img, dot, zone };
+    }
+    const h = this.chestHud;
+    const on = chestReady(this.d.chest) && (this.d.tut ?? -1) < 0;
+    h.img.setY(y).setVisible(on);
+    h.zone.setY(y - 32).setVisible(on);
+    this.chestBg?.clear();
+    if (on) this.chestBg?.fillStyle(col('ink'), 0.75).fillRoundedRect(W - 72, y - 30, 64, 60, 12).lineStyle(3, col('gold')).strokeRoundedRect(W - 72, y - 30, 64, 60, 12);
+    h.dot.clear();
+    if (on) h.dot.fillStyle(col('ink')).fillCircle(W - 18, y - 22, 11).fillStyle(col('scarlet')).fillCircle(W - 18, y - 22, 8);
+  }
+
+  /** záložka Denní truhla (návrh A: kalendář 7 dní) */
+  private chestTab(y0: number, D: number) {
+    const ready = chestReady(this.d.chest);
+    const day = chestDay(this.d.chest);
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
+    add(this.add.text(W / 2, y0 + 82, ready ? t('Série: {d}. den – otevři dnešní truhlu', { d: day }) : t('Série: {d}. den – přijď zítra pro další', { d: day }), txt(20, PAL.fog)).setOrigin(0.5).setDepth(D + 2));
+    const tw = (W - 40) / 3, th = 128;
+    const doneN = ready ? day - 1 : day;
+    for (let i = 0; i < 6; i++) {
+      const x = 10 + (i % 3) * (tw + 10), y = y0 + 108 + Math.floor(i / 3) * (th + 8);
+      const done = i < doneN, today = ready && i === day - 1;
+      const g = add(this.add.graphics().setDepth(D + 1));
+      g.fillStyle(col(today ? 'amber' : done ? 'green' : 'ink')).fillRoundedRect(x, y, tw, th, 10);
+      add(this.add.text(x + tw / 2, y + 16, t('{n}. den', { n: i + 1 }), txt(20, PAL.white)).setOrigin(0.5).setDepth(D + 2));
+      add(this.add.image(x + tw / 2, y + 60, 'obj', 'chest').setScale(2.5).setDepth(D + 2).setAlpha(done ? 0.5 : 1));
+      const lb = add(this.add.text(x + tw / 2, y + 104, done ? '✓' : this.chestRewText(CHEST_REW[i]), txt(done ? 26 : 18, done ? PAL.white : PAL.bone)).setOrigin(0.5).setAlign('center').setDepth(D + 2));
+      lb.setWordWrapWidth(tw - 12);
+      lb.setScale(Math.min(1, (tw - 10) / lb.width, 44 / lb.height));
+    }
+    // 7. den: zlatá truhla
+    const gy = y0 + 108 + 2 * (th + 8);
+    const gold = ready && day === 7, gDone = doneN >= 7;
+    const g = add(this.add.graphics().setDepth(D + 1));
+    g.fillStyle(col(gold ? 'amber' : gDone ? 'green' : 'ink')).fillRoundedRect(10, gy, W - 20, 92, 10);
+    add(this.add.image(66, gy + 50, 'obj', 'chest').setScale(3.6).setTint(col('gold')).setDepth(D + 2));
+    add(this.add.text(122, gy + 16, t('7. den: ZLATÁ TRUHLA'), txt(24, PAL.gold)).setDepth(D + 2));
+    const gl = add(this.add.text(122, gy + 52, this.chestRewText(CHEST_REW[6]), txt(19, PAL.bone)).setDepth(D + 2));
+    gl.setScale(Math.min(1, (W - 140) / gl.width));
+    const by = gy + 112;
+    if (ready) {
+      const wide = !ads.available;
+      const o = this.btn(10, by, wide ? W - 20 : 250, 66, () => void this.chestOpen(false), D + 2);
+      this.drawBtn(o, t('Otevřít'), true, 'green');
+      this.shopObjs.push(o.bg, o.label, o.zone);
+      if (!wide) {
+        const a = this.btn(270, by, W - 280, 66, () => void this.chestOpen(true), D + 2);
+        this.drawBtn(a, t('×2 za reklamu'), true, 'plum');
+        this.shopObjs.push(a.bg, a.label, a.zone);
+      }
+    } else {
+      const left = add(this.add.text(W / 2, by + 30, '', txt(24, PAL.mint)).setOrigin(0.5).setDepth(D + 2));
+      const upd = () => {
+        const m = new Date();
+        m.setHours(24, 0, 0, 0);
+        left.setText(t('Další truhla za {t}', { t: hms(m.getTime() - Date.now()) }));
+        if (chestReady(this.d.chest)) this.openShop('chest', false);
+      };
+      upd();
+      this.leagueLive = upd;
+    }
+  }
+
+  /** pustí reklamu a spustí / prodlouží kampaň */
+  async adWatchNow() {
+    if (!(await ads.rewarded())) return this.banner(this.views[0].cam, t('Reklama se nepřehrála'));
+    const a = (this.d.adv ??= newAdv());
+    adWatch(a);
+    store(this.d);
+    sfx.levelUp();
+    this.banner(this.views[0].cam, t('Kampaň běží! Výdělek ×{m}', { m: xf(adPower(a)) }));
+    if (this.tab === 'special' && this.shopObjs.length) this.openShop('special', false);
+  }
+
+  /** záložka Speciální nabídka (návrh C): reklamní kampaň, denní truhla, bez reklam, krígly */
+  private specialTab(y0: number, D: number) {
+    const a = (this.d.adv ??= newAdv());
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
+    const card = (y: number, h: number, c: keyof typeof PAL) => add(this.add.graphics().setDepth(D + 1)).fillStyle(col(c)).fillRoundedRect(10, y, W - 20, h, 12);
+    // reklamní kampaň
+    let y = y0 + 70;
+    card(y, 238, 'plum');
+    add(this.add.image(62, y + 70, 'icons', 'tv').setScale(5).setDepth(D + 2));
+    add(this.add.text(118, y + 12, t('Reklamní kampaň'), txt(28, PAL.gold)).setDepth(D + 2));
+    const st = add(this.add.text(118, y + 50, '', txt(19, PAL.white)).setDepth(D + 2));
+    const sub = add(this.add.text(118, y + 76, t('každé zhlédnutí +{v}, roste až na ×{m}', { v: xf(0.02), m: xf(AD_TOP) }), txt(16, PAL.bone)).setDepth(D + 2));
+    sub.setScale(Math.min(1, (W - 136) / sub.width));
+    const bar = add(this.add.graphics().setDepth(D + 2));
+    const p = (adPower(a) - AD_BASE) / (AD_TOP - AD_BASE);
+    bar.fillStyle(col('ink')).fillRoundedRect(118, y + 104, W - 146, 18, 7);
+    bar.fillStyle(col('mint')).fillRoundedRect(118, y + 104, Math.max(18, (W - 146) * p), 18, 7);
+    add(this.add.text(118 + (W - 146) / 2, y + 113, `×${xf(adPower(a))}  →  ×${xf(AD_TOP)}`, txt(16, PAL.white)).setOrigin(0.5).setDepth(D + 3));
+    const upd = () => {
+      const left = a.until - Date.now();
+      st.setText(left > 0 ? t('běží: výdělek ×{m} – ještě {t}', { m: xf(adPower(a)), t: hms(left) }) : t('výdělek ×{m} na {h} h', { m: xf(adPower(a)), h: AD_H }));
+      st.setColor(left > 0 ? PAL.mint : PAL.white).setScale(Math.min(1, (W - 136) / st.width));
+    };
+    upd();
+    this.leagueLive = upd;
+    const watch = this.btn(118, y + 134, W - 146, 50, () => void this.adWatchNow(), D + 3);
+    this.drawBtn(watch, ads.available ? t('📺 Pustit reklamu') : t('jen v mobilní aplikaci'), ads.available, 'green');
+    const cost = adLvlCost(a.lvl);
+    const up = this.btn(118, y + 190, W - 146, 40, () => {
+      if (this.d.krigle < cost) return;
+      this.d.krigle -= cost;
+      a.lvl++;
+      store(this.d);
+      sfx.levelUp();
+      this.openShop('special', false);
+    }, D + 3);
+    this.drawBtn(up, a.lvl >= AD_LVL_MAX ? t('Lepší reklama: max') : t('Lepší reklama +{v} · {k}', { v: xf(0.1), k: this.krigleTxt(cost) }), a.lvl < AD_LVL_MAX && this.d.krigle >= cost, 'amber');
+    this.shopObjs.push(watch.bg, watch.label, watch.zone, up.bg, up.label, up.zone);
+    // denní truhla
+    y += 252;
+    card(y, 100, 'ink');
+    add(this.add.image(58, y + 54, 'obj', 'chest').setScale(3).setDepth(D + 2));
+    add(this.add.text(108, y + 16, t('Denní truhla'), txt(24, PAL.bone)).setDepth(D + 2));
+    const cs = add(this.add.text(108, y + 52, t('zdarma každý den · série {d}/7', { d: chestDay(this.d.chest) }), txt(16, PAL.fog)).setDepth(D + 2));
+    cs.setScale(Math.min(1, 250 / cs.width));
+    const ch = this.btn(W - 150, y + 26, 128, 50, () => this.openShop('chest', false), D + 3);
+    this.drawBtn(ch, chestReady(this.d.chest) ? t('Otevřít') : t('Ukázat'), true, chestReady(this.d.chest) ? 'green' : 'slate');
+    this.shopObjs.push(ch.bg, ch.label, ch.zone);
+    // placené položky – zatím jen připravené místo
+    const paid: [string, string][] = [
+      [t('Bez reklam'), t('všechny odměny bez reklamy')],
+      [t('Balík krígel'), t('50 krígel do začátku')],
+    ];
+    paid.forEach(([title, desc], i) => {
+      const yy = y + 114 + i * 96;
+      card(yy, 84, 'ink');
+      add(this.add.text(26, yy + 12, title, txt(22, PAL.bone)).setDepth(D + 2));
+      add(this.add.text(26, yy + 46, desc, txt(16, PAL.fog)).setDepth(D + 2));
+      const b = this.btn(W - 150, yy + 18, 128, 48, () => this.banner(this.views[0].cam, t('Brzy v mobilní aplikaci')), D + 3);
+      this.drawBtn(b, t('brzy'), false, 'amber');
+      this.shopObjs.push(b.bg, b.label, b.zone);
+    });
+  }
+
+  // VIP host (návrh C): reflektor, hvězda, pruh nahoře s odpočtem; ťuknutím obsloužit
+  vipObjs: Phaser.GameObjects.GameObject[] = [];
+  vipSpr?: Phaser.GameObjects.Sprite;
+  vipBar?: { g: Phaser.GameObjects.Graphics; tx: Phaser.GameObjects.Text; zone: Phaser.GameObjects.Zone };
+  vipT = 0;
+  private vipTick(dt: number) {
+    if ((this.vipT -= dt) > 0) return;
+    this.vipT = 1;
+    this.chestHudDraw(); // truhla se ukáže po návodu a o půlnoci
+    if ((this.d.tut ?? -1) >= 0 || !this.views[0]) return;
+    const v = (this.d.vip ??= newVip());
+    const r = vipTick(v);
+    if (r === 'left') {
+      this.vipHide(false);
+      this.banner(this.views[0].cam, t('VIP host odešel – nikdo ho neobsloužil'));
+    }
+    if (v.until && !this.vipSpr) {
+      this.vipShow();
+      if (r === 'came') this.banner(this.views[0].cam, t('Přišel VIP host! Ťukni na něj'), true);
+    }
+    if (this.vipBar) {
+      const m = Math.max(1, Math.ceil((v.until - Date.now()) / 60_000));
+      this.vipBar.tx.setText(t('★ VIP host čeká ještě {m} min · odměna {h} h výdělku', { m, h: VIP_H }));
+      this.vipBar.tx.setScale(Math.min(1, (W - 120) / this.vipBar.tx.width));
+    }
+  }
+
+  private vipShow() {
+    const v = this.views[0];
+    // ulička vpravo mezi stoly (viditelná část hospody)
+    const wv = v.cam.worldView;
+    const p = { x: Math.round(wv.x + wv.width * 0.86), y: Math.round(wv.y + wv.height * 0.6) };
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.vipObjs.push(o), this.events.emit('pubObj', o), o);
+    const top = v.cam.worldView.y;
+    const cone = add(this.add.graphics().setDepth(p.y - 1));
+    cone.fillStyle(col('sand'), 0.22).fillTriangle(p.x, top, p.x - 22, p.y + 2, p.x + 22, p.y + 2);
+    cone.fillStyle(col('sand'), 0.35).fillEllipse(p.x, p.y, 34, 8);
+    this.tweens.add({ targets: cone, alpha: { from: 0.7, to: 1 }, yoyo: true, repeat: -1, duration: 700 });
+    const spr = add(this.add.sprite(p.x, p.y, 'vampire', 1).setOrigin(0.5, 1).setScale(1.25).setDepth(p.y + 3));
+    this.tweens.add({ targets: spr, y: p.y - 2, yoyo: true, repeat: -1, duration: 400, ease: 'Sine.inOut' });
+    this.vipSpr = spr;
+    const bub = add(this.add.graphics().setDepth(p.y + 4));
+    bub.fillStyle(col('white')).fillCircle(p.x + 13, p.y - 34, 8);
+    const star = add(this.add.image(p.x + 13, p.y - 34, 'icons', 'star').setScale(0.75).setDepth(p.y + 5));
+    this.tweens.add({ targets: star, scale: { from: 0.65, to: 0.85 }, yoyo: true, repeat: -1, duration: 450 });
+    // pruh nahoře nad hospodou (UI) – ťuknutím taky obsloužit
+    const c = v.cam;
+    const y = c.y + 8;
+    const g = this.add.graphics().setDepth(65);
+    const bw = W - 100;
+    g.fillStyle(col('ink')).fillRoundedRect(12, y + 3, bw, 40, 10).fillStyle(col('plum')).fillRoundedRect(12, y, bw, 40, 10);
+    const tx = this.add.text(12 + bw / 2, y + 20, '', txt(19, PAL.gold)).setOrigin(0.5).setDepth(66);
+    const zone = this.add.zone(12, y, bw, 40).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(67);
+    zone.on('pointerdown', () => this.vipServeNow());
+    this.vipBar = { g, tx, zone };
+    this.vipT = 0;
+  }
+
+  private vipHide(happy: boolean) {
+    const spr = this.vipSpr;
+    this.vipObjs.forEach((o) => o !== spr && o.destroy());
+    this.vipObjs = [];
+    this.vipSpr = undefined;
+    if (spr) this.tweens.add({ targets: spr, y: spr.y - (happy ? 14 : 0), alpha: 0, duration: 700, onComplete: () => spr.destroy() });
+    if (this.vipBar) {
+      this.vipBar.g.destroy();
+      this.vipBar.tx.destroy();
+      this.vipBar.zone.destroy();
+      this.vipBar = undefined;
+    }
+  }
+
+  /** obsloužit VIP: odměna VIP_H hodin výdělku */
+  vipServeNow() {
+    const v = this.d.vip;
+    if (!v?.until || v.until <= Date.now()) return;
+    vipServe(v);
+    const n = this.hoursIncome(VIP_H);
+    this.gain(n);
+    store(this.d);
+    const spr = this.vipSpr;
+    if (spr) {
+      const c = this.views[0].cam;
+      const wv = c.worldView;
+      const sx = c.x + (spr.x - wv.x) * c.zoom, sy = c.y + (spr.y - 20 - wv.y) * c.zoom;
+      confetti(this, sx, sy, 40, 460, 0.7);
+      popText(this, sx, sy - 30, '+' + big(n), PAL.gold, 32);
+    }
+    this.vipHide(true);
+    this.banner(this.views[0].cam, t('VIP host spokojen! +{n} coins', { n: big(n) }));
+    sfx.cheer();
+  }
+
+  /** ťuknutí do hospody na VIP */
+  private vipTap(view: number, wx: number, wy: number) {
+    if (view !== 0 || !this.vipSpr) return false;
+    const b = Phaser.Geom.Rectangle.Inflate(this.vipSpr.getBounds(), 8, 8);
+    if (!b.contains(wx, wy)) return false;
+    this.vipServeNow();
+    return true;
   }
 
   // ---------- bestiář ----------
@@ -2362,7 +2720,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0));
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0)) * adMult(this.d.adv);
   }
 
   // ---------- obchod s krígly ----------
@@ -2964,6 +3322,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.punchT -= dt;
     this.tutFollow?.();
     this.tutTick();
+    this.vipTick(dt);
     this.coinT -= dt;
     this.d.pubs.forEach((p, i) => {
       let open = 0;
@@ -3076,7 +3435,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.skillBtns.forEach((_, i) => this.drawSkill(i));
     this.stripRates.forEach((r, i) => r.setText(t('+{n} / s', { n: big(this.rate(this.d.pubs[i])) })));
 
-    const cheap = ['shop', 'tasks', 'brew', 'keeper'].some((id) => this.tabAlert(id) && !this.tileLock(id));
+    const cheap = ['shop', 'tasks', 'brew', 'keeper', 'special'].some((id) => this.tabAlert(id) && !this.tileLock(id));
     this.shopDot.clear();
     if (cheap) this.shopDot.fillStyle(col('ink')).fillCircle(W - 126, 20, 11).fillStyle(col('scarlet')).fillCircle(W - 126, 20, 8);
     for (const r of this.shopRows) this.drawBtn(r.b, big(r.o.cost), this.d.coins >= r.o.cost, 'green');

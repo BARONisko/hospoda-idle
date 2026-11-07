@@ -146,6 +146,29 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('bez chyb v konzoli (3 hospody)', p.errors.length === 0);
   await p.close();
 }
+// 9) speciální nabídka: denní truhla, reklamní kampaň, VIP host
+{
+  const p = await page('?fakeads=1');
+  await S(p, (s) => { s.d.tut = -1; s.d.coins = 1e6; s.buy(0, s.cards[1].def); s.hire(0, s.cards[0].def); s.chestHudDraw(); });
+  ok('truhla: ikona v hospodě svítí', await S(p, (s) => s.chestHud.img.visible));
+  await S(p, (s) => s.openShop('chest', false));
+  ok('truhla: záložka se otevře', await S(p, (s) => s.shopObjs.length > 20));
+  await p.evaluate(() => game.scene.getScene('Pub').chestOpen(false));
+  ok('truhla: 1. den otevřen, ikona zmizí', await S(p, (s) => s.d.chest.day === 1 && !s.chestHud.img.visible));
+  await S(p, (s) => { const y = new Date(); y.setDate(y.getDate() - 1); s.d.chest = { day: 6, last: `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, '0')}-${String(y.getDate()).padStart(2, '0')}` }; window.k0 = s.d.krigle; });
+  await p.evaluate(() => game.scene.getScene('Pub').chestOpen(true));
+  ok('truhla: 7. den zlatá ×2 = 6 krígel a body číšníkům', await S(p, (s) => s.d.chest.day === 7 && s.d.krigle - window.k0 === 6 && s.d.pubs[0].w.every((w) => w.xp >= 40000)));
+  await S(p, (s) => { s.openShop('special', false); window.p0 = s.pay(s.d.pubs[0], s.cards[0].def); });
+  await p.evaluate(() => game.scene.getScene('Pub').adWatchNow());
+  ok('kampaň: výdělek ×1,22 po 1. zhlédnutí', await S(p, (s) => Math.abs(s.pay(s.d.pubs[0], s.cards[0].def) / window.p0 - 1.22) < 1e-6));
+  await S(p, (s) => { s.d.vip = { next: Date.now() - 1000, until: 0 }; s.vipT = 0; });
+  await p.waitForTimeout(1500);
+  ok('VIP: přišel a čeká', await S(p, (s) => !!s.vipSpr && s.d.vip.until > Date.now()));
+  ok('VIP: ťuknutí ho obslouží a dá výdělek', await S(p, (s) => { const e = s.d.earned; s.vipServeNow(); return !s.vipSpr && s.d.earned > e && s.d.vip.until === 0; }));
+  ok('upozornění: VIP a truhla naplánované', await S(p, (s) => { const n = s.notes().map((x) => x.id); return n.includes(5) && n.includes(3); }));
+  ok('bez chyb v konzoli (speciální nabídka)', p.errors.length === 0);
+  await p.close();
+}
 await b.close();
 await server.close();
 console.log(fails ? `\n${fails} testů selhalo` : '\nvšechny testy prošly');

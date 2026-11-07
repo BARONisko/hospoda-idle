@@ -21,7 +21,7 @@ export interface NotifyProvider {
 }
 
 /** druhy upozornění (id) */
-export const NOTE = { full: 1, darts: 2, chest: 3, temple: 4 } as const;
+export const NOTE = { full: 1, darts: 2, chest: 3, temple: 4, vip: 5 } as const;
 
 type CapLN = {
   requestPermissions(): Promise<{ display: string }>;
