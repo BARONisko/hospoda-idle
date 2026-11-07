@@ -143,3 +143,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Číšníci pomaleji (přání uživatele „~20× pomaleji“, wv3 = všem vynulovány úrovně a body): xpFor(p) = 40 000·p^1,7
   (1. bod ~1. den, 5 bodů ~2 týdny, 10 ~1,5 měsíce, všech 33 ~rok při ~12 h roznášení denně). Pípa točí 1 pivo za cyklus
   (ne +1 za milník – s pomalými číšníky prestiž trvala 1,2 h). Sim: prestiž ~stejně jako bez číšníků (35 min, 5,3 h na 40 krígel).
+- Číšníci max 3 (přání uživatele, ať je aspoň trochu čekání): poptávka pípa 0,67 + kuchyně 0,25 = 0,92 věcí/s vs 3 číšníci
+  bez vylepšení 0,86/s → ~7 % čekání, Rychlost/Podnos ho odstraní. Kdo měl Vilmu (4.), dostal zpět 4 000 × násobek hospody.

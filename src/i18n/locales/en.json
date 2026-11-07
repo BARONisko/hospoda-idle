@@ -680,5 +680,6 @@
  "talíře čekají – číšníci nestíhají!": "plates waiting – waiters can't keep up!",
  "nejdřív automat": "auto first",
  "TRUHLA!": "CHEST!",
- "Číšníci začínají znovu od úrovně 1 – zkušenosti teď přibývají pomaleji": "Waiters start again from level 1 – experience now grows more slowly"
+ "Číšníci začínají znovu od úrovně 1 – zkušenosti teď přibývají pomaleji": "Waiters start again from level 1 – experience now grows more slowly",
+ "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "Vilma left (there are now 3 waiters) – {n} coins refunded"
 }

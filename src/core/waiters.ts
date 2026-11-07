@@ -13,7 +13,7 @@ export interface WaiterState {
   xp?: number;
 }
 
-export const WAITER_MAX = 4;
+export const WAITER_MAX = 3;
 export const BAR_CAP = 12;
 /** jména a postavy číšníků (lidé z P.U.B.) */
 export const WAITERS = [

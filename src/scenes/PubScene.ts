@@ -214,6 +214,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       // v3: číšníci se levelovali ~20× moc rychle → zkušenosti, úrovně i body všem vynulovat (přání uživatele)
       if (!this.d.wv3) for (const w of p.w ?? []) (w.xp = 0), (w.s = 0), (w.t = 0), (w.m = 0);
     }
+    // jen 3 číšníci (ať je aspoň trochu čekání a Rychlost s Podnosem mají smysl): 4. číšník odchází, vrátit cenu
+    for (const p of this.d.pubs) {
+      while ((p.w?.length ?? 0) > WAITER_MAX) {
+        p.w!.pop();
+        const back = 4000 * actMult(p.act);
+        this.d.coins += back;
+        this.time.delayedCall(2500, () => this.views[0] && this.banner(this.views[0].cam, t('Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins', { n: big(back) })));
+      }
+    }
     if (!this.d.wv3 && this.d.pubs.some((p) => p.w?.length)) this.time.delayedCall(1500, () => this.views[0] && this.banner(this.views[0].cam, t('Číšníci začínají znovu od úrovně 1 – zkušenosti teď přibývají pomaleji')));
     this.d.wv3 = true;
     this.wrun = this.d.pubs.map(() => []);
