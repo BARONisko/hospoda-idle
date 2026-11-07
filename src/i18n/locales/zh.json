@@ -845,5 +845,19 @@
  "Začít znovu": "重新开始",
  "Smazat hru": "删除存档",
  "Opravdu? Ťukni znovu": "确定？再点一次",
- "celá hra od začátku, i s návodem": "从头开始，包括教程"
+ "celá hra od začátku, i s návodem": "从头开始，包括教程",
+ "Úkol splněn! +{n} coins": "任务完成！+{n} coins",
+ "Hotovo! {s}": "完成！{s}",
+ "Kup {n} vylepšení v Obchodě": "在商店购买{n}个升级",
+ "Kup vylepšení v Obchodě": "在商店购买升级",
+ "Získej styl hospody (2 milníky jedné stanice)": "获得酒馆风格（一个设施2个里程碑）",
+ "Zavolej hygienu – dostaneš krígly": "叫卫生检查 – 获得酒杯",
+ "VYBER +{n}": "领取 +{n}",
+ "Otevři: {s}": "开启：{s}",
+ "{s} na úroveň {n}": "{s}升到{n}级",
+ "Všechny úkoly od hostinského splněny!": "店主任务全部完成！",
+ "Podívej se do menu: {s}": "查看菜单：{s}",
+ "UKAŽ": "指给我",
+ "Najmi obsluhu: {s}": "雇佣员工：{s}",
+ "V noci nasbírej {n} kostí": "夜里收集{n}根骨头"
 }

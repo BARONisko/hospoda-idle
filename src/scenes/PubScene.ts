@@ -25,6 +25,7 @@ import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importS
 import { PubView } from '../game/PubView';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
 import { GUESTS } from '../game/PubView';
+import { QUESTS, QCtx, QuestDef, currentQuest, questDone } from '../core/quests';
 import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today, WeekKind, newWeekly, weekId, weekText } from '../core/goals';
 
 const W = 540;
@@ -327,6 +328,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.hintBtn = undefined;
     this.idleS = 0;
     if (this.hintMode === 'a') this.hintBtn = this.btn(W - 66, this.hintY() - 52, 52, 44, () => (this.hintObjs.length ? this.hideHint() : this.showHint(this.hintY(), false)), 60);
+    if (!this.d.q) this.d.q = QUESTS.filter((q) => questDone(q, this.d, this.qctx())).map((q) => q.id);
     this.daily();
     this.chestHudDraw();
     this.time.delayedCall(700, () => this.leagueCheck());
@@ -921,6 +923,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const lock = this.tileLock(sub && tab === 'shop' ? sub : tab);
       const b = this.btn(x, y, tw, th, () => {
         if (lock) return this.banner(this.views[0].cam, t('{s}: otevře se {c}', { s: label, c: lock }));
+        const qk = sub && tab === 'shop' ? sub : tab;
+        if (!(this.d.qTiles ??= []).includes(qk)) this.d.qTiles.push(qk);
         if (tab === 'temple') return this.guideEv('tile:temple'), this.openTemple();
         if (tab === 'darts') return this.guideEv('tile:darts'), this.openDarts();
         if (sub) this.shopSub = sub;
@@ -1427,6 +1431,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const k = this.kriglyNow();
     this.row(y0, RH, D, t('Zavolat hygienu'), t('krígly: {k} (+{b} % výdělek)', { k: big(this.d.krigle), b: big(Math.round(this.d.krigle * KRIGL_BONUS * 100)) }), 'blood', PAL.sand);
     const pb = this.btn(W - 212, y0 + 12, 190, 62, () => this.askPrestige(), D + 2);
+    this.hygBtn = pb;
     const pm = prestigeMin(this.d.stats.prestiges);
     this.drawBtn(pb, k >= pm ? t('+{k} krígel', { k: big(k) }) : t('{k} / {m} krígel', { k: big(k), m: big(pm) }), k >= pm, 'red');
     this.shopObjs.push(pb.bg, pb.label, pb.zone);
@@ -1704,7 +1709,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   chestBg?: Phaser.GameObjects.Graphics;
   chestHud?: { img: Phaser.GameObjects.Image; dot: Phaser.GameObjects.Graphics; zone: Phaser.GameObjects.Zone };
   private chestHudDraw() {
-    const y = TOP + (this.d.pubs.length > 1 ? TABH : 0) + 40;
+    const y = TOP + (this.d.pubs.length > 1 ? TABH : 0) + 40 + this.qOff();
     if (!this.chestHud) {
       const bg = this.add.graphics().setDepth(59);
       const img = this.add.image(W - 40, y, 'obj', 'chest').setScale(3).setDepth(60);
@@ -2701,7 +2706,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const viewH = VIEW_H;
       this.views[0].frame(0, TOP, W, viewH, 118);
       // schopnost manažera nahoře u zdi (tam nesedí hosté) – dole by zakrývala bubliny s objednávkami
-      this.skillBtns[0] = this.btn(14, TOP + 12, 180, 44, () => this.useSkill(0), 60);
+      this.skillBtns[0] = this.btn(14, TOP + 12 + this.qOff(), 180, 44, () => this.useSkill(0), 60);
       const g = this.add.graphics();
       g.fillStyle(col('dusk')).fillRect(0, TOP + viewH, W, H - TOP - viewH);
       g.fillStyle(col('gold')).fillRect(0, TOP + viewH, W, 3);
@@ -2716,7 +2721,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const rt = this.add.text(tb.x + tb.w / 2, tb.y + 34, '', txt(14, PAL.mint)).setOrigin(0.5).setDepth(62);
       this.stripRates.push(rt);
       this.pubTabs.push(tb);
-      this.skillBtns[i] = this.btn(14, TOP + TABH + 10, 180, 44, () => this.useSkill(i), 60);
+      this.skillBtns[i] = this.btn(14, TOP + TABH + 10 + this.qOff(), 180, 44, () => this.useSkill(i), 60);
     });
     const g = this.add.graphics();
     g.fillStyle(col('dusk')).fillRect(0, TOP, W, TABH).fillRect(0, TOP + VIEW_H, W, H - TOP - VIEW_H);
@@ -3556,6 +3561,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.punchT -= dt;
     this.tutFollow?.();
     this.guideFollow?.();
+    this.qTick();
     this.tutTick();
     this.vipTick(dt);
     this.coinT -= dt;
@@ -3659,6 +3665,186 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.hintTick(dt);
     this.dartsTick(dt);
     this.refresh();
+  }
+
+  // ---------- úkol od hostinského: lišta nahoře (úkolníček, úkol, postup, UKAŽ / VYBER) ----------
+  hygBtn?: Btn;
+  qUi?: { g: Phaser.GameObjects.Graphics; icon: Phaser.GameObjects.Image; title: Phaser.GameObjects.Text; cnt: Phaser.GameObjects.Text; rew: Phaser.GameObjects.Text; coin: Phaser.GameObjects.Image; btn: Btn; hl: Phaser.GameObjects.Graphics; arrow: Phaser.GameObjects.Graphics };
+  qKey = '';
+  /** šipka UKAŽ míří na cíl úkolu (id úkolu) */
+  qPoint: string | null = null;
+  qPh = 0;
+  qOffNow = -1;
+  static QH = 60;
+
+  private qctx(): QCtx {
+    return { lock: (k) => this.tileLock(k), krigly: () => [this.kriglyNow(), prestigeMin(this.d.stats.prestiges)] };
+  }
+
+  private qCur(): QuestDef | null {
+    return (this.d.tut ?? -1) < 0 ? currentQuest(this.d, this.qctx()) : null;
+  }
+
+  /** o kolik se posunou věci nahoře v hospodě (schopnost manažera, truhla, cedule stylu) kvůli liště úkolu */
+  private qOff() {
+    return this.qCur() ? PubScene.QH + 10 : 0;
+  }
+
+  private qReward() {
+    return Math.max(30, Math.round(this.totalRate() * 60));
+  }
+
+  /** obdélník, na který teď ukázat (podle stavu menu) */
+  private qTarget(q: QuestDef): number[] | null {
+    const r = (b?: Btn) => (b && b.bg.active && b.visible ? [b.x, b.y, b.w, b.h] : null);
+    const menu = () => (this.shopObjs.length ? null : r(this.shopBtn));
+    const tileR = (key: string) => {
+      if (!this.shopObjs.length) return r(this.shopBtn);
+      if (this.tab !== 'home') return null;
+      const k = PubScene.TILES.findIndex(([tb, sub]) => (sub && tb === 'shop' ? sub : tb) === key);
+      const y0 = H - 6 * 96 - 126, tw = (W - 40) / 3;
+      return [10 + (k % 3) * (tw + 10), y0 + 64 + Math.floor(k / 3) * 126, tw, 118];
+    };
+    const card = (sid: string, what: 'buy' | 'staff') => {
+      if (this.shopObjs.length) return null;
+      const c = this.cards.find((k) => k.def.id === sid)?.[what];
+      return c ? [c.x, c.y, c.w, c.h] : null;
+    };
+    const a = q.at;
+    switch (a.k) {
+      case 'buy':
+      case 'staff':
+        return card(a.s, a.k);
+      case 'tile':
+        return this.d.qTiles?.includes(a.key) ? null : tileR(a.key);
+      case 'up':
+      case 'hyg':
+        if (this.shopObjs.length && this.tab === 'shop' && this.shopSub === 'up') return a.k === 'hyg' ? r(this.hygBtn) : r(this.shopRows[0]?.b);
+        return this.shopObjs.length && this.tab !== 'home' ? null : tileR('up') ?? menu();
+      case 'tip': {
+        if (this.shopObjs.length) return null;
+        const p = this.views[this.views.length > 1 ? this.sel : 0]?.tipTarget();
+        return p ? [p.x - 30, p.y - 10, 60, 60] : null;
+      }
+      case 'style': {
+        const p = this.d.pubs[this.views.length > 1 ? this.sel : 0];
+        const best = STATIONS.filter((d) => (p.st[d.id]?.lvl ?? 0) > 0).sort((x, y) => (p.st[y.id]?.lvl ?? 0) - (p.st[x.id]?.lvl ?? 0))[0];
+        return best ? card(best.id, 'buy') : null;
+      }
+    }
+  }
+
+  private qClaim() {
+    const q = this.qCur();
+    if (!q || !questDone(q, this.d, this.qctx())) return;
+    const n = this.qReward();
+    this.d.coins += n;
+    (this.d.q ??= []).push(q.id);
+    this.qPoint = null;
+    sfx.fanfare();
+    this.banner(this.views[0].cam, t('Úkol splněn! +{n} coins', { n: big(n) }));
+    if (!this.qCur()) this.time.delayedCall(1500, () => this.banner(this.views[0].cam, t('Všechny úkoly od hostinského splněny!')));
+    store(this.d);
+  }
+
+  private qShow() {
+    const q = this.qCur();
+    if (!q) return;
+    this.qPoint = this.qPoint === q.id ? null : q.id;
+    // cíl je na kartě, ale menu je otevřené → zavřít menu
+    if (this.qPoint && (q.at.k === 'buy' || q.at.k === 'staff' || q.at.k === 'tip' || q.at.k === 'style') && this.shopObjs.length) this.closeShop();
+    sfx.click();
+  }
+
+  /** každý snímek: lišta úkolu, posun věcí nahoře, šipka UKAŽ */
+  private qTick() {
+    const off = this.qOff();
+    if (off !== this.qOffNow) {
+      this.qOffNow = off;
+      const y = TOP + (this.views.length > 1 ? TABH + 10 : 12) + off;
+      this.skillBtns.forEach((b, i) => {
+        if (!b) return;
+        b.y = y;
+        b.zone.setY(y);
+        b.label.setY(y + b.h / 2);
+        this.drawSkill(i);
+      });
+      this.chestHudDraw();
+      this.drawStyleSign();
+    }
+    const q = this.qCur();
+    const D = 95;
+    if (!this.qUi) {
+      const g = this.add.graphics().setDepth(D);
+      const icon = this.add.image(44, 0, 'icons', 'clipboard').setScale(3).setDepth(D + 1);
+      const title = this.add.text(80, 0, '', { fontFamily: 'Arial, Helvetica, sans-serif', fontStyle: 'bold', fontSize: '21px', color: PAL.gold }).setDepth(D + 1);
+      const cnt = this.add.text(W - 132, 0, '', { fontFamily: 'Arial, Helvetica, sans-serif', fontStyle: 'bold', fontSize: '15px', color: PAL.white }).setOrigin(1, 0).setDepth(D + 1);
+      const rew = this.add.text(W - 132, 0, '', { fontFamily: 'Arial, Helvetica, sans-serif', fontStyle: 'bold', fontSize: '16px', color: PAL.gold }).setOrigin(1, 0).setDepth(D + 1);
+      const coin = this.add.image(0, 0, 'obj', 'coin').setScale(1.5).setDepth(D + 1);
+      const btn = this.btn(W - 122, 0, 108, 46, () => (this.qCur() && questDone(this.qCur()!, this.d, this.qctx()) ? this.qClaim() : this.qShow()), D + 2);
+      const hl = this.add.graphics().setDepth(430);
+      const arrow = this.add.graphics().setDepth(431);
+      const tri = (c: number, gr: number) => arrow.fillStyle(c).fillTriangle(-22 - gr, -14 - gr, 22 + gr, -14 - gr, 0, 22 + gr).fillRect(-9 - gr, -40 - gr, 18 + gr * 2, 28);
+      tri(col('ink'), 4);
+      tri(col('gold'), 0);
+      this.qUi = { g, icon, title, cnt, rew, coin, btn, hl, arrow };
+    }
+    const u = this.qUi;
+    const show = !!q && !this.guideCur && !this.awayObjs.length;
+    const parts = [u.g, u.icon, u.title, u.cnt, u.rew, u.coin, u.btn.label];
+    if (!show) {
+      if (this.qKey !== '') {
+        parts.forEach((o) => o.setVisible(false));
+        this.drawBtn(u.btn, '', false, 'amber', false);
+        u.hl.clear();
+        u.arrow.setVisible(false);
+        this.qKey = '';
+      }
+      if (!q) this.qPoint = null;
+      return;
+    }
+    const done = questDone(q, this.d, this.qctx());
+    const [a, b] = q.prog(this.d, this.qctx());
+    const y = TOP + (this.views.length > 1 ? TABH : 0) + 6;
+    const rw = this.qReward();
+    const key = `${q.id}|${done}|${a}|${y}|${big(rw)}`;
+    if (key !== this.qKey) {
+      this.qKey = key;
+      parts.forEach((o) => o.setVisible(true));
+      const QH = PubScene.QH, x0 = 8, w = W - 16;
+      const c = done ? col('mint') : col('gold');
+      u.g.clear();
+      if (done) u.g.fillStyle(col('mint'), 0.25).fillRoundedRect(x0 - 4, y - 4, w + 8, QH + 8, 14);
+      u.g.fillStyle(col('ink'), 0.95).fillRoundedRect(x0, y, w, QH, 10).lineStyle(3, c).strokeRoundedRect(x0, y, w, QH, 10);
+      u.icon.setY(y + QH / 2 + 2);
+      // červený vykřičník na úkolníčku
+      u.g.fillStyle(col('ink')).fillCircle(64, y + 14, 12).fillStyle(col('scarlet')).fillCircle(64, y + 14, 9).fillStyle(col('white')).fillRect(62.5, y + 8, 3, 8).fillRect(62.5, y + 18, 3, 3);
+      u.title.setText(done ? t('Hotovo! {s}', { s: q.text() }) : q.text()).setColor(done ? PAL.mint : PAL.gold).setY(y + (done ? QH / 2 - 12 : 7));
+      u.title.setScale(Math.min(1, (done ? W - 280 : W - 300) / u.title.width));
+      u.cnt.setVisible(!done).setText(`${big(Math.min(a, b))} / ${big(b)}`).setY(y + 36);
+      u.rew.setVisible(!done).setText(`+${big(rw)}`).setY(y + 8);
+      u.coin.setVisible(!done).setPosition(W - 140 - u.rew.width, y + 18);
+      if (!done) {
+        const bx = 80, bw = W - 230 - (u.cnt.width + 10) + 0;
+        u.g.fillStyle(col('dusk')).fillRoundedRect(bx, y + 38, bw, 12, 5);
+        if (a > 0) u.g.fillStyle(col('mint')).fillRoundedRect(bx, y + 38, Math.max(10, (bw * Math.min(a, b)) / b), 12, 5);
+      }
+      const bw = done ? 168 : 108;
+      Object.assign(u.btn, { x: W - 14 - bw, y: y + 7, w: bw });
+      u.btn.zone.setPosition(u.btn.x, u.btn.y).setSize(bw, 46);
+      u.btn.label.setPosition(u.btn.x + bw / 2, u.btn.y + 23);
+      this.drawBtn(u.btn, done ? t('VYBER +{n}', { n: big(rw) }) : t('UKAŽ'), true, done ? 'green' : 'amber');
+      u.btn.label.setScale(Math.min(1, (bw - 12) / u.btn.label.width));
+    }
+    // šipka UKAŽ
+    u.hl.clear();
+    const r = this.qPoint === q.id && !done ? this.qTarget(q) : null;
+    u.arrow.setVisible(!!r);
+    if (!r) return;
+    this.qPh += 0.12;
+    const [x, ty, w, h] = r, up = ty < TOP + TABH;
+    u.hl.lineStyle(4, col('gold'), 0.6 + 0.4 * Math.sin(this.qPh * 2)).strokeRoundedRect(x - 6, ty - 6, w + 12, h + 12, 10);
+    u.arrow.setAngle(up ? 180 : 0).setPosition(x + w / 2, up ? ty + h + 44 + Math.sin(this.qPh) * 8 : ty - 30 - Math.sin(this.qPh) * 8);
   }
 
   // ---------- průvodce: novinky ukázat šipkou (velký pokyn + krátké vysvětlení, jako návod) ----------
@@ -3852,7 +4038,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     b.setVisible(!!sty);
     if (!sty) return;
     const n = styleCount(this.d.pubs);
-    const y = TOP + (this.views.length > 1 ? TABH : 0) + 8;
+    const y = TOP + (this.views.length > 1 ? TABH : 0) + 8 + this.qOff();
     a.setText(STYLES[sty].name.toUpperCase()).setY(y + 2);
     b.setText(STYLES[sty].perk + (n > 1 ? '\n' + t('{n} styly: +{v} % všude', { n, v: Math.round(STYLE_MIX * (n - 1) * 100) }) : '')).setY(y + 30).setColor(PAL.bone);
     const w = Math.max(a.width, b.width) + 24, h = 30 + b.height + 6;

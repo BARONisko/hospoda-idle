@@ -845,5 +845,19 @@
  "Začít znovu": "最初からやり直す",
  "Smazat hru": "データ削除",
  "Opravdu? Ťukni znovu": "本当に？もう一度タップ",
- "celá hra od začátku, i s návodem": "チュートリアルから全部やり直し"
+ "celá hra od začátku, i s návodem": "チュートリアルから全部やり直し",
+ "Úkol splněn! +{n} coins": "タスク完了！+{n} coins",
+ "Hotovo! {s}": "完了！{s}",
+ "Kup {n} vylepšení v Obchodě": "ショップで強化を{n}個買う",
+ "Kup vylepšení v Obchodě": "ショップで強化を買う",
+ "Získej styl hospody (2 milníky jedné stanice)": "店のスタイルを得る（1つの設備で節目2つ）",
+ "Zavolej hygienu – dostaneš krígly": "衛生検査を呼ぶ – ジョッキがもらえる",
+ "VYBER +{n}": "受け取る +{n}",
+ "Otevři: {s}": "開ける：{s}",
+ "{s} na úroveň {n}": "{s}をレベル{n}に",
+ "Všechny úkoly od hostinského splněny!": "店主のタスクを全部達成！",
+ "Podívej se do menu: {s}": "メニューを見る：{s}",
+ "UKAŽ": "見せて",
+ "Najmi obsluhu: {s}": "店員を雇う：{s}",
+ "V noci nasbírej {n} kostí": "夜に骨を{n}個集める"
 }

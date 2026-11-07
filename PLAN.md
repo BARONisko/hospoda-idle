@@ -220,6 +220,10 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Číšníci na pípě 50 → 15 coins (přání: ~10 ťuknutí a pak automat). Okno nové hospody: „{m}×“ = ACT_STEP.
 - HOTOVO (přání uživatele): Nastavení → „Začít znovu“ (Smazat hru → do 6 s „Opravdu? Ťukni znovu“ → smaže uložení
   a načte hru od návodu; wipe() zamkne ukládání). Řádky Nastavení se zmenší, aby se vše vešlo na obrazovku.
-- ÚKOL OD HOSTINSKÉHO (schváleno, varianta A = lišta nahoře pod coins s tlačítkem UKAŽ): návrhy obrázku místo emoji
-  tools/_tmp/obr-navrhy*.png (1 nový pixel portrét hostinského 24×24 v medailonu – tools/_tmp/face.py, 2 postavička
-  ze hry, 3 úkolníček s „!“) – čeká na výběr uživatele.
+- HOTOVO ÚKOL OD HOSTINSKÉHO (výběr uživatele: lišta A nahoře + obrázek 3 = pixel úkolníček s červeným „!“):
+  src/core/quests.ts (QUESTS ~31 úkolů: úrovně, otevřít/obsluha stanic, obchod, spropitné, části menu, styl, kosti,
+  hygiena, …; nedostupné se přeskočí – avail), PubScene q*: lišta přes horní okraj hospody (pod záložkami),
+  postup + odměna (1 min výdělku, min 30), UKAŽ = pulzující rámeček + šipka (Menu → dlaždice → řádek v Obchodě /
+  karta / host), po splnění zelená „VYBER +N“. Uložení d.q (hotové), d.qTiles (navštívené dlaždice). Staré hry:
+  při prvním načtení se splněné úkoly označí bez odměny. Schopnost manažera, truhla a cedule stylu se posunou o lištu.
+  Lišta skrytá během návodu a průvodce novinkami.

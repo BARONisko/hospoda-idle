@@ -845,5 +845,19 @@
  "Začít znovu": "Начать заново",
  "Smazat hru": "Удалить игру",
  "Opravdu? Ťukni znovu": "Точно? Нажми ещё раз",
- "celá hra od začátku, i s návodem": "вся игра с начала, с обучением"
+ "celá hra od začátku, i s návodem": "вся игра с начала, с обучением",
+ "Úkol splněn! +{n} coins": "Задание выполнено! +{n} coins",
+ "Hotovo! {s}": "Готово! {s}",
+ "Kup {n} vylepšení v Obchodě": "Купи {n} улучшений в Магазине",
+ "Kup vylepšení v Obchodě": "Купи улучшение в Магазине",
+ "Získej styl hospody (2 milníky jedné stanice)": "Получи стиль трактира (2 рубежа одной станции)",
+ "Zavolej hygienu – dostaneš krígly": "Вызови санэпидем – получишь кружки",
+ "VYBER +{n}": "ЗАБРАТЬ +{n}",
+ "Otevři: {s}": "Открой: {s}",
+ "{s} na úroveň {n}": "{s} до уровня {n}",
+ "Všechny úkoly od hostinského splněny!": "Все задания трактирщика выполнены!",
+ "Podívej se do menu: {s}": "Загляни в меню: {s}",
+ "UKAŽ": "ПОКАЖИ",
+ "Najmi obsluhu: {s}": "Найми персонал: {s}",
+ "V noci nasbírej {n} kostí": "Собери ночью {n} костей"
 }

@@ -845,5 +845,19 @@
  "Začít znovu": "Baştan başla",
  "Smazat hru": "Oyunu sil",
  "Opravdu? Ťukni znovu": "Emin misin? Tekrar dokun",
- "celá hra od začátku, i s návodem": "öğreticiyle birlikte en baştan"
+ "celá hra od začátku, i s návodem": "öğreticiyle birlikte en baştan",
+ "Úkol splněn! +{n} coins": "Görev tamam! +{n} coins",
+ "Hotovo! {s}": "Tamam! {s}",
+ "Kup {n} vylepšení v Obchodě": "Dükkandan {n} geliştirme al",
+ "Kup vylepšení v Obchodě": "Dükkandan geliştirme al",
+ "Získej styl hospody (2 milníky jedné stanice)": "Bar tarzı kazan (bir istasyonda 2 kilometre taşı)",
+ "Zavolej hygienu – dostaneš krígly": "Sağlık denetimini çağır – kupa kazan",
+ "VYBER +{n}": "AL +{n}",
+ "Otevři: {s}": "Aç: {s}",
+ "{s} na úroveň {n}": "{s} seviye {n}",
+ "Všechny úkoly od hostinského splněny!": "Hancı görevlerinin hepsi tamam!",
+ "Podívej se do menu: {s}": "Menüye bak: {s}",
+ "UKAŽ": "GÖSTER",
+ "Najmi obsluhu: {s}": "Personel al: {s}",
+ "V noci nasbírej {n} kostí": "Gece {n} kemik topla"
 }

@@ -845,5 +845,19 @@
  "Začít znovu": "처음부터 다시",
  "Smazat hru": "게임 삭제",
  "Opravdu? Ťukni znovu": "정말? 다시 탭",
- "celá hra od začátku, i s návodem": "튜토리얼부터 전부 다시"
+ "celá hra od začátku, i s návodem": "튜토리얼부터 전부 다시",
+ "Úkol splněn! +{n} coins": "임무 완료! +{n} coins",
+ "Hotovo! {s}": "완료! {s}",
+ "Kup {n} vylepšení v Obchodě": "상점에서 강화 {n}개 구매",
+ "Kup vylepšení v Obchodě": "상점에서 강화 구매",
+ "Získej styl hospody (2 milníky jedné stanice)": "술집 스타일 얻기 (한 설비 이정표 2개)",
+ "Zavolej hygienu – dostaneš krígly": "위생 검사 호출 – 맥주잔을 받아요",
+ "VYBER +{n}": "받기 +{n}",
+ "Otevři: {s}": "열기: {s}",
+ "{s} na úroveň {n}": "{s} 레벨 {n}까지",
+ "Všechny úkoly od hostinského splněny!": "주인장 임무 모두 완료!",
+ "Podívej se do menu: {s}": "메뉴 확인: {s}",
+ "UKAŽ": "보기",
+ "Najmi obsluhu: {s}": "직원 고용: {s}",
+ "V noci nasbírej {n} kostí": "밤에 뼈 {n}개 모으기"
 }

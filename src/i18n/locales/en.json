@@ -845,5 +845,19 @@
  "Začít znovu": "Start over",
  "Smazat hru": "Delete game",
  "Opravdu? Ťukni znovu": "Sure? Tap again",
- "celá hra od začátku, i s návodem": "whole game from the start, with tutorial"
+ "celá hra od začátku, i s návodem": "whole game from the start, with tutorial",
+ "Úkol splněn! +{n} coins": "Task done! +{n} coins",
+ "Hotovo! {s}": "Done! {s}",
+ "Kup {n} vylepšení v Obchodě": "Buy {n} upgrades in the Shop",
+ "Kup vylepšení v Obchodě": "Buy an upgrade in the Shop",
+ "Získej styl hospody (2 milníky jedné stanice)": "Get a pub style (2 milestones on one station)",
+ "Zavolej hygienu – dostaneš krígly": "Call the health inspector – you get mugs",
+ "VYBER +{n}": "CLAIM +{n}",
+ "Otevři: {s}": "Open: {s}",
+ "{s} na úroveň {n}": "{s} to level {n}",
+ "Všechny úkoly od hostinského splněny!": "All innkeeper tasks done!",
+ "Podívej se do menu: {s}": "Check the menu: {s}",
+ "UKAŽ": "SHOW",
+ "Najmi obsluhu: {s}": "Hire staff: {s}",
+ "V noci nasbírej {n} kostí": "Collect {n} bones at night"
 }

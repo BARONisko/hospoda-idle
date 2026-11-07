@@ -845,5 +845,19 @@
  "Začít znovu": "Zacznij od nowa",
  "Smazat hru": "Usuń grę",
  "Opravdu? Ťukni znovu": "Na pewno? Stuknij znowu",
- "celá hra od začátku, i s návodem": "cała gra od początku, z samouczkiem"
+ "celá hra od začátku, i s návodem": "cała gra od początku, z samouczkiem",
+ "Úkol splněn! +{n} coins": "Zadanie zrobione! +{n} coins",
+ "Hotovo! {s}": "Gotowe! {s}",
+ "Kup {n} vylepšení v Obchodě": "Kup {n} ulepszeń w Sklepie",
+ "Kup vylepšení v Obchodě": "Kup ulepszenie w Sklepie",
+ "Získej styl hospody (2 milníky jedné stanice)": "Zdobądź styl knajpy (2 kamienie milowe jednej stacji)",
+ "Zavolej hygienu – dostaneš krígly": "Wezwij sanepid – dostaniesz kufle",
+ "VYBER +{n}": "ODBIERZ +{n}",
+ "Otevři: {s}": "Otwórz: {s}",
+ "{s} na úroveň {n}": "{s} na poziom {n}",
+ "Všechny úkoly od hostinského splněny!": "Wszystkie zadania karczmarza zrobione!",
+ "Podívej se do menu: {s}": "Zajrzyj do menu: {s}",
+ "UKAŽ": "POKAŻ",
+ "Najmi obsluhu: {s}": "Zatrudnij obsługę: {s}",
+ "V noci nasbírej {n} kostí": "Zbierz w nocy {n} kości"
 }

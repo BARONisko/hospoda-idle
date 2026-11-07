@@ -61,6 +61,9 @@ export interface Save {
   /** průvodce novinkami: čekající (id) a už ukázané */
   guideQ?: string[];
   guides?: string[];
+  /** úkol od hostinského: splněné úkoly (id) a navštívené části menu */
+  q?: string[];
+  qTiles?: string[];
   /** hvězdy stanic: klíč `${act}_${stanice}` → počet (0–5) */
   stars?: Record<string, number>;
   /** koupená výzdoba (id) – zůstává i po hygieně */

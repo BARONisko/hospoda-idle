@@ -845,5 +845,19 @@
  "Začít znovu": "Recomeçar",
  "Smazat hru": "Apagar jogo",
  "Opravdu? Ťukni znovu": "Certeza? Toque de novo",
- "celá hra od začátku, i s návodem": "tudo do início, com tutorial"
+ "celá hra od začátku, i s návodem": "tudo do início, com tutorial",
+ "Úkol splněn! +{n} coins": "Tarefa feita! +{n} coins",
+ "Hotovo! {s}": "Feito! {s}",
+ "Kup {n} vylepšení v Obchodě": "Compre {n} melhorias na Loja",
+ "Kup vylepšení v Obchodě": "Compre uma melhoria na Loja",
+ "Získej styl hospody (2 milníky jedné stanice)": "Ganhe um estilo de bar (2 marcos numa estação)",
+ "Zavolej hygienu – dostaneš krígly": "Chame a vigilância – ganha canecas",
+ "VYBER +{n}": "PEGAR +{n}",
+ "Otevři: {s}": "Abra: {s}",
+ "{s} na úroveň {n}": "{s} ao nível {n}",
+ "Všechny úkoly od hostinského splněny!": "Todas as tarefas do taberneiro feitas!",
+ "Podívej se do menu: {s}": "Veja no menu: {s}",
+ "UKAŽ": "MOSTRAR",
+ "Najmi obsluhu: {s}": "Contrate equipe: {s}",
+ "V noci nasbírej {n} kostí": "Junte {n} ossos à noite"
 }
