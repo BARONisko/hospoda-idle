@@ -1752,7 +1752,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   chestBg?: Phaser.GameObjects.Graphics;
   chestHud?: { img: Phaser.GameObjects.Image; dot: Phaser.GameObjects.Graphics; zone: Phaser.GameObjects.Zone };
   private chestHudDraw() {
-    const y = TOP + (this.d.pubs.length > 1 ? TABH : 0) + 40 + this.qOff();
+    // cedule stylu je v rohu nahoře, truhla pod ní (přání uživatele)
+    const y = this.signBot ? this.signBot + 40 : TOP + (this.d.pubs.length > 1 ? TABH : 0) + 40 + this.qOff();
     if (!this.chestHud) {
       const bg = this.add.graphics().setDepth(59);
       const img = this.add.image(W - 40, y, 'obj', 'chest').setScale(3).setDepth(60);
@@ -4081,6 +4082,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     g.fillStyle(c).fillPoints(pts, true);
   }
 
+  /** spodní okraj cedule stylu (0 = není vidět) – truhla jde pod ni */
+  signBot = 0;
   styleSign?: { g: Phaser.GameObjects.Graphics; a: Phaser.GameObjects.Text; b: Phaser.GameObjects.Text };
   /** cedule stylu nahoře v hospodě (název stylu, výhoda, bonus za různé styly) */
   private drawStyleSign() {
@@ -4091,11 +4094,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     g.clear();
     a.setVisible(!!sty);
     b.setVisible(!!sty);
-    if (!sty) return;
+    const bot = (v: number) => {
+      if (v === this.signBot) return;
+      this.signBot = v;
+      this.chestHudDraw();
+    };
+    if (!sty) return bot(0);
     const n = styleCount(this.d.pubs);
-    // vpravo v rohu (přání uživatele – uprostřed zavazela); když je tam truhla, tak pod ní
-    const chest = !!this.chestHud?.img.visible;
-    const y = TOP + (this.views.length > 1 ? TABH : 0) + 8 + this.qOff() + (chest ? 74 : 0);
+    // vpravo v rohu (přání uživatele – uprostřed zavazela), truhla až pod ní
+    const y = TOP + (this.views.length > 1 ? TABH : 0) + 8 + this.qOff();
     a.setText(STYLES[sty].name.toUpperCase()).setY(y + 2);
     b.setText(STYLES[sty].perk + (n > 1 ? '\n' + t('{n} styly: +{v} % všude', { n, v: Math.round(STYLE_MIX * (n - 1) * 100) }) : '')).setY(y + 30).setColor(PAL.bone).setAlign('center');
     const w = Math.max(a.width, b.width) + 24, h = 30 + b.height + 6;
@@ -4105,6 +4112,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     g.fillStyle(col('olive')).fillRect(cx - w / 2 + 14, y - 8, 4, 10).fillRect(cx + w / 2 - 18, y - 8, 4, 10);
     g.fillStyle(col('ink')).fillRoundedRect(cx - w / 2, y, w, h, 8);
     g.fillStyle(col('rust')).fillRoundedRect(cx - w / 2 + 3, y + 2, w - 6, h - 4, 6);
+    bot(y + h);
   }
 
   private refresh() {

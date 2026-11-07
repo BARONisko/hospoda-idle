@@ -241,4 +241,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   milníku i karta Šipek se ukazují vždy jen jedna naráz (milník 2 s, šipky 2,6 s, nápis 1,9 s), stejný text se
   nezařadí dvakrát, čekají nejvýš 3 (zahodí se nejstarší obyčejný nápis, výzvy k akci a milníky zůstanou),
   co čeká přes 10 s, zahodí se.
-- ČEKÁ: zrušit ceduli PIVNICE a zúžit lištu úkolu? Poslední krok návodu (HOTOVO) má v menu velkou ceduli.
+- HOTOVO (přání): cedule stylu (PIVNICE) vpravo nahoře, truhla pod ní (signBot), když je k vyzvednutí.
+- ČEKÁ: zúžit lištu úkolu? Poslední krok návodu (HOTOVO) má v menu velkou ceduli.
