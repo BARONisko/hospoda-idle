@@ -1,7 +1,8 @@
 // Šipky: hra na nulu (odečítá se, přestřelený hod se nepočítá). Začíná na 301 a každá dohraná hra cíl zvedne
 // (body ze začátku rychle, pak pomaleji). Šipky přibývají samy (10 za hodinu), dohraná hra = 1 bod na vylepšení.
 // Ručně se nemíří: bez automatu se hází ťuknutím na terč (jen když je otevřený); koupený automat (1 bod) hází
-// sám po 2 s v reálném čase (i v hospodě a offline – 1 šipka za 2 s, nikdy celá zásoba najednou) a jde vypnout.
+// sám po 2 s v reálném čase, i v hospodě (1 šipka za 2 s, nikdy celá zásoba najednou); offline se šipky jen ukládají
+// a házet se začne po návratu. Jde vypnout.
 // Automat je první vylepšení (ostatní jdou koupit až po něm). Přestřelený hod se nepočítá.
 import { t } from '../i18n';
 import type { StatId } from './talisman';
@@ -31,6 +32,8 @@ export const START = 301;
 export const target = (legs: number) => Math.min(1001, START + 10 * legs);
 /** mezera mezi hody, když je terč otevřený (s) */
 export const THROW_GAP = 2;
+/** delší mezera mezi tiky = hra byla zavřená → offline se nehází (ms) */
+export const OFFLINE_GAP = 10_000;
 /** 10 šipek za hodinu (+1 za úroveň „Víc šipek za hodinu“) */
 export const DART_MS = 360_000;
 export const dartMs = (up: Record<string, number>, statSpeed = 0) => 3_600_000 / ((10 + (up.rate ?? 0)) * (1 + statSpeed));
@@ -60,7 +63,7 @@ export const autoOn = (s: DartsState) => s.auto && (s.up.auto ?? 0) > 0;
 const pc = (v: number) => String(Math.round(v * 10) / 10).replace('.', ',');
 const grow = (base: number, g: number) => (l: number) => Math.ceil(base * g ** l);
 export const DART_UPS: DartUp[] = [
-  { id: 'auto', name: t('Automatické házení'), desc: () => t('hází samo po 2 s, i když tu nejsi'), max: 1, cost: () => 1 },
+  { id: 'auto', name: t('Automatické házení'), desc: () => t('hází samo po 2 s, i v hospodě'), max: 1, cost: () => 1 },
   { id: 'acc', name: t('Přesnost'), desc: (l) => t('rozptyl menší o {v} %', { v: pc((1 - 0.96 ** l) * 100) }), max: 40, cost: grow(1, 1.06) },
   { id: 'rate', name: t('Víc šipek za hodinu'), desc: (l) => t('{n} šipek za hodinu', { n: 10 + l }), max: 20, cost: grow(2, 1.08) },
   { id: 'cap', name: t('Větší toulec'), desc: (l) => t('zásoba až {n} šipek', { n: DART_CAP + 10 * l }), max: 10, cost: grow(1, 1.15) },
@@ -234,6 +237,8 @@ export function tickDarts(s: DartsState, now: number, throwNow: boolean, statAcc
     s.tat = now;
     return out;
   }
+  // offline (hra zavřená / na pozadí déle než pár hodů) se nehází: šipky se jen ukládají a házet se začne až teď
+  if (s.tat === undefined || now - s.tat > OFFLINE_GAP) s.tat = now;
   // v reálném čase: za uplynulý čas nejvýš 1 hod za THROW_GAP (zásoba se neodhází najednou)
   let allowed = Math.floor((now - (s.tat ?? now)) / gap);
   if (s.tat === undefined) s.tat = now;

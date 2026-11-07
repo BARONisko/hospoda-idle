@@ -1,5 +1,5 @@
 // Šipky (minihra v Menu místo Den a noc): hra na nulu (301 a s každou hrou víc), šipky přibývají samy,
-// dohraná hra = bod na vylepšení. Hází se jen automaticky (po 2 s), házení jde vypnout; zapnuté hází i offline.
+// dohraná hra = bod na vylepšení. Hází se jen automaticky (po 2 s), házení jde vypnout; zapnuté hází i v hospodě; offline se šipky jen ukládají.
 // Terč i zeď jsou z původní hry P.U.B. (terč se překreslí, když vylepšení zvětší pole).
 import Phaser from 'phaser';
 import { PAL } from '../data/palette';
@@ -143,8 +143,8 @@ export class DartsScene extends Phaser.Scene {
         this.host.dartsSave();
         this.play();
       });
-    const info = !has ? t('Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i offline.')
-      : S.auto ? t('Hází se samo, i když tu nejsi. Dohraj přesně na nulu = 1 bod.') : t('Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.');
+    const info = !has ? t('Ťukni na terč = hod (míří se samo). Dohraj přesně na nulu = 1 bod. Za 1 bod si kup automat – hází sám i v hospodě.')
+      : S.auto ? t('Hází se samo i v hospodě. Offline se šipky schovávají a hodí se po návratu. Dohraj přesně na nulu = 1 bod.') : t('Házení je vypnuté – šipky se šetří do toulce. Ťukni na terč = hod.');
     this.text(W / 2, 888, info, 17, PAL.fog, 0.5).setWordWrapWidth(W - 40).setAlign('center');
     // ruční hod ťuknutím na terč (bez automatu nebo s vypnutým)
     if (!autoOn(S)) {

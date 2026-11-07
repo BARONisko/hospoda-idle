@@ -138,3 +138,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   první vylepšení: ostatní (i „Do celé hry“) mají „nejdřív automat“, dokud ho hráč nekoupí.
 - Chrám: zisk truhly v boji má velký efekt (TempleScene.chestFx: „TRUHLA!“, paprsky, konfety, truhla vyskočí a odletí
   nahoru, otřes, záblesk, levelUp + jásot); otevření truhly navíc paprsky, 2× konfety, otřes, déšť mincí a jásot.
+- Šipky offline: automat offline nehází, šipky se jen ukládají (max 12 h přírůstku); po návratu hází 1 za 2 s
+  (darts.OFFLINE_GAP 10 s: delší mezera mezi tiky = hra byla zavřená → tat = teď). Texty v šipkách upraveny.
