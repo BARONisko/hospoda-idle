@@ -218,3 +218,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   běží naráz), první noc (místo okna: noc = kosti → ťukni na příšeru → kde kosti utratit), každá nově odemčená
   dlaždice menu (místo banneru: ťukni na Menu → ťukni na dlaždici + co to dělá → Rozumím).
 - Číšníci na pípě 50 → 15 coins (přání: ~10 ťuknutí a pak automat). Okno nové hospody: „{m}×“ = ACT_STEP.
+- HOTOVO (přání uživatele): Nastavení → „Začít znovu“ (Smazat hru → do 6 s „Opravdu? Ťukni znovu“ → smaže uložení
+  a načte hru od návodu; wipe() zamkne ukládání). Řádky Nastavení se zmenší, aby se vše vešlo na obrazovku.
+- ÚKOL OD HOSTINSKÉHO (schváleno, varianta A = lišta nahoře pod coins s tlačítkem UKAŽ): návrhy obrázku místo emoji
+  tools/_tmp/obr-navrhy*.png (1 nový pixel portrét hostinského 24×24 v medailonu – tools/_tmp/face.py, 2 postavička
+  ze hry, 3 úkolníček s „!“) – čeká na výběr uživatele.

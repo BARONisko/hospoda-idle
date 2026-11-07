@@ -841,5 +841,9 @@
  "sběrač ťuká na bubliny hostů za tebe – kup ho za kosti": "le collecteur touche les bulles pour toi – achète-le avec des os",
  "NOVÉ V MENU: {s}": "NOUVEAU DANS LE MENU : {s}",
  "ťukni na Menu": "touche Menu",
- "ŤUKNI NA: {s}": "TOUCHE : {s}"
+ "ŤUKNI NA: {s}": "TOUCHE : {s}",
+ "Začít znovu": "Recommencer",
+ "Smazat hru": "Effacer la partie",
+ "Opravdu? Ťukni znovu": "Sûr ? Touche encore",
+ "celá hra od začátku, i s návodem": "tout depuis le début, avec tutoriel"
 }

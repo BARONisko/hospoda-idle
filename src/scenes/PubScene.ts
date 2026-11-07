@@ -21,7 +21,7 @@ import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, newA
 import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
-import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave } from '../core/save';
+import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave, wipe } from '../core/save';
 import { PubView } from '../game/PubView';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
 import { GUESTS } from '../game/PubView';
@@ -1535,7 +1535,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   // ---------- nastavení ----------
   private optsTab(y0: number, D: number) {
-    const RH = 96;
+    // výška řádku tak, aby se vešly všechny (zvuky, hudba, záloha, jazyk, složka, upozornění, začít znovu)
+    const n = 5 + (location.protocol.startsWith('http') ? 1 : 0) + (notify.available ? 1 : 0);
+    const RH = Math.min(96, Math.floor((H - y0 - 6) / n));
     // hlasitost: − / hodnota / + po 10 % (0 % = vypnuto)
     const vols: [string, () => number, (v: number) => void][] = [
       [t('Zvuky'), () => sfx.sfxVol, (v) => sfx.setSfxVol(v)],
@@ -1600,19 +1602,28 @@ export class PubScene extends Phaser.Scene implements TempleHost {
           if (this.tab === 'opts') this.openShop('opts', false);
         });
       }]);
+    // začít znovu: první ťuk se zeptá, druhý smaže uloženou hru
+    const ask = Date.now() - this.wipeAsk < 6000;
+    if (ask) this.time.delayedCall(6100, () => this.tab === 'opts' && this.shopObjs.length && this.openShop('opts', false));
+    rows.push([t('Začít znovu'), ask ? t('Opravdu? Ťukni znovu') : t('Smazat hru'), () => {
+      if (!ask) return void (this.wipeAsk = Date.now());
+      wipe();
+      location.reload();
+    }]);
     rows.forEach(([title, val, fn], i) => {
       i += vols.length + 1;
       const y = y0 + i * RH;
-      this.row(y, RH, D, title, title === t('Hra do složky') ? t('spustíš ji z disku bez internetu') : title === t('Upozornění') ? t('plná hospoda, VIP host, truhla, chrám') : '');
+      this.row(y, RH, D, title, title === t('Hra do složky') ? t('spustíš ji z disku bez internetu') : title === t('Upozornění') ? t('plná hospoda, VIP host, truhla, chrám') : title === t('Začít znovu') ? t('celá hra od začátku, i s návodem') : '');
       const b = this.btn(W - 232, y + 14, 210, 60, () => {
         fn();
         saveOpts();
         this.openShop('opts', false);
       }, D + 2);
-      this.drawBtn(b, val, true, 'plum');
+      this.drawBtn(b, val, true, title === t('Začít znovu') ? (ask ? 'red' : 'amber') : 'plum');
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
-    this.shopObjs.push(this.add.text(W / 2, y0 + (vols.length + 1 + rows.length) * RH + 30, 'P.U.B. Idle – Pajzl Tycoon', txt(18, PAL.slate)).setOrigin(0.5).setDepth(D + 1));
+    const fy = y0 + (vols.length + 1 + rows.length) * RH + 30;
+    if (fy < H - 10) this.shopObjs.push(this.add.text(W / 2, fy, 'P.U.B. Idle – Pajzl Tycoon', txt(18, PAL.slate)).setOrigin(0.5).setDepth(D + 1));
   }
 
   // ---------- speciální nabídka: denní truhla, reklamní kampaň, VIP host ----------
@@ -2725,6 +2736,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   pubTabs: Btn[] = [];
   sel = 0;
   swipe: number | null = null;
+  /** Nastavení: čas prvního ťuku na „Smazat hru“ (druhý do 6 s smaže) */
+  wipeAsk = 0;
 
   /** přepne na hospodu i: její výhled, schopnost manažera a karty stanic */
   private selectPub(i: number) {

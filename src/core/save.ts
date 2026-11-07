@@ -168,6 +168,7 @@ export function store(d: Save) {
 }
 
 export function wipe() {
+  locked = true; // po smazání už nic neukládat (pagehide při znovunačtení)
   try {
     localStorage.removeItem(KEY);
   } catch {
