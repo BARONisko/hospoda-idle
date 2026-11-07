@@ -660,23 +660,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** milník (25, 50, 100 …): paprsky, velký nápis, konfety, mince do počítadla, otřes, zvuk (efekty B) */
   private milestone(i: number, def: StationDef) {
-    const cx = W / 2, cy = TOP + VIEW_H / 2;
     const lvl = this.st(this.d.pubs[i], def.id).lvl;
-    const sn = STATION_NAMES[this.d.pubs[i].act][def.id];
-    if (this.ntfMode === 'b' || this.ntfMode === 'c') {
-      // jen u karty: konfety, mince do počítadla a „×2“; B navíc toast
-      const card = this.cards.find((k) => k.pub === i && k.def.id === def.id);
-      const ky = card ? card.y + 40 : cy;
-      confetti(this, 270, ky, 40, 460, 0.7);
-      if (card) flashRect(this, 8, card.y - 4, W - 16, 88, 457, 0xffd75e);
-      popText(this, 380, ky - 10, t('výdělek ×2!'), PAL.gold, 34);
-      coinFountain(this, 160, ky, 12, [40, 40], 462, () => this.bumpCoins());
-      sfx.levelUp();
-      if (this.ntfMode === 'b') this.ntfPush({ k: 'txt', text: t('{s} úroveň {n} – výdělek ×2!', { s: sn, n: lvl }), top: true });
-      return;
-    }
-    if (this.ntfMode === 'a') return this.ntfPush({ k: 'mile', text: 'mile' + i + def.id + lvl, top: true, run: () => this.milestoneFx(i, def, lvl) });
-    this.milestoneFx(i, def, lvl);
+    this.ntfPush({ k: 'mile', text: 'mile' + i + def.id + lvl, top: true, run: () => this.milestoneFx(i, def, lvl) });
   }
 
   private milestoneFx(i: number, def: StationDef, lvl: number) {
@@ -698,53 +683,36 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     punch(this, [this.coinIcon], 1.18);
   }
 
-  // ---------- upozornění: návrhy na zredukování (?ntf=a|b|c; bez parametru beze změny) ----------
-  ntfMode = (new URLSearchParams(location.search).get('ntf') ?? '') as '' | 'a' | 'b' | 'c';
-  private ntfQ: { k: 'txt' | 'mile' | 'darts'; text: string; top: boolean; run?: () => void }[] = [];
+  // ---------- upozornění (výběr uživatele A – fronta): vždy jen jedno naráz ----------
+  private ntfQ: { k: 'txt' | 'mile' | 'darts'; text: string; top: boolean; run?: () => void; at?: number }[] = [];
   private ntfBusy = 0;
 
   /** fronta: vždy jen jedno upozornění naráz, stejné texty se nespojují dvakrát, nejvýš 3 čekající */
   private ntfPush(n: { k: 'txt' | 'mile' | 'darts'; text: string; top: boolean; run?: () => void }) {
     if (this.ntfQ.some((x) => x.text === n.text)) return;
-    this.ntfQ.push(n);
-    while (this.ntfQ.length > 3) this.ntfQ.splice(this.ntfQ.findIndex((x) => x.k === 'txt' && !x.top), 1);
+    this.ntfQ.push({ ...n, at: Date.now() });
+    // víc než 3 čekající → zahodit nejstarší obyčejný nápis (výzvy k akci a milníky zůstanou)
+    while (this.ntfQ.length > 3) {
+      const k = this.ntfQ.findIndex((x) => x.k !== 'mile' && !x.top);
+      this.ntfQ.splice(k >= 0 ? k : 0, 1);
+    }
     this.ntfNext();
   }
 
   private ntfNext() {
     if (this.ntfBusy > Date.now()) return;
+    // co čeká přes 10 s, už je staré – zahodit
+    this.ntfQ = this.ntfQ.filter((x) => Date.now() - (x.at ?? 0) < 10000);
     const n = this.ntfQ.shift();
     if (!n) return;
     this.ntfBusy = Date.now() + (n.k === 'mile' ? 2000 : n.k === 'darts' ? 2600 : 1900);
     if (n.run) return n.run();
-    if (this.ntfMode === 'a') return this.bannerRaw(n.text, n.top);
-    this.toast(n.text, n.top);
-  }
-
-  /** malý toast na spodním okraji hospody (návrhy B a C) */
-  private toast(text: string, hot = false) {
-    sfx.pop();
-    const D = 452, y = TOP + VIEW_H - 40;
-    const tx = this.add.text(W / 2, y, text, txt(22, hot ? PAL.gold : PAL.white)).setOrigin(0.5).setDepth(D + 1);
-    tx.setScale(Math.min(1, (W - 70) / tx.width));
-    const w = tx.width * tx.scale + 36, h = 44;
-    const g = this.add.graphics().setDepth(D);
-    g.fillStyle(col('ink'), 0.92).fillRoundedRect(W / 2 - w / 2, y - h / 2, w, h, 22);
-    g.lineStyle(3, col(hot ? 'gold' : 'fog'), 0.9).strokeRoundedRect(W / 2 - w / 2, y - h / 2, w, h, 22);
-    const objs = [g, tx];
-    objs.forEach((o) => o.setAlpha(0));
-    this.tweens.add({ targets: objs, alpha: 1, y: '-=10', duration: 180 });
-    this.tweens.add({ targets: objs, alpha: 0, delay: 1700, duration: 300, onComplete: () => objs.forEach((o) => o.destroy()) });
+    this.bannerRaw(n.text, n.top);
   }
 
   private banner(c: Phaser.Cameras.Scene2D.Camera, text: string, top = false) {
-    if (this.ntfMode) {
-      // C: jen důležité (výzvy k akci, top=true); ostatní jen zvuk
-      if (this.ntfMode === 'c' && !top) return sfx.pop();
-      return this.ntfPush({ k: 'txt', text, top });
-    }
     void c;
-    this.bannerRaw(text, top);
+    this.ntfPush({ k: 'txt', text, top });
   }
 
   private bannerRaw(text: string, top = false) {
@@ -852,10 +820,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** automat v šipkách dohrál hru, zatímco hráč je v hospodě: karta shora s konfetami, ťuknutí otevře šipky */
   private dartsNoticeObjs: Phaser.GameObjects.GameObject[] = [];
   private dartsNotice(pts: number) {
-    if (this.ntfMode === 'c') return; // jen červená tečka na Menu
-    if (this.ntfMode === 'b') return this.ntfPush({ k: 'txt', text: t('Šipky: hra {n} dohraná · +{p} b.', { n: this.d.darts?.legs ?? 0, p: pts }), top: false });
-    if (this.ntfMode === 'a') return this.ntfPush({ k: 'darts', text: 'darts', top: false, run: () => this.dartsNoticeRaw(pts) });
-    this.dartsNoticeRaw(pts);
+    this.ntfPush({ k: 'darts', text: 'darts', top: false, run: () => this.dartsNoticeRaw(pts) });
   }
 
   private dartsNoticeRaw(pts: number) {

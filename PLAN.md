@@ -236,5 +236,9 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   (objednávkou) – ťuk na bublinu nebo na hosta, který ji má; host bez bubliny nic. tipTarget míří na bublinu.
   Během kroku „ťukni na bublinu“ (návod i noční průvodce) bubliny samy nezmizí (PubView.hold). Cedule u tohoto kroku
   dole přes karty, ať šipka nepřeškrtne text. Texty „ťukej na hosty“ → „ťukej na bubliny hostů“.
-- ČEKÁ (zadání uživatele, naštvaný): „oprav to celé, efekty, zkontroluj texty, nelíbí se mi přeplněnost upozorněními –
-  zlepši, zredukuj, dej návrhy“. → audit všech upozornění/bannerů/efektů + ≥3 návrhy na snímcích.
+- Zadání uživatele (naštvaný): „přeplněno upozorněními – zredukuj, dej návrhy“. Návrhy docs/navrhy-upozorneni
+  (A fronta, B toasty, C ticho). HOTOVO výběr A: fronta upozornění (PubScene ntfPush/ntfNext) – banner(), oslava
+  milníku i karta Šipek se ukazují vždy jen jedna naráz (milník 2 s, šipky 2,6 s, nápis 1,9 s), stejný text se
+  nezařadí dvakrát, čekají nejvýš 3 (zahodí se nejstarší obyčejný nápis, výzvy k akci a milníky zůstanou),
+  co čeká přes 10 s, zahodí se.
+- ČEKÁ: zrušit ceduli PIVNICE a zúžit lištu úkolu? Poslední krok návodu (HOTOVO) má v menu velkou ceduli.
