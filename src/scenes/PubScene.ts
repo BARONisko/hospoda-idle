@@ -2468,15 +2468,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   // ---------- návod pro nového hráče ----------
   tutObjs: Phaser.GameObjects.GameObject[] = [];
-  private static TUT: { text: string; done: string }[] = [
-    { text: t('Ťukni na Pípu – hostinský natočí pivo a vyděláš coins.'), done: 'tap' },
-    { text: t('Za coins kup další úroveň pípy – vydělá víc.'), done: 'buy:tap' },
-    { text: t('Ťukni na hosta v hospodě – dá ti spropitné!'), done: 'tip' },
-    { text: t('Najmi číšníky – pípa pak točí sama a oni roznášejí pivo, i když nehraješ.'), done: 'hire' },
-    { text: t('Otevři kuchyni – další zdroj coins.'), done: 'buy:kitchen' },
-    { text: t('Ťukni na Menu – najdeš v něm obchod, úkoly a další.'), done: 'menu' },
-    { text: t('Ťukni na Obchod – tady kupuješ vylepšení výdělku.'), done: 'tile:shop' },
-    { text: t('Hotovo! Další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!'), done: 'close' },
+  private static TUT: { head: string; text: string; done: string }[] = [
+    { head: t('ŤUKNI NA PÍPU'), text: t('hostinský natočí pivo a vyděláš coins'), done: 'tap' },
+    { head: t('KUP ÚROVEŇ PÍPY'), text: t('vyšší úroveň = víc coins za každé pivo'), done: 'buy:tap' },
+    { head: t('ŤUKNI NA HOSTA'), text: t('dá ti spropitné'), done: 'tip' },
+    { head: t('NAJMI ČÍŠNÍKY'), text: t('pípa pak točí sama a číšníci roznášejí pivo, i když nehraješ'), done: 'hire' },
+    { head: t('OTEVŘI KUCHYNI'), text: t('další zdroj coins'), done: 'buy:kitchen' },
+    { head: t('ŤUKNI NA MENU'), text: t('najdeš v něm obchod, úkoly a další'), done: 'menu' },
+    { head: t('ŤUKNI NA OBCHOD'), text: t('tady kupuješ vylepšení výdělku'), done: 'tile:shop' },
+    { head: t('HOTOVO!'), text: t('další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!'), done: 'close' },
   ];
 
   /** událost hráče posune návod */
@@ -2498,9 +2498,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const i0 = this.d.tut ?? -1;
       const need = i0 >= 0 ? this.tutNeed(PubScene.TUT[i0].done) : 0;
       const manual = !this.st(this.d.pubs[0], 'tap').auto;
-      if (need > 0) this.tutBub.setText(manual
-        ? t('Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.', { c: Math.floor(this.d.coins), n: need })
-        : t('Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).', { c: Math.floor(this.d.coins), n: need }));
+      if (need > 0) {
+        const [h, x] = this.tutPoorText(manual, need);
+        this.tutHead?.setText(h).setScale(1);
+        this.tutHead?.setScale(Math.min(1, (W - 110) / this.tutHead.width));
+        this.tutBub.setText(x);
+      }
       return;
     }
     this.tutBub = null;
@@ -2517,10 +2520,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const need = this.tutNeed(step.done);
     this.tutPoor = need > 0;
     const tapManual = !this.st(this.d.pubs[0], 'tap').auto;
-    let text = step.text;
-    if (need > 0) text = tapManual
-      ? t('Ťukej na Pípu (vlevo) a sbírej coins: {c} / {n}. Pak kup vpravo.', { c: Math.floor(this.d.coins), n: need })
-      : t('Pípa točí sama – počkej na coins: {c} / {n} (nebo ťukej na hosty).', { c: Math.floor(this.d.coins), n: need });
+    let [head, text] = [step.head, step.text];
+    if (need > 0) [head, text] = this.tutPoorText(tapManual, need);
     // dlaždice Obchod v mřížce Menu (stejný výpočet jako menuGrid)
     const menuY0 = H - 6 * 96 - 126, tw = (W - 40) / 3, th = 118;
     const si = PubScene.TILES.findIndex(([tb, sub]) => tb === 'shop' && sub === 'up');
@@ -2565,11 +2566,18 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.tutObjs.push(dim);
     }
     const by = TOP + (step.done === 'menu' ? 90 : 16); // u Menu níž, ať ji nepřekryje šipka
-    const bub = this.add.text(W / 2, by, text, txt(24, PAL.ink)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 80).setDepth(D + 1);
+    // návrh C: krok x/8, velký zlatý pokyn, pod ním vysvětlení běžným tučným písmem
+    const hd = this.add.text(W / 2, by + 6, head, txt(46, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 1);
+    hd.setScale(Math.min(1, (W - 110) / hd.width));
+    const bub = this.add.text(W / 2, by + 58, text, { fontFamily: 'Arial, Helvetica, sans-serif', fontStyle: 'bold', fontSize: '22px', color: PAL.white, align: 'center', wordWrap: { width: W - 90 } }).setOrigin(0.5, 0).setDepth(D + 1);
+    const nr = this.add.text(52, by - 4, t('krok {a}/{b}', { a: i + 1, b: PubScene.TUT.length }), txt(20, PAL.fog)).setDepth(D + 1);
     this.tutBub = bub;
+    this.tutHead = hd;
     const g = this.add.graphics().setDepth(D);
-    g.fillStyle(col('ink'), 0.5).fillRoundedRect(W / 2 - bub.width / 2 - 16, by - 6, bub.width + 32, bub.height + 16, 12);
-    g.fillStyle(col('sand')).fillRoundedRect(W / 2 - bub.width / 2 - 18, by - 10, bub.width + 36, bub.height + 16, 12);
+    const bh = 58 + Math.max(bub.height, 52) + 22;
+    g.fillStyle(col('ink'), 0.96).fillRoundedRect(40, by - 12, W - 80, bh, 12);
+    g.lineStyle(4, col('gold')).strokeRoundedRect(40, by - 12, W - 80, bh, 12);
+    this.tutObjs.push(hd, nr);
     const up = step.done === 'menu';
     // šipka v kontejneru: kontejner jde za cílem (u hosta každý snímek), šipka v něm houpe
     const holder = this.add.container(tx, ty).setDepth(D + 2);
@@ -2616,6 +2624,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** zvýrazněné místo návodu (x, y, š, v) – i pro automatický test */
   tutRect: number[] | null = null;
   private tutBub: Phaser.GameObjects.Text | null = null;
+  private tutHead: Phaser.GameObjects.Text | null = null;
+
+  /** návod, když hráč nemá na nákup: pokyn a vysvětlení */
+  private tutPoorText(manual: boolean, need: number): [string, string] {
+    const c = Math.floor(this.d.coins);
+    return manual
+      ? [t('SBÍREJ COINS: {c} / {n}', { c, n: need }), t('ťukej na Pípu vlevo, pak kup vpravo')]
+      : [t('POČKEJ NA COINS: {c} / {n}', { c, n: need }), t('pípa točí sama (nebo ťukej na hosty)')];
+  }
   private tutCoins = -1;
 
   /** kolik coins chybí k nákupu v kroku návodu (0 = má dost / krok nic nekupuje) */
@@ -3622,7 +3639,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** text vedle pruhu karty: vede styl / zásobuje vyšší hospody / dostává zásoby / kolik chybí ke stylu */
   private cardTag(p: PubState, id: string, open: boolean): { text: string; col: string } | null {
-    if (!open || this.night) return null;
+    // během návodu nic navíc – nový hráč se má soustředit na ťukání a nákup
+    if (!open || this.night || ((this.d.tut ?? -1) >= 0 && this.views.length === 1)) return null;
     const pubs = this.d.pubs;
     const sn = starsOf(this.d.stars, p.act, id);
     if (sn < STAR_MAX && (p.st[id]?.lvl ?? 0) >= STAR_LVL[id]) return { text: t('★ {n}. hvězda po hygieně', { n: sn + 1 }), col: PAL.gold };
@@ -3631,6 +3649,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (out > 0) return { text: t('▶ zásobuje +{v} %', { v: Math.round(out * 100) }), col: PAL.sand };
     const inn = supplyIn(pubs, p, id);
     if (inn > 1) return { text: t('zásoby ×{m}', { m: String(Math.round(inn * 100) / 100).replace('.', ',') }), col: PAL.mint };
+    // „chybí N milníků“ až když se styl blíží (aspoň jedna stanice má milník)
+    if (Math.max(...STATIONS.map((d) => milestoneCount(p.st[d.id]?.lvl ?? 0))) < 1) return null;
     const k = styleGap(p, id);
     return { text: k === 1 ? t('{s}: chybí 1 milník', { s: STYLES[id].name }) : k < 5 ? t('{s}: chybí {k} milníky', { s: STYLES[id].name, k }) : t('{s}: chybí {k} milníků', { s: STYLES[id].name, k }), col: PAL.fog };
   }
@@ -3696,7 +3716,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const staff = c.def.staff * actMult(p.act) * (1 - this.ts().staff);
       c.name.setText(STATION_NAMES[p.act][c.def.id]).setAlpha(open ? 1 : 0.55);
       const ms = nextMilestone(s.lvl);
-      c.lvl.setText(open ? (ms ? t('úroveň {n} · ×2 na {m}', { n: s.lvl, m: ms }) : t('úroveň {n}', { n: s.lvl })) + (starsOf(this.d.stars, p.act, c.def.id) < STAR_MAX ? ' · ★ ' + STAR_LVL[c.def.id] : '') : t('zavřeno'));
+      c.lvl.setText(open ? (ms ? t('úroveň {n} · ×2 na {m}', { n: s.lvl, m: ms }) : t('úroveň {n}', { n: s.lvl })) + (starsOf(this.d.stars, p.act, c.def.id) < STAR_MAX && (s.lvl * 2 >= STAR_LVL[c.def.id] || starsOf(this.d.stars, p.act, c.def.id) > 0) ? ' · ★ ' + STAR_LVL[c.def.id] : '') : t('zavřeno'));
       c.lvl.setScale(Math.min(1, 290 / Math.max(1, c.lvl.width)));
       c.info.setText(open ? t('+{n} / {s} s', { n: big(this.pay(p, c.def)), s: +this.cyc(c.def).toFixed(2) }) : '');
       this.drawBtn(c.buy, open ? `+${n}\n${big(price)}` : t('Otevřít\n{n}', { n: big(price) }), this.d.coins >= price, 'green');

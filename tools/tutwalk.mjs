@@ -18,7 +18,7 @@ while (Date.now() - t0 < 400_000) {
     let r = s.tutRect;
     let tip = null;
     if (i >= 0 && s.constructor.TUT?.[i]?.done === 'tip') { const q = s.views[0]?.tipTarget(); tip = q ? [q.x, q.y] : null; }
-    return { i, r, tip, coins: Math.floor(s.d.coins), night: s.night, text: s.tutBub?.text ?? '' };
+    return { i, r, tip, coins: Math.floor(s.d.coins), night: s.night, text: (s.tutHead?.text ?? '') + ' – ' + (s.tutBub?.text ?? '') };
   });
   if (st.i !== last) {
     console.log(`krok ${st.i} po ${((Date.now() - since) / 1000).toFixed(0)} s, ťuků ${taps}, coins ${st.coins}, noc ${st.night}: ${st.text}`);

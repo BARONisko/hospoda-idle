@@ -208,3 +208,7 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   PRESTIGE_MIN 10 → 6, Věrní manažeři 100 000 → 200 krígel. Přepočet uložení (eco2): krígly → ⌊2·√K⌋, coins
   a tržba běhu ÷ 5^(nejvyšší hospoda−1), banner „Nová ekonomika: krígly A → B“.
   Sim: 1 hospoda 1. hygiena 15 min, prestiž (6 krígel) 25 min.
+- HOTOVO (výběr uživatele C): návod čitelněji – tmavá cedule se zlatým rámem, „krok x/8“, velký zlatý pokyn
+  (TUT.head, 46 px) a pod ním vysvětlení běžným tučným písmem (Arial 22 px, bílé). Bez peněz „SBÍREJ COINS: c / n“.
+  Během návodu karty bez řádků stylu/zásob; „chybí N milníků“ až od prvního milníku, „★ 500“ až od půlky cesty.
+- ČEKÁ: kamarád uživatele neví, co dělat po návodu → návrh lepšího vedení (viz odpověď v chatu, hospoda 59).

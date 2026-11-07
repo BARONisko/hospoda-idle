@@ -91,7 +91,7 @@ export function styleGap(p: PubLike, id: string) {
   const lead = pubStyle(p);
   if (lead === id) return 0;
   const top = Math.max(...STATIONS.map((d) => ms(p, d.id)));
-  return Math.max(1, top + 1 - ms(p, id));
+  return Math.max(1, Math.max(top + 1, STYLE_MIN) - ms(p, id));
 }
 /** počet odlišných stylů ve všech hospodách */
 export const styleCount = (pubs: PubLike[]) => new Set(pubs.map(pubStyle).filter(Boolean)).size;
