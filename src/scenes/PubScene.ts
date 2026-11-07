@@ -2537,7 +2537,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     { head: t('OTEVŘI KUCHYNI'), text: t('další zdroj coins'), done: 'buy:kitchen' },
     { head: t('ŤUKNI NA MENU'), text: t('najdeš v něm obchod, úkoly a další'), done: 'menu' },
     { head: t('ŤUKNI NA OBCHOD'), text: t('tady kupuješ vylepšení výdělku'), done: 'tile:shop' },
-    { head: t('HOTOVO!'), text: t('další části menu se odemknou během hry. Zavři menu – hodně štěstí, hostinský!'), done: 'close' },
+    { head: t('HOTOVO!'), text: t('další části menu se odemknou během hry. Hodně štěstí, hostinský!'), done: 'close' },
   ];
 
   /** událost hráče posune návod */
@@ -2551,8 +2551,27 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const dn = (this.d.dn ??= { lvl: 0, v2: true });
       nightCfg.shift = dn.shift ?? 0;
       dn.shift = switchPhase(false);
+      this.tutFinale();
     }
     this.tutShow();
+  }
+
+  /** konec návodu: cedule HOTOVO! na hlavní obrazovce, sama zmizí */
+  /** do kdy svítí cedule HOTOVO! (průvodce novinkami počká) */
+  tutFinaleUntil = 0;
+  private tutFinale() {
+    this.tutFinaleUntil = Date.now() + 4000;
+    const step = PubScene.TUT[PubScene.TUT.length - 1], D = 430, by = TOP + 16;
+    const hd = this.add.text(W / 2, by + 6, step.head, txt(46, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 1);
+    const tx = this.add.text(W / 2, by + 58, step.text, { fontFamily: 'Arial, Helvetica, sans-serif', fontStyle: 'bold', fontSize: '22px', color: PAL.white, align: 'center', wordWrap: { width: W - 90 } }).setOrigin(0.5, 0).setDepth(D + 1);
+    const bh = 58 + Math.max(tx.height, 30) + 22;
+    const g = this.add.graphics().setDepth(D);
+    g.fillStyle(col('ink'), 0.96).fillRoundedRect(40, by - 12, W - 80, bh, 12);
+    g.lineStyle(4, col('gold')).strokeRoundedRect(40, by - 12, W - 80, bh, 12);
+    const objs = [g, hd, tx];
+    confetti(this, W / 2, by + bh, 50, D + 2, 0.8);
+    sfx.levelUp();
+    this.tweens.add({ targets: objs, alpha: 0, delay: 3500, duration: 500, onComplete: () => objs.forEach((o) => o.destroy()) });
   }
 
   private tutShow(textOnly = false) {
@@ -2653,6 +2672,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (up) arrow.setAngle(180);
     this.tweens.add({ targets: arrow, y: arrow.y + (up ? -10 : 10), yoyo: true, repeat: -1, duration: 380, ease: 'Sine.inOut' });
     this.tutObjs.push(g, bub, holder);
+    // v menu jen šipka na křížek (přání uživatele) – cedule HOTOVO! až po zavření menu na hlavní obrazovce
+    if (step.done === 'close') [g, hd, bub, nr].forEach((o) => o.setVisible(false));
     // kde ťukat: pulzující kruhy a „ŤUKNI“ přímo na pruhu karty Pípa
     if (tapHere) {
       const cx = 160, cy = card('tap').y + 81;
@@ -3838,7 +3859,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.qUi = { g, icon, title, cnt, rew, coin, btn, hl, arrow };
     }
     const u = this.qUi;
-    const show = !!q && !this.guideCur && !this.awayObjs.length;
+    const show = !!q && !this.guideCur && Date.now() >= this.tutFinaleUntil && !this.awayObjs.length;
     const parts = [u.g, u.icon, u.title, u.cnt, u.rew, u.coin, u.btn.label];
     if (!show) {
       if (this.qKey !== '') {
@@ -3961,7 +3982,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** spustí další průvodce z fronty, když nic jiného neběží */
   private guideStart() {
-    if (this.guideCur || this.awayObjs.length || (this.d.tut ?? -1) >= 0 || this.d.pubIntro) return;
+    if (this.guideCur || this.awayObjs.length || (this.d.tut ?? -1) >= 0 || this.d.pubIntro || Date.now() < this.tutFinaleUntil) return;
     const id = this.d.guideQ?.[0];
     if (!id) return;
     const steps = this.guideSteps(id);
