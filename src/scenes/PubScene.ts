@@ -9,6 +9,7 @@ import { milestoneCount } from '../core/economy';
 import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
+import { iap, ProductId, PRODUCTS } from '../core/shop';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
 import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
 import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward } from '../core/league';
@@ -16,7 +17,7 @@ import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, nightLen, nightShare, s
 import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
 import { notify, NOTE, Note } from '../core/notify';
-import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey } from '../core/special';
+import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, VIP_GEMS, GOLD_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs } from '../core/special';
 import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
@@ -457,8 +458,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const secs = Math.min(cap, raw);
     const rate = this.d.pubs.reduce((a, p) => a + this.rate(p), 0);
     // reklamní kampaň platí jen po dobu, kdy běžela
-    const base = rate / adMult(this.d.adv);
-    const g = Math.floor(base * (secs + (adPower(this.d.adv) - 1) * adOverlap(this.d.adv, leftAt, leftAt + secs * 1000)));
+    // reklamní kampaň a Štamgast platí jen po dobu, kdy běžely
+    const base = rate / adMult(this.d.adv) / (passOn(this.d.pass) ? PASS_MULT : 1);
+    const g = Math.floor(base * multSecs(leftAt, leftAt + secs * 1000, [[this.d.adv?.until ?? 0, adPower(this.d.adv)], [this.d.pass?.until ?? 0, PASS_MULT]]));
     this.d.at = Date.now();
     // číšníci sbírají zkušenosti i offline (jen přes den, podle toho, jak moc mají práce)
     const daySecs = secs * (1 - nightShare());
@@ -520,13 +522,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.awayObjs = [];
       sfx.coin(1);
     };
-    const two = ads.available;
+    const two = this.canReward();
     const ok = this.btn(two ? bx + 24 : W / 2 - 110, by + bh - 90, two ? 190 : 220, 64, done, D + 3);
     this.drawBtn(ok, t('Vybrat'), true, 'green');
     objs.push(ok.bg, ok.label, ok.zone);
     if (two) {
       const x2 = this.btn(bx + bw - 214, by + bh - 90, 190, 64, async () => {
-        if (await ads.rewarded()) {
+        if (await this.rewarded()) {
           this.gain(g);
           store(this.d);
         }
@@ -866,7 +868,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (id === 'tasks') return this.claimable();
     if (id === 'brew') return this.brewFull();
     if (id === 'keeper') return this.skillPoints() > 0;
-    if (id === 'special') return chestReady(this.d.chest) && (this.d.tut ?? -1) < 0;
+    if (id === 'special') return (chestReady(this.d.chest) && (this.d.tut ?? -1) < 0) || (passOn(this.d.pass) && this.d.pass!.claim !== dayKey());
     if (id === 'darts') return !!this.d.darts && DART_UPS.some((u) => (this.d.darts!.up[u.id] ?? 0) < u.max && u.cost(this.d.darts!.up[u.id] ?? 0) <= this.d.darts!.pts);
     if (id === 'temple') return isWeekend() && !this.tileLock('temple') && templeState(this.d.temple).used < ROUNDS_PER_DAY;
     return false;
@@ -1616,7 +1618,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       case 'bones': return t('{n} kostí', { n: r.n * x });
       case 'darts': return t('{n} šipek', { n: r.n * x });
       case 'krigle': return this.krigleTxt(r.n * x);
-      case 'gold': return t('+{p} bod pro číšníka + {k}', { p: x, k: this.krigleTxt(GOLD_KRIGLE * x) });
+      case 'gold': return t('+{p} bod pro číšníka + {k} + {g} 💎', { p: x, k: this.krigleTxt(GOLD_KRIGLE * x), g: GOLD_GEMS * x });
     }
   }
 
@@ -1633,6 +1635,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     else {
       // zlatá truhla: bod číšníkovi s nejméně body (bez číšníků 8 h výdělku) + krígly
       this.d.krigle += GOLD_KRIGLE * x;
+      this.d.gems = (this.d.gems ?? 0) + GOLD_GEMS * x;
       for (let i = 0; i < x; i++) {
         const ws = this.d.pubs.flatMap((p) => p.w ?? []).filter((w) => wEarned(w) < MAX_POINTS);
         if (!ws.length) {
@@ -1649,7 +1652,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** otevře denní truhlu (x2 = za reklamu) */
   private async chestOpen(x2: boolean) {
     if (!chestReady(this.d.chest)) return;
-    if (x2 && !(await ads.rewarded())) return this.banner(this.views[0].cam, t('Reklama se nepřehrála'));
+    if (x2 && !(await this.rewarded())) return this.banner(this.views[0].cam, t('Reklama se nepřehrála'));
     if (!chestReady(this.d.chest)) return;
     const { st, day } = openChest(this.d.chest);
     this.d.chest = st;
@@ -1730,7 +1733,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     gl.setScale(Math.min(1, (W - 140) / gl.width));
     const by = gy + 112;
     if (ready) {
-      const wide = !ads.available;
+      const wide = !this.canReward();
       const o = this.btn(10, by, wide ? W - 20 : 250, 66, () => void this.chestOpen(false), D + 2);
       this.drawBtn(o, t('Otevřít'), true, 'green');
       this.shopObjs.push(o.bg, o.label, o.zone);
@@ -1754,7 +1757,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** pustí reklamu a spustí / prodlouží kampaň */
   async adWatchNow() {
-    if (!(await ads.rewarded())) return this.banner(this.views[0].cam, t('Reklama se nepřehrála'));
+    if (!(await this.rewarded())) return this.banner(this.views[0].cam, t('Reklama se nepřehrála'));
     const a = (this.d.adv ??= newAdv());
     adWatch(a);
     store(this.d);
@@ -1763,14 +1766,106 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (this.tab === 'special' && this.shopObjs.length) this.openShop('special', false);
   }
 
-  /** záložka Speciální nabídka (návrh C): reklamní kampaň, denní truhla, bez reklam, krígly */
+  /** odměna „za reklamu“ jde vzít (reklamní síť, Štamgast nebo koupené bez reklam) */
+  private canReward() {
+    return ads.available || passOn(this.d.pass) || !!this.d.noAds;
+  }
+
+  /** „reklama“: se Štamgastem nebo bez reklam hned true */
+  private async rewarded() {
+    if (passOn(this.d.pass) || this.d.noAds) return true;
+    return ads.rewarded();
+  }
+
+  /** trvalý automat koupený za diamanty */
+  private owns(id: string) {
+    return !!this.d.own?.includes(id);
+  }
+
+  /** utratí diamanty za položku */
+  gemBuy(id: GemItem) {
+    const cost = GEM_COST[id];
+    if ((this.d.gems ?? 0) < cost || this.owns(id)) return false;
+    this.d.gems = (this.d.gems ?? 0) - cost;
+    if (id === 'skip4' || id === 'skip24') {
+      // časoskok: výdělek hned (do ligy se nepočítá)
+      const n = this.hoursIncome(id === 'skip4' ? 4 : 24);
+      this.d.coins += n;
+      this.d.earned += n;
+      this.d.run += n;
+      this.banner(this.views[0].cam, t('Časoskok! +{n} coins', { n: big(n) }));
+      coinFountain(this, W / 2, 400, 14);
+    } else {
+      (this.d.own ??= []).push(id);
+      this.banner(this.views[0].cam, t('Koupeno: {s}', { s: id === 'vipdoor' ? t('VIP vrátný') : t('Sběrač truhel') }));
+    }
+    store(this.d);
+    sfx.levelUp();
+    if (this.tab === 'special' && this.shopObjs.length) this.openShop('special', false);
+    return true;
+  }
+
+  /** nákup za peníze (jen v aplikaci; ?fakeshop=1 na zkoušku) */
+  async iapBuy(id: ProductId) {
+    if (!(await iap.buy(id))) return this.banner(this.views[0].cam, iap.available ? t('Nákup se nepovedl') : t('Jen v mobilní aplikaci'));
+    if (id === 'pass') {
+      this.d.pass = passBuy(this.d.pass);
+      this.banner(this.views[0].cam, t('Štamgast na {d} dní!', { d: PASS_DAYS }));
+    } else if (id === 'noads') {
+      this.d.noAds = true;
+      this.banner(this.views[0].cam, t('Odměny teď bez reklam'));
+    } else {
+      this.d.gems = (this.d.gems ?? 0) + (PRODUCTS[id].gems ?? 0);
+      this.banner(this.views[0].cam, t('+{n} 💎', { n: PRODUCTS[id].gems ?? 0 }));
+    }
+    store(this.d);
+    sfx.levelUp();
+    sfx.cheer();
+    if (this.tab === 'special' && this.shopObjs.length) this.openShop('special', false);
+  }
+
+  /** denní diamanty Štamgasta */
+  passClaim() {
+    const p = this.d.pass;
+    if (!passOn(p) || p!.claim === dayKey()) return;
+    p!.claim = dayKey();
+    this.d.gems = (this.d.gems ?? 0) + PASS_GEMS;
+    store(this.d);
+    sfx.coin(1);
+    this.banner(this.views[0].cam, t('+{n} 💎', { n: PASS_GEMS }));
+    if (this.tab === 'special' && this.shopObjs.length) this.openShop('special', false);
+  }
+
+  /** podzáložka speciální nabídky */
+  spSub: 'offer' | 'gems' | 'pass' = 'offer';
+
+  /** záložka Speciální nabídka: Nabídka (kampaň, truhla, bez reklam) · Diamanty · Štamgast */
   private specialTab(y0: number, D: number) {
+    const subs: [PubScene['spSub'], string][] = [['offer', t('Nabídka')], ['gems', t('💎 Diamanty')], ['pass', t('Štamgast')]];
+    const sw = (W - 40) / 3;
+    subs.forEach(([id, label], i) => {
+      const b = this.btn(10 + i * (sw + 10), y0 + 62, sw, 46, () => ((this.spSub = id), this.openShop('special', false)), D + 3);
+      this.drawBtn(b, label, true, this.spSub === id ? 'amber' : 'ink');
+      this.shopObjs.push(b.bg, b.label, b.zone);
+    });
+    const yc = y0 + 124;
+    if (this.spSub === 'gems') return this.gemsSub(yc, D);
+    if (this.spSub === 'pass') return this.passSub(yc, D);
+    this.offerSub(yc, D);
+  }
+
+  private card(y: number, h: number, c: keyof typeof PAL, D: number) {
+    const g = this.add.graphics().setDepth(D + 1).fillStyle(col(c)).fillRoundedRect(10, y, W - 20, h, 12);
+    this.shopObjs.push(g);
+    return g;
+  }
+
+  private offerSub(y: number, D: number) {
     const a = (this.d.adv ??= newAdv());
     const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
-    const card = (y: number, h: number, c: keyof typeof PAL) => add(this.add.graphics().setDepth(D + 1)).fillStyle(col(c)).fillRoundedRect(10, y, W - 20, h, 12);
+    const can = this.canReward();
     // reklamní kampaň
-    let y = y0 + 70;
-    card(y, 238, 'plum');
+    this.card(y, 238, 'plum', D);
     add(this.add.image(62, y + 70, 'icons', 'tv').setScale(5).setDepth(D + 2));
     add(this.add.text(118, y + 12, t('Reklamní kampaň'), txt(28, PAL.gold)).setDepth(D + 2));
     const st = add(this.add.text(118, y + 50, '', txt(19, PAL.white)).setDepth(D + 2));
@@ -1789,7 +1884,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     upd();
     this.leagueLive = upd;
     const watch = this.btn(118, y + 134, W - 146, 50, () => void this.adWatchNow(), D + 3);
-    this.drawBtn(watch, ads.available ? t('📺 Pustit reklamu') : t('jen v mobilní aplikaci'), ads.available, 'green');
+    this.drawBtn(watch, can ? (ads.available && !passOn(this.d.pass) && !this.d.noAds ? t('📺 Pustit reklamu') : t('Spustit kampaň')) : t('jen v mobilní aplikaci'), can, 'green');
     const cost = adLvlCost(a.lvl);
     const up = this.btn(118, y + 190, W - 146, 40, () => {
       if (this.d.krigle < cost) return;
@@ -1803,7 +1898,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.shopObjs.push(watch.bg, watch.label, watch.zone, up.bg, up.label, up.zone);
     // denní truhla
     y += 252;
-    card(y, 100, 'ink');
+    this.card(y, 100, 'ink', D);
     add(this.add.image(58, y + 54, 'obj', 'chest').setScale(3).setDepth(D + 2));
     add(this.add.text(108, y + 16, t('Denní truhla'), txt(24, PAL.bone)).setDepth(D + 2));
     const cs = add(this.add.text(108, y + 52, t('zdarma každý den · série {d}/7', { d: chestDay(this.d.chest) }), txt(16, PAL.fog)).setDepth(D + 2));
@@ -1811,20 +1906,82 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const ch = this.btn(W - 150, y + 26, 128, 50, () => this.openShop('chest', false), D + 3);
     this.drawBtn(ch, chestReady(this.d.chest) ? t('Otevřít') : t('Ukázat'), true, chestReady(this.d.chest) ? 'green' : 'slate');
     this.shopObjs.push(ch.bg, ch.label, ch.zone);
-    // placené položky – zatím jen připravené místo
-    const paid: [string, string][] = [
-      [t('Bez reklam'), t('všechny odměny bez reklamy')],
-      [t('Balík krígel'), t('50 krígel do začátku')],
+    // bez reklam (za peníze)
+    y += 114;
+    this.card(y, 84, 'ink', D);
+    add(this.add.text(26, y + 12, t('Bez reklam'), txt(22, PAL.bone)).setDepth(D + 2));
+    add(this.add.text(26, y + 46, this.d.noAds ? t('koupeno – odměny bez reklam') : t('všechny odměny bez reklamy'), txt(16, PAL.fog)).setDepth(D + 2));
+    const na = this.btn(W - 150, y + 18, 128, 48, () => void this.iapBuy('noads'), D + 3);
+    this.drawBtn(na, this.d.noAds ? '✓' : iap.price('noads'), !this.d.noAds && iap.available, 'amber');
+    this.shopObjs.push(na.bg, na.label, na.zone);
+  }
+
+  /** Diamanty: časoskoky (z A), trvalé automaty (z C), balíčky za peníze */
+  private gemsSub(y: number, D: number) {
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
+    const gems = this.d.gems ?? 0;
+    add(this.add.text(W / 2, y + 14, t('Máš {n} 💎', { n: gems }), txt(26, PAL.ice)).setOrigin(0.5).setDepth(D + 2));
+    const rows: [string, GemItem, string, string, string, number][] = [
+      [t('Urychlení'), 'skip4', t('Časoskok 4 h'), t('hned 4 h výdělku'), 'clock', 0],
+      ['', 'skip24', t('Časoskok 24 h'), t('hned celý den výdělku'), 'clock', 0],
+      [t('Automatika (napořád)'), 'chestbot', t('Sběrač truhel'), t('denní truhlu otevře sám'), 'chest', 1],
+      ['', 'vipdoor', t('VIP vrátný'), t('obslouží VIP, když to nestihneš'), 'bouncer', 0],
     ];
-    paid.forEach(([title, desc], i) => {
-      const yy = y + 114 + i * 96;
-      card(yy, 84, 'ink');
-      add(this.add.text(26, yy + 12, title, txt(22, PAL.bone)).setDepth(D + 2));
-      add(this.add.text(26, yy + 46, desc, txt(16, PAL.fog)).setDepth(D + 2));
-      const b = this.btn(W - 150, yy + 18, 128, 48, () => this.banner(this.views[0].cam, t('Brzy v mobilní aplikaci')), D + 3);
-      this.drawBtn(b, t('brzy'), false, 'amber');
+    let yy = y + 40;
+    for (const [head, id, title, desc, icon, obj] of rows) {
+      if (head) {
+        add(this.add.text(20, yy + 4, head, txt(20, PAL.gold)).setDepth(D + 2));
+        yy += 32;
+      }
+      const own = this.owns(id);
+      this.card(yy, 80, own ? 'green' : 'ink', D);
+      add(this.add.image(48, yy + 40, obj ? 'obj' : 'icons', icon).setScale(obj ? 2.4 : 3).setDepth(D + 2));
+      add(this.add.text(88, yy + 10, title, txt(22, PAL.bone)).setDepth(D + 2));
+      const ds = add(this.add.text(88, yy + 44, desc, txt(16, PAL.fog)).setDepth(D + 2));
+      ds.setScale(Math.min(1, 270 / ds.width));
+      if (own) add(this.add.text(W - 86, yy + 40, t('koupeno ✓'), txt(20, PAL.white)).setOrigin(0.5).setDepth(D + 2));
+      else {
+        const b = this.btn(W - 150, yy + 15, 128, 50, () => this.gemBuy(id), D + 3);
+        this.drawBtn(b, `${GEM_COST[id]} 💎`, gems >= GEM_COST[id], 'plum');
+        this.shopObjs.push(b.bg, b.label, b.zone);
+      }
+      yy += 88;
+    }
+    // balíčky za peníze
+    add(this.add.text(20, yy + 4, t('Koupit diamanty'), txt(20, PAL.gold)).setDepth(D + 2));
+    yy += 32;
+    (['gems100', 'gems550'] as ProductId[]).forEach((id, i) => {
+      const bw = (W - 30) / 2;
+      const b = this.btn(10 + i * (bw + 10), yy, bw, 60, () => void this.iapBuy(id), D + 3);
+      this.drawBtn(b, `${PRODUCTS[id].gems} 💎 · ${iap.price(id)}`, iap.available, 'amber');
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
+    if (!iap.available) add(this.add.text(W / 2, yy + 80, t('nákup jen v mobilní aplikaci · diamanty zdarma: VIP host, zlatá truhla'), txt(15, PAL.fog)).setOrigin(0.5).setDepth(D + 2));
+  }
+
+  /** Štamgast pass (z B): 30 dní výhod */
+  private passSub(y: number, D: number) {
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
+    const on = passOn(this.d.pass);
+    this.card(y, 400, 'plum', D);
+    add(this.add.image(62, y + 64, 'obj', 'apronIcon').setScale(4.5).setDepth(D + 2));
+    add(this.add.text(118, y + 16, t('Štamgastská karta'), txt(30, PAL.gold)).setDepth(D + 2));
+    const st = add(this.add.text(118, y + 56, '', txt(20, on ? PAL.mint : PAL.white)).setDepth(D + 2));
+    const upd = () => st.setText(passOn(this.d.pass) ? (this.d.pass!.until - Date.now() > 2 * 86400_000 ? t('platí ještě {d} dní', { d: Math.floor((this.d.pass!.until - Date.now()) / 86400_000) }) : t('platí ještě {t}', { t: hms(this.d.pass!.until - Date.now()) })) : t('{d} dní · {p}', { d: PASS_DAYS, p: iap.price('pass') }));
+    upd();
+    this.leagueLive = upd;
+    [t('✓ výdělek ×{m} – i offline', { m: PASS_MULT }), t('✓ VIP vrátný: žádný VIP neodejde'), t('✓ truhla, kampaň a ×2 bez reklam'), t('✓ každý den {n} 💎', { n: PASS_GEMS })].forEach((s, i) =>
+      add(this.add.text(36, y + 130 + i * 40, s, txt(22, PAL.bone)).setDepth(D + 2)),
+    );
+    const b = this.btn(30, y + 302, W - 60, 70, () => void this.iapBuy('pass'), D + 3);
+    this.drawBtn(b, on ? t('Prodloužit o {d} dní · {p}', { d: PASS_DAYS, p: iap.price('pass') }) : t('Stát se štamgastem · {p}', { p: iap.price('pass') }), iap.available, 'green');
+    this.shopObjs.push(b.bg, b.label, b.zone);
+    if (on) {
+      const got = this.d.pass!.claim === dayKey();
+      const c = this.btn(30, y + 420, W - 60, 64, () => this.passClaim(), D + 3);
+      this.drawBtn(c, got ? t('Dnešní diamanty vyzvednuty ✓') : t('Vyzvednout {n} 💎', { n: PASS_GEMS }), !got, 'amber');
+      this.shopObjs.push(c.bg, c.label, c.zone);
+    } else if (!iap.available) add(this.add.text(W / 2, y + 430, t('nákup jen v mobilní aplikaci'), txt(18, PAL.fog)).setOrigin(0.5).setDepth(D + 2));
   }
 
   // VIP host (návrh C): reflektor, hvězda, pruh nahoře s odpočtem; ťuknutím obsloužit
@@ -1838,11 +1995,18 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.chestHudDraw(); // truhla se ukáže po návodu a o půlnoci
     if ((this.d.tut ?? -1) >= 0 || !this.views[0]) return;
     const v = (this.d.vip ??= newVip());
-    const r = vipTick(v);
+    const missed = { n: 0 };
+    const r = vipTick(v, Date.now(), missed);
+    // VIP vrátný (automat za diamanty nebo Štamgast) obslouží, koho hráč nestihl – i když byla hra zavřená
+    const door = this.owns('vipdoor') || passOn(this.d.pass);
     if (r === 'left') {
-      this.vipHide(false);
-      this.banner(this.views[0].cam, t('VIP host odešel – nikdo ho neobsloužil'));
+      if (door) this.vipPay(1, t('Vrátný obsloužil VIP hosta! +{n} coins'));
+      else this.banner(this.views[0].cam, t('VIP host odešel – nikdo ho neobsloužil'));
+      this.vipHide(door);
     }
+    if (door && missed.n) this.vipPay(Math.min(4, missed.n), t('Vrátný obsloužil VIP hosty, když jsi byl pryč: +{n} coins'));
+    // sběrač truhel otevře denní truhlu sám
+    if (this.owns('chestbot') && chestReady(this.d.chest) && !this.awayObjs.length) void this.chestOpen(passOn(this.d.pass) || this.d.noAds === true);
     if (v.until && !this.vipSpr) {
       this.vipShow();
       if (r === 'came') this.banner(this.views[0].cam, t('Přišel VIP host! Ťukni na něj'), true);
@@ -1900,12 +2064,23 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   /** obsloužit VIP: odměna VIP_H hodin výdělku */
+  /** odměna za VIP (k = kolik hostů): výdělek a diamanty */
+  private vipPay(k: number, msg: string) {
+    const n = this.hoursIncome(VIP_H) * k;
+    this.gain(n);
+    this.d.gems = (this.d.gems ?? 0) + VIP_GEMS * k;
+    store(this.d);
+    this.banner(this.views[0].cam, msg.replace('{n}', big(n)));
+    return n;
+  }
+
   vipServeNow() {
     const v = this.d.vip;
     if (!v?.until || v.until <= Date.now()) return;
     vipServe(v);
     const n = this.hoursIncome(VIP_H);
     this.gain(n);
+    this.d.gems = (this.d.gems ?? 0) + VIP_GEMS;
     store(this.d);
     const spr = this.vipSpr;
     if (spr) {
@@ -1916,7 +2091,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       popText(this, sx, sy - 30, '+' + big(n), PAL.gold, 32);
     }
     this.vipHide(true);
-    this.banner(this.views[0].cam, t('VIP host spokojen! +{n} coins', { n: big(n) }));
+    this.banner(this.views[0].cam, t('VIP host spokojen! +{n} coins +{g} 💎', { n: big(n), g: VIP_GEMS }));
     sfx.cheer();
   }
 
@@ -2720,7 +2895,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0)) * adMult(this.d.adv);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1);
   }
 
   // ---------- obchod s krígly ----------

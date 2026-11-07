@@ -95,14 +95,17 @@ export const vipWait = (at: number) => (30 + (Math.floor(at / 60_000) % 31)) * 6
 export const newVip = (now = Date.now()): VipState => ({ next: now + 20 * 60_000, until: 0 });
 
 /** posune stav: příchod / odchod (nestihl). Vrací 'came' | 'left' | null. */
-export function vipTick(v: VipState, now = Date.now()): 'came' | 'left' | null {
+export function vipTick(v: VipState, now = Date.now(), missed?: { n: number }): 'came' | 'left' | null {
   if (v.until && now >= v.until) {
     v.until = 0;
     return 'left';
   }
   if (!v.until && now >= v.next) {
-    // přeskočit příchody, které celé proběhly, když hra byla zavřená
-    while (v.next + vipWait(v.next) <= now) v.next += VIP_EVERY;
+    // přeskočit příchody, které celé proběhly, když hra byla zavřená (missed.n = kolik jich bylo)
+    while (v.next + vipWait(v.next) <= now) {
+      v.next += VIP_EVERY;
+      if (missed) missed.n++;
+    }
     if (now < v.next) return null;
     v.until = v.next + vipWait(v.next);
     v.next += VIP_EVERY;
@@ -114,4 +117,39 @@ export function vipTick(v: VipState, now = Date.now()): 'came' | 'left' | null {
 /** obsloužen: odchází spokojený */
 export function vipServe(v: VipState) {
   v.until = 0;
+}
+
+
+// ---------- diamanty a Štamgast pass ----------
+/** ceny v diamantech: časoskoky (hned X h výdělku) a trvalé automaty */
+export const GEM_COST = { skip4: 20, skip24: 90, chestbot: 200, vipdoor: 300 } as const;
+export type GemItem = keyof typeof GEM_COST;
+/** diamanty zdarma: za obslouženého VIP a ve zlaté truhle (7. den) */
+export const VIP_GEMS = 2;
+export const GOLD_GEMS = 10;
+
+export interface PassState {
+  /** platí do (ms) */
+  until: number;
+  /** den posledního vyzvednutí denních diamantů */
+  claim?: string;
+}
+export const PASS_DAYS = 30;
+export const PASS_MULT = 2;
+export const PASS_GEMS = 20;
+export const passOn = (p: PassState | undefined, now = Date.now()) => !!p && p.until > now;
+/** koupě / prodloužení o 30 dní */
+export function passBuy(p: PassState | undefined, now = Date.now()): PassState {
+  return { ...p, until: Math.max(now, p?.until ?? 0) + PASS_DAYS * 86400_000 };
+}
+
+/** součet násobku výdělku přes interval [from, to] (ms) v sekundách: segs = [platí do, násobek] */
+export function multSecs(from: number, to: number, segs: [number, number][]) {
+  const pts = [...new Set([from, to, ...segs.map(([u]) => u).filter((u) => u > from && u < to)])].sort((a, b) => a - b);
+  let sum = 0;
+  for (let i = 0; i + 1 < pts.length; i++) {
+    const m = segs.reduce((a, [u, k]) => (pts[i] < u ? a * k : a), 1);
+    sum += ((pts[i + 1] - pts[i]) / 1000) * m;
+  }
+  return sum;
 }

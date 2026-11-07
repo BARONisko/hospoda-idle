@@ -108,6 +108,11 @@ export interface Save {
   chest?: import('./special').ChestState;
   adv?: import('./special').AdvState;
   vip?: import('./special').VipState;
+  /** diamanty (prémiová měna), Štamgast pass, trvalé automaty za diamanty, koupené „bez reklam“ */
+  gems?: number;
+  pass?: import('./special').PassState;
+  own?: string[];
+  noAds?: boolean;
   /** čas posledního uložení (ms) – pro výdělek offline */
   at: number;
 }

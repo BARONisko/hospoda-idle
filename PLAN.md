@@ -169,3 +169,10 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   časoskoky, turbo, dovařit pivovar), B „Štamgast“ (předplatné 99 Kč/30 dní + Pivní sezóna s pasem, známky jen bonus),
   C „Diamanty“ (trvalé automaty: úrovně, hygiena, truhla, VIP vrátný, noční směna 24 h). Doporučeno A+C (jedna měna,
   záložka Automatika = trvalé věci). Zdarma po troškách (7. den truhly, VIP, úspěchy). Liga bez vlivu časoskoků.
+- HOTOVO (výběr uživatele: modré diamanty + Štamgast pass, od každého návrhu něco, „zlatá střední cesta“):
+  Speciální nabídka má 3 podzáložky (PubScene.spSub): Nabídka (kampaň, denní truhla, Bez reklam 99 Kč) ·
+  💎 Diamanty (z A: Časoskok 4 h 20 💎 / 24 h 90 💎 – do ligy se nepočítá; z C trvale: Sběrač truhel 200 💎 = denní
+  truhlu otevře sám, VIP vrátný 300 💎 = obslouží VIP, kterého hráč nestihl, i offline max 4; balíčky 100 💎 49 Kč,
+  550 💎 199 Kč) · Štamgast (z B: karta 30 dní 99 Kč: výdělek ×2 i offline, VIP vrátný, truhla/kampaň/×2 bez reklam,
+  denně 20 💎 tlačítkem). Diamanty zdarma: VIP +2 💎, zlatá truhla +10 💎. Nákupy: src/core/shop.ts (rozhraní jako
+  ads.ts, na webu „jen v mobilní aplikaci“, ?fakeshop=1 na zkoušku). Uložení: gems, pass, own[], noAds.
