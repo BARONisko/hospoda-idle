@@ -39,15 +39,16 @@ export const smileBonus = (w: WaiterState) => SMILE_STEP * w.m;
 /** body utracené za vylepšení */
 export const spent = (w: WaiterState) => w.s + w.t + w.m;
 
-// Zkušenosti: 1 XP = 1 s roznášení (i offline). Úroveň L → L+1 stojí XP_A · XP_R^L.
-// Všech 33 bodů (rychlost 20 + podnos 3 + úsměv 10) ≈ 9 milionů s práce ≈ rok hraní (~10 h výroby denně).
-export const XP_A = 55;
-export const XP_R = 1.4;
+// Zkušenosti: 1 XP = 1 s roznášení (i offline). Body: xpFor(p) = XP_A · p^XP_K
+// → 1. bod zhruba za první den, 5 bodů za ~2 týdny, 10 za ~1,5 měsíce, všech 33 (rychlost 20 + podnos 3 + úsměv 10)
+// zhruba za rok (při ~12 h roznášení denně). Dřív (55·1,4^L) to šlo ~20× rychleji – uživatel chtěl pomaleji.
+export const XP_A = 40_000;
+export const XP_K = 1.7;
 export const MAX_POINTS = SPD_MAX + TRAY_MAX + SMILE_MAX;
 /** XP potřebné na dosažení `pts` bodů (úroveň 1 + pts) */
-export const xpFor = (pts: number) => (XP_A * (XP_R ** pts - 1)) / (XP_R - 1);
+export const xpFor = (pts: number) => XP_A * pts ** XP_K;
 /** získané body podle zkušeností */
-export const earned = (w: WaiterState) => Math.min(MAX_POINTS, Math.floor(Math.log(((w.xp ?? 0) * (XP_R - 1)) / XP_A + 1) / Math.log(XP_R) + 1e-9));
+export const earned = (w: WaiterState) => Math.min(MAX_POINTS, Math.floor(((w.xp ?? 0) / XP_A) ** (1 / XP_K) + 1e-9));
 export const freePoints = (w: WaiterState) => Math.max(0, earned(w) - spent(w));
 export const waiterLvl = (w: WaiterState) => 1 + earned(w);
 /** postup k další úrovni 0–1 */
@@ -61,8 +62,8 @@ export const xpProgress = (w: WaiterState) => {
 export const hireCost = (i: number) => [0, 0, 400, 4000][i] ?? Infinity;
 /** s kostlivcem na pípě nastoupí rovnou dva číšníci */
 export const START_CREW = (): WaiterState[] => [{ s: 0, t: 0, m: 0 }, { s: 0, t: 0, m: 0 }];
-/** kolik piv natočí pípa za cyklus: 1 + 1 za každý milník (25, 50, 100, …) – hostů žízní víc a číšníci musí stíhat */
-export const beersPerCycle = (milestones: number) => 1 + milestones;
+/** kolik piv natočí pípa za cyklus: 1 (dřív +1 za milník – s pomalými zkušenostmi číšníků by to hru moc brzdilo) */
+export const beersPerCycle = (_milestones: number) => 1;
 
 export type WaiterUp = 's' | 't' | 'm';
 export const UP_MAX: Record<WaiterUp, number> = { s: SPD_MAX, t: TRAY_MAX, m: SMILE_MAX };

@@ -140,3 +140,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   nahoru, otřes, záblesk, levelUp + jásot); otevření truhly navíc paprsky, 2× konfety, otřes, déšť mincí a jásot.
 - Šipky offline: automat offline nehází, šipky se jen ukládají (max 12 h přírůstku); po návratu hází 1 za 2 s
   (darts.OFFLINE_GAP 10 s: delší mezera mezi tiky = hra byla zavřená → tat = teď). Texty v šipkách upraveny.
+- Číšníci pomaleji (přání uživatele „~20× pomaleji“, wv3 = všem vynulovány úrovně a body): xpFor(p) = 40 000·p^1,7
+  (1. bod ~1. den, 5 bodů ~2 týdny, 10 ~1,5 měsíce, všech 33 ~rok při ~12 h roznášení denně). Pípa točí 1 pivo za cyklus
+  (ne +1 za milník – s pomalými číšníky prestiž trvala 1,2 h). Sim: prestiž ~stejně jako bez číšníků (35 min, 5,3 h na 40 krígel).

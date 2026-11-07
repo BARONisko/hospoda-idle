@@ -211,9 +211,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     }
     for (const p of this.d.pubs) {
       if (p.st.tap?.auto && !p.w?.length) p.w = START_CREW();
-      // vylepšení koupená dřív za coins zůstanou (zkušenosti aspoň na utracené body)
-      for (const w of p.w ?? []) w.xp = Math.max(w.xp ?? 0, wSpent(w) ? xpFor(wSpent(w)) + 1e-6 : 0);
+      // v3: číšníci se levelovali ~20× moc rychle → zkušenosti, úrovně i body všem vynulovat (přání uživatele)
+      if (!this.d.wv3) for (const w of p.w ?? []) (w.xp = 0), (w.s = 0), (w.t = 0), (w.m = 0);
     }
+    if (!this.d.wv3 && this.d.pubs.some((p) => p.w?.length)) this.time.delayedCall(1500, () => this.views[0] && this.banner(this.views[0].cam, t('Číšníci začínají znovu od úrovně 1 – zkušenosti teď přibývají pomaleji')));
+    this.d.wv3 = true;
     this.wrun = this.d.pubs.map(() => []);
     loadOpts();
     // ladění: ?pubs=2|3 přidá hospody (než bude prestiž)
