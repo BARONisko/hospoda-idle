@@ -230,3 +230,4 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - HOTOVO (stížnost uživatele „v menu otravná cedule SPECIÁLNÍ NABÍDKA + Rozumím“): velká cedule průvodce jen na hlavní
   obrazovce; v otevřeném menu jen šipka a rámeček na dlaždici, po ťuknutí konec (krok „Rozumím“ zrušen, vysvětlení
   je už v ceduli s „ťukni na Menu“). Průvodce s cedulí (nová hospoda, noc) počká na zavřené menu.
+- HOTOVO (přání): cedule stylu hospody (PIVNICE…) vpravo v rohu, pod truhlou, když je vidět.

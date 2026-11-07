@@ -4046,13 +4046,18 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     b.setVisible(!!sty);
     if (!sty) return;
     const n = styleCount(this.d.pubs);
-    const y = TOP + (this.views.length > 1 ? TABH : 0) + 8 + this.qOff();
+    // vpravo v rohu (přání uživatele – uprostřed zavazela); když je tam truhla, tak pod ní
+    const chest = !!this.chestHud?.img.visible;
+    const y = TOP + (this.views.length > 1 ? TABH : 0) + 8 + this.qOff() + (chest ? 74 : 0);
     a.setText(STYLES[sty].name.toUpperCase()).setY(y + 2);
-    b.setText(STYLES[sty].perk + (n > 1 ? '\n' + t('{n} styly: +{v} % všude', { n, v: Math.round(STYLE_MIX * (n - 1) * 100) }) : '')).setY(y + 30).setColor(PAL.bone);
+    b.setText(STYLES[sty].perk + (n > 1 ? '\n' + t('{n} styly: +{v} % všude', { n, v: Math.round(STYLE_MIX * (n - 1) * 100) }) : '')).setY(y + 30).setColor(PAL.bone).setAlign('center');
     const w = Math.max(a.width, b.width) + 24, h = 30 + b.height + 6;
-    g.fillStyle(col('olive')).fillRect(W / 2 - w / 2 + 14, y - 8, 4, 10).fillRect(W / 2 + w / 2 - 18, y - 8, 4, 10);
-    g.fillStyle(col('ink')).fillRoundedRect(W / 2 - w / 2, y, w, h, 8);
-    g.fillStyle(col('rust')).fillRoundedRect(W / 2 - w / 2 + 3, y + 2, w - 6, h - 4, 6);
+    const cx = W - 8 - w / 2;
+    a.setX(cx);
+    b.setX(cx);
+    g.fillStyle(col('olive')).fillRect(cx - w / 2 + 14, y - 8, 4, 10).fillRect(cx + w / 2 - 18, y - 8, 4, 10);
+    g.fillStyle(col('ink')).fillRoundedRect(cx - w / 2, y, w, h, 8);
+    g.fillStyle(col('rust')).fillRoundedRect(cx - w / 2 + 3, y + 2, w - 6, h - 4, 6);
   }
 
   private refresh() {
