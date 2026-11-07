@@ -398,7 +398,6 @@
  "odemkne se od úrovně {n} Delší noci": "ab Stufe {n} von Längere Nacht",
  "Přepnout na den": "Zum Tag wechseln",
  "Přepnout na noc": "Zur Nacht wechseln",
- "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "Knochen sammelst du nachts: Stationen und Tippen auf Gäste.\nAusgeben kannst du sie im Beinhaus und für Talismane.",
  "noc trvá {a} · +1 s za úroveň": "Nacht dauert {a} · +1 s pro Stufe",
  "odemkne se, až noc potrvá {m}": "ab {m} Nachtlänge freigeschaltet",
  "Soupeř v lize mezitím přidal +{n} coins": "Dein Liga-Rivale hat inzwischen +{n} coins gemacht",
@@ -522,8 +521,6 @@
  "V Obchodě si můžeš koupit: {s}.": "Im Laden kannst du kaufen: {s}.",
  "Za krígly si můžeš koupit: {s}.": "Für Krüge kannst du kaufen: {s}.",
  "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "Ruf die Inspektion (Laden): du bekommst +{k} Krüge = Einnahmen dauerhaft +{v} %.",
- "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "Spare für „{s}“ ({c} coins, etwa {d}). Tippe solange auf Gäste – sie geben Trinkgeld.",
- "Ťukej na hosty – dávají spropitné.": "Tippe auf Gäste – sie geben Trinkgeld.",
  "Ukaž": "Zeigen",
  "sběrač bublin rychlejší o {v} %": "Blasensammler {v} % schneller",
  "schopnost manažera dřív o {v} %": "Managerfähigkeit {v} % früher bereit",
@@ -813,7 +810,6 @@
  "SBÍREJ COINS: {c} / {n}": "SAMMLE COINS: {c} / {n}",
  "ťukej na Pípu vlevo, pak kup vpravo": "tippe links auf den Zapfhahn, dann rechts kaufen",
  "POČKEJ NA COINS: {c} / {n}": "WARTE AUF COINS: {c} / {n}",
- "pípa točí sama (nebo ťukej na hosty)": "der Zapfhahn läuft allein (oder tippe auf Gäste)",
  "krok {a}/{b}": "Schritt {a}/{b}",
  "NOVÁ HOSPODA!": "NEUE KNEIPE!",
  "ťukni nahoře na „{n}“": "tippe oben auf „{n}“",
@@ -860,5 +856,12 @@
  "UKAŽ": "ZEIG",
  "Najmi obsluhu: {s}": "Stelle Personal ein: {s}",
  "V noci nasbírej {n} kostí": "Sammle nachts {n} Knochen",
- "každý den truhla zdarma": "jeden Tag eine Gratis-Truhe"
+ "každý den truhla zdarma": "jeden Tag eine Gratis-Truhe",
+ "ŤUKNI NA BUBLINU": "TIPPE AUF DIE BLASE",
+ "host si objednal – dá ti spropitné": "der Gast hat bestellt – er gibt dir Trinkgeld",
+ "příšera si objednala – dá ti kost": "das Monster hat bestellt – es gibt dir einen Knochen",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na bubliny hostů – dávají spropitné.": "Spare für „{s}“ ({c} coins, etwa {d}). Tippe solange auf Gäste – sie geben Trinkgeld.",
+ "Ťukej na bubliny hostů – dávají spropitné.": "Tippe auf Gäste – sie geben Trinkgeld.",
+ "pípa točí sama (nebo ťukej na bubliny hostů)": "der Zapfhahn läuft allein (oder tippe auf Gäste)",
+ "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "Knochen sammelst du nachts: Stationen und Tippen auf Gäste.\nAusgeben kannst du sie im Beinhaus und für Talismane."
 }

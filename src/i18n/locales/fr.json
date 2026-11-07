@@ -398,7 +398,6 @@
  "odemkne se od úrovně {n} Delší noci": "débloqué au niveau {n} de Nuit plus longue",
  "Přepnout na den": "Passer au jour",
  "Přepnout na noc": "Passer à la nuit",
- "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "Les os se récoltent la nuit : stations et touches sur les clients.\nDépense-les à l'Ossuaire et en talismans.",
  "noc trvá {a} · +1 s za úroveň": "la nuit dure {a} · +1 s par niveau",
  "odemkne se, až noc potrvá {m}": "débloqué quand la nuit dure {m}",
  "Soupeř v lize mezitím přidal +{n} coins": "Pendant ce temps, ton rival a gagné +{n} coins",
@@ -522,8 +521,6 @@
  "V Obchodě si můžeš koupit: {s}.": "Dans la Boutique tu peux acheter : {s}.",
  "Za krígly si můžeš koupit: {s}.": "Avec des chopes tu peux acheter : {s}.",
  "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "Appelle l'inspection (Boutique) : tu gagnes +{k} chopes = gains +{v} % pour toujours.",
- "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "Économise pour « {s} » ({c} coins, environ {d}). En attendant, touche les clients – ils donnent des pourboires.",
- "Ťukej na hosty – dávají spropitné.": "Touche les clients – ils donnent des pourboires.",
  "Ukaž": "Montrer",
  "sběrač bublin rychlejší o {v} %": "collecteur de bulles plus rapide de {v} %",
  "schopnost manažera dřív o {v} %": "compétence du gérant prête {v} % plus tôt",
@@ -813,7 +810,6 @@
  "SBÍREJ COINS: {c} / {n}": "RAMASSE DES COINS : {c} / {n}",
  "ťukej na Pípu vlevo, pak kup vpravo": "touche la pression à gauche, puis achète à droite",
  "POČKEJ NA COINS: {c} / {n}": "ATTENDS LES COINS : {c} / {n}",
- "pípa točí sama (nebo ťukej na hosty)": "la pression tire seule (ou touche les clients)",
  "krok {a}/{b}": "étape {a}/{b}",
  "NOVÁ HOSPODA!": "NOUVEAU BISTROT !",
  "ťukni nahoře na „{n}“": "touche « {n} » en haut",
@@ -860,5 +856,12 @@
  "UKAŽ": "MONTRE",
  "Najmi obsluhu: {s}": "Embauche du personnel : {s}",
  "V noci nasbírej {n} kostí": "Ramasse {n} os la nuit",
- "každý den truhla zdarma": "un coffre gratuit chaque jour"
+ "každý den truhla zdarma": "un coffre gratuit chaque jour",
+ "ŤUKNI NA BUBLINU": "TOUCHE LA BULLE",
+ "host si objednal – dá ti spropitné": "le client a commandé – il te donne un pourboire",
+ "příšera si objednala – dá ti kost": "le monstre a commandé – il te donne un os",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na bubliny hostů – dávají spropitné.": "Économise pour « {s} » ({c} coins, environ {d}). En attendant, touche les clients – ils donnent des pourboires.",
+ "Ťukej na bubliny hostů – dávají spropitné.": "Touche les clients – ils donnent des pourboires.",
+ "pípa točí sama (nebo ťukej na bubliny hostů)": "la pression tire seule (ou touche les clients)",
+ "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "Les os se récoltent la nuit : stations et touches sur les clients.\nDépense-les à l'Ossuaire et en talismans."
 }

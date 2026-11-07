@@ -398,7 +398,6 @@
  "odemkne se od úrovně {n} Delší noci": "更长的夜晚 {n} 级解锁",
  "Přepnout na den": "切换到白天",
  "Přepnout na noc": "切换到夜晚",
- "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "夜里收集骨头:站点和点击客人。\n可在骨堂和护身符上花掉。",
  "noc trvá {a} · +1 s za úroveň": "夜晚 {a} · 每级 +1 秒",
  "odemkne se, až noc potrvá {m}": "夜晚达到 {m} 时解锁",
  "Soupeř v lize mezitím přidal +{n} coins": "期间联赛对手增加了 +{n} coins",
@@ -522,8 +521,6 @@
  "V Obchodě si můžeš koupit: {s}.": "商店里可以买：{s}。",
  "Za krígly si můžeš koupit: {s}.": "可以用酒杯买：{s}。",
  "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "叫卫生检查（商店）：获得+{k}酒杯 = 收入永久+{v} %。",
- "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "为“{s}”攒钱（{c} coins，约{d}）。同时点击客人 – 他们给小费。",
- "Ťukej na hosty – dávají spropitné.": "点击客人 – 他们给小费。",
  "Ukaž": "查看",
  "sběrač bublin rychlejší o {v} %": "泡泡收集器加快 {v} %",
  "schopnost manažera dřív o {v} %": "经理技能提前 {v} %",
@@ -813,7 +810,6 @@
  "SBÍREJ COINS: {c} / {n}": "收集 coins：{c} / {n}",
  "ťukej na Pípu vlevo, pak kup vpravo": "点左边的酒头，然后在右边购买",
  "POČKEJ NA COINS: {c} / {n}": "等待 coins：{c} / {n}",
- "pípa točí sama (nebo ťukej na hosty)": "酒头会自动出酒（或点击客人）",
  "krok {a}/{b}": "第 {a}/{b} 步",
  "NOVÁ HOSPODA!": "新酒馆！",
  "ťukni nahoře na „{n}“": "点击上方的“{n}”",
@@ -860,5 +856,12 @@
  "UKAŽ": "指给我",
  "Najmi obsluhu: {s}": "雇佣员工：{s}",
  "V noci nasbírej {n} kostí": "夜里收集{n}根骨头",
- "každý den truhla zdarma": "每天免费宝箱"
+ "každý den truhla zdarma": "每天免费宝箱",
+ "ŤUKNI NA BUBLINU": "点击气泡",
+ "host si objednal – dá ti spropitné": "客人点单了 – 给你小费",
+ "příšera si objednala – dá ti kost": "怪物点单了 – 给你骨头",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na bubliny hostů – dávají spropitné.": "为“{s}”攒钱（{c} coins，约{d}）。同时点击客人 – 他们给小费。",
+ "Ťukej na bubliny hostů – dávají spropitné.": "点击客人 – 他们给小费。",
+ "pípa točí sama (nebo ťukej na bubliny hostů)": "酒头会自动出酒（或点击客人）",
+ "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "夜里收集骨头:站点和点击客人。\n可在骨堂和护身符上花掉。"
 }

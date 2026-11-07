@@ -350,8 +350,9 @@ export class PubView {
       if (!g.order || g.leaving) continue;
       if (Phaser.Geom.Rectangle.Contains(Phaser.Geom.Rectangle.Inflate(g.order[0].getBounds(), 5, 5), wx, wy)) return this.tipGuest(g);
     }
+    // spropitné dá jen host s bublinou (objednávkou) – ťuk na něj samotného taky platí, host bez bubliny nic
     for (const g of this.guests) {
-      if (g.tipped || g.leaving) continue;
+      if (!g.order || g.leaving) continue;
       if (Phaser.Geom.Rectangle.Contains(Phaser.Geom.Rectangle.Inflate(g.spr.getBounds(), 6, 6), wx, wy)) return this.tipGuest(g);
     }
     return false;
@@ -373,6 +374,8 @@ export class PubView {
   }
 
   private last?: Guest;
+  /** návod čeká na ťuk na bublinu → bubliny se samy neobslouží */
+  hold = false;
 
 
   /** sběrač: obslouží nejstarší bublinu s objednávkou (vrací true, když nějakou našel) */
@@ -390,11 +393,11 @@ export class PubView {
     g.next = (g.sat ?? 0) + this.rnd.realInRange(8, 14);
   }
 
-  /** kam na obrazovce ukázat návodem „ťukni na hosta“: hlava sedícího hosta, který ještě nedal spropitné */
+  /** kam na obrazovce ukázat návodem „ťukni na bublinu“: bublina s objednávkou (host bez bubliny spropitné nedá) */
   tipTarget(): { x: number; y: number } | null {
-    const g = this.guests.find((q) => !q.tipped && !q.leaving && !q.path.length) ?? this.guests.find((q) => !q.tipped && !q.leaving);
+    const g = this.guests.find((q) => q.order && !q.leaving);
     if (!g || !this.cam.visible) return null;
-    const b = g.spr.getBounds();
+    const b = g.order![0].getBounds();
     const v = this.cam.worldView;
     return { x: this.cam.x + (b.centerX - v.x) * this.cam.zoom, y: this.cam.y + (b.top - v.y) * this.cam.zoom };
   }
@@ -630,7 +633,8 @@ export class PubView {
           this.s.tweens.add({ targets: g.order, y: '-=2', yoyo: true, repeat: -1, duration: 700, delay: 250, ease: 'Sine.inOut' });
         }
         // bublina vydrží 6 s, pak se obslouží sama (ťuknutím hned)
-        if (g.order && g.sat - (g.orderAt ?? 0) > 6) this.serve(g);
+        // (v návodu „ťukni na bublinu“ bublina počká, než na ni hráč ťukne)
+        if (g.order && g.sat - (g.orderAt ?? 0) > 6 && !this.hold) this.serve(g);
         // pivo nosí číšníci (přes den, když nějaké má); jídlo a noc jako dřív
         if (!g.mug && !g.order && g.sat > 0.5 && !this.carried(food)) {
           g.mug = this.s.add.image(sp.x + (g.seat.flip ? -13 : 13), sp.y - 6, 'obj', food ? FOOD[this.pub.act] : g.sitT > 6 ? 'mug' : 'mugDark').setOrigin(0.5, 1).setDepth(sp.y + 4);

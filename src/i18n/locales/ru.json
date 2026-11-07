@@ -398,7 +398,6 @@
  "odemkne se od úrovně {n} Delší noci": "откроется с {n} уровня Долгой ночи",
  "Přepnout na den": "Переключить на день",
  "Přepnout na noc": "Переключить на ночь",
- "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "Кости собираешь ночью: станции и нажатия на гостей.\nТратишь их в Костнице и на талисманы.",
  "noc trvá {a} · +1 s za úroveň": "ночь длится {a} · +1 с за уровень",
  "odemkne se, až noc potrvá {m}": "откроется, когда ночь будет {m}",
  "Soupeř v lize mezitím přidal +{n} coins": "Тем временем соперник в лиге добавил +{n} coins",
@@ -522,8 +521,6 @@
  "V Obchodě si můžeš koupit: {s}.": "В Магазине можно купить: {s}.",
  "Za krígly si můžeš koupit: {s}.": "За кружки можно купить: {s}.",
  "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "Вызови санинспекцию (Магазин): +{k} кружек = доход навсегда +{v} %.",
- "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "Копи на «{s}» ({c} coins, примерно {d}). А пока тапай по гостям – они дают чаевые.",
- "Ťukej na hosty – dávají spropitné.": "Тапай по гостям – они дают чаевые.",
  "Ukaž": "Показать",
  "sběrač bublin rychlejší o {v} %": "сборщик пузырей быстрее на {v} %",
  "schopnost manažera dřív o {v} %": "навык менеджера раньше на {v} %",
@@ -813,7 +810,6 @@
  "SBÍREJ COINS: {c} / {n}": "СОБИРАЙ COINS: {c} / {n}",
  "ťukej na Pípu vlevo, pak kup vpravo": "нажимай кран слева, потом покупай справа",
  "POČKEJ NA COINS: {c} / {n}": "ЖДИ COINS: {c} / {n}",
- "pípa točí sama (nebo ťukej na hosty)": "кран наливает сам (или нажимай на гостей)",
  "krok {a}/{b}": "шаг {a}/{b}",
  "NOVÁ HOSPODA!": "НОВЫЙ ТРАКТИР!",
  "ťukni nahoře na „{n}“": "нажми вверху «{n}»",
@@ -860,5 +856,12 @@
  "UKAŽ": "ПОКАЖИ",
  "Najmi obsluhu: {s}": "Найми персонал: {s}",
  "V noci nasbírej {n} kostí": "Собери ночью {n} костей",
- "každý den truhla zdarma": "каждый день бесплатный сундук"
+ "každý den truhla zdarma": "каждый день бесплатный сундук",
+ "ŤUKNI NA BUBLINU": "НАЖМИ НА ПУЗЫРЬ",
+ "host si objednal – dá ti spropitné": "гость заказал – даст чаевые",
+ "příšera si objednala – dá ti kost": "чудище заказало – даст кость",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na bubliny hostů – dávají spropitné.": "Копи на «{s}» ({c} coins, примерно {d}). А пока тапай по гостям – они дают чаевые.",
+ "Ťukej na bubliny hostů – dávají spropitné.": "Тапай по гостям – они дают чаевые.",
+ "pípa točí sama (nebo ťukej na bubliny hostů)": "кран наливает сам (или нажимай на гостей)",
+ "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "Кости собираешь ночью: станции и нажатия на гостей.\nТратишь их в Костнице и на талисманы."
 }

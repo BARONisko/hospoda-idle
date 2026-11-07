@@ -398,7 +398,6 @@
  "odemkne se od úrovně {n} Delší noci": "unlocks at Longer night level {n}",
  "Přepnout na den": "Switch to day",
  "Přepnout na noc": "Switch to night",
- "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "You collect bones at night: stations and tapping guests.\nSpend them in the Ossuary and on talismans.",
  "noc trvá {a} · +1 s za úroveň": "night lasts {a} · +1 s per level",
  "odemkne se, až noc potrvá {m}": "unlocks when the night lasts {m}",
  "Soupeř v lize mezitím přidal +{n} coins": "Meanwhile your league rival added +{n} coins",
@@ -522,8 +521,6 @@
  "V Obchodě si můžeš koupit: {s}.": "You can buy in the Shop: {s}.",
  "Za krígly si můžeš koupit: {s}.": "You can buy with tankards: {s}.",
  "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "Call the inspection (Shop): you get +{k} tankards = income +{v} % forever.",
- "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "Save up for “{s}” ({c} coins, about {d}). Meanwhile tap guests – they tip.",
- "Ťukej na hosty – dávají spropitné.": "Tap guests – they tip.",
  "Ukaž": "Show",
  "sběrač bublin rychlejší o {v} %": "bubble collector faster by {v} %",
  "schopnost manažera dřív o {v} %": "manager skill ready {v} % sooner",
@@ -813,7 +810,6 @@
  "SBÍREJ COINS: {c} / {n}": "COLLECT COINS: {c} / {n}",
  "ťukej na Pípu vlevo, pak kup vpravo": "tap the Tap on the left, then buy on the right",
  "POČKEJ NA COINS: {c} / {n}": "WAIT FOR COINS: {c} / {n}",
- "pípa točí sama (nebo ťukej na hosty)": "the tap pours by itself (or tap guests)",
  "krok {a}/{b}": "step {a}/{b}",
  "NOVÁ HOSPODA!": "NEW PUB!",
  "ťukni nahoře na „{n}“": "tap “{n}” at the top",
@@ -860,5 +856,12 @@
  "UKAŽ": "SHOW",
  "Najmi obsluhu: {s}": "Hire staff: {s}",
  "V noci nasbírej {n} kostí": "Collect {n} bones at night",
- "každý den truhla zdarma": "a free chest every day"
+ "každý den truhla zdarma": "a free chest every day",
+ "ŤUKNI NA BUBLINU": "TAP THE BUBBLE",
+ "host si objednal – dá ti spropitné": "the guest ordered – you get a tip",
+ "příšera si objednala – dá ti kost": "the monster ordered – you get a bone",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na bubliny hostů – dávají spropitné.": "Save up for “{s}” ({c} coins, about {d}). Meanwhile tap guests – they tip.",
+ "Ťukej na bubliny hostů – dávají spropitné.": "Tap guests – they tip.",
+ "pípa točí sama (nebo ťukej na bubliny hostů)": "the tap pours by itself (or tap guests)",
+ "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "You collect bones at night: stations and tapping guests.\nSpend them in the Ossuary and on talismans."
 }

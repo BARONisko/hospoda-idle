@@ -398,7 +398,6 @@
  "odemkne se od úrovně {n} Delší noci": "Daha uzun gece seviye {n} ile açılır",
  "Přepnout na den": "Gündüze geç",
  "Přepnout na noc": "Geceye geç",
- "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "Kemikleri gece toplarsın: istasyonlar ve misafirlere dokunma.\nKemikhane'de ve tılsımlara harcarsın.",
  "noc trvá {a} · +1 s za úroveň": "gece {a} sürer · seviye başına +1 sn",
  "odemkne se, až noc potrvá {m}": "gece {m} olunca açılır",
  "Soupeř v lize mezitím přidal +{n} coins": "Bu arada lig rakibin +{n} coins ekledi",
@@ -522,8 +521,6 @@
  "V Obchodě si můžeš koupit: {s}.": "Dükkânda alabilirsin: {s}.",
  "Za krígly si můžeš koupit: {s}.": "Kupalarla alabilirsin: {s}.",
  "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "Teftiş çağır (Dükkân): +{k} kupa = kazanç sonsuza dek +{v} %.",
- "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "“{s}” için biriktir ({c} coins, yaklaşık {d}). Bu arada misafirlere dokun – bahşiş verirler.",
- "Ťukej na hosty – dávají spropitné.": "Misafirlere dokun – bahşiş verirler.",
  "Ukaž": "Göster",
  "sběrač bublin rychlejší o {v} %": "baloncuk toplayıcı %{v} daha hızlı",
  "schopnost manažera dřív o {v} %": "müdür yeteneği %{v} daha erken",
@@ -813,7 +810,6 @@
  "SBÍREJ COINS: {c} / {n}": "COIN TOPLA: {c} / {n}",
  "ťukej na Pípu vlevo, pak kup vpravo": "soldaki musluğa dokun, sonra sağdan satın al",
  "POČKEJ NA COINS: {c} / {n}": "COIN BEKLE: {c} / {n}",
- "pípa točí sama (nebo ťukej na hosty)": "musluk kendi doldurur (ya da müşterilere dokun)",
  "krok {a}/{b}": "adım {a}/{b}",
  "NOVÁ HOSPODA!": "YENİ MEYHANE!",
  "ťukni nahoře na „{n}“": "yukarıda “{n}” sekmesine dokun",
@@ -860,5 +856,12 @@
  "UKAŽ": "GÖSTER",
  "Najmi obsluhu: {s}": "Personel al: {s}",
  "V noci nasbírej {n} kostí": "Gece {n} kemik topla",
- "každý den truhla zdarma": "her gün bedava sandık"
+ "každý den truhla zdarma": "her gün bedava sandık",
+ "ŤUKNI NA BUBLINU": "BALONA DOKUN",
+ "host si objednal – dá ti spropitné": "misafir sipariş verdi – bahşiş verir",
+ "příšera si objednala – dá ti kost": "canavar sipariş verdi – kemik verir",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na bubliny hostů – dávají spropitné.": "“{s}” için biriktir ({c} coins, yaklaşık {d}). Bu arada misafirlere dokun – bahşiş verirler.",
+ "Ťukej na bubliny hostů – dávají spropitné.": "Misafirlere dokun – bahşiş verirler.",
+ "pípa točí sama (nebo ťukej na bubliny hostů)": "musluk kendi doldurur (ya da müşterilere dokun)",
+ "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "Kemikleri gece toplarsın: istasyonlar ve misafirlere dokunma.\nKemikhane'de ve tılsımlara harcarsın."
 }

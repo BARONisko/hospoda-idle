@@ -398,7 +398,6 @@
  "odemkne se od úrovně {n} Delší noci": "長い夜 レベル{n}で解放",
  "Přepnout na den": "昼に切り替え",
  "Přepnout na noc": "夜に切り替え",
- "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "骨は夜に集まる:ステーションと客のタップ。\n納骨堂やお守りに使える。",
  "noc trvá {a} · +1 s za úroveň": "夜は {a} · 1レベルごとに+1秒",
  "odemkne se, až noc potrvá {m}": "夜が {m} になると解放",
  "Soupeř v lize mezitím přidal +{n} coins": "その間にリーグのライバルは +{n} coins 稼いだ",
@@ -522,8 +521,6 @@
  "V Obchodě si můžeš koupit: {s}.": "ショップで買える：{s}。",
  "Za krígly si můžeš koupit: {s}.": "ジョッキで買える：{s}。",
  "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "衛生検査を呼ぼう（ショップ）：ジョッキ+{k} = 収入永久+{v} %。",
- "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "「{s}」のために貯めよう（{c} coins、約{d}）。その間、客をタップ – チップをくれる。",
- "Ťukej na hosty – dávají spropitné.": "客をタップ – チップをくれる。",
  "Ukaž": "見る",
  "sběrač bublin rychlejší o {v} %": "泡コレクター {v} % 高速",
  "schopnost manažera dřív o {v} %": "マネージャースキル {v} % 早く",
@@ -813,7 +810,6 @@
  "SBÍREJ COINS: {c} / {n}": "コインを集める：{c} / {n}",
  "ťukej na Pípu vlevo, pak kup vpravo": "左のサーバーをタップして右で買う",
  "POČKEJ NA COINS: {c} / {n}": "コインを待つ：{c} / {n}",
- "pípa točí sama (nebo ťukej na hosty)": "サーバーは自動で注ぐ（客をタップしてもOK）",
  "krok {a}/{b}": "ステップ {a}/{b}",
  "NOVÁ HOSPODA!": "新しい酒場！",
  "ťukni nahoře na „{n}“": "上の「{n}」をタップ",
@@ -860,5 +856,12 @@
  "UKAŽ": "見せて",
  "Najmi obsluhu: {s}": "店員を雇う：{s}",
  "V noci nasbírej {n} kostí": "夜に骨を{n}個集める",
- "každý den truhla zdarma": "毎日無料の宝箱"
+ "každý den truhla zdarma": "毎日無料の宝箱",
+ "ŤUKNI NA BUBLINU": "吹き出しをタップ",
+ "host si objednal – dá ti spropitné": "客が注文した – チップがもらえる",
+ "příšera si objednala – dá ti kost": "モンスターが注文 – 骨がもらえる",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na bubliny hostů – dávají spropitné.": "「{s}」のために貯めよう（{c} coins、約{d}）。その間、客をタップ – チップをくれる。",
+ "Ťukej na bubliny hostů – dávají spropitné.": "客をタップ – チップをくれる。",
+ "pípa točí sama (nebo ťukej na bubliny hostů)": "サーバーは自動で注ぐ（客をタップしてもOK）",
+ "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "骨は夜に集まる:ステーションと客のタップ。\n納骨堂やお守りに使える。"
 }

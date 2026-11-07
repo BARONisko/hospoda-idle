@@ -398,7 +398,6 @@
  "odemkne se od úrovně {n} Delší noci": "더 긴 밤 레벨 {n}에 해금",
  "Přepnout na den": "낮으로 전환",
  "Přepnout na noc": "밤으로 전환",
- "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "뼈는 밤에 모아요: 스테이션과 손님 탭.\n납골당과 부적에 쓸 수 있어요.",
  "noc trvá {a} · +1 s za úroveň": "밤 {a} · 레벨당 +1초",
  "odemkne se, až noc potrvá {m}": "밤이 {m}이 되면 해금",
  "Soupeř v lize mezitím přidal +{n} coins": "그동안 리그 라이벌이 +{n} coins 벌었어요",
@@ -522,8 +521,6 @@
  "V Obchodě si můžeš koupit: {s}.": "상점에서 살 수 있어요: {s}.",
  "Za krígly si můžeš koupit: {s}.": "맥주잔으로 살 수 있어요: {s}.",
  "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "위생 검사 호출 (상점): 맥주잔 +{k} = 수입 영구 +{v} %.",
- "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "„{s}“를 위해 모으세요 ({c} coins, 약 {d}). 그동안 손님을 탭 – 팁을 줘요.",
- "Ťukej na hosty – dávají spropitné.": "손님을 탭하세요 – 팁을 줘요.",
  "Ukaž": "보기",
  "sběrač bublin rychlejší o {v} %": "거품 수집기 {v} % 빠름",
  "schopnost manažera dřív o {v} %": "매니저 기술 {v} % 빨리",
@@ -813,7 +810,6 @@
  "SBÍREJ COINS: {c} / {n}": "코인 모으기: {c} / {n}",
  "ťukej na Pípu vlevo, pak kup vpravo": "왼쪽 탭을 누르고 오른쪽에서 사세요",
  "POČKEJ NA COINS: {c} / {n}": "코인 기다리기: {c} / {n}",
- "pípa točí sama (nebo ťukej na hosty)": "탭이 자동으로 따라요 (손님을 눌러도 돼요)",
  "krok {a}/{b}": "단계 {a}/{b}",
  "NOVÁ HOSPODA!": "새 술집!",
  "ťukni nahoře na „{n}“": "위의 “{n}”을(를) 누르세요",
@@ -860,5 +856,12 @@
  "UKAŽ": "보기",
  "Najmi obsluhu: {s}": "직원 고용: {s}",
  "V noci nasbírej {n} kostí": "밤에 뼈 {n}개 모으기",
- "každý den truhla zdarma": "매일 무료 상자"
+ "každý den truhla zdarma": "매일 무료 상자",
+ "ŤUKNI NA BUBLINU": "말풍선을 탭",
+ "host si objednal – dá ti spropitné": "손님이 주문했어요 – 팁을 줘요",
+ "příšera si objednala – dá ti kost": "괴물이 주문했어요 – 뼈를 줘요",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na bubliny hostů – dávají spropitné.": "„{s}“를 위해 모으세요 ({c} coins, 약 {d}). 그동안 손님을 탭 – 팁을 줘요.",
+ "Ťukej na bubliny hostů – dávají spropitné.": "손님을 탭하세요 – 팁을 줘요.",
+ "pípa točí sama (nebo ťukej na bubliny hostů)": "탭이 자동으로 따라요 (손님을 눌러도 돼요)",
+ "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "뼈는 밤에 모아요: 스테이션과 손님 탭.\n납골당과 부적에 쓸 수 있어요."
 }

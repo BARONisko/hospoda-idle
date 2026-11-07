@@ -232,3 +232,9 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   je už v ceduli s „ťukni na Menu“). Průvodce s cedulí (nová hospoda, noc) počká na zavřené menu.
 - HOTOVO (přání): cedule stylu hospody (PIVNICE…) vpravo v rohu, pod truhlou, když je vidět.
 - HOTOVO (hlášení: nápis vlevo nahoře jen z půlky): banner a oslava milníku vždy uprostřed výhledu hospody (dřív podle kamery 1. hospody, která při jiné vybrané hospodě mohla mít špatný rámeček), dlouhý text se zalomí a zmenší.
+- HOTOVO (stížnost uživatele: návod „ťukni na hosta“ ukázal hosta bez bubliny): spropitné dá JEN host s bublinou
+  (objednávkou) – ťuk na bublinu nebo na hosta, který ji má; host bez bubliny nic. tipTarget míří na bublinu.
+  Během kroku „ťukni na bublinu“ (návod i noční průvodce) bubliny samy nezmizí (PubView.hold). Cedule u tohoto kroku
+  dole přes karty, ať šipka nepřeškrtne text. Texty „ťukej na hosty“ → „ťukej na bubliny hostů“.
+- ČEKÁ (zadání uživatele, naštvaný): „oprav to celé, efekty, zkontroluj texty, nelíbí se mi přeplněnost upozorněními –
+  zlepši, zredukuj, dej návrhy“. → audit všech upozornění/bannerů/efektů + ≥3 návrhy na snímcích.

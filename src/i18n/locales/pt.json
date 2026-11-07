@@ -398,7 +398,6 @@
  "odemkne se od úrovně {n} Delší noci": "desbloqueia no nível {n} de Noite mais longa",
  "Přepnout na den": "Mudar para dia",
  "Přepnout na noc": "Mudar para noite",
- "Kosti sbíráš v noci: stanice a ťuknutí na hosty.\nUtratíš je i v Kostnici a za talismany.": "Você coleta ossos à noite: estações e toques nos clientes.\nGaste-os no Ossário e em talismãs.",
  "noc trvá {a} · +1 s za úroveň": "a noite dura {a} · +1 s por nível",
  "odemkne se, až noc potrvá {m}": "libera quando a noite durar {m}",
  "Soupeř v lize mezitím přidal +{n} coins": "Enquanto isso, o rival da liga somou +{n} coins",
@@ -522,8 +521,6 @@
  "V Obchodě si můžeš koupit: {s}.": "Na Loja você pode comprar: {s}.",
  "Za krígly si můžeš koupit: {s}.": "Com canecas você pode comprar: {s}.",
  "Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.": "Chame a vigilância (Loja): ganha +{k} canecas = ganhos +{v} % para sempre.",
- "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na hosty – dávají spropitné.": "Economize para “{s}” ({c} coins, cerca de {d}). Enquanto isso toque nos clientes – dão gorjeta.",
- "Ťukej na hosty – dávají spropitné.": "Toque nos clientes – dão gorjeta.",
  "Ukaž": "Mostrar",
  "sběrač bublin rychlejší o {v} %": "coletor de bolhas {v} % mais rápido",
  "schopnost manažera dřív o {v} %": "habilidade do gerente {v} % antes",
@@ -813,7 +810,6 @@
  "SBÍREJ COINS: {c} / {n}": "JUNTA COINS: {c} / {n}",
  "ťukej na Pípu vlevo, pak kup vpravo": "toca na torneira à esquerda e compra à direita",
  "POČKEJ NA COINS: {c} / {n}": "ESPERA PELOS COINS: {c} / {n}",
- "pípa točí sama (nebo ťukej na hosty)": "a torneira serve sozinha (ou toca nos clientes)",
  "krok {a}/{b}": "passo {a}/{b}",
  "NOVÁ HOSPODA!": "NOVA TABERNA!",
  "ťukni nahoře na „{n}“": "toca em “{n}” em cima",
@@ -860,5 +856,12 @@
  "UKAŽ": "MOSTRAR",
  "Najmi obsluhu: {s}": "Contrate equipe: {s}",
  "V noci nasbírej {n} kostí": "Junte {n} ossos à noite",
- "každý den truhla zdarma": "um baú grátis todo dia"
+ "každý den truhla zdarma": "um baú grátis todo dia",
+ "ŤUKNI NA BUBLINU": "TOQUE NO BALÃO",
+ "host si objednal – dá ti spropitné": "o cliente pediu – dá gorjeta",
+ "příšera si objednala – dá ti kost": "o monstro pediu – dá um osso",
+ "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na bubliny hostů – dávají spropitné.": "Economize para “{s}” ({c} coins, cerca de {d}). Enquanto isso toque nos clientes – dão gorjeta.",
+ "Ťukej na bubliny hostů – dávají spropitné.": "Toque nos clientes – dão gorjeta.",
+ "pípa točí sama (nebo ťukej na bubliny hostů)": "a torneira serve sozinha (ou toca nos clientes)",
+ "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "Você coleta ossos à noite: estações e toques nos clientes.\nGaste-os no Ossário e em talismãs."
 }
