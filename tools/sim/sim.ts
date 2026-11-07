@@ -15,7 +15,32 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
   let coins = 0, run = 0, t = 0;
   const marks: Record<string, number> = {};
   const kb = 1 + KRIGL_BONUS * krigle;
-  const pay = (p: number, d: StationDef, s: St) => payout(d, Math.max(1, s.lvl)) * actMult(p + 1) * upMult(up, p + 1, d.id) * kb;
+  const spent = Array(pubs).fill(0), lvls = Array(pubs).fill(0);
+  const mc = (p: number, i: number) => (st[p][i].lvl > 0 ? milestoneCount(st[p][i].lvl) : -1);
+  // návrhy přepracování vylepšování (PROP=A/B/C)
+  const extra = (p: number, i: number) => {
+    if (PROP === 'A') {
+      let m = 1; // zásobování: každý milník stejné stanice v nižších hospodách +50 %
+      for (let q = 0; q < p; q++) m += 0.5 * Math.max(0, mc(q, i));
+      return m;
+    }
+    if (PROP === 'B') {
+      const star = (q: number) => Math.max(0, Math.min(...st[q].map((_, j) => mc(q, j))));
+      let all = 0;
+      for (let q = 0; q < pubs; q++) all += star(q);
+      return 1.5 ** star(p) * (1 + 0.1 * all); // hvězdy hospody: ×1,5 hospodě, +10 % všem
+    }
+    if (PROP === 'C') {
+      const sty = (q: number) => {
+        const m = st[q].map((_, j) => mc(q, j)), top = Math.max(...m);
+        return m.filter((x) => x === top).length === 1 && top > 0 ? m.indexOf(top) : -1;
+      };
+      const styles = new Set(Array.from({ length: pubs }, (_, q) => sty(q)).filter((x) => x >= 0));
+      return (sty(p) === i ? 2 : 1) * (1 + 0.25 * Math.max(0, styles.size - 1)); // styl hospody: vedoucí stanice ×2, různé styly +25 %
+    }
+    return 1;
+  };
+  const pay = (p: number, d: StationDef, s: St) => payout(d, Math.max(1, s.lvl)) * actMult(p + 1) * upMult(up, p + 1, d.id) * kb * extra(p, STATIONS.indexOf(d));
   const demand = (p: number) => {
     const ps = st[p];
     return (ps[0].auto ? beersPerCycle(milestoneCount(ps[0].lvl)) / STATIONS[0].cycle : 0) + (ps[1].auto ? 1 / STATIONS[1].cycle : 0);
@@ -36,17 +61,23 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
     // nákupy: nejlepší poměr přírůstek výdělku / cena
     for (;;) {
       const r0 = rate();
-      let best: { gain: number; price: number; act: () => void } | null = null;
-      const consider = (price: number, act: () => void, undo: () => void) => {
+      let best: { gain: number; price: number; act: () => void; pub: number } | null = null;
+      const consider = (price: number, act: () => void, undo: () => void, pub = -1) => {
         act();
         const g = rate() - r0;
         undo();
         const score = g / price;
-        if (g > 0 && (!best || score > best.gain / best.price)) best = { gain: g, price, act };
+        if (g > 0 && (!best || score > best.gain / best.price)) best = { gain: g, price, act, pub };
       };
       st.forEach((ps, p) => ps.forEach((s, i) => {
         const d = STATIONS[i];
-        consider(cost(d, s.lvl) * actMult(p + 1), () => s.lvl++, () => s.lvl--);
+        if (s.lvl === 0 && !s.auto) {
+          // otevření stanice a hned obsluha (samotné otevření bez obsluhy nic nevydělá)
+          const crewIn = i === 0 && !ws[p].length;
+          consider((cost(d, 0) + d.staff) * actMult(p + 1), () => ((s.lvl = 1), (s.auto = true), crewIn && ws[p].push(...START_CREW())), () => ((s.lvl = 0), (s.auto = false), crewIn && ws[p].splice(0)), p);
+          return;
+        }
+        consider(cost(d, s.lvl) * actMult(p + 1), () => s.lvl++, () => s.lvl--, p);
         if (s.lvl > 0 && !s.auto) consider(d.staff * actMult(p + 1), () => ((s.auto = true), i === 0 && ws[p].push(...START_CREW())), () => ((s.auto = false), i === 0 && ws[p].splice(0)));
       }));
       if (WAITERS_ON) ws.forEach((list, p) => {
@@ -59,14 +90,26 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
         consider(u.cost, () => up.push(u.id), () => up.pop());
       }
       // levné „otevření“ stanice (bez okamžitého přínosu) – když nic jiného
-      const b = best as { gain: number; price: number; act: () => void } | null;
+      const b = best as { gain: number; price: number; act: () => void; pub: number } | null;
       if (!b || b.price > coins) {
         // počkej na peníze, ale nejdéle 2 min výdělku
         break;
       }
       coins -= b.price;
+      if (b.pub >= 0) spent[b.pub] += b.price, lvls[b.pub]++;
       b.act();
     }
+    // skutečný hráč otevře a obsadí každou stanici, jakmile na ni má 3× (hladový výpočet to neumí)
+    st.forEach((ps, p) => ps.forEach((s, i) => {
+      const d = STATIONS[i], price = (cost(d, 0) + d.staff) * actMult(p + 1);
+      if (s.lvl === 0 && coins >= 3 * price) {
+        coins -= price;
+        spent[p] += price;
+        s.lvl = 1;
+        s.auto = true;
+        if (i === 0 && !ws[p].length) ws[p].push(...START_CREW());
+      }
+    }));
     // návod vede hráče ke kostlivci na pípě hned za 50 coins (pak už pípu neťuká)
     st.forEach((ps, p) => {
       const tap = ps[0], price = STATIONS[0].staff * actMult(p + 1);
@@ -107,10 +150,13 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
     if (kriglyFor(run) >= PRESTIGE_MIN && !('prestiž' in marks)) marks['prestiž'] = t;
     if (kriglyFor(run) >= 4 * PRESTIGE_MIN && !('40 krígel' in marks)) marks['40 krígel'] = t;
   }
-  return Object.fromEntries(Object.entries(marks).map(([k, v]) => [k, fmt(v)]));
+  const res: Record<string, string> = Object.fromEntries(Object.entries(marks).map(([k, v]) => [k, fmt(v)]));
+  if (pubs > 1) res['útrata po hospodách %'] = spent.map((x) => ((100 * x) / spent.reduce((a, b) => a + b, 0)).toFixed(2)).join(' / ') + '; úrovně ' + lvls.join(' / ') + '  (konec: ' + st.map((ps) => ps.map((x) => x.lvl).join(',')).join(' | ') + ')';
+  return res;
 }
 
 const WAITERS_ON = !process.env.NO_WAITERS;
+const PROP = process.env.PROP ?? '';
 console.log('1 hospoda, 0 krígel ', run(1, 0));
 console.log('2 hospody, 15 krígel', run(2, 15));
 console.log('3 hospody, 50 krígel', run(3, 50));

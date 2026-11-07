@@ -176,3 +176,16 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   550 💎 199 Kč) · Štamgast (z B: karta 30 dní 99 Kč: výdělek ×2 i offline, VIP vrátný, truhla/kampaň/×2 bez reklam,
   denně 20 💎 tlačítkem). Diamanty zdarma: VIP +2 💎, zlatá truhla +10 💎. Nákupy: src/core/shop.ts (rozhraní jako
   ads.ts, na webu „jen v mobilní aplikaci“, ?fakeshop=1 na zkoušku). Uložení: gems, pass, own[], noAds.
+- SCHVÁLENO uživatelem: ceny a obsah diamantů 💎 i Štamgast passu (9e01a44) sedí.
+- NÁVRH (čeká na výběr uživatele): přepracovat hlavní vylepšování stanic, aby hráč volil směr a přemýšlel,
+  i mezi hospodami (teď 3. hospoda zastíní 1.: actMult 50^(act−1) násobí cenu i výdělek stejně → do Pajzlu jde
+  v simulaci 0,04 % útraty). Bez vyskakovacích oken, přímo na kartách a ve hře. Snímky tools/_tmp/navrhA–C.png
+  (tools/_tmp/mock.mjs), simulace `PROP=A|B|C node tools/sim/run.mjs`:
+  - A Zásobování: každý milník stanice v nižší hospodě = +50 % stejné stanici ve všech vyšších (vozík se sudy).
+  - B Hvězdy hospody: ⭐ když všechny 4 stanice dosáhnou dalšího milníku; ⭐ = hospoda ×1,5 a +10 % všem
+    hospodám; karta nejslabší stanice „brzdí ⭐ – chybí N úrovní“.
+  - C Styl hospody: stanice s nejvíc milníky určí styl (Pivnice/Jídelna/Sklípek/Herna) = ×2 + perk, cedule
+    a hosté ve hře; různé styly v hospodách +25 % každý navíc.
+- Simulace opravena: dřív nikdy neotevřela kuchyň/sklep/kostky ani další hospody (otevření bez obsluhy nic
+  nevydělá) – teď otevření + obsluha jako jeden krok a „skutečný hráč“ otevře stanici, když má 3× cenu.
+  Nové základní časy: 1 hospoda prestiž 32 min, 40 krígel 2,1 h (dřív hlášeno 35 min / 5,3 h).
