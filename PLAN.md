@@ -189,3 +189,14 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Simulace opravena: dřív nikdy neotevřela kuchyň/sklep/kostky ani další hospody (otevření bez obsluhy nic
   nevydělá) – teď otevření + obsluha jako jeden krok a „skutečný hráč“ otevře stanici, když má 3× cenu.
   Nové základní časy: 1 hospoda prestiž 32 min, 40 krígel 2,1 h (dřív hlášeno 35 min / 5,3 h).
+- HOTOVO (výběr uživatele C + A): styl hospody a zásobování (economy.ts: STYLES, pubStyle, styleGap, styleMix,
+  supplyIn/Out, styleSupplyMult; PubScene.pay × styleSupplyMult).
+  - Styl: stanice s nejvíc milníky (aspoň 2 = úroveň 50, bez remízy) určí styl – sama ×1,25, karta se zlatým
+    rámem „♛ Pivnice“, cedule nahoře v hospodě. Výhody: Pivnice spropitné ×2 (ta hospoda), Jídelna schopnost
+    manažera o 50 % delší (ta hospoda), Sklípek spánek +1 h, Herna události o 25 % častěji. Různé styly napříč
+    hospodami +25 % všude za každý další. Ostatní karty: „Jídelna: chybí 2 milníky“. Při změně stylu banner.
+  - Zásobování: každý milník stanice v nižší hospodě = +15 % stejné stanici ve všech vyšších; karta „▶ zásobuje
+    +X %“ (nižší hospoda), „zásoby ×N“ (vyšší). Pruh karty zkrácen na 150 px, text vedle (při varování plná šířka).
+  - Sim (opravená): 1 hospoda prestiž 32 → 27 min, 40 krígel 2,11 → 1,93 h (čísla stažena z ×1,5/+25 %).
+- NÁVRH uživatele (čeká na upřesnění): hvězdy stanice – úroveň 500 = ⭐ (+10 %), platí po vynulování (hygieně),
+  další ⭐ několikrát dražší, max 5.

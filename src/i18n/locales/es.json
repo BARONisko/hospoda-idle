@@ -776,5 +776,20 @@
  "nákup jen v mobilní aplikaci": "compras solo en la app móvil",
  "Vrátný obsloužil VIP hosta! +{n} coins": "¡El portero atendió al VIP! +{n} coins",
  "Vrátný obsloužil VIP hosty, když jsi byl pryč: +{n} coins": "El portero atendió VIPs en tu ausencia: +{n} coins",
- "VIP host spokojen! +{n} coins +{g} 💎": "¡VIP satisfecho! +{n} coins +{g} 💎"
+ "VIP host spokojen! +{n} coins +{g} 💎": "¡VIP satisfecho! +{n} coins +{g} 💎",
+ "Pivnice": "Cervecería",
+ "Jídelna": "Comedor",
+ "Sklípek": "Bodega",
+ "Herna": "Garito",
+ "spropitné ×2": "propinas ×2",
+ "schopnost manažera o 50 % delší": "habilidad del gerente 50 % más larga",
+ "spánek o 1 h delší": "sueño 1 h más largo",
+ "zásoby ×{m}": "suministros ×{m}",
+ "{n} styly: +{v} % všude": "{n} estilos: +{v} % en todas partes",
+ "{p} je teď {s}: {k}": "{p} ahora es {s}: {k}",
+ "{s}: chybí 1 milník": "{s}: falta 1 hito",
+ "{s}: chybí {k} milníky": "{s}: faltan {k} hitos",
+ "{s}: chybí {k} milníků": "{s}: faltan {k} hitos",
+ "▶ zásobuje +{v} %": "▶ abastece +{v} %",
+ "♛ {s}": "♛ {s}"
 }

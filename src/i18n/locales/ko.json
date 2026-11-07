@@ -776,5 +776,20 @@
  "nákup jen v mobilní aplikaci": "구매는 모바일 앱에서만",
  "Vrátný obsloužil VIP hosta! +{n} coins": "도어맨이 VIP를 대접했어요! +{n} coins",
  "Vrátný obsloužil VIP hosty, když jsi byl pryč: +{n} coins": "자리를 비운 동안 도어맨이 VIP를 대접: +{n} coins",
- "VIP host spokojen! +{n} coins +{g} 💎": "VIP 만족! +{n} coins +{g} 💎"
+ "VIP host spokojen! +{n} coins +{g} 💎": "VIP 만족! +{n} coins +{g} 💎",
+ "Pivnice": "맥주홀",
+ "Jídelna": "식당",
+ "Sklípek": "와인 저장고",
+ "Herna": "도박장",
+ "spropitné ×2": "팁 ×2",
+ "schopnost manažera o 50 % delší": "매니저 스킬 50 % 더 길게",
+ "spánek o 1 h delší": "수면 1시간 더 길게",
+ "zásoby ×{m}": "공급 ×{m}",
+ "{n} styly: +{v} % všude": "스타일 {n}개: 모든 곳 +{v} %",
+ "{p} je teď {s}: {k}": "{p}은(는) 이제 {s}: {k}",
+ "{s}: chybí 1 milník": "{s}: 마일스톤 1개 남음",
+ "{s}: chybí {k} milníky": "{s}: 마일스톤 {k}개 남음",
+ "{s}: chybí {k} milníků": "{s}: 마일스톤 {k}개 남음",
+ "▶ zásobuje +{v} %": "▶ 공급 +{v} %",
+ "♛ {s}": "♛ {s}"
 }

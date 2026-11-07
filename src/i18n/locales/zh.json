@@ -776,5 +776,20 @@
  "nákup jen v mobilní aplikaci": "仅在手机应用内购买",
  "Vrátný obsloužil VIP hosta! +{n} coins": "门童招待了VIP！+{n} coins",
  "Vrátný obsloužil VIP hosty, když jsi byl pryč: +{n} coins": "你不在时门童招待了VIP：+{n} coins",
- "VIP host spokojen! +{n} coins +{g} 💎": "VIP很满意！+{n} coins +{g} 💎"
+ "VIP host spokojen! +{n} coins +{g} 💎": "VIP很满意！+{n} coins +{g} 💎",
+ "Pivnice": "啤酒馆",
+ "Jídelna": "小饭馆",
+ "Sklípek": "酒窖",
+ "Herna": "赌坊",
+ "spropitné ×2": "小费×2",
+ "schopnost manažera o 50 % delší": "经理技能延长50 %",
+ "spánek o 1 h delší": "睡眠延长1小时",
+ "zásoby ×{m}": "供货×{m}",
+ "{n} styly: +{v} % všude": "{n}种风格：全部+{v} %",
+ "{p} je teď {s}: {k}": "{p}现在是{s}：{k}",
+ "{s}: chybí 1 milník": "{s}：还差1个里程碑",
+ "{s}: chybí {k} milníky": "{s}：还差{k}个里程碑",
+ "{s}: chybí {k} milníků": "{s}：还差{k}个里程碑",
+ "▶ zásobuje +{v} %": "▶ 供货 +{v} %",
+ "♛ {s}": "♛ {s}"
 }

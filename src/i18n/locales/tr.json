@@ -776,5 +776,20 @@
  "nákup jen v mobilní aplikaci": "satın alma sadece uygulamada",
  "Vrátný obsloužil VIP hosta! +{n} coins": "Kapıcı VIP'e hizmet etti! +{n} coins",
  "Vrátný obsloužil VIP hosty, když jsi byl pryč: +{n} coins": "Sen yokken kapıcı VIP'lere hizmet etti: +{n} coins",
- "VIP host spokojen! +{n} coins +{g} 💎": "VIP memnun! +{n} coins +{g} 💎"
+ "VIP host spokojen! +{n} coins +{g} 💎": "VIP memnun! +{n} coins +{g} 💎",
+ "Pivnice": "Birahane",
+ "Jídelna": "Lokanta",
+ "Sklípek": "Mahzen",
+ "Herna": "Kumarhane",
+ "spropitné ×2": "bahşiş ×2",
+ "schopnost manažera o 50 % delší": "yönetici yeteneği %50 daha uzun",
+ "spánek o 1 h delší": "uyku 1 saat daha uzun",
+ "zásoby ×{m}": "tedarik ×{m}",
+ "{n} styly: +{v} % všude": "{n} tarz: her yerde +%{v}",
+ "{p} je teď {s}: {k}": "{p} artık {s}: {k}",
+ "{s}: chybí 1 milník": "{s}: 1 kilometre taşı kaldı",
+ "{s}: chybí {k} milníky": "{s}: {k} kilometre taşı kaldı",
+ "{s}: chybí {k} milníků": "{s}: {k} kilometre taşı kaldı",
+ "▶ zásobuje +{v} %": "▶ tedarik +%{v}",
+ "♛ {s}": "♛ {s}"
 }

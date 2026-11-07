@@ -776,5 +776,20 @@
  "nákup jen v mobilní aplikaci": "購入はモバイルアプリのみ",
  "Vrátný obsloužil VIP hosta! +{n} coins": "ドアマンがVIPを接客！ +{n} coins",
  "Vrátný obsloužil VIP hosty, když jsi byl pryč: +{n} coins": "留守中にドアマンがVIPを接客：+{n} coins",
- "VIP host spokojen! +{n} coins +{g} 💎": "VIP客は満足！ +{n} coins +{g} 💎"
+ "VIP host spokojen! +{n} coins +{g} 💎": "VIP客は満足！ +{n} coins +{g} 💎",
+ "Pivnice": "ビアホール",
+ "Jídelna": "食堂",
+ "Sklípek": "ワイン蔵",
+ "Herna": "賭場",
+ "spropitné ×2": "チップ×2",
+ "schopnost manažera o 50 % delší": "マネージャーのスキルが50 %長く",
+ "spánek o 1 h delší": "睡眠が1時間長く",
+ "zásoby ×{m}": "仕入れ×{m}",
+ "{n} styly: +{v} % všude": "{n}つのスタイル：全店+{v} %",
+ "{p} je teď {s}: {k}": "{p}は{s}になった：{k}",
+ "{s}: chybí 1 milník": "{s}：あと1マイルストーン",
+ "{s}: chybí {k} milníky": "{s}：あと{k}マイルストーン",
+ "{s}: chybí {k} milníků": "{s}：あと{k}マイルストーン",
+ "▶ zásobuje +{v} %": "▶ 供給 +{v} %",
+ "♛ {s}": "♛ {s}"
 }

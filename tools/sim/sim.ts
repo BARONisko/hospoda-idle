@@ -1,7 +1,7 @@
 // Simulace průběhu hry: „chamtivý“ hráč kupuje vždy to, co se nejrychleji vrátí (úroveň, kostlivec, vylepšení).
 // Spuštění: node tools/sim/run.mjs   → časy do milníků (1K, 1M, první prestiž…) pro 1.–3. hospodu.
 import { crew, beersPerCycle, START_CREW, hireCost, freePoints, UP_MAX, WAITER_MAX, type WaiterState, type WaiterUp } from '../../src/core/waiters';
-import { milestoneCount } from '../../src/core/economy';
+import { milestoneCount, styleSupplyMult } from '../../src/core/economy';
 import { STATIONS, StationDef, payout, cost, actMult, UPGRADES, upMult, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN, PRESTIGE_FIRST } from '../../src/core/economy';
 
 interface St { lvl: number; auto: boolean }
@@ -17,28 +17,12 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
   const kb = 1 + KRIGL_BONUS * krigle;
   const spent = Array(pubs).fill(0), lvls = Array(pubs).fill(0);
   const mc = (p: number, i: number) => (st[p][i].lvl > 0 ? milestoneCount(st[p][i].lvl) : -1);
-  // návrhy přepracování vylepšování (PROP=A/B/C)
+  // styl hospody + zásobování (OLD=1 = bez nich, pro srovnání)
+  const pl = () => st.map((ps, p) => ({ act: p + 1, st: Object.fromEntries(ps.map((x, i) => [STATIONS[i].id, { lvl: x.lvl }])) }));
   const extra = (p: number, i: number) => {
-    if (PROP === 'A') {
-      let m = 1; // zásobování: každý milník stejné stanice v nižších hospodách +50 %
-      for (let q = 0; q < p; q++) m += 0.5 * Math.max(0, mc(q, i));
-      return m;
-    }
-    if (PROP === 'B') {
-      const star = (q: number) => Math.max(0, Math.min(...st[q].map((_, j) => mc(q, j))));
-      let all = 0;
-      for (let q = 0; q < pubs; q++) all += star(q);
-      return 1.5 ** star(p) * (1 + 0.1 * all); // hvězdy hospody: ×1,5 hospodě, +10 % všem
-    }
-    if (PROP === 'C') {
-      const sty = (q: number) => {
-        const m = st[q].map((_, j) => mc(q, j)), top = Math.max(...m);
-        return m.filter((x) => x === top).length === 1 && top > 0 ? m.indexOf(top) : -1;
-      };
-      const styles = new Set(Array.from({ length: pubs }, (_, q) => sty(q)).filter((x) => x >= 0));
-      return (sty(p) === i ? 2 : 1) * (1 + 0.25 * Math.max(0, styles.size - 1)); // styl hospody: vedoucí stanice ×2, různé styly +25 %
-    }
-    return 1;
+    if (OLD) return 1;
+    const P = pl();
+    return styleSupplyMult(P, P[p], STATIONS[i].id);
   };
   const pay = (p: number, d: StationDef, s: St) => payout(d, Math.max(1, s.lvl)) * actMult(p + 1) * upMult(up, p + 1, d.id) * kb * extra(p, STATIONS.indexOf(d));
   const demand = (p: number) => {
@@ -156,7 +140,7 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
 }
 
 const WAITERS_ON = !process.env.NO_WAITERS;
-const PROP = process.env.PROP ?? '';
+const OLD = !!process.env.OLD;
 console.log('1 hospoda, 0 krígel ', run(1, 0));
 console.log('2 hospody, 15 krígel', run(2, 15));
 console.log('3 hospody, 50 krígel', run(3, 50));

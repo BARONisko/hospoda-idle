@@ -143,6 +143,13 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   const p = await page('?pubs=3');
   await S(p, (s) => s.selectPub(2));
   ok('3 hospody: záložka přepne hospodu', await S(p, (s) => s.sel === 2 && !s.views[0].cam.visible && s.views[2].cam.visible && s.cards.every((c) => c.pub === 2)));
+  // styl hospody + zásobování: Pajzl s pípou na 50 = Pivnice a zásobuje vyšší hospody
+  const r0 = await S(p, (s) => { s.d.pubs.forEach((q) => ['tap', 'kitchen', 'cellar', 'dice'].forEach((k) => (q.st[k] = { lvl: 10, auto: true, prog: 0 }))); return s.pay(s.d.pubs[2], s.cards[0].def); });
+  await S(p, (s) => { s.d.pubs[0].st.tap.lvl = 50; s.selectPub(0); s.refresh(); });
+  ok('styl: Pajzl je Pivnice, karta pípy ukazuje korunku', await S(p, (s) => s.cards[0].tag.text.startsWith('♛') && s.styleSign.a.visible));
+  ok('zásobování: pípa v Žabákovi vydělává víc', await S(p, (s, r) => s.pay(s.d.pubs[2], s.cards[0].def) > r * 1.25, r0));
+  await S(p, (s) => { s.d.pubs[1].st.dice.lvl = 50; s.refresh(); });
+  ok('styly: 2 různé styly = +25 % všude', await S(p, (s) => s.styleSign.b.text.includes('25')));
   ok('bez chyb v konzoli (3 hospody)', p.errors.length === 0);
   await p.close();
 }

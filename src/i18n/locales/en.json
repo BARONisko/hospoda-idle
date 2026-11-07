@@ -776,5 +776,20 @@
  "nákup jen v mobilní aplikaci": "purchases only in the mobile app",
  "Vrátný obsloužil VIP hosta! +{n} coins": "The doorman served the VIP! +{n} coins",
  "Vrátný obsloužil VIP hosty, když jsi byl pryč: +{n} coins": "The doorman served VIPs while you were away: +{n} coins",
- "VIP host spokojen! +{n} coins +{g} 💎": "VIP guest happy! +{n} coins +{g} 💎"
+ "VIP host spokojen! +{n} coins +{g} 💎": "VIP guest happy! +{n} coins +{g} 💎",
+ "Pivnice": "Beer Hall",
+ "Jídelna": "Diner",
+ "Sklípek": "Wine Cellar",
+ "Herna": "Gaming Den",
+ "spropitné ×2": "tips ×2",
+ "schopnost manažera o 50 % delší": "manager skill lasts 50 % longer",
+ "spánek o 1 h delší": "sleep 1 h longer",
+ "zásoby ×{m}": "supplies ×{m}",
+ "{n} styly: +{v} % všude": "{n} styles: +{v} % everywhere",
+ "{p} je teď {s}: {k}": "{p} is now a {s}: {k}",
+ "{s}: chybí 1 milník": "{s}: 1 milestone to go",
+ "{s}: chybí {k} milníky": "{s}: {k} milestones to go",
+ "{s}: chybí {k} milníků": "{s}: {k} milestones to go",
+ "▶ zásobuje +{v} %": "▶ supplies +{v} %",
+ "♛ {s}": "♛ {s}"
 }

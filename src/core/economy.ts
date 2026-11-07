@@ -64,6 +64,46 @@ export const perSec = (d: StationDef, lvl: number) => payout(d, lvl) / d.cycle;
 /** další milník (úroveň, kde se výdělek zdvojnásobí), nebo null */
 export const nextMilestone = (lvl: number): number | null => MILESTONES.find((m) => lvl < m) ?? (Math.floor(lvl / 100) + 1) * 100;
 
+/** styl hospody (návrh C): stanice s nejvíc milníky určí styl – sama ×STYLE_MULT a hospoda dostane výhodu stylu */
+export const STYLES: Record<string, { name: string; perk: string }> = {
+  tap: { name: t('Pivnice'), perk: t('spropitné ×2') },
+  kitchen: { name: t('Jídelna'), perk: t('schopnost manažera o 50 % delší') },
+  cellar: { name: t('Sklípek'), perk: t('spánek o 1 h delší') },
+  dice: { name: t('Herna'), perk: t('události o 25 % častěji') },
+};
+export const STYLE_MULT = 1.25;
+/** styl až od 2 milníků (úroveň 50) */
+export const STYLE_MIN = 2;
+/** každý další odlišný styl napříč hospodami: +25 % výdělek všude */
+export const STYLE_MIX = 0.25;
+/** zásobování (návrh A): každý milník stanice v nižší hospodě = +15 % stejné stanici ve všech vyšších */
+export const SUPPLY = 0.15;
+type PubLike = { act: number; st: Record<string, { lvl: number } | undefined> };
+const ms = (p: PubLike, id: string) => milestoneCount(p.st[id]?.lvl ?? 0);
+/** id stanice, která určuje styl (nejvíc milníků, bez remízy, aspoň 1), jinak null */
+export function pubStyle(p: PubLike): string | null {
+  const m = STATIONS.map((d) => ms(p, d.id)), top = Math.max(...m);
+  return top >= STYLE_MIN && m.filter((x) => x === top).length === 1 ? STATIONS[m.indexOf(top)].id : null;
+}
+/** kolik milníků chybí stanici, aby převzala styl hospody (0 = už vede) */
+export function styleGap(p: PubLike, id: string) {
+  const lead = pubStyle(p);
+  if (lead === id) return 0;
+  const top = Math.max(...STATIONS.map((d) => ms(p, d.id)));
+  return Math.max(1, top + 1 - ms(p, id));
+}
+/** počet odlišných stylů ve všech hospodách */
+export const styleCount = (pubs: PubLike[]) => new Set(pubs.map(pubStyle).filter(Boolean)).size;
+export const styleMix = (pubs: PubLike[]) => 1 + STYLE_MIX * Math.max(0, styleCount(pubs) - 1);
+/** má některá hospoda styl stanice id */
+export const hasStyle = (pubs: PubLike[], id: string) => pubs.some((p) => pubStyle(p) === id);
+/** násobek ze zásob od nižších hospod */
+export const supplyIn = (pubs: PubLike[], p: PubLike, id: string) => 1 + SUPPLY * pubs.filter((q) => q.act < p.act).reduce((a, q) => a + ms(q, id), 0);
+/** kolik % tahle stanice dodává vyšším hospodám (0 = žádná vyšší hospoda nebo bez milníku) */
+export const supplyOut = (pubs: PubLike[], p: PubLike, id: string) => (pubs.some((q) => q.act > p.act) ? SUPPLY * ms(p, id) : 0);
+/** celkový násobek stanice ze stylu, zásob a mixu stylů */
+export const styleSupplyMult = (pubs: PubLike[], p: PubLike, id: string) => (pubStyle(p) === id ? STYLE_MULT : 1) * supplyIn(pubs, p, id) * styleMix(pubs);
+
 /** jednorázové vylepšení z obchodu: ×3 výdělek stanice v dané hospodě */
 export interface UpgradeDef {
   id: string;

@@ -776,5 +776,20 @@
  "nákup jen v mobilní aplikaci": "покупки только в приложении",
  "Vrátný obsloužil VIP hosta! +{n} coins": "Швейцар обслужил VIP! +{n} coins",
  "Vrátný obsloužil VIP hosty, když jsi byl pryč: +{n} coins": "Швейцар обслужил VIP, пока тебя не было: +{n} coins",
- "VIP host spokojen! +{n} coins +{g} 💎": "VIP доволен! +{n} coins +{g} 💎"
+ "VIP host spokojen! +{n} coins +{g} 💎": "VIP доволен! +{n} coins +{g} 💎",
+ "Pivnice": "Пивная",
+ "Jídelna": "Столовая",
+ "Sklípek": "Погребок",
+ "Herna": "Игорный зал",
+ "spropitné ×2": "чаевые ×2",
+ "schopnost manažera o 50 % delší": "умение управляющего на 50 % дольше",
+ "spánek o 1 h delší": "сон на 1 ч дольше",
+ "zásoby ×{m}": "поставки ×{m}",
+ "{n} styly: +{v} % všude": "{n} стиля: +{v} % везде",
+ "{p} je teď {s}: {k}": "{p} теперь {s}: {k}",
+ "{s}: chybí 1 milník": "{s}: ещё 1 рубеж",
+ "{s}: chybí {k} milníky": "{s}: ещё {k} рубежа",
+ "{s}: chybí {k} milníků": "{s}: ещё {k} рубежей",
+ "▶ zásobuje +{v} %": "▶ снабжает +{v} %",
+ "♛ {s}": "♛ {s}"
 }
