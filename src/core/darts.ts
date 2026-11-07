@@ -1,7 +1,8 @@
 // Šipky: hra na nulu (odečítá se, přestřelený hod se nepočítá). Začíná na 301 a každá dohraná hra cíl zvedne
 // (body ze začátku rychle, pak pomaleji). Šipky přibývají samy (10 za hodinu), dohraná hra = 1 bod na vylepšení.
 // Ručně se nemíří: bez automatu se hází ťuknutím na terč (jen když je otevřený); koupený automat (1 bod) hází
-// sám po 2 s i offline a jde vypnout. Přestřelený hod se nepočítá.
+// sám po 2 s v reálném čase (i v hospodě a offline – 1 šipka za 2 s, nikdy celá zásoba najednou) a jde vypnout.
+// Automat je první vylepšení (ostatní jdou koupit až po něm). Přestřelený hod se nepočítá.
 import { t } from '../i18n';
 import type { StatId } from './talisman';
 
@@ -14,6 +15,8 @@ export interface DartsState {
   up: Record<string, number>;
   /** automatické házení zapnuté (platí jen s koupeným automatem up.auto) */
   auto: boolean;
+  /** čas posledního hodu automatu na pozadí (ms) – hází v reálném čase, 1 šipka za THROW_GAP */
+  tat?: number;
   /** verze (2 = bez ručního míření; 3 = automat se kupuje) */
   v?: number;
   /** zbývá do nuly v aktuální hře; dohrané hry; zásahy v řadě; vítr této hry (x, y v poloměrech terče) */
@@ -226,9 +229,16 @@ export function tickDarts(s: DartsState, now: number, throwNow: boolean, statAcc
     s.have = autoOn(s) ? s.have + n : s.have >= cap ? s.have : Math.min(cap, s.have + n);
   }
   const out = { legs: 0, pts: 0, thrown: 0 };
-  if (!throwNow || !autoOn(s)) return out;
-  let guard = 5000;
-  while (s.have > 0 && guard-- > 0) {
+  const gap = THROW_GAP * 1000;
+  if (!throwNow || !autoOn(s)) {
+    s.tat = now;
+    return out;
+  }
+  // v reálném čase: za uplynulý čas nejvýš 1 hod za THROW_GAP (zásoba se neodhází najednou)
+  let allowed = Math.floor((now - (s.tat ?? now)) / gap);
+  if (s.tat === undefined) s.tat = now;
+  while (s.have > 0 && allowed-- > 0) {
+    s.tat += gap;
     s.have--;
     const [x, y] = aimLand(s, statAcc);
     const r = resolve(s, x, y, extra);
@@ -239,6 +249,8 @@ export function tickDarts(s: DartsState, now: number, throwNow: boolean, statAcc
       out.pts += r.leg;
     }
   }
+  // bez šipek se čas na hody nešetří
+  if (s.have <= 0 || now - s.tat > gap) s.tat = Math.max(s.tat, now - gap);
   return out;
 }
 

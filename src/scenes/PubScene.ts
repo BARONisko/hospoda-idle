@@ -680,6 +680,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   dartsClose() {
+    // automat na pozadí naváže v reálném čase (nic se neodhází najednou)
+    if (this.d.darts) this.d.darts.tat = Date.now();
     this.scene.stop('Darts');
     this.dartsOpen = false;
     this.input.enabled = true;

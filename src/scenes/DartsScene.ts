@@ -302,7 +302,9 @@ export class DartsScene extends Phaser.Scene {
       a.setScale(Math.min(1, 330 / a.width));
       const b = this.text(22, y + (rh > 70 ? 34 : 26), max ? u.desc(lvl) : lvl ? `${u.desc(lvl)} → ${u.desc(lvl + 1)}` : u.desc(lvl + 1), 14, PAL.fog);
       b.setScale(Math.min(1, 340 / b.width));
-      this.button(W - 160, y + 6, 140, rh - 20, max ? '✓' : t('{n} b.', { n: price }), u.stat ? 'amber' : 'green', !max && S.pts >= price, () => {
+      // automatické házení je první vylepšení: ostatní až po něm
+      const locked = u.id !== 'auto' && !(S.up.auto ?? 0);
+      this.button(W - 160, y + 6, 140, rh - 20, max ? '✓' : locked ? t('nejdřív automat') : t('{n} b.', { n: price }), u.stat ? 'amber' : 'green', !max && !locked && S.pts >= price, () => {
         S.pts -= price;
         S.up[u.id] = lvl + 1;
         sfx.fanfare();

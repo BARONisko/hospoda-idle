@@ -133,3 +133,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   kuchyně s kuchařem dá talíř k výdeji (max 6, p.dish {n,v}, talíře u kuchyně), plný výdej = kuchyně stojí („talíře čekají
   – číšníci nestíhají!“). Číšník vezme to, čeho čeká poměrně víc (bar / výdej). rate/offline: pípa + kuchyně × min(1,
   kapacita / (piva/s + talíře/s)). Texty: „Obsluha u všech 4 stanic“, „obsluha pracovala“, „Kostky s kostlivcem“ zpět.
+- Šipky v reálném čase (přání uživatele): automat na pozadí hází nejvýš 1 šipku za 2 s (DartsState.tat), po zavření
+  terče naváže od teď – zásoba se nikdy neodhází najednou (dřív 71 šipek při návratu do hospody). Automatické házení je
+  první vylepšení: ostatní (i „Do celé hry“) mají „nejdřív automat“, dokud ho hráč nekoupí.
