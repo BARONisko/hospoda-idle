@@ -681,5 +681,15 @@
  "nejdřív automat": "primero autom.",
  "TRUHLA!": "¡COFRE!",
  "Číšníci začínají znovu od úrovně 1 – zkušenosti teď přibývají pomaleji": "Los camareros empiezan de nuevo en nivel 1 – la experiencia sube más despacio",
- "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "Vilma se fue (ahora hay 3 camareros) – se devolvieron {n} coins"
+ "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "Vilma se fue (ahora hay 3 camareros) – se devolvieron {n} coins",
+ "Hospoda je plná!": "¡La taberna está llena!",
+ "Kasa přetéká – přijď vybrat výdělek, jinak se už nic nepřičítá.": "La caja rebosa: ven a cobrar, ya no se suma nada.",
+ "Toulec je plný": "Carcaj lleno",
+ "Šipky čekají na hod – další už nepřibývají.": "Los dardos esperan: ya no llegan más.",
+ "Víkend v chrámu začíná": "Empieza el fin de semana del templo",
+ "Cthulhu se probudil – chrám v R'lyeh je otevřený.": "Cthulhu ha despertado: el templo de R'lyeh está abierto.",
+ "Upozornění": "Notificaciones",
+ "Upozornění nejsou povolená v telefonu": "Las notificaciones no están permitidas en el móvil",
+ "Na webu přijdou, jen dokud je prohlížeč otevřený": "En la web solo llegan con el navegador abierto",
+ "plná hospoda, víkend v chrámu": "taberna llena, fin de semana del templo"
 }

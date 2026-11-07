@@ -145,3 +145,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   (ne +1 za milník – s pomalými číšníky prestiž trvala 1,2 h). Sim: prestiž ~stejně jako bez číšníků (35 min, 5,3 h na 40 krígel).
 - Číšníci max 3 (přání uživatele, ať je aspoň trochu čekání): poptávka pípa 0,67 + kuchyně 0,25 = 0,92 věcí/s vs 3 číšníci
   bez vylepšení 0,86/s → ~7 % čekání, Rychlost/Podnos ho odstraní. Kdo měl Vilmu (4.), dostal zpět 4 000 × násobek hospody.
+- Upozornění na mobilu (src/core/notify.ts, rozhraní jako ads.ts): Menu → Nastavení → Upozornění (zapnout = žádost
+  o povolení). Při odchodu ze hry se naplánuje „Hospoda je plná!“ (za strop offline offCap), „Toulec je plný“ (šipky bez
+  automatu) a „Víkend v chrámu začíná“ (sobota 9:00, když je chrám odemčený); při návratu se zruší. Aplikace (Capacitor):
+  plugin LocalNotifications přes window.Capacitor (přijdou i při zavřené hře – plugin @capacitor/local-notifications
+  bude potřeba přidat při stavbě aplikace). Web/PWA: Notification API + časovač, jen dokud prohlížeč stránku nechá žít.

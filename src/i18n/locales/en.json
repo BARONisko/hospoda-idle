@@ -681,5 +681,15 @@
  "nejdřív automat": "auto first",
  "TRUHLA!": "CHEST!",
  "Číšníci začínají znovu od úrovně 1 – zkušenosti teď přibývají pomaleji": "Waiters start again from level 1 – experience now grows more slowly",
- "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "Vilma left (there are now 3 waiters) – {n} coins refunded"
+ "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "Vilma left (there are now 3 waiters) – {n} coins refunded",
+ "Hospoda je plná!": "The pub is full!",
+ "Kasa přetéká – přijď vybrat výdělek, jinak se už nic nepřičítá.": "The till is overflowing – come collect, nothing more is being added.",
+ "Toulec je plný": "Quiver is full",
+ "Šipky čekají na hod – další už nepřibývají.": "Darts are waiting to be thrown – no more are coming.",
+ "Víkend v chrámu začíná": "Temple weekend begins",
+ "Cthulhu se probudil – chrám v R'lyeh je otevřený.": "Cthulhu has awoken – the temple in R'lyeh is open.",
+ "Upozornění": "Notifications",
+ "Upozornění nejsou povolená v telefonu": "Notifications are not allowed on this phone",
+ "Na webu přijdou, jen dokud je prohlížeč otevřený": "On the web they only arrive while the browser is open",
+ "plná hospoda, víkend v chrámu": "full pub, temple weekend"
 }

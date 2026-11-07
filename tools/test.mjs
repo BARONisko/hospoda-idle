@@ -45,6 +45,7 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     ok(`Menu: záložka ${tab}`, await S(p, (s) => s.shopObjs.length > 5));
   }
   await S(p, (s) => s.closeShop());
+  ok('upozornění: plná hospoda naplánovaná za strop offline', await S(p, (s) => s.notes().some((n) => n.id === 1 && Math.abs(n.at - Date.now() - s.offCap() * 1000) < 5000)));
   // 3) obchod: vylepšení a manažer
   await S(p, (s) => { s.d.coins = 1e9; s.openShop('shop', false); s.shopRows[0].o.buy(); });
   ok('koupě v obchodě', await S(p, (s) => s.d.up.length + (s.d.pubs[0].mgr ? 1 : 0) >= 1));

@@ -681,5 +681,15 @@
  "nejdřív automat": "сначала автомат",
  "TRUHLA!": "СУНДУК!",
  "Číšníci začínají znovu od úrovně 1 – zkušenosti teď přibývají pomaleji": "Официанты начинают снова с 1 уровня – опыт теперь растёт медленнее",
- "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "Вильма ушла (теперь 3 официанта) – возвращено {n} coins"
+ "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "Вильма ушла (теперь 3 официанта) – возвращено {n} coins",
+ "Hospoda je plná!": "Трактир полон!",
+ "Kasa přetéká – přijď vybrat výdělek, jinak se už nic nepřičítá.": "Касса переполнена – забери выручку, больше ничего не копится.",
+ "Toulec je plný": "Колчан полон",
+ "Šipky čekají na hod – další už nepřibývají.": "Дротики ждут броска – новые не прибавляются.",
+ "Víkend v chrámu začíná": "Начинаются выходные в храме",
+ "Cthulhu se probudil – chrám v R'lyeh je otevřený.": "Ктулху проснулся – храм в Р'льехе открыт.",
+ "Upozornění": "Уведомления",
+ "Upozornění nejsou povolená v telefonu": "Уведомления запрещены на телефоне",
+ "Na webu přijdou, jen dokud je prohlížeč otevřený": "В браузере – только пока он открыт",
+ "plná hospoda, víkend v chrámu": "полный трактир, выходные в храме"
 }

@@ -14,7 +14,8 @@ import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
 import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward } from '../core/league';
 import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, nightLen, nightShare, switchPhase, nightCost, nightCostN, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
 import type { TempleHost } from './TempleScene';
-import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts } from '../core/darts';
+import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
+import { notify, NOTE, Note } from '../core/notify';
 import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
@@ -57,6 +58,8 @@ const SBAR = 46;
 const VIEW_H = 404;
 const TABH = 56;
 const OPTS_KEY = 'pubidle_opts';
+/** upozornění na mobilu zapnutá (nastavení) */
+let notesOn = false;
 
 /** Stáhne soubor se zálohou hry */
 function downloadBackup(text: string) {
@@ -104,7 +107,8 @@ function downloadOffline() {
 function loadOpts() {
   try {
     // sv/mv = hlasitost zvuků/hudby 0–1; starší uložení měla jen zapnuto/vypnuto (snd/mus)
-    const o = JSON.parse(localStorage.getItem(OPTS_KEY) ?? '{}') as { snd?: boolean; mus?: boolean; sv?: number; mv?: number };
+    const o = JSON.parse(localStorage.getItem(OPTS_KEY) ?? '{}') as { snd?: boolean; mus?: boolean; sv?: number; mv?: number; nt?: boolean };
+    notesOn = !!o.nt;
     sfx.setSfxVol(o.sv ?? (o.snd === false ? 0 : 1));
     sfx.setMusVol(o.mv ?? (o.mus === false ? 0 : 1));
   } catch {
@@ -113,7 +117,7 @@ function loadOpts() {
 }
 function saveOpts() {
   try {
-    localStorage.setItem(OPTS_KEY, JSON.stringify({ sv: sfx.sfxVol, mv: sfx.musVol }));
+    localStorage.setItem(OPTS_KEY, JSON.stringify({ sv: sfx.sfxVol, mv: sfx.musVol, nt: notesOn }));
   } catch {
     /* nic */
   }
@@ -390,10 +394,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (dc) this.d.coins = dc;
     const save = () => {
       if (document.visibilityState === 'visible') {
+        void notify.cancel();
         this.offline();
         this.leagueCheck();
+      } else {
+        store(this.d);
+        if (notesOn) void notify.schedule(this.notes());
       }
-      else store(this.d);
     };
     document.addEventListener('visibilitychange', save);
     window.addEventListener('pagehide', save);
@@ -402,6 +409,23 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       window.removeEventListener('pagehide', save);
     });
     this.refresh();
+  }
+
+  /** upozornění na dobu, kdy je hra zavřená: plná hospoda, plný toulec, víkend v chrámu */
+  notes(now = Date.now()): Note[] {
+    const out: Note[] = [];
+    if (this.d.pubs.some((p) => this.rate(p) > 0))
+      out.push({ id: NOTE.full, at: now + this.offCap() * 1000, title: t('Hospoda je plná!'), body: t('Kasa přetéká – přijď vybrat výdělek, jinak se už nic nepřičítá.') });
+    const ds = this.d.darts;
+    if (ds && this.d.nightInfo && !autoOn(ds) && ds.have < dartCap(ds.up))
+      out.push({ id: NOTE.darts, at: now + (dartCap(ds.up) - ds.have) * dartMs(ds.up, this.ts().dspeed), title: t('Toulec je plný'), body: t('Šipky čekají na hod – další už nepřibývají.') });
+    if (!this.tileLock('temple') && !isWeekend(now)) {
+      const sat = new Date(now);
+      sat.setDate(sat.getDate() + ((6 - sat.getDay() + 7) % 7));
+      sat.setHours(9, 0, 0, 0);
+      out.push({ id: NOTE.temple, at: sat.getTime(), title: t('Víkend v chrámu začíná'), body: t('Cthulhu se probudil – chrám v R\'lyeh je otevřený.') });
+    }
+    return out;
   }
 
   /** výdělek za dobu nepřítomnosti (běží jen stanice s kostlivcem), strop 8 h */
@@ -1518,10 +1542,24 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.drawBtn(ld, t('Nahrát'), true, 'amber');
       this.shopObjs.push(sv.bg, sv.label, sv.zone, ld.bg, ld.label, ld.zone);
     }
+    if (notify.available)
+      rows.push([t('Upozornění'), notesOn ? t('zapnuto') : t('vypnuto'), () => {
+        if (notesOn) {
+          notesOn = false;
+          return;
+        }
+        void notify.permit().then((ok) => {
+          notesOn = ok;
+          saveOpts();
+          if (!ok) this.banner(this.views[0].cam, t('Upozornění nejsou povolená v telefonu'));
+          else if (notify.webOnly) this.banner(this.views[0].cam, t('Na webu přijdou, jen dokud je prohlížeč otevřený'));
+          if (this.tab === 'opts') this.openShop('opts', false);
+        });
+      }]);
     rows.forEach(([title, val, fn], i) => {
       i += vols.length + 1;
       const y = y0 + i * RH;
-      this.row(y, RH, D, title, i === 4 ? t('spustíš ji z disku bez internetu') : '');
+      this.row(y, RH, D, title, title === t('Hra do složky') ? t('spustíš ji z disku bez internetu') : title === t('Upozornění') ? t('plná hospoda, víkend v chrámu') : '');
       const b = this.btn(W - 232, y + 14, 210, 60, () => {
         fn();
         saveOpts();

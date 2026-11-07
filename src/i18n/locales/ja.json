@@ -681,5 +681,15 @@
  "nejdřív automat": "先に自動投げ",
  "TRUHLA!": "宝箱！",
  "Číšníci začínají znovu od úrovně 1 – zkušenosti teď přibývají pomaleji": "ウェイターはレベル1から再スタート – 経験値の伸びが遅くなった",
- "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "ヴィルマが辞めた（ウェイターは3人に）– {n} coins返金"
+ "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "ヴィルマが辞めた（ウェイターは3人に）– {n} coins返金",
+ "Hospoda je plná!": "酒場が満杯！",
+ "Kasa přetéká – přijď vybrat výdělek, jinak se už nic nepřičítá.": "レジがあふれています。回収しないともう増えません。",
+ "Toulec je plný": "矢筒が満杯",
+ "Šipky čekají na hod – další už nepřibývají.": "ダーツが投げられるのを待っています。もう増えません。",
+ "Víkend v chrámu začíná": "神殿の週末が始まる",
+ "Cthulhu se probudil – chrám v R'lyeh je otevřený.": "クトゥルフが目覚めた。ルルイエの神殿が開いた。",
+ "Upozornění": "通知",
+ "Upozornění nejsou povolená v telefonu": "端末で通知が許可されていません",
+ "Na webu přijdou, jen dokud je prohlížeč otevřený": "Webではブラウザが開いている間のみ",
+ "plná hospoda, víkend v chrámu": "満杯の酒場、神殿の週末"
 }

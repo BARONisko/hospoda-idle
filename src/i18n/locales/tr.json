@@ -681,5 +681,15 @@
  "nejdřív automat": "önce otomat",
  "TRUHLA!": "SANDIK!",
  "Číšníci začínají znovu od úrovně 1 – zkušenosti teď přibývají pomaleji": "Garsonlar yeniden 1. seviyeden başlıyor – deneyim artık daha yavaş artıyor",
- "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "Vilma ayrıldı (artık 3 garson) – {n} coins iade edildi"
+ "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "Vilma ayrıldı (artık 3 garson) – {n} coins iade edildi",
+ "Hospoda je plná!": "Meyhane doldu!",
+ "Kasa přetéká – přijď vybrat výdělek, jinak se už nic nepřičítá.": "Kasa taşıyor – kazancını topla, artık bir şey eklenmiyor.",
+ "Toulec je plný": "Sadak dolu",
+ "Šipky čekají na hod – další už nepřibývají.": "Oklar atılmayı bekliyor – yenisi gelmiyor.",
+ "Víkend v chrámu začíná": "Tapınak hafta sonu başlıyor",
+ "Cthulhu se probudil – chrám v R'lyeh je otevřený.": "Cthulhu uyandı – R'lyeh tapınağı açık.",
+ "Upozornění": "Bildirimler",
+ "Upozornění nejsou povolená v telefonu": "Telefonda bildirimlere izin verilmiyor",
+ "Na webu přijdou, jen dokud je prohlížeč otevřený": "Web'de yalnızca tarayıcı açıkken gelir",
+ "plná hospoda, víkend v chrámu": "dolu meyhane, tapınak hafta sonu"
 }

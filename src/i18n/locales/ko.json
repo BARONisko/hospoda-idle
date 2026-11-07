@@ -681,5 +681,15 @@
  "nejdřív automat": "자동 먼저",
  "TRUHLA!": "상자!",
  "Číšníci začínají znovu od úrovně 1 – zkušenosti teď přibývají pomaleji": "웨이터가 레벨 1부터 다시 시작 – 이제 경험치가 더 천천히 오릅니다",
- "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "빌마가 떠났습니다 (이제 웨이터 3명) – {n} coins 환불"
+ "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "빌마가 떠났습니다 (이제 웨이터 3명) – {n} coins 환불",
+ "Hospoda je plná!": "주점이 가득 찼어요!",
+ "Kasa přetéká – přijď vybrat výdělek, jinak se už nic nepřičítá.": "금고가 넘칩니다. 수익을 가져가세요, 더 이상 쌓이지 않아요.",
+ "Toulec je plný": "화살통이 가득 참",
+ "Šipky čekají na hod – další už nepřibývají.": "다트가 기다려요. 더 늘지 않아요.",
+ "Víkend v chrámu začíná": "신전 주말 시작",
+ "Cthulhu se probudil – chrám v R'lyeh je otevřený.": "크툴루가 깨어났다. 르뤼에 신전이 열렸다.",
+ "Upozornění": "알림",
+ "Upozornění nejsou povolená v telefonu": "휴대폰에서 알림이 허용되지 않음",
+ "Na webu přijdou, jen dokud je prohlížeč otevřený": "웹에서는 브라우저가 열려 있을 때만",
+ "plná hospoda, víkend v chrámu": "가득 찬 주점, 신전 주말"
 }

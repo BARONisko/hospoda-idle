@@ -681,5 +681,15 @@
  "nejdřív automat": "先买自动",
  "TRUHLA!": "宝箱！",
  "Číšníci začínají znovu od úrovně 1 – zkušenosti teď přibývají pomaleji": "服务员从1级重新开始 – 经验现在增长更慢",
- "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "维尔玛离职了（现在3名服务员）– 退还{n} coins"
+ "Vilma odešla (číšníci jsou teď 3) – vráceno {n} coins": "维尔玛离职了（现在3名服务员）– 退还{n} coins",
+ "Hospoda je plná!": "酒馆满了！",
+ "Kasa přetéká – přijď vybrat výdělek, jinak se už nic nepřičítá.": "钱柜满了——快来收钱，否则不再增加。",
+ "Toulec je plný": "箭袋满了",
+ "Šipky čekají na hod – další už nepřibývají.": "飞镖等着投掷——不会再增加。",
+ "Víkend v chrámu začíná": "神殿周末开始",
+ "Cthulhu se probudil – chrám v R'lyeh je otevřený.": "克苏鲁苏醒了——拉莱耶神殿开放。",
+ "Upozornění": "通知",
+ "Upozornění nejsou povolená v telefonu": "手机未允许通知",
+ "Na webu přijdou, jen dokud je prohlížeč otevřený": "网页版仅在浏览器打开时送达",
+ "plná hospoda, víkend v chrámu": "酒馆满了、神殿周末"
 }
