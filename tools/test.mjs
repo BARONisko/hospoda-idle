@@ -110,9 +110,10 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   });
   ok('liga: výhra = postup, prohra = sestup', lg);
   // 6) prestiž
-  await S(p, (s) => { s.d.run = 1e8; s.askPrestige(); s.prestige(); });
+  await S(p, (s) => { s.d.run = 1e8; s.d.pubs[0].st.tap.lvl = 500; s.askPrestige(); s.prestige(); });
   await p.waitForTimeout(800);
-  ok('prestiž: 2 hospody a krígly', await S(p, (s) => s.d.pubs.length === 2 && s.d.krigle >= 31 && s.views.length === 2));
+  ok('prestiž: 2 hospody a krígly', await S(p, (s) => s.d.pubs.length === 2 && s.d.krigle >= 11 && s.views.length === 2));
+  ok('hvězdy: pípa na 500 = po hygieně 1. hvězda, úrovně 10× dražší', await S(p, (s) => s.d.stars?.['1_tap'] === 1 && s.cards.length > 0 && s.offer(s.d.pubs[0], s.cards[0].def).price >= 10 * Math.ceil(5 * 1.07 ** s.d.pubs[0].st.tap.lvl) - 10));
   ok('prestiž: startovní kapitál a věrní manažeři', await S(p, (s) => s.d.coins >= 1000 && s.d.pubs[0].mgr === true));
   ok('prestiž: výzdoba zůstala', await S(p, (s) => s.has('portrait')));
   ok('bez chyb v konzoli', p.errors.length === 0);

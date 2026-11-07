@@ -791,5 +791,7 @@
  "{s}: chybí {k} milníky": "{s}: faltan {k} hitos",
  "{s}: chybí {k} milníků": "{s}: faltan {k} hitos",
  "▶ zásobuje +{v} %": "▶ abastece +{v} %",
- "♛ {s}": "♛ {s}"
+ "♛ {s}": "♛ {s}",
+ "Nová ekonomika: krígly {a} → {b}": "Nueva economía: jarras {a} → {b}",
+ "★ {n}. hvězda po hygieně": "★ estrella {n} tras la higiene"
 }

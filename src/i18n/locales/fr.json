@@ -791,5 +791,7 @@
  "{s}: chybí {k} milníky": "{s} : encore {k} paliers",
  "{s}: chybí {k} milníků": "{s} : encore {k} paliers",
  "▶ zásobuje +{v} %": "▶ approvisionne +{v} %",
- "♛ {s}": "♛ {s}"
+ "♛ {s}": "♛ {s}",
+ "Nová ekonomika: krígly {a} → {b}": "Nouvelle économie : chopes {a} → {b}",
+ "★ {n}. hvězda po hygieně": "★ {n}e étoile après l’hygiène"
 }

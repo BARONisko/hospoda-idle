@@ -791,5 +791,7 @@
  "{s}: chybí {k} milníky": "{s}: 마일스톤 {k}개 남음",
  "{s}: chybí {k} milníků": "{s}: 마일스톤 {k}개 남음",
  "▶ zásobuje +{v} %": "▶ 공급 +{v} %",
- "♛ {s}": "♛ {s}"
+ "♛ {s}": "♛ {s}",
+ "Nová ekonomika: krígly {a} → {b}": "새 경제: 맥주잔 {a} → {b}",
+ "★ {n}. hvězda po hygieně": "★ 위생 점검 후 {n}번째 별"
 }

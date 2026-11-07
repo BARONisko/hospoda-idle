@@ -33,8 +33,9 @@ export const STATION_NAMES: Record<number, Record<string, string>> = {
   4: { tap: t('Pípa z hlubin'), kitchen: t('Obětní kotel'), cellar: t('Potopená kaple'), dice: t('Kostky osudu') },
 };
 export const PUB_NAMES: Record<number, string> = { 1: t('Pajzl u Berana'), 2: t('Sklepní krčma'), 3: t('Žabákův podnik'), 4: t('Chrám Cthulhu') };
-/** každá další hospoda vydělává řádově víc */
-export const actMult = (act: number) => 50 ** (act - 1);
+/** každá další hospoda vydělává řádově víc (dřív 50×, teď 10× – menší čísla, víc prostoru pro bonusy) */
+export const ACT_STEP = 10;
+export const actMult = (act: number) => ACT_STEP ** (act - 1);
 
 export const MILESTONES = [25, 50, 100, 200, 300, 400, 500];
 
@@ -104,6 +105,18 @@ export const supplyOut = (pubs: PubLike[], p: PubLike, id: string) => (pubs.some
 /** celkový násobek stanice ze stylu, zásob a mixu stylů */
 export const styleSupplyMult = (pubs: PubLike[], p: PubLike, id: string) => (pubStyle(p) === id ? STYLE_MULT : 1) * supplyIn(pubs, p, id) * styleMix(pubs);
 
+/** hvězdy stanic: úroveň STAR_LVL v běhu = po hygieně hvězda (max STAR_MAX); každá +10 % výdělek celé hospody,
+ *  úrovně té stanice pak STAR_COST× dražší za každou hvězdu */
+export const STAR_LVL: Record<string, number> = { tap: 500, kitchen: 400, cellar: 300, dice: 300 };
+export const STAR_MAX = 5;
+export const STAR_BONUS = 0.1;
+export const STAR_COST = 10;
+export const starKey = (act: number, id: string) => `${act}_${id}`;
+export const starsOf = (stars: Record<string, number> | undefined, act: number, id: string) => stars?.[starKey(act, id)] ?? 0;
+/** násobek výdělku hospody z hvězd všech jejích stanic */
+export const starMult = (stars: Record<string, number> | undefined, act: number) => 1 + STAR_BONUS * STATIONS.reduce((a, d) => a + starsOf(stars, act, d.id), 0);
+export const starCost = (stars: Record<string, number> | undefined, act: number, id: string) => STAR_COST ** starsOf(stars, act, id);
+
 /** jednorázové vylepšení z obchodu: ×3 výdělek stanice v dané hospodě */
 export interface UpgradeDef {
   id: string;
@@ -155,9 +168,10 @@ export const BOOST_S = 30;
 export const BOOST_CD = 300;
 
 /** prestiž: krígly za výdělek v běhu, každý +KRIGL_BONUS výdělku navždy */
-export const kriglyFor = (run: number) => Math.floor(Math.sqrt(run / 1e5));
+/** krígly rostou se čtvrtou odmocninou tržby (dřív druhou → tisíce až miliony krígel) */
+export const kriglyFor = (run: number) => Math.floor(2 * (run / 1e5) ** 0.25);
 export const KRIGL_BONUS = 0.009;
-export const PRESTIGE_MIN = 10;
+export const PRESTIGE_MIN = 6;
 /** první hygiena (cesta k 2. hospodě) jde dřív: stačí 4 krígly (~1,6M tržby, cca 15 min) */
 export const PRESTIGE_FIRST = 4;
 export const prestigeMin = (prestiges: number) => (prestiges > 0 ? PRESTIGE_MIN : PRESTIGE_FIRST);
@@ -208,7 +222,7 @@ export const KRIGL_SHOP: KriglItem[] = [
   { id: 'offline', name: t('Delší spánek'), cost: exp(2, 1.035), eff: (n) => t('spánek {h} (max 12 h)', { h: hm(OFFLINE_BASE_H + kOffline(n)) }) },
   { id: 'events', name: t('Rušnější hospoda'), cost: (n) => (n < 2 ? [15, 45][n] : Math.ceil(45 * 1.15 ** (n - 1))), eff: (n) => t('události o {v} % častěji', { v: pc((1 / kEvents(n) - 1) * 100) }) },
   { id: 'krigly', name: t('Hlubší sklep'), cost: exp(40, 2.5), eff: (n) => t('krígly z hygieny +{v} %', { v: Math.round(kKrigly(n) * 100) }) },
-  { id: 'keepMgr', name: t('Věrní manažeři'), cost: () => 100000, max: 1, eff: (n) => (n ? t('manažeři zůstanou i po hygieně') : t('manažeři po hygieně odejdou')) },
+  { id: 'keepMgr', name: t('Věrní manažeři'), cost: () => 200, max: 1, eff: (n) => (n ? t('manažeři zůstanou i po hygieně') : t('manažeři po hygieně odejdou')) },
   { id: 'cthulhu', name: t('Zlatý výčep'), cost: exp(300, 3), eff: (n) => t('výdělek všude ×{v}', { v: pc(kCthulhu(n)) }) },
 ];
 /** je položka na maximu (strop úrovní nebo už nic nepřidá) */

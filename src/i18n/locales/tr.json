@@ -791,5 +791,7 @@
  "{s}: chybí {k} milníky": "{s}: {k} kilometre taşı kaldı",
  "{s}: chybí {k} milníků": "{s}: {k} kilometre taşı kaldı",
  "▶ zásobuje +{v} %": "▶ tedarik +%{v}",
- "♛ {s}": "♛ {s}"
+ "♛ {s}": "♛ {s}",
+ "Nová ekonomika: krígly {a} → {b}": "Yeni ekonomi: kupalar {a} → {b}",
+ "★ {n}. hvězda po hygieně": "★ hijyenden sonra {n}. yıldız"
 }

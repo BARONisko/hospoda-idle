@@ -200,3 +200,11 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   - Sim (opravená): 1 hospoda prestiž 32 → 27 min, 40 krígel 2,11 → 1,93 h (čísla stažena z ×1,5/+25 %).
 - NÁVRH uživatele (čeká na upřesnění): hvězdy stanice – úroveň 500 = ⭐ (+10 %), platí po vynulování (hygieně),
   další ⭐ několikrát dražší, max 5.
+- HOTOVO (přání uživatele): hvězdy stanic jako rámečky – úroveň 500/400/300/300 (Pípa/Kuchyně/Sklep/Kostky) v běhu
+  = po hygieně +1 hvězda (max 5, uložení stars `${act}_${id}`); každá +10 % výdělek celé hospody, úrovně té stanice
+  10× dražší za hvězdu. Karta: rámeček bronz/stříbro/zlato/modrá/fialová + 1–5 hvězdiček za názvem, v řádku úrovně
+  „★ 500“ (cíl), vedle pruhu „★ 2. hvězda po hygieně“.
+- HOTOVO (přání uživatele „menší čísla“): hospody 10× místo 50× (ACT_STEP), krígly = ⌊2·(tržba/1e5)^¼⌋ (dřív √),
+  PRESTIGE_MIN 10 → 6, Věrní manažeři 100 000 → 200 krígel. Přepočet uložení (eco2): krígly → ⌊2·√K⌋, coins
+  a tržba běhu ÷ 5^(nejvyšší hospoda−1), banner „Nová ekonomika: krígly A → B“.
+  Sim: 1 hospoda 1. hygiena 15 min, prestiž (6 krígel) 25 min.

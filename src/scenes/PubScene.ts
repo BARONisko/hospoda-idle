@@ -6,7 +6,7 @@ import { confetti, rays, bigText, coinFountain, popText, punch, flashRect } from
 import { big, dur } from '../core/num';
 import { WAITERS, WAITER_MAX, BAR_CAP, crew, tripTime, smileBonus, hireCost as wHireCost, UP_MAX as W_UP_MAX, freePoints, xpProgress, xpFor, spent as wSpent, earned as wEarned, MAX_POINTS, upName as wUpName, waiterLvl, waiterRate, tray, SMILE_STEP, START_CREW, beersPerCycle, type WaiterUp } from '../core/waiters';
 import { milestoneCount } from '../core/economy';
-import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H, STYLES, pubStyle, styleGap, styleCount, hasStyle, styleSupplyMult, supplyIn, supplyOut, STYLE_MIX } from '../core/economy';
+import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H, STYLES, pubStyle, styleGap, styleCount, hasStyle, styleSupplyMult, supplyIn, supplyOut, STYLE_MIX, STAR_LVL, STAR_MAX, starsOf, starMult, starCost, starKey } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { iap, ProductId, PRODUCTS } from '../core/shop';
@@ -264,6 +264,18 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       for (let l = 0; l < n; l++) this.d.krigle += Math.ceil(300 * 6 ** l);
       if (this.d.kup) delete this.d.kup.cthulhu;
       this.d.kup3 = true;
+    }
+    // ekonomika v2 (přání uživatele: menší čísla): krígly přepočtené na novou křivku (2·√K), coins a tržba běhu
+    // podle nového násobku hospod (10× místo 50×)
+    if (!this.d.eco2) {
+      const old = this.d.krigle;
+      this.d.krigle = Math.floor(2 * Math.sqrt(Math.max(0, old)));
+      const top = Math.max(1, ...this.d.pubs.map((p) => p.act));
+      const f = 5 ** (top - 1);
+      this.d.coins /= f;
+      this.d.run /= f;
+      this.d.eco2 = true;
+      if (old > 0) this.time.delayedCall(1500, () => this.views[0] && this.banner(this.views[0].cam, t('Nová ekonomika: krígly {a} → {b}', { a: big(old), b: big(this.d.krigle) }), true));
     }
     this.events.off('guestArrive');
     this.events.on('guestArrive', () => (this.d.gxp = (this.d.gxp ?? 0) + 1 + this.ts().gxp));
@@ -2196,7 +2208,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     let best: { name: string; cost: number } | null = null;
     for (const def of STATIONS) {
       const lvl = p.st[def.id]?.lvl ?? 0;
-      const cost = Math.ceil(costN(def, lvl, 1) * actMult(p.act));
+      const cost = Math.ceil(costN(def, lvl, 1) * actMult(p.act) * starCost(this.d.stars, p.act, def.id));
       if (!best || cost < best.cost) best = { name: STATION_NAMES[p.act][def.id], cost };
     }
     if (best && d.coins >= best.cost) return { text: t('Kup další úroveň: {s}. Každých 25 úrovní výdělek ×2.', { s: best.name }) };
@@ -2427,6 +2439,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   private prestige() {
     const k = this.kriglyNow();
+    // hvězdy stanic: úroveň STAR_LVL v tomhle běhu = +1 hvězda (nejvýš STAR_MAX)
+    for (const p of this.d.pubs)
+      for (const def of STATIONS) {
+        const n = starsOf(this.d.stars, p.act, def.id);
+        if (n < STAR_MAX && (p.st[def.id]?.lvl ?? 0) >= STAR_LVL[def.id]) (this.d.stars ??= {})[starKey(p.act, def.id)] = n + 1;
+      }
     const n = Math.min(MAX_PUBS, this.d.pubs.length + 1);
     if (n > this.d.pubs.length) this.d.pubIntro = n;
     this.d.krigle += k;
@@ -2636,7 +2654,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** kolik úrovní a za kolik se koupí podle přepínače ×1/×10/×100/MAX */
   private offer(p: PubState, def: StationDef) {
     const lvl = this.st(p, def.id).lvl;
-    const m = actMult(p.act);
+    const m = actMult(p.act) * starCost(this.d.stars, p.act, def.id);
     // režim „Další“ (-1): přesně tolik úrovní, kolik chybí do dalšího milníku
     const n = lvl === 0 ? 1 : this.mode < 0 ? Math.max(1, (nextMilestone(lvl) ?? lvl + 1) - lvl) : this.mode || Math.max(1, affordable(def, lvl, this.d.coins / m));
     return { n, price: Math.ceil(costN(def, lvl, n) * m) };
@@ -2903,7 +2921,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * styleSupplyMult(this.d.pubs, p, def.id);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act);
   }
 
   // ---------- obchod s krígly ----------
@@ -3606,6 +3624,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private cardTag(p: PubState, id: string, open: boolean): { text: string; col: string } | null {
     if (!open || this.night) return null;
     const pubs = this.d.pubs;
+    const sn = starsOf(this.d.stars, p.act, id);
+    if (sn < STAR_MAX && (p.st[id]?.lvl ?? 0) >= STAR_LVL[id]) return { text: t('★ {n}. hvězda po hygieně', { n: sn + 1 }), col: PAL.gold };
     const out = supplyOut(pubs, p, id);
     if (pubStyle(p) === id) return { text: t('♛ {s}', { s: STYLES[id].name }) + (out > 0 ? ' · ▶ +' + Math.round(out * 100) + ' %' : ''), col: PAL.gold };
     if (out > 0) return { text: t('▶ zásobuje +{v} %', { v: Math.round(out * 100) }), col: PAL.sand };
@@ -3613,6 +3633,16 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (inn > 1) return { text: t('zásoby ×{m}', { m: String(Math.round(inn * 100) / 100).replace('.', ',') }), col: PAL.mint };
     const k = styleGap(p, id);
     return { text: k === 1 ? t('{s}: chybí 1 milník', { s: STYLES[id].name }) : k < 5 ? t('{s}: chybí {k} milníky', { s: STYLES[id].name, k }) : t('{s}: chybí {k} milníků', { s: STYLES[id].name, k }), col: PAL.fog };
+  }
+
+  /** hvězdička (5 cípů) s tmavým stínem */
+  private starShape(g: Phaser.GameObjects.Graphics, x: number, y: number, r: number, c: number) {
+    const pts = Array.from({ length: 10 }, (_, k) => {
+      const rr = k % 2 ? r * 0.45 : r, a = -Math.PI / 2 + (k * Math.PI) / 5;
+      return { x: x + Math.cos(a) * rr, y: y + Math.sin(a) * rr };
+    });
+    g.fillStyle(col('ink')).fillPoints(pts.map((q) => ({ x: q.x + 1.5, y: q.y + 1.5 })), true);
+    g.fillStyle(c).fillPoints(pts, true);
   }
 
   styleSign?: { g: Phaser.GameObjects.Graphics; a: Phaser.GameObjects.Text; b: Phaser.GameObjects.Text };
@@ -3666,7 +3696,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const staff = c.def.staff * actMult(p.act) * (1 - this.ts().staff);
       c.name.setText(STATION_NAMES[p.act][c.def.id]).setAlpha(open ? 1 : 0.55);
       const ms = nextMilestone(s.lvl);
-      c.lvl.setText(open ? (ms ? t('úroveň {n} · ×2 na {m}', { n: s.lvl, m: ms }) : t('úroveň {n}', { n: s.lvl })) : t('zavřeno'));
+      c.lvl.setText(open ? (ms ? t('úroveň {n} · ×2 na {m}', { n: s.lvl, m: ms }) : t('úroveň {n}', { n: s.lvl })) + (starsOf(this.d.stars, p.act, c.def.id) < STAR_MAX ? ' · ★ ' + STAR_LVL[c.def.id] : '') : t('zavřeno'));
+      c.lvl.setScale(Math.min(1, 290 / Math.max(1, c.lvl.width)));
       c.info.setText(open ? t('+{n} / {s} s', { n: big(this.pay(p, c.def)), s: +this.cyc(c.def).toFixed(2) }) : '');
       this.drawBtn(c.buy, open ? `+${n}\n${big(price)}` : t('Otevřít\n{n}', { n: big(price) }), this.d.coins >= price, 'green');
       const sl = STAFF_LABEL[c.def.id];
@@ -3683,7 +3714,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       c.tag.setText(warn || !tag ? '' : tag.text).setColor(tag?.col ?? PAL.sand);
       c.tag.setScale(Math.min(1, 132 / Math.max(1, c.tag.width)));
       c.bar.clear();
-      if (pubStyle(p) === c.def.id) c.bar.lineStyle(3, col('gold')).strokeRoundedRect(11, c.y + 1, W - 22, CARD_H - 10, 10);
+      const stars = starsOf(this.d.stars, p.act, c.def.id);
+      if (stars > 0) {
+        // rámeček podle počtu hvězd: bronz, stříbro, zlato, diamant, purpur
+        const fc = col((['copper', 'bone', 'gold', 'sky', 'plum'] as const)[stars - 1]);
+        c.bar.lineStyle(4, fc).strokeRoundedRect(11, c.y + 1, W - 22, CARD_H - 10, 10);
+        const sx = 26 + c.name.width + 16;
+        for (let k = 0; k < stars; k++) this.starShape(c.bar, sx + k * 20, c.y + 25, 8, fc);
+      } else if (pubStyle(p) === c.def.id) c.bar.lineStyle(3, col('gold')).strokeRoundedRect(11, c.y + 1, W - 22, CARD_H - 10, 10);
       c.bar.fillStyle(col('dusk')).fillRoundedRect(26, c.y + 72, bw, 18, 6);
       if (open && s.prog > 0) c.bar.fillStyle(col(s.auto ? 'mint' : 'amber')).fillRoundedRect(26, c.y + 72, Math.max(12, bw * Math.min(1, s.prog)), 18, 6);
       if (open && !s.auto && s.prog === 0) c.info.setText(t('ťukni sem!'));

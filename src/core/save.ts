@@ -56,6 +56,10 @@ export interface Save {
   kup2?: boolean;
   /** vrácené krígly za starý Cthulhu (×10) */
   kup3?: boolean;
+  /** ekonomika v2: menší čísla (hospody 10× místo 50×, krígly ze 4. odmocniny) – přepočteno */
+  eco2?: boolean;
+  /** hvězdy stanic: klíč `${act}_${stanice}` → počet (0–5) */
+  stars?: Record<string, number>;
   /** koupená výzdoba (id) – zůstává i po hygieně */
   decor?: string[];
   /** pivovar (zůstává i po hygieně) */

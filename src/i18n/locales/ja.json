@@ -791,5 +791,7 @@
  "{s}: chybí {k} milníky": "{s}：あと{k}マイルストーン",
  "{s}: chybí {k} milníků": "{s}：あと{k}マイルストーン",
  "▶ zásobuje +{v} %": "▶ 供給 +{v} %",
- "♛ {s}": "♛ {s}"
+ "♛ {s}": "♛ {s}",
+ "Nová ekonomika: krígly {a} → {b}": "新しい経済：ジョッキ {a} → {b}",
+ "★ {n}. hvězda po hygieně": "★ 衛生検査後に{n}つ目の星"
 }

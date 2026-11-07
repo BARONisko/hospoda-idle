@@ -791,5 +791,7 @@
  "{s}: chybí {k} milníky": "{s}: brakuje {k} progów",
  "{s}: chybí {k} milníků": "{s}: brakuje {k} progów",
  "▶ zásobuje +{v} %": "▶ zaopatruje +{v} %",
- "♛ {s}": "♛ {s}"
+ "♛ {s}": "♛ {s}",
+ "Nová ekonomika: krígly {a} → {b}": "Nowa ekonomia: kufle {a} → {b}",
+ "★ {n}. hvězda po hygieně": "★ {n}. gwiazdka po higienie"
 }
