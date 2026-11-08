@@ -3036,19 +3036,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (def.id === 'tap') sfx.pour();
       else sfx.click();
     }
-    // kombo: rychlé ťukání za sebou (jen efekt a zvuk)
+    // kombo: rychlé ťukání za sebou – jen stoupající zvuk (nápisy „KOMBO ×n“ zrušeny: nic nedávaly a zaplňovaly kartu)
     if (s.lvl > 0 && !s.auto) {
       this.comboN = this.comboT > 0 ? this.comboN + 1 : 1;
       this.comboT = 0.9;
-      const card = this.cards.find((k) => k.pub === i && k.def.id === def.id);
-      if (this.comboN >= 3 && card) {
-        sfx.combo(this.comboN);
-        popText(this, 160 + Phaser.Math.Between(-60, 60), card.y + 20, t('KOMBO ×{n}', { n: this.comboN }), this.comboN >= 10 ? PAL.gold : PAL.white, this.comboN >= 10 ? 30 : 24);
-        if (this.comboN % 10 === 0) {
-          confetti(this, 160, card.y + 40, 20, 459, 0.6);
-          this.cameras.main.shake(120, 0.004);
-        }
-      }
+      if (this.comboN >= 3) sfx.combo(this.comboN);
     }
   }
 
