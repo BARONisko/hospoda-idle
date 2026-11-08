@@ -290,3 +290,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Sběrač zdražen (src/core/collector.ts, výpočet tools/sim/coll.mjs): najmout 500 / 20 K / 300 K kostí, rychlost f·(100+(n+1)^1,5)
   (f = 1/3/9 podle hospody, max 1,5 s ≈ 298 úrovní), +1 bublina 1000·f·4^n, nejvýš 5. Celkem 13 M kostí → běžný hráč
   (~100 K kostí/den, třetina na sběrače) max ~13 měsíců, zapálený ~4 měs., 3. sběrač najmout ~3–9 dní (dřív za den).
+- HOTOVO hospoda 63 – VĚRNOST HOSTŮ (výběr uživatele A + vzhled A2, docs/navrhy-skilly/vernost-A123.png; src/core/loyalty.ts):
+  každé obsloužení hosta (bublina: ťuk, sběrač, hvězda stromu) = 1 bod jeho druhu (PubView.lastKey → tipReward, d.loy).
+  Úrovně 1–5 (tečky) za 10/50/200/1000/5000; úroveň = +1 % spropitné od toho druhu; úroveň 5 = „věrný host“, zlatý rámeček
+  a malý trvalý bonus (stat podle pořadí ve Sbírce, +0,9 %). Nová úroveň = jen plovoucí nápis u hosta (žádný banner).
+  Sbírka: záložky po hospodách + Sezóna, velké karty (tečky + pruh), ťuknutí = detail dole. Test v npm test.

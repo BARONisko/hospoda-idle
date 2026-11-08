@@ -940,5 +940,12 @@
  "{s}: {r}!": "{s}: {r}!",
  "od 5. úrovně hostinského": "주인장 레벨 5부터",
  "bubliny\nmax": "말풍선\n최대",
- "výdělek stanice +{a} %": "스테이션 수익 +{a}%"
+ "výdělek stanice +{a} %": "스테이션 수익 +{a}%",
+ "věrný host": "단골손님",
+ "věrný host!": "단골손님!",
+ "obslouženo {a} / {b}": "응대 {a} / {b}",
+ "spropitné od něj +{v} %": "이 손님 팁 +{v}%",
+ "na 5: ": "5에서: ",
+ "Sezóna": "시즌",
+ "{n}: věrnost {l}!": "{n}: 충성 {l}!"
 }

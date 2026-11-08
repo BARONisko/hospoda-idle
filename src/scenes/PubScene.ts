@@ -22,6 +22,7 @@ import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weeken
 import { TALISMANS, STAT_NAMES, talisCost, stats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { TREE, TREE_BY_ID, TREE_BRANCHES, TREE_COLORS, STAR_TEXT, treeSpent, treeCan, hasStar, treeStats, xpNeed, oldXpNeed, lvlFromTotal, respecCost, pathX, type StarId, type TreeNode } from '../core/skilltree';
 import { collHire, collSpdCost, collAmtCost, COLL_AMT_MAX } from '../core/collector';
+import { loyLvl, loyProg, loyNext, loyTip, loyPerk, LOY_MAX } from '../core/loyalty';
 import { mastStage, mastRank, mastProg, mastPay, RANKS, RANK_COLORS, MAST_MAX } from '../core/mastery';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave, wipe } from '../core/save';
@@ -1209,6 +1210,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const a = stats(this.d.talis), b = treeStats(this.d.skills, stats({}));
     for (const k of Object.keys(a) as (keyof typeof a)[]) a[k] += b[k];
     for (const o of OSSUARY) a[o.stat] += (this.d.oss?.[o.stat] ?? 0) * o.per;
+    // štamgasti (věrnost hostů úroveň 5): každý druh vlastní malý bonus
+    this.allGuests().forEach((k, i) => {
+      if (loyLvl(this.d.loy?.[k]) >= LOY_MAX) a[loyPerk(i)[0]] += loyPerk(i)[1];
+    });
     // staty z chrámu: trvalé z truhel (d.oss) a týdenní z oltáře (platí jen do dalšího víkendu)
     for (const o of TEMPLE_STATS) a[o.stat] += (this.d.oss?.[o.stat] ?? 0) * o.per;
     const al = this.d.temple?.altar;
@@ -2563,21 +2568,74 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   // ---------- bestiář ----------
+  /** všechny druhy hostů ve Sbírce (pořadí = bonus štamgasta) */
+  private allGuests() {
+    return [...new Set([...Object.values(GUESTS).flat(), ...Object.values(SEASONS).map((x) => x.guest)])];
+  }
+
+  private guestName(key: string) {
+    return GUEST_NAMES[key] ?? Object.values(SEASONS).find((x) => x.guest === key)?.guestName ?? key;
+  }
+
+  bookSel = '';
+  bookGrp = 0;
+  /** 5 teček věrnosti (zlaté = dosažené úrovně) */
+  private loyDots(g: Phaser.GameObjects.Graphics, x: number, y: number, lvl: number, gap = 12, r = 4) {
+    for (let k = 0; k < LOY_MAX; k++) g.fillStyle(col('ink')).fillCircle(x + k * gap, y, r + 1).fillStyle(k < lvl ? col('gold') : 0x4a3f55).fillCircle(x + k * gap, y, r);
+  }
+  /** popis věrnosti druhu: úroveň, postup, bonus */
+  private loyText(key: string) {
+    const n = this.d.loy?.[key] ?? 0, l = loyLvl(n), i = this.allGuests().indexOf(key), [st, v] = loyPerk(i);
+    return {
+      n, l,
+      prog: l >= LOY_MAX ? t('věrný host!') : t('obslouženo {a} / {b}', { a: n, b: loyNext(n) }),
+      bonus: t('spropitné od něj +{v} %', { v: l }) + ' · ' + (l >= LOY_MAX ? '' : t('na 5: ')) + STAT_NAMES[st](v),
+    };
+  }
+
   private bookTab(y0: number, D: number) {
-    const all = [...new Set([...Object.values(GUESTS).flat(), ...Object.values(SEASONS).map((x) => x.guest)])];
-    this.shopObjs.push(this.add.text(W - 20, y0 + 586, `${this.d.seen.length}/${all.length}`, txt(22, PAL.gold)).setOrigin(1, 0).setDepth(D + 6));
-    all.forEach((key, i) => {
-      const cx = 10 + (i % 7) * 74 + 37;
-      const y = y0 + Math.floor(i / 7) * 114;
-      const seen = this.d.seen.includes(key);
-      const box = this.add.graphics().setDepth(D + 1);
-      box.fillStyle(col('ink'), 0.6).fillRoundedRect(cx - 34, y, 68, 108, 8);
-      const spr = this.add.sprite(cx, y + 76, key, 1).setOrigin(0.5, 1).setScale(3.6).setDepth(D + 2);
-      if (!seen) spr.setTintFill(col('dusk'));
-      const nm = this.add.text(cx, y + 92, seen ? GUEST_NAMES[key] ?? Object.values(SEASONS).find((x) => x.guest === key)?.guestName ?? key : '???', txt(14, seen ? PAL.bone : PAL.slate)).setOrigin(0.5).setDepth(D + 2);
-      nm.setScale(Math.min(1, 64 / nm.width));
-      this.shopObjs.push(box, spr, nm);
+    // Sbírka s věrností hostů (výběr uživatele A2): záložky po hospodách, velké karty s tečkami a pruhem; ťuknutí = detail dole
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
+    const nameOf = (key: string, seen: boolean) => (seen ? this.guestName(key) : '???');
+    const groups = [...Object.values(GUESTS).map((g) => [...new Set(g)]), Object.values(SEASONS).map((x) => x.guest)];
+    const gn = [...Object.values(PUB_NAMES).slice(0, 4), t('Sezóna')];
+    const tw = (W - 20 - 4 * 4) / 5;
+    gn.forEach((n, i) => {
+      const b = this.btn(10 + i * (tw + 4), y0 - 50, tw, 40, () => ((this.bookGrp = i), (this.bookSel = ''), this.openShop('book', false)), D + 2);
+      this.drawBtn(b, n, true, this.bookGrp === i ? 'gold' : 'plum');
+      b.label.setFontSize(15).setScale(Math.min(1, (tw - 8) / b.label.width));
+      if (this.bookGrp === i) b.label.setColor(PAL.ink).setStroke(PAL.ink, 0);
+      this.shopObjs.push(b.bg, b.label, b.zone);
     });
+    (groups[this.bookGrp] ?? []).forEach((key, i) => {
+      const cw = (W - 20 - 3 * 8) / 4, x = 10 + (i % 4) * (cw + 8), y = y0 + Math.floor(i / 4) * 178, seen = this.d.seen.includes(key);
+      const L = this.loyText(key);
+      const g = add(this.add.graphics().setDepth(D + 1));
+      g.fillStyle(col('ink'), 0.6).fillRoundedRect(x, y, cw, 170, 10);
+      if (L.l >= LOY_MAX) g.lineStyle(4, col('gold')).strokeRoundedRect(x, y, cw, 170, 10);
+      if (this.bookSel === key) g.lineStyle(3, col('white')).strokeRoundedRect(x - 2, y - 2, cw + 4, 174, 11);
+      const z = add(this.add.zone(x, y, cw, 170).setOrigin(0).setInteractive().setDepth(D + 3));
+      z.on('pointerdown', () => seen && ((this.bookSel = this.bookSel === key ? '' : key), sfx.click(), this.openShop('book', false)));
+      const spr = add(this.add.sprite(x + cw / 2, y + 96, key, 1).setOrigin(0.5, 1).setScale(4.6).setDepth(D + 2));
+      if (!seen) spr.setTintFill(col('dusk'));
+      const nm = add(this.add.text(x + cw / 2, y + 110, nameOf(key, seen), txt(18, seen ? PAL.bone : PAL.slate)).setOrigin(0.5).setDepth(D + 2));
+      nm.setScale(Math.min(1, (cw - 8) / nm.width));
+      if (!seen) return;
+      this.loyDots(g, x + cw / 2 - 28, y + 132, L.l, 14, 5);
+      g.fillStyle(col('dusk')).fillRoundedRect(x + 10, y + 148, cw - 20, 10, 4).fillStyle(col('gold')).fillRoundedRect(x + 10, y + 148, Math.max(6, (cw - 20) * loyProg(L.n)), 10, 4);
+    });
+    if (this.bookSel) {
+      const L = this.loyText(this.bookSel), py = H - 128;
+      const g = add(this.add.graphics().setDepth(D + 7));
+      g.fillStyle(col('ink'), 0.97).fillRoundedRect(10, py, W - 20, 118, 12).lineStyle(3, col('gold')).strokeRoundedRect(10, py, W - 20, 118, 12);
+      add(this.add.sprite(56, py + 100, this.bookSel, 1).setOrigin(0.5, 1).setScale(4).setDepth(D + 8));
+      add(this.add.text(100, py + 10, this.guestName(this.bookSel), txt(26, PAL.gold)).setDepth(D + 8));
+      this.loyDots(g, W - 110, py + 26, L.l, 18, 6);
+      add(this.add.text(100, py + 46, L.prog, txt(18, PAL.bone)).setDepth(D + 8));
+      g.fillStyle(col('dusk')).fillRoundedRect(100, py + 72, W - 130, 10, 4).fillStyle(col('gold')).fillRoundedRect(100, py + 72, Math.max(8, (W - 130) * loyProg(L.n)), 10, 4);
+      const bt = add(this.add.text(100, py + 90, L.bonus, txt(16, PAL.fog)).setDepth(D + 8));
+      bt.setScale(Math.min(1, (W - 120) / bt.width));
+    }
   }
 
   private closeShop() {
@@ -3532,9 +3590,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** odměna za spropitné (ťuknutí nebo sběrač): přes den coins, v noci kost */
   private tipReward(v: PubView) {
+    // věrnost hostů (varianta A): bod pro druh hosta, za úroveň +1 % spropitné od něj
+    const lk = v.lastKey, loy = (this.d.loy ??= {});
+    const lb = loyLvl(loy[lk]);
+    if (lk) loy[lk] = (loy[lk] ?? 0) + 1;
+    const lup = !!lk && loyLvl(loy[lk]) > lb;
+    if (lup && loyLvl(loy[lk]) >= LOY_MAX) this.tsCache = undefined;
     // zlatý host: občas dá spropitné ×10
     const gold = !this.night && Math.random() < Math.min(0.1, this.ts().golden);
-    const tip = (gold ? 10 : 1) * Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (pubStyle(v.pub) === 'tap' ? 2 : 1) * (1 + this.ts().tips + guestTips(this.d.gxp ?? 0)) * this.happyMult()));
+    const tip = (gold ? 10 : 1) * Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (pubStyle(v.pub) === 'tap' ? 2 : 1) * (1 + this.ts().tips + guestTips(this.d.gxp ?? 0)) * this.happyMult() * loyTip(loy[lk])));
     const bone = this.boneMult() * (1 + this.ts().nighttips);
     if (this.night) this.d.bones = (this.d.bones ?? 0) + bone;
     else this.gain(tip);
@@ -3544,7 +3608,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.week('tips');
     this.xp(1);
     this.task('tips', 1);
-    v.tipPop((gold ? t('ZLATÝ HOST! ') : '') + '+' + big(this.night ? bone : tip));
+    v.tipPop(lup ? t('{n}: věrnost {l}!', { n: this.guestName(lk), l: loyLvl(loy[lk]) }) : (gold ? t('ZLATÝ HOST! ') : '') + '+' + big(this.night ? bone : tip));
   }
 
   // ---------- sběrač bublin (číšník): každá hospoda vlastní, kupuje se a vylepšuje za kosti ----------

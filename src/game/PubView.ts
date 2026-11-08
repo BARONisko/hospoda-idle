@@ -362,6 +362,8 @@ export class PubView {
   private tipGuest(g: Guest) {
     g.tipped = true;
     this.last = g;
+    // věrnost hostů: druh obslouženého hosta (PubScene.tipReward přičte bod)
+    this.lastKey = g.spr.texture.key;
     if (g.order) {
       const o = g.order;
       g.order = undefined;
@@ -374,6 +376,8 @@ export class PubView {
   }
 
   private last?: Guest;
+  /** druh naposledy obslouženého hosta (klíč textury) */
+  lastKey = '';
   /** návod čeká na ťuk na bublinu → bubliny se samy neobslouží */
   hold = false;
 

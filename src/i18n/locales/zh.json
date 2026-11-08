@@ -940,5 +940,12 @@
  "{s}: {r}!": "{s}：{r}！",
  "od 5. úrovně hostinského": "老板等级 5 起",
  "bubliny\nmax": "气泡\n已满",
- "výdělek stanice +{a} %": "工位收益 +{a}%"
+ "výdělek stanice +{a} %": "工位收益 +{a}%",
+ "věrný host": "忠实客人",
+ "věrný host!": "忠实客人！",
+ "obslouženo {a} / {b}": "已服务 {a} / {b}",
+ "spropitné od něj +{v} %": "他的小费 +{v}%",
+ "na 5: ": "5级：",
+ "Sezóna": "季节",
+ "{n}: věrnost {l}!": "{n}：忠诚 {l}！"
 }

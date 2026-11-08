@@ -940,5 +940,12 @@
  "{s}: {r}!": "{s} : {r} !",
  "od 5. úrovně hostinského": "dès le niveau 5 de tavernier",
  "bubliny\nmax": "bulles\nmax",
- "výdělek stanice +{a} %": "gains du poste +{a} %"
+ "výdělek stanice +{a} %": "gains du poste +{a} %",
+ "věrný host": "client fidèle",
+ "věrný host!": "client fidèle !",
+ "obslouženo {a} / {b}": "servi {a} / {b}",
+ "spropitné od něj +{v} %": "ses pourboires +{v} %",
+ "na 5: ": "au 5 : ",
+ "Sezóna": "Saison",
+ "{n}: věrnost {l}!": "{n} : fidélité {l} !"
 }

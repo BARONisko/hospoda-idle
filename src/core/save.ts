@@ -121,6 +121,8 @@ export interface Save {
   tut?: number;
   /** už viděl vysvětlení první noci (kosti místo coins) */
   nightInfo?: boolean;
+  /** věrnost hostů po druzích: počet obsloužení (klíč = druh hosta) */
+  loy?: Record<string, number>;
   /** bestiář: viděné druhy hostů */
   seen: string[];
   /** koupená vylepšení z obchodu (id) */

@@ -106,6 +106,13 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     return s.mast('tap') >= 10 && s.pay(pub, def) > p0 * 1.09 && s.cyc(def) === c0;
   }));
   ok('mistrovství: hodnost a tečky na kartě', await S(p, (s) => { s.refresh(); return s.cards[0].bnum.text === 'Tovaryš' || s.cards[0].bnum.text.length > 2; }));
+  // 5g4) věrnost hostů: obsloužení druhu = bod, úroveň 1 po 10, spropitné od něj +1 %
+  ok('věrnost hostů: 10 obsloužení = úroveň 1, Sbírka s tečkami', await S(p, (s) => {
+    const v = s.views[0]; s.d.loy = {}; v.lastKey = 'guest3';
+    for (let i = 0; i < 10; i++) s.tipReward(v);
+    s.bookGrp = 0; s.bookSel = 'guest3'; s.d.seen.includes('guest3') || s.d.seen.push('guest3'); s.openShop('book', false);
+    return s.d.loy.guest3 === 10 && s.loyText('guest3').l === 1;
+  }));
   ok('sběrač: najmutí 500 kostí, bubliny nejvýš 5', await S(p, (s) => {
     s.d.coll = { 1: { spd: 0, amt: 5 } }; s.d.bones = 1e9; s.d.tabTut = [...(s.d.tabTut ?? []), 'coll']; s.openShop('coll', false);
     s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown');

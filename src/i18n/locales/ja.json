@@ -940,5 +940,12 @@
  "{s}: {r}!": "{s}：{r}！",
  "od 5. úrovně hostinského": "店主レベル5から",
  "bubliny\nmax": "吹き出し\n最大",
- "výdělek stanice +{a} %": "ステーション収入 +{a}%"
+ "výdělek stanice +{a} %": "ステーション収入 +{a}%",
+ "věrný host": "常連客",
+ "věrný host!": "常連客！",
+ "obslouženo {a} / {b}": "接客 {a} / {b}",
+ "spropitné od něj +{v} %": "この客のチップ +{v}%",
+ "na 5: ": "5で：",
+ "Sezóna": "シーズン",
+ "{n}: věrnost {l}!": "{n}：忠誠 {l}！"
 }

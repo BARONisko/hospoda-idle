@@ -940,5 +940,12 @@
  "{s}: {r}!": "{s}: {r}!",
  "od 5. úrovně hostinského": "od 5. poziomu karczmarza",
  "bubliny\nmax": "bańki\nmax",
- "výdělek stanice +{a} %": "zarobek stanowiska +{a} %"
+ "výdělek stanice +{a} %": "zarobek stanowiska +{a} %",
+ "věrný host": "wierny gość",
+ "věrný host!": "wierny gość!",
+ "obslouženo {a} / {b}": "obsłużono {a} / {b}",
+ "spropitné od něj +{v} %": "jego napiwki +{v} %",
+ "na 5: ": "na 5: ",
+ "Sezóna": "Sezon",
+ "{n}: věrnost {l}!": "{n}: wierność {l}!"
 }

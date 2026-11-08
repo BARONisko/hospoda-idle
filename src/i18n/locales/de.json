@@ -940,5 +940,12 @@
  "{s}: {r}!": "{s}: {r}!",
  "od 5. úrovně hostinského": "ab Wirt-Stufe 5",
  "bubliny\nmax": "Blasen\nmax",
- "výdělek stanice +{a} %": "Stationseinnahmen +{a} %"
+ "výdělek stanice +{a} %": "Stationseinnahmen +{a} %",
+ "věrný host": "treuer Gast",
+ "věrný host!": "treuer Gast!",
+ "obslouženo {a} / {b}": "bedient {a} / {b}",
+ "spropitné od něj +{v} %": "sein Trinkgeld +{v} %",
+ "na 5: ": "bei 5: ",
+ "Sezóna": "Saison",
+ "{n}: věrnost {l}!": "{n}: Treue {l}!"
 }

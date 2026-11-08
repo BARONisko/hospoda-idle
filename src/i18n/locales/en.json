@@ -940,5 +940,12 @@
  "{s}: {r}!": "{s}: {r}!",
  "od 5. úrovně hostinského": "from landlord level 5",
  "bubliny\nmax": "bubbles\nmax",
- "výdělek stanice +{a} %": "station earnings +{a} %"
+ "výdělek stanice +{a} %": "station earnings +{a} %",
+ "věrný host": "loyal guest",
+ "věrný host!": "loyal guest!",
+ "obslouženo {a} / {b}": "served {a} / {b}",
+ "spropitné od něj +{v} %": "their tips +{v} %",
+ "na 5: ": "at 5: ",
+ "Sezóna": "Season",
+ "{n}: věrnost {l}!": "{n}: loyalty {l}!"
 }

@@ -940,5 +940,12 @@
  "{s}: {r}!": "{s}: {r}!",
  "od 5. úrovně hostinského": "meyhaneci seviye 5'ten",
  "bubliny\nmax": "baloncuk\nmaks",
- "výdělek stanice +{a} %": "istasyon kazancı +%{a}"
+ "výdělek stanice +{a} %": "istasyon kazancı +%{a}",
+ "věrný host": "sadık misafir",
+ "věrný host!": "sadık misafir!",
+ "obslouženo {a} / {b}": "hizmet {a} / {b}",
+ "spropitné od něj +{v} %": "bahşişi +%{v}",
+ "na 5: ": "5'te: ",
+ "Sezóna": "Sezon",
+ "{n}: věrnost {l}!": "{n}: sadakat {l}!"
 }
