@@ -318,6 +318,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.stripRates = [];
     this.pubTabs = [];
     this.skillBtns = [];
+    this.skillIcons = [];
+    this.skillKeys = [];
     this.strips = [];
     this.scroll = 0;
     this.drag = null;
@@ -1959,7 +1961,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     h.img.setY(y).setVisible(on);
     h.zone.setY(y - 32).setVisible(on);
     this.chestBg?.clear();
-    if (on) this.chestBg?.fillStyle(col('ink'), 0.75).fillRoundedRect(W - 72, y - 30, 64, 60, 12).lineStyle(3, col('gold')).strokeRoundedRect(W - 72, y - 30, 64, 60, 12);
+    if (on) this.chestBg?.fillStyle(col('ink'), 0.75).fillCircle(W - 40, y, 31).lineStyle(3, col('gold')).strokeCircle(W - 40, y, 31);
     h.dot.clear();
     if (on) h.dot.fillStyle(col('ink')).fillCircle(W - 18, y - 22, 11).fillStyle(col('scarlet')).fillCircle(W - 18, y - 22, 8);
   }
@@ -2557,16 +2559,37 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // tlačítka všech hospod leží na stejném místě – ťuknutí smí chytit jen to vybrané hospody (dřív chytalo poslední)
     const mine = this.views.length < 2 || i === this.sel;
     b.zone.input && (b.zone.input.enabled = mine);
-    if (!p.mgr || !mine) return this.drawBtn(b, '', false, 'amber', false);
+    const ic = (this.skillIcons[i] ??= this.add.image(0, 0, 'icons', 'bolt').setDepth(61));
+    if (!p.mgr || !mine) {
+      ic.setVisible(false);
+      return this.drawBtn(b, '', false, 'amber', false);
+    }
     const now = Date.now();
     const mmss = (ms: number) => {
       const s = Math.ceil(ms / 1000);
       return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
     };
-    if (this.boosted(p)) this.drawBtn(b, `×${BOOST_MULT}  ${mmss(p.boostUntil! - now)}`, true, 'scarlet');
-    else if ((p.boostReady ?? 0) > now) this.drawBtn(b, mmss(p.boostReady! - now), false, 'amber');
-    else this.drawBtn(b, MANAGERS[p.act].skill, true, 'amber');
+    // kulatá ikona (návrh 4): připravená = zlatý blesk, běží = ×2 a čas, nabíjí se = šedá s časem
+    const boost = this.boosted(p), wait = !boost && (p.boostReady ?? 0) > now;
+    const txt2 = boost ? mmss(p.boostUntil! - now) : wait ? mmss(p.boostReady! - now) : '';
+    const key = `${boost}|${wait}|${txt2}|${b.x}|${b.y}`;
+    b.visible = true;
+    b.enabled = !wait;
+    if (this.skillKeys[i] === key) return;
+    this.skillKeys[i] = key;
+    const r = b.w / 2, cx = b.x + r, cy = b.y + r;
+    b.bg.clear().setVisible(true);
+    b.bg.fillStyle(col('ink')).fillCircle(cx, cy + 4, r).fillStyle(col(boost ? 'scarlet' : wait ? 'slate' : 'amber')).fillCircle(cx, cy, r);
+    b.bg.fillStyle(0xffffff, 0.15).fillCircle(cx, cy - r * 0.35, r * 0.55);
+    if (!wait && !boost) b.bg.lineStyle(3, col('gold')).strokeCircle(cx, cy, r + 2);
+    ic.setVisible(!boost).setPosition(cx, wait ? cy - 8 : cy).setScale(wait ? 2 : 3).setAlpha(wait ? 0.6 : 1);
+    b.label.setVisible(!!txt2).setText(boost ? `×${BOOST_MULT}\n${txt2}` : txt2).setPosition(cx, wait ? cy + 16 : cy).setScale(1);
+    b.label.setScale(Math.min(1, (b.w - 6) / Math.max(1, b.label.width)));
+    b.zone.setPosition(b.x, b.y).setSize(b.w, b.h);
+    void MANAGERS;
   }
+  skillIcons: Phaser.GameObjects.Image[] = [];
+  skillKeys: string[] = [];
 
   // ---------- návštěvníci s rozhodnutím ----------
   visitT = 120;
@@ -2979,7 +3002,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const viewH = VIEW_H;
       this.views[0].frame(0, TOP, W, viewH, 118);
       // schopnost manažera nahoře u zdi (tam nesedí hosté) – dole by zakrývala bubliny s objednávkami
-      this.skillBtns[0] = this.btn(14, TOP + 12 + this.qOff(), 180, 44, () => this.useSkill(0), 60);
+      this.skillBtns[0] = this.btn(14, TOP + 12 + this.qOff(), 60, 60, () => this.useSkill(0), 60);
       const g = this.add.graphics();
       g.fillStyle(col('dusk')).fillRect(0, TOP + viewH, W, H - TOP - viewH);
       g.fillStyle(col('gold')).fillRect(0, TOP + viewH, W, 3);
@@ -2994,7 +3017,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const rt = this.add.text(tb.x + tb.w / 2, tb.y + 34, '', txt(14, PAL.mint)).setOrigin(0.5).setDepth(62);
       this.stripRates.push(rt);
       this.pubTabs.push(tb);
-      this.skillBtns[i] = this.btn(14, TOP + TABH + 10 + this.qOff(), 180, 44, () => this.useSkill(i), 60);
+      this.skillBtns[i] = this.btn(14, TOP + TABH + 10 + this.qOff(), 60, 60, () => this.useSkill(i), 60);
     });
     const g = this.add.graphics();
     g.fillStyle(col('dusk')).fillRect(0, TOP, W, TABH).fillRect(0, TOP + VIEW_H, W, H - TOP - VIEW_H);
@@ -3615,14 +3638,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   private addWaiterChips() {
-    const y = TOP + VIEW_H - 74;
+    const y = TOP + VIEW_H - 82;
     for (let k = 0; k < WAITER_MAX; k++) {
-      const x = 12 + k * 72;
+      const x = 12 + k * 66;
       const bg = this.add.graphics().setDepth(50);
-      const face = this.add.image(x + 32, y + 40, WAITERS[k].key, 0).setScale(2).setDepth(51);
+      const face = this.add.image(x + 30, y + 34, WAITERS[k].key, 0).setScale(2).setDepth(51);
       const name = this.add.text(x + 32, y + 56, '', txt(14, PAL.bone)).setOrigin(0.5).setDepth(52);
       const lvl = this.add.text(x + 60, y + 2, '', txt(15, PAL.ink)).setOrigin(0.5).setDepth(53);
-      const zone = this.add.zone(x, y, 64, 66).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(54);
+      const zone = this.add.zone(x, y, 60, 70).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(54);
       zone.on('pointerdown', () => this.waiterChip(k));
       this.wChips.push({ bg, face, name, lvl, zone });
     }
@@ -3638,9 +3661,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const key = `${pi}|${hidden}|${ws.map((w) => waiterLvl(w) + ':' + freePoints(w)).join(',')}|${this.d.coins >= price}|${this.wSel}`;
     if (key === this.wChipKey) return;
     this.wChipKey = key;
-    const y = TOP + VIEW_H - 74;
+    const y = TOP + VIEW_H - 82;
     this.wChips.forEach((c, k) => {
-      const x = 12 + k * 72;
+      const x = 12 + k * 66;
       const has = k < ws.length, next = k === ws.length;
       const show = !hidden && (has || next);
       c.bg.clear().setVisible(show);
@@ -3651,16 +3674,17 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       c.lvl.setVisible(show && has);
       c.name.setVisible(show);
       if (!show) return;
-      c.bg.fillStyle(col('ink'), 0.8).fillRoundedRect(x, y, 64, 66, 9);
-      c.bg.lineStyle(3, col(this.wSel === k ? 'gold' : has ? 'mauve' : 'slate')).strokeRoundedRect(x, y, 64, 66, 9);
+      // kulaté ikony (návrh 4)
+      c.bg.fillStyle(col('ink'), 0.8).fillCircle(x + 30, y + 30, 28);
+      c.bg.lineStyle(3, col(this.wSel === k ? 'gold' : has ? 'mauve' : 'slate')).strokeCircle(x + 30, y + 30, 28);
       if (has) {
-        c.bg.fillStyle(col('gold')).fillRoundedRect(x + 48, y - 8, 26, 20, 9);
+        c.bg.fillStyle(col('ink')).fillCircle(x + 52, y + 6, 12).fillStyle(col('gold')).fillCircle(x + 52, y + 6, 10);
         // volný bod na vylepšení = zelená tečka
         if (freePoints(ws[k])) c.bg.fillStyle(col('ink')).fillCircle(x + 6, y + 6, 9).fillStyle(col('mint')).fillCircle(x + 6, y + 6, 7);
-        c.lvl.setText(String(waiterLvl(ws[k])));
-        c.name.setText(WAITERS[k].name).setColor(PAL.bone).setFontSize(14).setY(y + 58);
+        c.lvl.setText(String(waiterLvl(ws[k]))).setPosition(x + 52, y + 6);
+        c.name.setText(WAITERS[k].name).setColor(PAL.bone).setFontSize(14).setPosition(x + 30, y + 66);
       } else {
-        c.name.setText(`+\n${big(price)}`).setAlign('center').setColor(this.d.coins >= price ? PAL.gold : PAL.fog).setFontSize(18).setY(y + 33);
+        c.name.setText(`+\n${big(price)}`).setAlign('center').setColor(this.d.coins >= price ? PAL.gold : PAL.fog).setFontSize(17).setPosition(x + 30, y + 30);
       }
     });
   }

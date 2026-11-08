@@ -270,3 +270,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   (UKAŽ zavře menu a ukáže šipkou, VYBER), lišta nad hospodou se nekreslí; tečka u Úkolů = je co vybrat.
   Přepínání hospod (záložky nahoře) beze změny. Otevřené menu zatím překrývá spodní lištu.
   Další kroky návrhu 4: Šťastná hodina / truhla / číšníci jako kulaté ikony vpravo ve scéně.
+- Kulaté ikony (návrh 4): Šťastná hodina = kulaté tlačítko s bleskem (čas uvnitř), číšníci kulaté ikony, truhla v kruhu.
+  Menu přes spodní lištu: návrh A (schovaná, teď) / B (vidět) v docs/navrhy-ui/menu-lista-A-B.png – čeká na volbu.
+- Skilly na rok: vybráno 2 (velký strom) + 3 (mistrovství stanic), návrh v docs/navrh-skilly.md – čeká na návrhy vzhledu.
