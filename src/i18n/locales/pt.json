@@ -938,5 +938,7 @@
  "výdělek +{a} % · rychlost +{b} %": "ganhos +{a} % · velocidade +{b} %",
  "roste samo – i offline, když má stanice obsluhu": "cresce sozinho – até offline, quando a estação tem equipe",
  "{s}: {r}!": "{s}: {r}!",
- "od 5. úrovně hostinského": "a partir do nível 5 de taberneiro"
+ "od 5. úrovně hostinského": "a partir do nível 5 de taberneiro",
+ "bubliny\nmax": "bolhas\nmáx",
+ "výdělek stanice +{a} %": "ganhos da estação +{a} %"
 }

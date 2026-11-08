@@ -938,5 +938,7 @@
  "výdělek +{a} % · rychlost +{b} %": "収入 +{a}% · 速度 +{b}%",
  "roste samo – i offline, když má stanice obsluhu": "自然に育つ――スタッフがいればオフラインでも",
  "{s}: {r}!": "{s}：{r}！",
- "od 5. úrovně hostinského": "店主レベル5から"
+ "od 5. úrovně hostinského": "店主レベル5から",
+ "bubliny\nmax": "吹き出し\n最大",
+ "výdělek stanice +{a} %": "ステーション収入 +{a}%"
 }

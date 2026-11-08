@@ -21,7 +21,8 @@ import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, newA
 import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER, weekendLeft } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { TREE, TREE_BY_ID, TREE_BRANCHES, TREE_COLORS, STAR_TEXT, treeSpent, treeCan, hasStar, treeStats, xpNeed, oldXpNeed, lvlFromTotal, respecCost, pathX, type StarId, type TreeNode } from '../core/skilltree';
-import { mastStage, mastRank, mastProg, mastPay, mastSpeed, RANKS, RANK_COLORS, MAST_MAX } from '../core/mastery';
+import { collHire, collSpdCost, collAmtCost, COLL_AMT_MAX } from '../core/collector';
+import { mastStage, mastRank, mastProg, mastPay, RANKS, RANK_COLORS, MAST_MAX } from '../core/mastery';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave, wipe } from '../core/save';
 import { PubView } from '../game/PubView';
@@ -166,7 +167,7 @@ interface Card {
   staff: Btn;
   tapZone: Phaser.GameObjects.Zone;
   y: number;
-  /** číslo stupně ve štítu mistrovství */
+  /** název hodnosti mistrovství (vedle úrovně, za ním tečky stupňů) */
   bnum: Phaser.GameObjects.Text;
 }
 
@@ -1572,7 +1573,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.shopObjs.push(
         this.add.text(86, y + 10, STATION_NAMES[1][def.id], txt(24, PAL.bone)).setDepth(D + 3),
         this.add.text(W - 26, y + 12, s > 0 ? `${RANKS[rank]} ${step}/10` : t('zatím nic'), txt(20, s > 0 ? PAL[RANK_COLORS[rank]] : PAL.fog)).setOrigin(1, 0).setDepth(D + 3),
-        this.add.text(86, y + 62, t('výdělek +{a} % · rychlost +{b} %', { a: String(Math.round(s * 8) / 10).replace('.', ','), b: Math.round((mastSpeed(s) - 1) * 100) }), txt(16, PAL.fog)).setDepth(D + 3),
+        this.add.text(86, y + 62, t('výdělek stanice +{a} %', { a: String(Math.round((mastPay(s) - 1) * 1000) / 10).replace('.', ',') }), txt(16, PAL.fog)).setDepth(D + 3),
       );
       g.fillStyle(col('dusk')).fillRoundedRect(86, y + 40, W - 112, 14, 6);
       g.fillStyle(rc).fillRoundedRect(86, y + 40, Math.max(10, (W - 112) * mastProg(sec)), 14, 6);
@@ -3340,7 +3341,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       tapZone.on('pointerdown', () => this.manual(pubIdx, def));
       const buy = this.btn(W - 212, y + 6, 190, 48, () => this.buy(pubIdx, def), depth);
       const staff = this.btn(W - 212, y + 57, 190, 22, () => this.hire(pubIdx, def), depth);
-      const bnum = this.add.text(36, y + 21, '', txt(19, PAL.ink)).setOrigin(0.5).setDepth(depth + 1);
+      const bnum = this.add.text(26, y + 32, '', txt(17, PAL.fog)).setDepth(depth + 1);
       this.cards.push({ tag, pub: pubIdx, def, box, name, lvl, bar, info, buy, staff, tapZone, y, bnum });
     });
   }
@@ -3502,7 +3503,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   private cyc(def: StationDef) {
-    return def.cycle * kSpeed(this.kl('speed')) * (this.has('aquarium') ? 0.9 : 1) / (1 + this.ts().cycle) / mastSpeed(this.mast(def.id));
+    return def.cycle * kSpeed(this.kl('speed')) * (this.has('aquarium') ? 0.9 : 1) / (1 + this.ts().cycle);
   }
 
   /** stupeň mistrovství stanice (0–50) */
@@ -3552,9 +3553,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return this.d.coll?.[this.d.pubs[i].act];
   }
 
-  /** každá další hospoda má sběrače 10× dražšího */
+  /** cena najmutí sběrače (src/core/collector.ts) */
   private collBase(i: number) {
-    return 200 * 10 ** (this.d.pubs[i].act - 1);
+    return collHire(this.d.pubs[i].act - 1);
   }
 
   /** interval sběru (s): 30 s, každá úroveň rychlosti o 1 % rychleji, nejrychleji 1,5 s */
@@ -3599,12 +3600,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         this.shopObjs.push(b.bg, b.label, b.zone);
         return;
       }
-      const cs = Math.ceil(base * 0.5 * 1.6 ** c.spd), ca = Math.ceil(base * 2 * 2.2 ** c.amt);
+      const cs = collSpdCost(p.act - 1, c.spd), ca = collAmtCost(p.act - 1, c.amt), maxA = c.amt >= COLL_AMT_MAX;
       const maxS = this.collSecs(c.spd) <= 1.5;
       const b1 = this.btn(W - 232, y + 24, 102, 62, refresh(cs, () => c.spd++), D + 2);
       this.drawBtn(b1, maxS ? t('rychlost\nmax') : t('rychleji\n{n}', { n: big(cs) }), !maxS && bones >= cs, 'blue');
-      const b2 = this.btn(W - 122, y + 24, 102, 62, refresh(ca, () => c.amt++), D + 2);
-      this.drawBtn(b2, t('+1 bublina\n{n}', { n: big(ca) }), bones >= ca, 'plum');
+      const b2 = this.btn(W - 122, y + 24, 102, 62, refresh(ca, () => !maxA && c.amt++), D + 2);
+      this.drawBtn(b2, maxA ? t('bubliny\nmax') : t('+1 bublina\n{n}', { n: big(ca) }), !maxA && bones >= ca, 'plum');
       [b1, b2].forEach((b) => b.label.setFontSize(16).setScale(Math.min(1, 94 / b.label.width)));
       this.shopObjs.push(b1.bg, b1.label, b1.zone, b2.bg, b2.label, b2.zone);
     });
@@ -4765,20 +4766,19 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       c.tag.setText('');
       c.tag.setScale(Math.min(1, 132 / Math.max(1, c.tag.width)));
       c.bar.clear();
-      // mistrovství (návrh 1): štít v barvě hodnosti s číslem stupně vlevo u názvu
+      // mistrovství (návrh 2): v řádku úrovně název hodnosti a 10 teček stupňů v barvě hodnosti
       const ms2 = open ? this.mast(c.def.id) : 0;
-      const nx = ms2 > 0 ? 58 : 26;
-      c.name.setX(nx);
-      c.lvl.setX(nx);
-      c.bnum.setText(ms2 > 0 ? String(mastRank(ms2).step) : '');
       if (ms2 > 0) {
-        const rc = col(RANK_COLORS[mastRank(ms2).rank]), y = c.y;
-        const sh = (gx: Phaser.GameObjects.Graphics, k: number, cc: number) =>
-          gx.fillStyle(cc).fillPoints([{ x: 22 - k, y: y + 6 - k }, { x: 50 + k, y: y + 6 - k }, { x: 50 + k, y: y + 26 }, { x: 36, y: y + 40 + k }, { x: 22 - k, y: y + 26 }], true);
-        sh(c.bar, 2, col('ink'));
-        sh(c.bar, 0, rc);
-        if (ms2 >= MAST_MAX) this.starShape(c.bar, 36, y + 46, 6, col('gold'));
-      }
+        const { rank, step } = mastRank(ms2), rc = col(RANK_COLORS[rank]);
+        c.lvl.setScale(1);
+        const lw = Math.min(c.lvl.width, 104);
+        c.lvl.setScale(lw / Math.max(1, c.lvl.width));
+        c.bnum.setText(RANKS[rank]).setColor(PAL[RANK_COLORS[rank]]).setPosition(26 + lw + 8, c.y + 32).setScale(1);
+        c.bnum.setScale(Math.min(1, 74 / Math.max(1, c.bnum.width)));
+        const dx = 26 + lw + 8 + c.bnum.displayWidth + 8;
+        for (let k = 0; k < 10; k++) c.bar.fillStyle(col('ink')).fillCircle(dx + 5 + k * 11, c.y + 42, 5).fillStyle(k < step ? rc : 0x4a3f55).fillCircle(dx + 5 + k * 11, c.y + 42, 4);
+        if (ms2 >= MAST_MAX) this.starShape(c.bar, dx + 120, c.y + 42, 6, col('gold'));
+      } else c.bnum.setText('');
       const stars = starsOf(this.d.stars, p.act, c.def.id);
       if (stars > 0) {
         // rámeček podle počtu hvězd: bronz, stříbro, zlato, diamant, purpur

@@ -938,5 +938,7 @@
  "výdělek +{a} % · rychlost +{b} %": "收益 +{a}% · 速度 +{b}%",
  "roste samo – i offline, když má stanice obsluhu": "自动成长——离线也会，只要工位有人",
  "{s}: {r}!": "{s}：{r}！",
- "od 5. úrovně hostinského": "老板等级 5 起"
+ "od 5. úrovně hostinského": "老板等级 5 起",
+ "bubliny\nmax": "气泡\n已满",
+ "výdělek stanice +{a} %": "工位收益 +{a}%"
 }

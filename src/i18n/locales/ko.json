@@ -938,5 +938,7 @@
  "výdělek +{a} % · rychlost +{b} %": "수익 +{a}% · 속도 +{b}%",
  "roste samo – i offline, když má stanice obsluhu": "스스로 자란다 – 직원이 있으면 오프라인에서도",
  "{s}: {r}!": "{s}: {r}!",
- "od 5. úrovně hostinského": "주인장 레벨 5부터"
+ "od 5. úrovně hostinského": "주인장 레벨 5부터",
+ "bubliny\nmax": "말풍선\n최대",
+ "výdělek stanice +{a} %": "스테이션 수익 +{a}%"
 }

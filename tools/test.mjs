@@ -99,13 +99,18 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   await S(p, (s) => { s.d.klvl = 300; s.d.skills = []; for (let i = 0; i <= 20; i++) s.d.skills.push('s' + i); });
   ok('strom: hvězda Dobrá pověst', await S(p, (s) => s.star('keep5') && !s.star('tray') && s.skillPoints() > 0));
   // 5g3) mistrovství: roste s časem obsluhy, zvedá výdělek a rychlost; štít na kartě
-  ok('mistrovství: výdělek a rychlost rostou', await S(p, (s) => {
+  ok('mistrovství: výdělek roste, rychlost stejná', await S(p, (s) => {
     s.d.mast = {}; const pub = s.d.pubs[0], def = s.cards[0].def; pub.st.tap.auto = true;
     const p0 = s.pay(pub, def), c0 = s.cyc(def);
     s.mastAdd(2e6); s.tsCache = undefined;
-    return s.mast('tap') >= 10 && s.pay(pub, def) > p0 * 1.07 && s.cyc(def) < c0;
+    return s.mast('tap') >= 10 && s.pay(pub, def) > p0 * 1.09 && s.cyc(def) === c0;
   }));
-  ok('mistrovství: štít s číslem na kartě', await S(p, (s) => { s.refresh(); return s.cards[0].bnum.text !== '' && s.cards[0].name.x > 40; }));
+  ok('mistrovství: hodnost a tečky na kartě', await S(p, (s) => { s.refresh(); return s.cards[0].bnum.text === 'Tovaryš' || s.cards[0].bnum.text.length > 2; }));
+  ok('sběrač: najmutí 500 kostí, bubliny nejvýš 5', await S(p, (s) => {
+    s.d.coll = { 1: { spd: 0, amt: 5 } }; s.d.bones = 1e9; s.d.tabTut = [...(s.d.tabTut ?? []), 'coll']; s.openShop('coll', false);
+    s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown');
+    return s.collBase(0) === 500 && s.d.coll[1].amt === 5;
+  }));
   // 5h) týdenní výzva
   await S(p, (s) => { const w = s.weekly(); w.prog = w.goal; s.openShop('tasks', false); s.shopObjs.filter((o) => o.type === 'Zone').find((z) => z.y > 360).emit('pointerdown'); });
   ok('týdenní výzva: vyzvednuta', await S(p, (s) => s.weekly().claimed));

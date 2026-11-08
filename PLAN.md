@@ -285,3 +285,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   - Mistrovství stanic (src/core/mastery.ts): čas obsluhy stanice (součet hospod, i offline, přežije hygienu), stupeň s
     = 2100·s^2,56 s, 50 stupňů (Učeň→Legenda po 10), stupeň +0,8 % výdělku stanice, každá hodnost +4 % rychlost. Štít v barvě
     hodnosti s číslem na kartě vlevo u názvu; nápis jen při nové hodnosti. Test: npm test (strom, hvězda, mistrovství, převod, offline).
+- Hospoda 63, přání uživatele: odznak mistrovství = varianta 2 (název hodnosti + 10 teček stupňů v řádku úrovně, místo štítu);
+  mistrovství už NEzrychluje stanice („rychlost jak doposud“) – místo toho hodnost +2 % výdělku navíc (stupeň +0,8 %).
+- Sběrač zdražen (src/core/collector.ts, výpočet tools/sim/coll.mjs): najmout 500 / 20 K / 300 K kostí, rychlost f·(100+(n+1)^1,5)
+  (f = 1/3/9 podle hospody, max 1,5 s ≈ 298 úrovní), +1 bublina 1000·f·4^n, nejvýš 5. Celkem 13 M kostí → běžný hráč
+  (~100 K kostí/den, třetina na sběrače) max ~13 měsíců, zapálený ~4 měs., 3. sběrač najmout ~3–9 dní (dřív za den).
