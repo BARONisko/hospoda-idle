@@ -119,7 +119,7 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     return s.collBase(0) === 500 && s.d.coll[1].amt === 5;
   }));
   // 5h) týdenní výzva
-  await S(p, (s) => { const w = s.weekly(); w.prog = w.goal; s.openShop('tasks', false); s.shopObjs.filter((o) => o.type === 'Zone').find((z) => z.y > 360).emit('pointerdown'); });
+  await S(p, (s) => { const w = s.weekly(); w.prog = w.goal; s.openShop('tasks', false); s.shopObjs.filter((o) => o.type === 'Zone').find((z) => z.y > 250).emit('pointerdown'); });
   ok('týdenní výzva: vyzvednuta', await S(p, (s) => s.weekly().claimed));
   // 5i) liga: výhra → postup a krígly, prohra → sestup
   const lg = await S(p, (s) => {
@@ -274,7 +274,7 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   await S(p, (s) => { s.d.tut = -1; s.d.coins = 0; s.d.pubs[0].st.tap.lvl = 30; s.manual(0, s.cards[0].def); });
   await p.waitForFunction(() => (game.scene.getScene('Pub').d.bones ?? 0) > 0, null, { timeout: 8000 }).catch(() => undefined);
   ok('noc: pípa vydělala kosti', await S(p, (s) => s.d.bones > 0 && s.d.coins === 0));
-  await S(p, (s) => { s.d.bones = 1e6; s.shopSub = 'bones'; s.openShop('shop', false); s.shopObjs.filter((o) => o.type === 'Zone').find((z) => z.x === 10 && z.y > 500).emit('pointerdown'); });
+  await S(p, (s) => { s.d.bones = 1e6; s.shopSub = 'bones'; s.openShop('shop', false); s.shopObjs.filter((o) => o.type === 'Zone').find((z) => z.x === 10 && z.y > 416).emit('pointerdown'); });
   await p.waitForFunction(() => !game.scene.getScene('Pub').ossBusy, null, { timeout: 10000 }).catch(() => undefined);
   ok('noc: Kostnice – hod kostkou zvedne náhodný stat', await S(p, (s) => s.d.ossRolls === 1 && Object.values(s.d.oss ?? {}).reduce((a, b) => a + b, 0) === 1 && s.d.bones < 1e6));
   ok('bez chyb v konzoli (noc)', p.errors.length === 0);

@@ -323,4 +323,4 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Záložka Úkoly bez úkolu od hostinského (přání; je v liště nad hospodou).
 - Počítač (přání: „bez rolování“): celá hra se vejde do viditelné části okna (desktopFit v main.ts – když okno sahá pod lištu
   Windows, hra se zmenší na viditelnou výšku); rolování zrušeno. Telefon beze změny.
-- ČEKÁ: Úkoly a Obchod v menu (uživateli se nelíbí) – návrhy A/B/C docs/navrhy-ui/menu-obchod-ukoly-ABC.png.
+- Menu B (výběr uživatele, docs/navrhy-ui/menu-obchod-ukoly-ABC.png, menu-B-ve-hre.png): spodní lišta Hospoda/Obchod/Úkoly/Menu je vidět i nad otevřeným menu (depth 350), menu začíná o lištu výš (MENU_Y0, obsah končí na MB = H − NAV_H), dlaždice Obchod a Úkoly z mřížky pryč; návod „ŤUKNI NA OBCHOD“ a úkoly ukazují na lištu. Ikona Menu = mřížka 3×3 dlaždic (dřív ozubené kolo jako Nastavení). Kontrola všech 16 částí menu: nic pod lištou, nic zakrytého.

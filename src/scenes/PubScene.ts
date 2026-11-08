@@ -50,6 +50,10 @@ const STRIP = 380; // horní lišta s penězi
 const CARD_H = 88;
 /** spodní lišta Hospoda / Obchod / Úkoly / Menu (návrh 4) */
 const NAV_H = 84;
+/** horní okraj otevřeného menu: spodní lišta zůstává vidět pod ním (výběr uživatele B) */
+const MENU_Y0 = 960 - NAV_H - 6 * 96 - 126;
+/** spodek obsahu menu (nad lištou) */
+const MB = 960 - NAV_H;
 /** strop výdělku offline (s) */
 const OFFLINE_CAP = 8 * 3600;
 /** kratší nepřítomnost se nehlásí oknem (s) */
@@ -995,6 +999,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** Menu: když někde svítí tečka, otevře rovnou tu záložku */
   /** Menu: mřížka dlaždic (červená tečka = něco tam čeká) */
+  private qVisit(k: string) {
+    if (!(this.d.qTiles ??= []).includes(k)) this.d.qTiles.push(k);
+  }
+
   private openMenu() {
     this.openShop('home');
   }
@@ -1003,14 +1011,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   navBtns: Btn[] = [];
   navDots?: Phaser.GameObjects.Graphics;
   private makeNav() {
-    const y = H - NAV_H, D = 250, bw = W / 4;
+    // lišta je nad otevřeným menu (D 300+) – výběr uživatele B; pod návodem (420) a okny
+    const y = H - NAV_H, D = 350, bw = W / 4;
     const g = this.add.graphics().setDepth(D);
     g.fillStyle(col('dusk')).fillRect(0, y, W, NAV_H).fillStyle(col('gold')).fillRect(0, y, W, 3);
     const items: [string, string, string, () => void][] = [
       [t('Hospoda'), 'obj', 'krigl0', () => (this.closeShop(), this.tut('close'))],
-      [t('Obchod'), 'obj', 'bag', () => ((this.shopSub = 'up'), this.guideEv('menu'), this.openShop('shop', false), this.tut('tile:shop'), this.guideEv('tile:up'))],
-      [t('Úkoly'), 'icons', 'clipboard', () => (this.guideEv('menu'), this.openShop('tasks', false), this.guideEv('tile:tasks'))],
-      [t('Menu'), 'icons', 'gear', () => this.openMenu()],
+      [t('Obchod'), 'obj', 'bag', () => ((this.shopSub = 'up'), this.qVisit('up'), this.guideEv('menu'), this.openShop('shop', false), this.tut('tile:shop'), this.guideEv('tile:up'))],
+      [t('Úkoly'), 'icons', 'clipboard', () => (this.qVisit('tasks'), this.guideEv('menu'), this.openShop('tasks', false), this.guideEv('tile:tasks'))],
+      [t('Menu'), 'icons', 'menu', () => this.openMenu()],
     ];
     this.navBtns = items.map(([label, atlas, frame, fn], i) => {
       const x = i * bw;
@@ -1033,8 +1042,6 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** dlaždice menu: [záložka, podzáložka obchodu, název, atlas, snímek] */
   private static TILES: [PubScene['tab'], PubScene['shopSub'] | null, string, string, string][] = [
     ['temple', null, t('Chrám'), 'obj', 'dIdol1'],
-    ['shop', 'up', t('Obchod'), 'obj', 'bag'],
-    ['tasks', null, t('Úkoly'), 'icons', 'clipboard'],
     ['brew', null, t('Pivovar'), 'obj', 'fermenter'],
     ['league', null, t('Liga'), 'obj', 'trophy'],
     ['talis', null, t('Talismany'), 'icons', 'upAmulet'],
@@ -1116,7 +1123,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (!menuStep) this.tutObjs.forEach((o) => (o as unknown as Phaser.GameObjects.Components.Visible).setVisible(false));
     this.tab = tab;
     const D = 300, RH = 96;
-    const y0 = H - 6 * RH - 126;
+    const y0 = MENU_Y0;
     const block = this.add.rectangle(0, TOP, W, H - TOP, 0x000000, 0.55).setOrigin(0).setDepth(D).setInteractive();
     block.on('pointerdown', (ptr: Phaser.Input.Pointer) => {
       if (ptr.y >= y0) return;
@@ -1436,7 +1443,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.shopObjs.push(h);
     });
     const sp = this.add.text(W / 2, ay + 12 + 4 * 92 + 6, t('utraceno: {n} b.', { n: treeSpent(this.d.skills) }), txt(20, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 3);
-    const ok = this.btn(W / 2 - 110, H - 120, 220, 56, () => ((this.ktInfo = false), this.openShop('keeper', false)), D + 3);
+    const ok = this.btn(W / 2 - 110, MB - 120, 220, 56, () => ((this.ktInfo = false), this.openShop('keeper', false)), D + 3);
     this.drawBtn(ok, t('Rozumím'), true, 'green');
     this.shopObjs.push(sp, ok.bg, ok.label, ok.zone);
   }
@@ -1478,7 +1485,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         this.shopObjs.push(dot);
       }
     });
-    const ay = ty + 50, ah = H - 140 - ay, py = ay + ah + 8;
+    const ay = ty + 50, ah = MB - 140 - ay, py = ay + ah + 8;
     const area = this.add.graphics().setDepth(D + 1);
     area.fillStyle(col('ink'), 0.55).fillRoundedRect(10, ay, W - 20, ah, 10);
     this.shopObjs.push(area);
@@ -1560,7 +1567,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // panel vybraného uzlu + KOUPIT
     if (!sel) return;
     const pg = this.add.graphics().setDepth(D + 1);
-    pg.fillStyle(col('ink'), 0.6).fillRoundedRect(10, py, W - 20, H - py - 10, 10);
+    pg.fillStyle(col('ink'), 0.6).fillRoundedRect(10, py, W - 20, MB - py - 10, 10);
     const has = own.includes(sel.id), can = treeCan(sel, own);
     // u koupeného uzlu: přerozdělení všech bodů za krígly
     if (has) {
@@ -1650,8 +1657,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     });
     this.shopObjs.push(this.add.zone(14, ay + 4, W - 28, rh - 8).setOrigin(0).setDepth(D + 1));
     const pg = this.add.graphics().setDepth(D + 1);
-    pg.fillStyle(col('ink'), 0.6).fillRoundedRect(10, py, W - 20, H - py - 10, 10);
-    const tx = this.add.text(W / 2, py + (H - py - 10) / 2, t('každý stupeň = 1 bod do stromu · roste samo, i offline'), txt(20, PAL.bone)).setOrigin(0.5).setDepth(D + 2);
+    pg.fillStyle(col('ink'), 0.6).fillRoundedRect(10, py, W - 20, MB - py - 10, 10);
+    const tx = this.add.text(W / 2, py + (MB - py - 10) / 2, t('každý stupeň = 1 bod do stromu · roste samo, i offline'), txt(20, PAL.bone)).setOrigin(0.5).setDepth(D + 2);
     tx.setScale(Math.min(1, (W - 50) / tx.width));
     this.shopObjs.push(pg, tx);
   }
@@ -2021,7 +2028,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private optsTab(y0: number, D: number) {
     // výška řádku tak, aby se vešly všechny (zvuky, hudba, záloha, jazyk, složka, upozornění, začít znovu)
     const n = 5 + (location.protocol.startsWith('http') ? 1 : 0) + (notify.available ? 1 : 0);
-    const RH = Math.min(96, Math.floor((H - y0 - 6) / n));
+    const RH = Math.min(96, Math.floor((MB - y0 - 6) / n));
     this.shopObjs.push(this.add.text(W - 12, y0 - 4, t('verze {v}', { v: __APP_VERSION__ }), txt(16, PAL.fog)).setOrigin(1, 1).setDepth(D + 2));
     // hlasitost: − / hodnota / + po 10 % (0 % = vypnuto)
     const vols: [string, () => number, (v: number) => void][] = [
@@ -2108,7 +2115,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
     const fy = y0 + (vols.length + 1 + rows.length) * RH + 30;
-    if (fy < H - 10) this.shopObjs.push(this.add.text(W / 2, fy, 'P.U.B. Idle – Pajzl Tycoon', txt(18, PAL.slate)).setOrigin(0.5).setDepth(D + 1));
+    if (fy < MB - 10) this.shopObjs.push(this.add.text(W / 2, fy, 'P.U.B. Idle – Pajzl Tycoon', txt(18, PAL.slate)).setOrigin(0.5).setDepth(D + 1));
   }
 
   // ---------- speciální nabídka: denní truhla, reklamní kampaň, VIP host ----------
@@ -2674,7 +2681,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       g.fillStyle(col('dusk')).fillRoundedRect(x + 10, y + 148, cw - 20, 10, 4).fillStyle(col('gold')).fillRoundedRect(x + 10, y + 148, Math.max(6, (cw - 20) * loyProg(L.n)), 10, 4);
     });
     if (this.bookSel) {
-      const L = this.loyText(this.bookSel), py = H - 128;
+      const L = this.loyText(this.bookSel), py = MB - 128;
       const g = add(this.add.graphics().setDepth(D + 7));
       g.fillStyle(col('ink'), 0.97).fillRoundedRect(10, py, W - 20, 118, 12).lineStyle(3, col('gold')).strokeRoundedRect(10, py, W - 20, 118, 12);
       add(this.add.sprite(56, py + 100, this.bookSel, 1).setOrigin(0.5, 1).setScale(4).setDepth(D + 8));
@@ -3093,7 +3100,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     { head: t('ŤUKNI NA BUBLINU'), text: t('host si objednal – dá ti spropitné'), done: 'tip' },
     { head: t('NAJMI ČÍŠNÍKY'), text: t('pípa pak točí sama a číšníci roznášejí pivo, i když nehraješ'), done: 'hire' },
     { head: t('OTEVŘI KUCHYNI'), text: t('další zdroj coins'), done: 'buy:kitchen' },
-    { head: t('ŤUKNI NA MENU'), text: t('najdeš v něm obchod, úkoly a další'), done: 'menu' },
+    { head: t('ŤUKNI NA MENU'), text: t('najdeš v něm další části hry'), done: 'menu' },
     { head: t('ŤUKNI NA OBCHOD'), text: t('tady kupuješ vylepšení výdělku'), done: 'tile:shop' },
     { head: t('HOTOVO!'), text: t('další části menu se odemknou během hry. Hodně štěstí, hostinský!'), done: 'close' },
   ];
@@ -3161,10 +3168,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const tapManual = !this.st(this.d.pubs[0], 'tap').auto;
     let [head, text] = [step.head, step.text];
     if (need > 0) [head, text] = this.tutPoorText(tapManual, need, step.done);
-    // dlaždice Obchod v mřížce Menu (stejný výpočet jako menuGrid)
-    const menuY0 = H - 6 * 96 - 126, tw = (W - 40) / 3, th = 118;
-    const si = PubScene.TILES.findIndex(([tb, sub]) => tb === 'shop' && sub === 'up');
-    const shopTile = [10 + (si % 3) * (tw + 10), menuY0 + 64 + Math.floor(si / 3) * (th + 8), tw, th];
+    // Obchod je ve spodní liště (vidět i nad otevřeným menu – výběr B)
+    const menuY0 = MENU_Y0;
+    const nb = this.navBtns[1];
+    const shopTile = [nb.x + 6, nb.y + 4, nb.w - 12, nb.h - 8];
     let tx = 0, ty = 0;
     // ťukání na pípu: šipka nad kartou, zvýrazněná přesně levá část karty (kde se ťuká)
     const tapHere = (need > 0 && tapManual) || step.done === 'tap';
@@ -4468,10 +4475,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const r = (b?: Btn) => (b && b.bg.active && b.visible ? [b.x, b.y, b.w, b.h] : null);
     const menu = () => (this.shopObjs.length ? null : r(this.shopBtn));
     const tileR = (key: string) => {
+      if (key === 'tasks' || key === 'up') return r(this.navBtns[key === 'up' ? 1 : 2]);
       if (!this.shopObjs.length) return r(this.shopBtn);
       if (this.tab !== 'home') return null;
       const k = PubScene.TILES.findIndex(([tb, sub]) => (sub && tb === 'shop' ? sub : tb) === key);
-      const y0 = H - 6 * 96 - 126, tw = (W - 40) / 3;
+      const y0 = MENU_Y0, tw = (W - 40) / 3;
       return [10 + (k % 3) * (tw + 10), y0 + 64 + Math.floor(k / 3) * 126, tw, 118];
     };
     const card = (sid: string, what: 'buy' | 'staff') => {
@@ -4643,7 +4651,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const tile = (key: string) => () => {
       if (!this.shopObjs.length || this.tab !== 'home') return null;
       const k = PubScene.TILES.findIndex(([tb, sub]) => (sub && tb === 'shop' ? sub : tb) === key);
-      const y0 = H - 6 * 96 - 126, tw = (W - 40) / 3;
+      const y0 = MENU_Y0, tw = (W - 40) / 3;
       return [10 + (k % 3) * (tw + 10), y0 + 64 + Math.floor(k / 3) * 126, tw, 118];
     };
     if (id.startsWith('pub')) {

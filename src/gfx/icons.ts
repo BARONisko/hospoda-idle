@@ -521,6 +521,21 @@ const I: Record<string, string[]> = {
     '............',
     '............',
   ],
+  // Menu (spodní lišta): mřížka 3×3 dlaždic – jako obsah menu (dřív ozubené kolo stejné jako Nastavení)
+  menu: [
+    'ygg.ygg.ygg.',
+    'gga.gga.gga.',
+    'gaa.gaa.gaa.',
+    '............',
+    'ygg.ygg.ygg.',
+    'gga.gga.gga.',
+    'gaa.gaa.gaa.',
+    '............',
+    'ygg.ygg.ygg.',
+    'gga.gga.gga.',
+    'gaa.gaa.gaa.',
+    '............',
+  ],
   gear: [
     '.....ff.....',
     '..f.ffff.f..',
