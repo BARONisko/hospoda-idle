@@ -254,4 +254,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - HOTOVO: Chrám – červená tečka jen do prvního otevření za den (d.templeSeen), na dlaždici „končí za 14 h 7 min“ / „otevře za 3 d 5 h“ (weekendLeft v temple.ts).
 - HOTOVO (přání: hrál v menu a první noc mu utekla): první noc stojí na začátku (switchPhase(true) každý snímek), dokud hráč v průvodci noci neťukne na Dál; nápis „Padla noc“ se u první noci nezobrazí (je tam cedule).
 - Test (npm test) 6b: hygiena jako skutečný hráč (lišta úkolu, VIP) – Ještě ne, hra po restartu běží, coins na rozjezd, průvodce novou hospodou; 6c: první noc stojí do Dál. (window.__night jen ve vývoji.)
+- VÝKON (hlášení: telefon se přehřívá): strop 30 snímků/s (fps.limit, dřív až 120 na iPhonu), powerPreference low-power; fillRoundedRect v Graphics nahrazen 5 obdélníky se schodkovým rohem (dřív earcut v každém snímku – největší žrout). Měření headless: skript na snímek 15,8 → 3,4 ms.
 - ČEKÁ: zúžit lištu úkolu? Poslední krok návodu (HOTOVO) má v menu velkou ceduli.

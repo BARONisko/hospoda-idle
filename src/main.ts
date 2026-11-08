@@ -46,6 +46,26 @@ const guard = <T extends object>(proto: T, name: keyof T) => {
 // každá scéna zvlášť (ostatní dál běží a kreslí se) a celý snímek jako záloha
 guard(Phaser.Scenes.Systems.prototype, 'step');
 guard(Phaser.Game.prototype, 'step');
+// Výkon (telefon se přehříval): zaoblený obdélník v Graphics se v každém snímku znovu trianguluje (earcut) –
+// místo toho 5 obyčejných obdélníků se „schodkovým“ rohem (pixel-art vzhled, nepřekrývají se → průhlednost sedí).
+{
+  const G = Phaser.GameObjects.Graphics.prototype as unknown as {
+    fillRoundedRect: (x: number, y: number, w: number, h: number, r?: number | { tl?: number }) => Phaser.GameObjects.Graphics;
+    fillRect: (x: number, y: number, w: number, h: number) => Phaser.GameObjects.Graphics;
+  };
+  G.fillRoundedRect = function (this: Phaser.GameObjects.Graphics, x, y, w, h, radius = 20) {
+    const r0 = typeof radius === 'number' ? radius : (radius?.tl ?? 0);
+    const r = Math.max(0, Math.min(r0, w / 2, h / 2));
+    if (r < 1.5) return this.fillRect(x, y, w, h);
+    const k = Math.max(1, Math.round(r * 0.3));
+    this.fillRect(x + r, y, w - 2 * r, k);
+    this.fillRect(x + k, y + k, w - 2 * k, r - k);
+    this.fillRect(x, y + r, w, h - 2 * r);
+    this.fillRect(x + k, y + h - r, w - 2 * k, r - k);
+    return this.fillRect(x + r, y + h - k, w - 2 * r, k);
+  };
+}
+
 // Mobil na výšku: logické rozlišení 540×960 (9:16), roztažení na displej se zachováním poměru.
 const game = new Phaser.Game({
   type: Phaser.WEBGL,
@@ -57,6 +77,9 @@ const game = new Phaser.Game({
   roundPixels: true,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   input: { activePointers: 2 },
+  // idle hra nepotřebuje 60–120 snímků/s: strop 30 = méně práce pro procesor i grafiku (telefon se nehřeje)
+  fps: { target: 30, limit: 30 },
+  render: { powerPreference: 'low-power' },
   scene: [BootScene, PubScene, TempleScene, DartsScene],
 });
 (window as unknown as { game: Phaser.Game }).game = game;
