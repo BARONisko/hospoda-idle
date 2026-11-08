@@ -244,4 +244,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - HOTOVO (přání): cedule stylu (PIVNICE) vpravo nahoře, truhla pod ní (signBot), když je k vyzvednutí.
 - HOTOVO (přání): konec návodu – v menu jen šipka na křížek, cedule HOTOVO! (s konfetami) až po zavření menu na hlavní obrazovce na 4 s (tutFinale); průvodce novinkami a lišta úkolu počkají.
 - HOTOVO (hlášení: počet piv na pultu schovaný pod lištou úkolu): „11/12“ teď pod korbely na přední hraně pultu, větší a s tmavým podkladem.
+- OPRAVA (hlášení: hra před první hygienou přestala reagovat): po hygieně (scene.restart) zůstávaly odkazy na zničené objekty (lišta úkolu qUi, cedule stylu, truhla, VIP…) → chyba v každém snímku → zamrznutí. create() je teď vynuluje. „Ještě ne“ v okně hygieny nechávalo awayObjs → hospoda zablokovaná.
 - ČEKÁ: zúžit lištu úkolu? Poslední krok návodu (HOTOVO) má v menu velkou ceduli.

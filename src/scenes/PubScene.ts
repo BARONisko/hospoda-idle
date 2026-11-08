@@ -285,6 +285,20 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (!this.d.seen.includes(key)) this.d.seen.push(key);
     });
     this.views = [];
+    // po restartu scény (hygiena) jsou staré objekty zničené – odkazy na ně zahodit, jinak hra spadne (zamrzne)
+    this.qUi = this.styleSign = this.chestHud = this.chestBg = this.vipBar = this.vipSpr = this.brewBar = this.brewTxt = undefined;
+    this.scrollBar = this.hint = this.hygBtn = undefined;
+    this.signBot = 0;
+    this.qOffNow = -1;
+    this.ntfQ = [];
+    this.ntfBusy = 0;
+    this.dartsNoticeObjs = [];
+    this.awayObjs = [];
+    this.guideObjs = [];
+    this.guideCur = null;
+    this.guideFollow = null;
+    this.tutObjs = [];
+    this.tutFinaleUntil = 0;
     this.wChips = [];
     this.wPanel = [];
     this.wPanelBtns = [];
@@ -2487,7 +2501,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     tx(by + 240, t('výdělek z krígel: +{a} % → +{b} %', { a: big(Math.round(cur * 100)), b: big(Math.round(nw * 100)) }), 22, PAL.mint);
     tx(by + 270, t('= vyděláváš ×{m} víc', { m: ((1 + nw) / (1 + cur)).toFixed(2) }), 22, PAL.gold);
     if (next) tx(by + 310, t('a otevřeš novou hospodu: {n}', { n: next }), 22, PAL.mint);
-    const close = () => objs.forEach((o) => o.destroy());
+    const close = () => {
+      objs.forEach((o) => o.destroy());
+      this.awayObjs = []; // jinak zůstane hospoda zablokovaná
+    };
     const no = this.btn(bx + 24, by + bh - 88, 180, 64, () => close(), D + 3);
     this.drawBtn(no, t('Ještě ne'), true, 'slate');
     const yes = this.btn(bx + bw - 204, by + bh - 88, 180, 64, () => this.prestige(), D + 3);
