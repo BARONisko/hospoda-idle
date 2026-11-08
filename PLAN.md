@@ -262,4 +262,4 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   (výchozí krígl); ťuknutí otevře hygienu. ed9580b. Čeká na volbu uživatele.
 - Postupné odemykání: 1. hygiena krígly · první noc Kostnice/Sběrač · 2. pivovar · 3. Chrám · 4. výzdoba · 5. šipky ·
   6. Liga (tileLock). Při prvním otevření nové části menu šipka na hlavní tlačítko + 1 řádek (tabTut, d.tabTut).
-  Chrám a Šipky (vlastní scény) zatím vlastní návod nemají.
+  Chrám a Šipky mají návod při prvním otevření (pointAt v ui/juice.ts, S.tut / T.tut; Chrám až o víkendu).

@@ -4,7 +4,7 @@
 import Phaser from 'phaser';
 import { PAL } from '../data/palette';
 import { txt } from '../ui/font';
-import { confetti, bigText, popText } from '../ui/juice';
+import { confetti, bigText, popText, pointAt } from '../ui/juice';
 import { t } from '../i18n';
 import { big } from '../core/num';
 import { sfx } from '../core/sfx';
@@ -82,6 +82,9 @@ export class DartsScene extends Phaser.Scene {
   private clearUi() {
     this.ui.forEach((o) => o.destroy());
     this.ui = [];
+    this.tutObjs?.forEach((o) => o.destroy());
+    this.tutObjs = [];
+    this.tutT?.remove();
   }
 
   private text(x: number, y: number, s: string, size: number, c: string, ox = 0) {
@@ -157,6 +160,37 @@ export class DartsScene extends Phaser.Scene {
       this.ui.push(z);
     }
     this.hudTick();
+    this.tutShow();
+  }
+
+  // ---------- návod při prvním otevření: šipka + 1 řádek ----------
+  tutObjs: Phaser.GameObjects.GameObject[] = [];
+  tutT?: Phaser.Time.TimerEvent;
+  private tutShow() {
+    this.tutObjs.forEach((o) => o.destroy());
+    this.tutObjs = [];
+    this.tutT?.remove();
+    const S = this.S, i = S.tut ?? 0;
+    if (i < 0 || this.mode !== 'play') return;
+    // krok 0: ťuknout na terč (s automatem rovnou dál)
+    if (i === 0 && autoOn(S)) return this.tutNext();
+    const steps: [number[], string, boolean][] = [
+      [[CX - 60, CY - 60, 120, 120], t('ťukni na terč = hod'), false],
+      [[W / 2 - 110, 668, 220, 70], t('dohraj přesně na nulu = 1 bod'), false],
+      [[280, 800, 240, 72], (S.up.auto ?? 0) > 0 ? t('za body kupuj vylepšení') : t('za 1 bod kup automat – hází sám'), false],
+    ];
+    const st = steps[i];
+    if (!st) return this.tutNext();
+    this.tutObjs = pointAt(this, st[0], st[1], 60, st[2]);
+    // krok 0 čeká na hod, další jdou dál samy
+    if (i > 0) this.tutT = this.time.delayedCall(4500, () => this.tutNext());
+  }
+
+  private tutNext() {
+    const S = this.S;
+    S.tut = (S.tut ?? 0) + 1 >= 3 ? -1 : (S.tut ?? 0) + 1;
+    this.host.dartsSave();
+    this.tutShow();
   }
 
   private hudTick() {
@@ -176,6 +210,7 @@ export class DartsScene extends Phaser.Scene {
     const S = this.S, st = this.host.dartsStats();
     if (S.have <= 0 || this.flying) return;
     S.have--;
+    if ((S.tut ?? 0) === 0) this.tutNext();
     const [x, y] = aimLand(S, st.dacc ?? 0);
     const res = resolve(S, x, y, st.dextra ?? 0);
     if (res.saved) S.have++;

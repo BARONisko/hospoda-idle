@@ -6,7 +6,7 @@ import { txt } from '../ui/font';
 import { t } from '../i18n';
 import { big } from '../core/num';
 import { sfx } from '../core/sfx';
-import { confetti, rays, bigText } from '../ui/juice';
+import { confetti, rays, bigText, pointAt } from '../ui/juice';
 import { STAT_NAMES, OSSUARY, TEMPLE_STATS, type StatId } from '../core/talisman';
 import {
   TempleState, templeState, cultIdle, isWeekend, msToSwitch, ROUNDS_PER_DAY, ROUND_S, bossHp, DIFFS, DIFF_REW, DIFF_NAMES, setDiff, ALTAR_PER, altarCost, weekendKey, tapPower, chestTen, TEMPLE_UPS, SEAL_BONUS,
@@ -508,6 +508,7 @@ export class TempleScene extends Phaser.Scene {
   private clearUi() {
     this.ui.forEach((o) => o.destroy());
     this.ui = [];
+    this.tutClear();
     this.hud = undefined;
   }
 
@@ -605,6 +606,44 @@ export class TempleScene extends Phaser.Scene {
     }
     this.button(W - 236, 18, 104, 60, t('Zpět'), 'blue', true, () => this.leave());
     this.host.templeSave();
+    this.tutShow();
+  }
+
+  // ---------- návod při prvním otevření (o víkendu): šipka + 1 řádek ----------
+  tutObjs: Phaser.GameObjects.GameObject[] = [];
+  tutT?: Phaser.Time.TimerEvent;
+  private tutClear() {
+    this.tutObjs.forEach((o) => o.destroy());
+    this.tutObjs = [];
+    this.tutT?.remove();
+    this.tutT = undefined;
+  }
+
+  private tutShow() {
+    this.tutClear();
+    const T = this.T, i = T.tut ?? 0;
+    // ve všední den je chrám zavřený – návod počká na víkend
+    if (i < 0 || !isWeekend()) return;
+    const b = this.cth.getBounds();
+    const steps: [string, number[], string, boolean, number?][] = [
+      ['lobby', [70, 840, W - 140, 74], t('o víkendu bojuj s Cthulhu'), false, 680],
+      ['fight', [b.x + b.width * 0.15, b.y + b.height * 0.55, b.width * 0.7, b.height * 0.3], t('táhni prstem přes chapadla'), true],
+      ['fight', [b.x + b.width * 0.3, b.y + b.height * 0.2, b.width * 0.4, b.height * 0.3], t('ťukni na Cthulhu = zásah'), true],
+      ['lobby', [W - 120, 18, 104, 60], t('za chapadla kupuj vylepšení'), true],
+    ];
+    const st = steps[i];
+    if (!st || st[0] !== this.mode) return;
+    if (i === 0 && T.used >= ROUNDS_PER_DAY) return;
+    this.tutObjs = pointAt(this, st[1], st[2], 70, st[3], st[4]);
+    // krok 0 čeká na „Do boje!“, ostatní jdou dál samy
+    if (i > 0) this.tutT = this.time.delayedCall(4000, () => this.tutNext());
+  }
+
+  private tutNext() {
+    const T = this.T;
+    T.tut = (T.tut ?? 0) + 1 >= 4 ? -1 : (T.tut ?? 0) + 1;
+    this.host.templeSave();
+    this.tutShow();
   }
 
   private leave() {
@@ -656,6 +695,8 @@ export class TempleScene extends Phaser.Scene {
     this.cth.play('kc_win');
     this.time.delayedCall(1200, () => this.cth.active && this.cth.play('kc_idle'));
     this.hudTick();
+    if ((this.T.tut ?? 0) === 0) this.tutNext();
+    else this.tutShow();
   }
 
   private hudTick() {

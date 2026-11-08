@@ -116,3 +116,24 @@ export function flashRect(s: Phaser.Scene, x: number, y: number, w: number, h: n
   g.lineStyle(4, 0xffd75e).strokeRoundedRect(x, y, w, h, 10);
   s.tweens.add({ targets: g, alpha: 0, duration: 450, onComplete: () => g.destroy() });
 }
+
+/** návod: zlatý rámeček kolem cíle, houpající se šipka a jeden řádek textu (přání uživatele: šipkou, málo textu).
+ *  below = šipka zespodu (míří nahoru), text pod ní. Vrací objekty ke smazání. */
+export function pointAt(s: Phaser.Scene, r: number[], text: string, depth: number, below = false, textY?: number): Phaser.GameObjects.GameObject[] {
+  const [x, y, w, h] = r;
+  const ink = Phaser.Display.Color.HexStringToColor(PAL.ink).color, gold = Phaser.Display.Color.HexStringToColor(PAL.gold).color;
+  const fr = s.add.graphics().setDepth(depth);
+  fr.lineStyle(4, gold).strokeRoundedRect(x - 4, y - 4, w + 8, h + 8, 10);
+  s.tweens.add({ targets: fr, alpha: 0.35, yoyo: true, repeat: -1, duration: 450 });
+  const ax = x + w / 2, ay = below ? y + h + 34 : y - 34;
+  const ar = s.add.graphics().setDepth(depth + 1).setPosition(ax, ay);
+  const tri = (c: number, g: number) => ar.fillStyle(c).fillTriangle(-20 - g, -12 - g, 20 + g, -12 - g, 0, 20 + g).fillRect(-8 - g, -36 - g, 16 + g * 2, 26);
+  tri(ink, 4);
+  tri(gold, 0);
+  if (below) ar.setAngle(180);
+  s.tweens.add({ targets: ar, y: ay + (below ? 8 : -8), yoyo: true, repeat: -1, duration: 380, ease: 'Sine.inOut' });
+  const W = s.scale.width;
+  const tx = s.add.text(W / 2, textY ?? (below ? ay + 58 : ay - 58), text, txt(24, PAL.gold)).setOrigin(0.5).setDepth(depth + 1).setBackgroundColor(PAL.ink).setPadding(12, 6, 12, 6);
+  tx.setScale(Math.min(1, (W - 30) / tx.width));
+  return [fr, ar, tx];
+}

@@ -16,6 +16,8 @@ export interface DartsState {
   up: Record<string, number>;
   /** automatické házení zapnuté (platí jen s koupeným automatem up.auto) */
   auto: boolean;
+  /** krok návodu při prvním otevření (−1 = hotovo) */
+  tut?: number;
   /** čas posledního hodu automatu na pozadí (ms) – hází v reálném čase, 1 šipka za THROW_GAP */
   tat?: number;
   /** verze (2 = bez ručního míření; 3 = automat se kupuje) */

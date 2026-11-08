@@ -3,6 +3,8 @@
 import { t } from '../i18n';
 
 export interface TempleState {
+  /** krok návodu (0 lobby, 1–2 boj, 3 obchod, −1 hotovo) */
+  tut?: number;
   /** klíč víkendu (datum soboty) – při změně chapadla shnijí a přijde nový boss */
   wk: string;
   /** zbývající životy bosse 0–1 */
