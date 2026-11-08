@@ -7,7 +7,8 @@ import { STATIONS, StationDef, payout, cost, actMult, UPGRADES, upMult, kriglyFo
 interface St { lvl: number; auto: boolean }
 const fmt = (s: number) => (s < 3600 ? `${(s / 60).toFixed(1)} min` : `${(s / 3600).toFixed(2)} h`);
 
-export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
+/** goal: zastav, až krígly v běhu (kf) dosáhnou goal, a vrať čas v s; kf = varianta vzorce krígel */
+export function run(pubs: number, krigle: number, maxT = 6 * 3600, goal = 0, kf: (run: number, pubs: number) => number = (r) => kriglyFor(r)): any {
   const st: St[][] = Array.from({ length: pubs }, (_, i) => STATIONS.map((d) => ({ lvl: d.id === 'tap' && i === 0 ? 1 : 0, auto: false })));
   const up: string[] = [];
   // číšníci: první nastoupí s kostlivcem na pípě, pípa vydělá jen to, co roznesou
@@ -138,6 +139,7 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
     run += r;
     t += 1;
     for (const [name, v] of [['1K', 1e3], ['1M', 1e6], ['1B', 1e9]] as const) if (run >= v && !(name in marks)) marks[name] = t;
+    if (goal && kf(run, pubs) >= goal) return t;
     if (kriglyFor(run) >= PRESTIGE_FIRST && !('1. hygiena' in marks)) marks['1. hygiena'] = t;
     if (kriglyFor(run) >= PRESTIGE_MIN && !('prestiž' in marks)) marks['prestiž'] = t;
     if (kriglyFor(run) >= 4 * PRESTIGE_MIN && !('40 krígel' in marks)) marks['40 krígel'] = t;
@@ -150,6 +152,8 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
 
 const WAITERS_ON = !process.env.NO_WAITERS;
 const OLD = !!process.env.OLD;
+if (!process.env.CHAIN) {
 console.log('1 hospoda, 0 krígel ', run(1, 0));
 console.log('2 hospody, 15 krígel', run(2, 15));
 console.log('3 hospody, 50 krígel', run(3, 50));
+}
