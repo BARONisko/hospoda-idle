@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">P.U.B. Idle</string>
+    <string name="title_activity_main">P.U.B. Idle</string>
+    <string name="package_name">cz.baronisko.pubidle</string>
+    <string name="custom_url_scheme">cz.baronisko.pubidle</string>
+</resources>

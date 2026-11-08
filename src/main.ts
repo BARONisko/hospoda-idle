@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+import { initAdMob } from './core/admob';
 import Phaser from 'phaser';
 import '@fontsource/jersey-10/latin-ext-400.css';
 import '@fontsource/jersey-10/latin-400.css';
@@ -108,7 +110,10 @@ window.visualViewport?.addEventListener('resize', desktopFit);
 setInterval(desktopFit, 1000);
 desktopFit();
 
-// PWA: hraní bez internetu (jen v sestavené verzi, ne ve vývoji)
-if (import.meta.env.PROD && 'serviceWorker' in navigator && location.protocol === 'https:') {
+// mobilní aplikace: reklamy za odměnu (AdMob)
+void initAdMob();
+
+// PWA: hraní bez internetu (jen v sestavené verzi, ne ve vývoji; v aplikaci Capacitor netřeba)
+if (import.meta.env.PROD && 'serviceWorker' in navigator && location.protocol === 'https:' && !Capacitor.isNativePlatform()) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => undefined));
 }

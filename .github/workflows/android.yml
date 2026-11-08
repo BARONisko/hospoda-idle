@@ -1,0 +1,52 @@
+# Sestavení Android aplikace (Capacitor): AAB pro Google Play + APK pro instalaci do telefonu.
+# Spouští se ručně (Actions → Android → Run workflow) nebo pushem tagu v*.
+# Podpis: tajemství KEYSTORE_BASE64 + KEYSTORE_PASSWORD (alias „upload“). Bez nich jen nepodepsaný AAB a ladicí APK.
+# Reklamy: proměnné (Variables) ADMOB_APP_ID + ADMOB_REWARDED; bez nich testovací reklamy Googlu.
+name: Android
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm run build
+        env:
+          VITE_ADMOB_REWARDED: ${{ vars.ADMOB_REWARDED }}
+      - run: npx cap sync android
+      - name: Klíč pro podpis
+        env:
+          KS: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KS" ]; then
+            echo "$KS" | base64 -d > "$RUNNER_TEMP/upload.jks"
+            echo "KEYSTORE_FILE=$RUNNER_TEMP/upload.jks" >> "$GITHUB_ENV"
+          fi
+      - name: Sestavit AAB a APK
+        working-directory: android
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+          ADMOB_APP_ID: ${{ vars.ADMOB_APP_ID }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: upload
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon bundleRelease assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pub-idle-${{ github.run_number }}
+          path: |
+            android/app/build/outputs/bundle/release/*.aab
+            android/app/build/outputs/apk/debug/*.apk

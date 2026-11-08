@@ -3,3 +3,5 @@ dist
 tools/_tmp
 *.log
 dist-offline
+*.jks
+*.keystore
