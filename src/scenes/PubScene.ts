@@ -52,6 +52,8 @@ const STRIP = 380; // horní lišta s penězi
 const CARD_H = 88;
 /** spodní lišta Hospoda / Obchod / Úkoly / Menu (návrh 4) */
 const NAV_H = 84;
+/** ×2 za reklamu na stanici – minut */
+const STATION_AD_MIN = 15;
 /** horní okraj otevřeného menu: spodní lišta zůstává vidět pod ním (výběr uživatele B) */
 const MENU_Y0 = 960 - NAV_H - 6 * 96 - 126;
 /** spodek obsahu menu (nad lištou) */
@@ -177,6 +179,10 @@ interface Card {
   y: number;
   /** název hodnosti mistrovství (vedle úrovně, za ním tečky stupňů) */
   bnum: Phaser.GameObjects.Text;
+  /** odznak „×2 za reklamu“ vedle názvu (návrh B) */
+  adG: Phaser.GameObjects.Graphics;
+  adT: Phaser.GameObjects.Text;
+  adZ: Phaser.GameObjects.Zone;
 }
 
 /**
@@ -2325,6 +2331,18 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     }
   }
 
+  /** ×2 za reklamu na jedné stanici na 15 min (karta, odznak vedle názvu) */
+  async stationAd(pi: number, id: string) {
+    sfx.init();
+    const p = this.d.pubs[pi];
+    if (!p || (p.adx?.[id] ?? 0) > Date.now()) return;
+    if (!(await this.rewarded())) return this.banner(this.views[0].cam, t('Reklama se nepřehrála'));
+    (p.adx ??= {})[id] = Date.now() + STATION_AD_MIN * 60_000;
+    sfx.buy();
+    this.banner(this.views[pi]?.cam ?? this.views[0].cam, t('{s} vydělává ×2 – {m} min', { s: STATION_NAMES[p.act][id], m: STATION_AD_MIN }));
+    store(this.d);
+  }
+
   /** pustí reklamu a spustí / prodlouží kampaň */
   async adWatchNow() {
     if (!(await this.rewarded())) return this.banner(this.views[0].cam, t('Reklama se nepřehrála'));
@@ -3453,7 +3471,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.skillBtns.forEach((_, j) => this.drawSkill(j));
     this.time.delayedCall(0, () => this.guideEv('pub:' + i));
     for (const c of this.cards)
-      [c.box, c.name, c.lvl, c.bar, c.info, c.tapZone, c.buy.bg, c.buy.label, c.buy.zone, c.staff.bg, c.staff.label, c.staff.zone, c.tag, c.bnum].forEach((o) => o.destroy());
+      [c.box, c.name, c.lvl, c.bar, c.info, c.tapZone, c.buy.bg, c.buy.label, c.buy.zone, c.staff.bg, c.staff.label, c.staff.zone, c.tag, c.bnum, c.adG, c.adT, c.adZ].forEach((o) => o.destroy());
     this.cards = [];
     this.addCards(i, TOP + VIEW_H + 10);
     this.refresh();
@@ -3513,7 +3531,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.sheetObjs.forEach((o) => o.destroy());
     this.sheetObjs = [];
     for (const c of this.cards)
-      [c.box, c.name, c.lvl, c.bar, c.info, c.tapZone, c.buy.bg, c.buy.label, c.buy.zone, c.staff.bg, c.staff.label, c.staff.zone, c.tag].forEach((o) => o.destroy());
+      [c.box, c.name, c.lvl, c.bar, c.info, c.tapZone, c.buy.bg, c.buy.label, c.buy.zone, c.staff.bg, c.staff.label, c.staff.zone, c.tag, c.bnum, c.adG, c.adT, c.adZ].forEach((o) => o.destroy());
     this.cards = [];
     this.sheet = -1;
   }
@@ -3535,7 +3553,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const buy = this.btn(W - 212, y + 6, 190, 48, () => this.buy(pubIdx, def), depth);
       const staff = this.btn(W - 212, y + 57, 190, 22, () => this.hire(pubIdx, def), depth);
       const bnum = this.add.text(26, y + 32, '', txt(17, PAL.fog)).setDepth(depth + 1);
-      this.cards.push({ tag, pub: pubIdx, def, box, name, lvl, bar, info, buy, staff, tapZone, y, bnum });
+      const adG = this.add.graphics().setDepth(depth + 2);
+      const adT = this.add.text(0, y + 20, '', txt(20, PAL.white)).setOrigin(0.5).setDepth(depth + 3).setStroke(PAL.ink, 4);
+      const adZ = this.add.zone(0, y + 1, 40, 40).setOrigin(0.5, 0).setInteractive({ useHandCursor: true }).setDepth(depth + 4);
+      adZ.on('pointerdown', () => void this.stationAd(pubIdx, def.id));
+      this.cards.push({ tag, pub: pubIdx, def, box, name, lvl, bar, info, buy, staff, tapZone, y, bnum, adG, adT, adZ });
     });
   }
 
@@ -3688,7 +3710,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act) * ((p.adx?.[def.id] ?? 0) > Date.now() ? 2 : 1);
   }
 
   // ---------- obchod s krígly ----------
@@ -5014,6 +5036,21 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         const sx = c.name.x + c.name.width + 16;
         for (let k = 0; k < stars; k++) this.starShape(c.bar, sx + k * 20, c.y + 19, 8, fc);
       } else if (pubStyle(p) === c.def.id) c.bar.lineStyle(3, col('gold')).strokeRoundedRect(11, c.y + 1, W - 22, CARD_H - 10, 10);
+      // ×2 za reklamu (návrh B): kulatý odznak za názvem / hvězdami; běží → červený s odpočtem
+      {
+        const left = (p.adx?.[c.def.id] ?? 0) - Date.now();
+        const show = open && !this.night && (left > 0 || this.canReward());
+        c.adG.clear().setVisible(show);
+        c.adT.setVisible(show);
+        if (show) c.adZ.setInteractive();
+        else c.adZ.disableInteractive();
+        if (show) {
+          const ax = Math.min(300, c.name.x + c.name.width + (stars > 0 ? 16 + stars * 20 : 0) + 26);
+          c.adG.fillStyle(col('ink')).fillCircle(ax, c.y + 20, 19).fillStyle(left > 0 ? col('red') : col('amber')).fillCircle(ax, c.y + 20, 16);
+          c.adT.setPosition(ax, c.y + 20).setText(left > 0 ? hms(left).replace(/^0:/, '') : '×2').setFontSize(left > 0 ? 15 : 20);
+          c.adZ.setPosition(ax, c.y + 1);
+        }
+      }
       c.bar.fillStyle(col('dusk')).fillRoundedRect(26, c.y + 57, bw, 16, 6);
       if (open && s.prog > 0) c.bar.fillStyle(col(s.auto ? 'mint' : 'amber')).fillRoundedRect(26, c.y + 57, Math.max(12, bw * Math.min(1, s.prog)), 16, 6);
       if (open && !s.auto && s.prog === 0) c.info.setText(t('ťukni sem!'));

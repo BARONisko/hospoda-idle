@@ -21,6 +21,8 @@ export interface PubState {
   boostUntil?: number;
   /** schopnost znovu připravena od (ms) */
   boostReady?: number;
+  /** ×2 za reklamu na stanici: id stanice → platí do (ms) */
+  adx?: Record<string, number>;
   /** číšníci (vylepšení každého zvlášť) */
   w?: import('./waiters').WaiterState[];
   /** piva čekající na baru: počet a jejich hodnota v coins */

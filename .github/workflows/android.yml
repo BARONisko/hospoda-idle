@@ -23,7 +23,7 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          VITE_ADMOB_REWARDED: ${{ vars.ADMOB_REWARDED }}
+          VITE_ADMOB_REWARDED: ${{ vars.ADMOB_REWARDED || 'ca-app-pub-8006969045918894/9741456666' }}
       - run: npx cap sync android
       - name: Klíč pro podpis
         env:
@@ -37,7 +37,7 @@ jobs:
         working-directory: android
         env:
           VERSION_CODE: ${{ github.run_number }}
-          ADMOB_APP_ID: ${{ vars.ADMOB_APP_ID }}
+          ADMOB_APP_ID: ${{ vars.ADMOB_APP_ID || 'ca-app-pub-8006969045918894~1551800445' }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: upload
