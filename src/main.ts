@@ -76,8 +76,7 @@ const game = new Phaser.Game({
   pixelArt: true,
   roundPixels: true,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-  // kolečko myši roluje stránku (na počítači)
-  input: { activePointers: 2, mouse: { preventDefaultWheel: false } },
+  input: { activePointers: 2 },
   // idle hra nepotřebuje 60–120 snímků/s: strop 30 = méně práce pro procesor i grafiku (telefon se nehřeje)
   fps: { target: 30, limit: 30 },
   render: { powerPreference: 'low-power' },
@@ -85,19 +84,29 @@ const game = new Phaser.Game({
 });
 (window as unknown as { game: Phaser.Game }).game = game;
 
-// Počítač (hlášení: „nevidím to celé a nemůžu rolovat“, přání: rolovat jako Idle Obelisk Miner): hra má pevnou
-// velikost na výšku (šířka max 560 px) a stránka se roluje kolečkem myši. Na telefonu beze změny (celá obrazovka).
+// Počítač (přání: „vlož to do prohlížeče tak, abych nemusel rolovat“): celá hra se vejde do viditelné části okna.
+// Když okno sahá pod lištu Windows / okraj obrazovky, hra se zmenší jen na viditelnou výšku (na telefonu beze změny).
 const gameDiv = document.getElementById('game');
-function desktopLayout() {
+let lastFit = '';
+function desktopFit() {
   if (!gameDiv || matchMedia('(pointer: coarse)').matches) return;
-  const w = Math.min(window.innerWidth, 560);
-  document.documentElement.style.overflowY = document.body.style.overflowY = 'auto';
-  document.body.style.touchAction = 'auto';
-  Object.assign(gameDiv.style, { position: 'relative', inset: 'auto', margin: '0 auto', width: w + 'px', height: Math.round((w * 960) / 540) + 'px' });
+  const scr = screen as Screen & { availTop?: number };
+  const winBottom = window.screenY + window.outerHeight;
+  const visBottom = (scr.availTop ?? 0) + screen.availHeight;
+  // co z okna je schované pod okrajem obrazovky (jen rozumné hodnoty – prohlížeče někdy hlásí nesmysly)
+  let over = winBottom - visBottom;
+  if (!(over > 0 && over < window.innerHeight / 2)) over = 0;
+  const vh = Math.min(window.innerHeight - over, window.visualViewport?.height ?? window.innerHeight);
+  const key = `${vh}|${window.innerWidth}`;
+  if (key === lastFit) return;
+  lastFit = key;
+  Object.assign(gameDiv.style, { position: 'fixed', top: '0', left: '0', right: '0', bottom: 'auto', height: vh + 'px' });
   game.scale.refresh();
 }
-window.addEventListener('resize', desktopLayout);
-desktopLayout();
+window.addEventListener('resize', desktopFit);
+window.visualViewport?.addEventListener('resize', desktopFit);
+setInterval(desktopFit, 1000);
+desktopFit();
 
 // PWA: hraní bez internetu (jen v sestavené verzi, ne ve vývoji)
 if (import.meta.env.PROD && 'serviceWorker' in navigator && location.protocol === 'https:') {

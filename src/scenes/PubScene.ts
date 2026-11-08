@@ -1049,9 +1049,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     ['opts', null, t('Nastavení'), 'icons', 'gear'],
   ];
 
+  tileH = 118;
   private menuGrid(y0: number, D: number) {
     this.shopObjs.push(this.add.text(20, y0 + 16, t('Menu'), txt(30, PAL.gold)).setDepth(D + 2));
-    const tw = (W - 40) / 3, th = 118;
+    const tw = (W - 40) / 3, th = this.tileH;
     PubScene.TILES.forEach(([tab, sub, label, atlas, frame], i) => {
       const x = 10 + (i % 3) * (tw + 10), y = y0 + 64 + Math.floor(i / 3) * (th + 8);
       const lock = this.tileLock(sub && tab === 'shop' ? sub : tab);

@@ -320,3 +320,7 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   přepnul hospodu tažením a najal číšníky dřív, krok už nepřišel. guideSkipDone() v update: splněný krok (vybraná hospoda,
   koupená pípa, najatí číšníci) se sám přeskočí. Test 6b teď prochází průvodce ŤUKÁNÍM PRSTEM na cíl šipky (dřív volal
   hire() z kódu, proto chybu neviděl); nový test 6b2 = přesně hlášený případ (bez opravy selže).
+- Záložka Úkoly bez úkolu od hostinského (přání; je v liště nad hospodou).
+- Počítač (přání: „bez rolování“): celá hra se vejde do viditelné části okna (desktopFit v main.ts – když okno sahá pod lištu
+  Windows, hra se zmenší na viditelnou výšku); rolování zrušeno. Telefon beze změny.
+- ČEKÁ: Úkoly a Obchod v menu (uživateli se nelíbí) – návrhy A/B/C docs/navrhy-ui/menu-obchod-ukoly-ABC.png.
