@@ -447,7 +447,7 @@ export class PubView {
     }
     while (this.barMugs.length > show) this.barMugs.pop()!.destroy();
     if (!this.barText) {
-      this.barText = this.s.add.text(this.ox + 7.8 * T, 3 * T + 2, '', txt(9, PAL.gold)).setOrigin(0.5).setDepth(5000).setResolution(3);
+      this.barText = this.s.add.text(this.ox + 7.55 * T, 4 * T + 22, '', txt(11, PAL.gold)).setOrigin(0.5).setBackgroundColor(PAL.ink).setPadding(2, 0, 2, 0).setDepth(5000).setResolution(3);
       this.objs.push(this.barText);
       this.s.events.emit('pubObj', this.barText);
     }

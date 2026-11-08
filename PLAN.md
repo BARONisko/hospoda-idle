@@ -243,4 +243,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   co čeká přes 10 s, zahodí se.
 - HOTOVO (přání): cedule stylu (PIVNICE) vpravo nahoře, truhla pod ní (signBot), když je k vyzvednutí.
 - HOTOVO (přání): konec návodu – v menu jen šipka na křížek, cedule HOTOVO! (s konfetami) až po zavření menu na hlavní obrazovce na 4 s (tutFinale); průvodce novinkami a lišta úkolu počkají.
+- HOTOVO (hlášení: počet piv na pultu schovaný pod lištou úkolu): „11/12“ teď pod korbely na přední hraně pultu, větší a s tmavým podkladem.
 - ČEKÁ: zúžit lištu úkolu? Poslední krok návodu (HOTOVO) má v menu velkou ceduli.
