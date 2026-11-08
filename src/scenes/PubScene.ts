@@ -3496,6 +3496,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     b.visible = visible;
     b.bg.clear();
     b.label.setVisible(visible);
+    // skryté tlačítko nesmí chytat dotyky (dřív neviditelné „UKAŽ“ skryté lišty úkolu blokovalo truhlu)
+    b.zone.setVisible(visible);
     if (!visible) return;
     b.bg.fillStyle(col('ink')).fillRoundedRect(b.x, b.y + 4, b.w, b.h, 9);
     b.bg.fillStyle(col(enabled ? c : 'slate')).fillRoundedRect(b.x, b.y, b.w, b.h, 9);

@@ -205,6 +205,32 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   if (p.errors.length) console.log(p.errors);
   await p.close();
 }
+// 6e) dotyky: žádné viditelné tlačítko hlavní obrazovky nesmí zakrývat neviditelný objekt; truhla jde ťuknout prstem
+{
+  for (const q of ['?night=0', '?pubs=3&night=0', '?night=1']) {
+    const p = await page(q);
+    await S(p, (s) => { s.d.tut = -1; s.tutShow(); s.d.chest = undefined; s.d.coins = 1e12; s.buy(0, s.cards[1].def); for (const c of s.cards) s.hire(0, c.def); s.d.pubs[0].mgr = true; s.chestHudDraw(); s.refresh(); });
+    await p.waitForTimeout(1200);
+    const bad = await S(p, (s) => {
+      const cam = s.cameras.main, im = s.input.manager;
+      const list = (s.input._list ?? []).filter((o) => im.inputCandidate(o, cam) && o.getBounds);
+      return list.filter((o) => {
+        const bd = o.getBounds();
+        const hits = list.filter((x) => x.getBounds().contains(bd.centerX, bd.centerY));
+        return hits.some((x) => x !== o && x.depth > o.depth);
+      }).map((o) => `${o.type} ${Math.round(o.x)},${Math.round(o.y)}`);
+    });
+    ok(`dotyky ${q}: nic zakrytého`, bad.length === 0);
+    if (bad.length) console.log(bad);
+    if (q === '?night=0') {
+      const xy = await S(p, (s) => { const z = s.chestHud.zone, rc = game.canvas.getBoundingClientRect(), k = rc.width / 540; return [rc.left + (z.x + 32) * k, rc.top + (z.y + 32) * k]; });
+      await p.touchscreen.tap(xy[0], xy[1]);
+      await p.waitForTimeout(400);
+      ok('truhla: ťuknutí prstem otevře truhlu', await S(p, (s) => s.shopObjs.length > 0 && s.tab === 'chest'));
+    }
+    await p.close();
+  }
+}
 // 7) offline výdělek
 {
   const p = await page('?pubs=2&away=3600');

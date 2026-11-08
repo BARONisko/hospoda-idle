@@ -305,3 +305,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   „úr. N · body P“. V Hostinském tlačítko „body: N ?“ → panel Odkud body (úrovně, mistrovství, hvězdy, věrní hosté, utraceno).
   Návody (šipka + 1 řádek): Mistrovství (1. stanice), Sbírka (1. karta), Hostinský (KOUPIT). Po hygieně jeden nápis
   „★ Nové hvězdy stanic: n – +n b. do stromu“. Celkový test: npm test, build, tutwalk, delší hraní tools/_tmp/play.mjs.
+- OPRAVA (hlášení: nejde ťuknout na truhlu): skrytá lišta úkolu (od návrhu 4 se nekreslí) měla aktivní neviditelné tlačítko
+  „UKAŽ“ přesně přes truhlu. drawBtn(..., visible=false) teď skryje i zónu → skrytá tlačítka nechytají dotyky (opraví i skryté
+  tlačítko obsluhy na kartě). Nový test 6e: žádné dotykové místo hlavní obrazovky není zakryté (1 hospoda, 3 hospody, noc)
+  a truhla jde otevřít skutečným ťuknutím prstem (ověřeno, že bez opravy test selže).
+- Návod krok 5 (přání): „NAŠETŘI 60 COINS“ – šipka na Pípu (vydělává sama), světlé obě karty; na „Otevřít“ až když má coins.
