@@ -863,5 +863,9 @@
  "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na bubliny hostů – dávají spropitné.": "「{s}」のために貯めよう（{c} coins、約{d}）。その間、客をタップ – チップをくれる。",
  "Ťukej na bubliny hostů – dávají spropitné.": "客をタップ – チップをくれる。",
  "pípa točí sama (nebo ťukej na bubliny hostů)": "サーバーは自動で注ぐ（客をタップしてもOK）",
- "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "骨は夜に集まる:ステーションと客のタップ。\n納骨堂やお守りに使える。"
+ "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "骨は夜に集まる:ステーションと客のタップ。\n納骨堂やお守りに使える。",
+ "1 pivo": "ビール1杯",
+ "pivo se vaří samo – i offline": "ビールは自動で醸造 – オフラインでも",
+ "první pivo zdarma – prodej ho": "最初のビールは無料 – 売ってみよう",
+ "piva jdou i na pivní akce": "ビールはビールアクションにも使える"
 }

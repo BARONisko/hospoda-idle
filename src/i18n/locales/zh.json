@@ -863,5 +863,9 @@
  "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na bubliny hostů – dávají spropitné.": "为“{s}”攒钱（{c} coins，约{d}）。同时点击客人 – 他们给小费。",
  "Ťukej na bubliny hostů – dávají spropitné.": "点击客人 – 他们给小费。",
  "pípa točí sama (nebo ťukej na bubliny hostů)": "酒头会自动出酒（或点击客人）",
- "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "夜里收集骨头:站点和点击客人。\n可在骨堂和护身符上花掉。"
+ "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "夜里收集骨头:站点和点击客人。\n可在骨堂和护身符上花掉。",
+ "1 pivo": "1 杯啤酒",
+ "pivo se vaří samo – i offline": "啤酒自动酿造——离线也会",
+ "první pivo zdarma – prodej ho": "第一杯啤酒免费——卖掉它",
+ "piva jdou i na pivní akce": "啤酒也能用于啤酒活动"
 }

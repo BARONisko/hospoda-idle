@@ -863,5 +863,9 @@
  "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na bubliny hostů – dávají spropitné.": "Save up for “{s}” ({c} coins, about {d}). Meanwhile tap guests – they tip.",
  "Ťukej na bubliny hostů – dávají spropitné.": "Tap guests – they tip.",
  "pípa točí sama (nebo ťukej na bubliny hostů)": "the tap pours by itself (or tap guests)",
- "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "You collect bones at night: stations and tapping guests.\nSpend them in the Ossuary and on talismans."
+ "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "You collect bones at night: stations and tapping guests.\nSpend them in the Ossuary and on talismans.",
+ "1 pivo": "1 beer",
+ "pivo se vaří samo – i offline": "beer brews by itself – even offline",
+ "první pivo zdarma – prodej ho": "first beer is free – sell it",
+ "piva jdou i na pivní akce": "beer also pays for beer actions"
 }

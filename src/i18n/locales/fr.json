@@ -863,5 +863,9 @@
  "Šetři na „{s}“ ({c} coins, asi {d}). Mezitím ťukej na bubliny hostů – dávají spropitné.": "Économise pour « {s} » ({c} coins, environ {d}). En attendant, touche les clients – ils donnent des pourboires.",
  "Ťukej na bubliny hostů – dávají spropitné.": "Touche les clients – ils donnent des pourboires.",
  "pípa točí sama (nebo ťukej na bubliny hostů)": "la pression tire seule (ou touche les clients)",
- "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "Les os se récoltent la nuit : stations et touches sur les clients.\nDépense-les à l'Ossuaire et en talismans."
+ "Kosti sbíráš v noci: stanice a ťuknutí na bubliny hostů.\nUtratíš je i v Kostnici a za talismany.": "Les os se récoltent la nuit : stations et touches sur les clients.\nDépense-les à l'Ossuaire et en talismans.",
+ "1 pivo": "1 bière",
+ "pivo se vaří samo – i offline": "la bière brasse toute seule – même hors ligne",
+ "první pivo zdarma – prodej ho": "première bière offerte – vends-la",
+ "piva jdou i na pivní akce": "la bière sert aussi aux actions"
 }

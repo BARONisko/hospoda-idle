@@ -61,6 +61,8 @@ export interface Save {
   /** průvodce novinkami: čekající (id) a už ukázané */
   guideQ?: string[];
   guides?: string[];
+  /** mini průvodce pivovarem: krok 0–2, -1 = hotovo */
+  brewTut?: number;
   /** úkol od hostinského: splněné úkoly (id) a navštívené části menu */
   q?: string[];
   qTiles?: string[];

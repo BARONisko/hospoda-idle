@@ -284,6 +284,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.events.on('guestSeen', (key: string) => {
       if (!this.d.seen.includes(key)) this.d.seen.push(key);
     });
+    // mini průvodce pivovarem jen pro ty, kdo pivovar ještě neviděli
+    if (this.d.brewTut === undefined && this.d.guides?.includes('tile:brew')) this.d.brewTut = -1;
     this.views = [];
     // po restartu scény (hygiena) jsou staré objekty zničené – odkazy na ně zahodit, jinak hra spadne (zamrzne)
     this.qUi = this.styleSign = this.chestHud = this.chestBg = this.vipBar = this.vipSpr = this.brewBar = this.brewTxt = undefined;
@@ -1374,6 +1376,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const price = this.visitCtx().income(sellSecs(b) * (1 + this.ts().beer));
     const sell = this.btn(10, y0 + 310, 255, 70, () => {
       if (b.stock < 1) return sfx.error();
+      if (this.d.brewTut === 0 || this.d.brewTut === 1) this.d.brewTut = 2;
       b.stock--;
       this.xp(15);
       this.week('beers');
@@ -1385,6 +1388,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.drawBtn(sell, t('Prodat pivo\n+{n} coins', { n: big(price) }), b.stock > 0, 'green');
     const inv = this.btn(275, y0 + 310, 255, 70, () => {
       if (b.stock < 1) return sfx.error();
+      if (this.d.brewTut === 0 || this.d.brewTut === 1) this.d.brewTut = 2;
       b.stock--;
       b.inv++;
       this.week('beers');
@@ -1447,11 +1451,61 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         store(this.d);
         this.openShop('brew', false);
       }, D + 2);
-      this.drawBtn(bt, a.on ?? `${a.label}\n${t('{n} piva', { n: a.cost })}`, can, a.on ? 'slate' : 'amber');
+      this.drawBtn(bt, a.on ?? `${a.label}\n${a.cost === 1 ? t('1 pivo') : t('{n} piva', { n: a.cost })}`, can, a.on ? 'slate' : 'amber');
       bt.label.setFontSize(18).setScale(Math.min(1, (bw - 10) / bt.label.width));
       this.shopObjs.push(bt.bg, bt.label, bt.zone);
     });
     this.drawBrewBar();
+    this.brewTutDraw(y0, D);
+  }
+
+  /** mini průvodce pivovarem při prvním otevření: šipka + krátký popisek (v menu žádná velká cedule) */
+  /** kdy přejde krok bez akce dál (ms, 0 = nečeká) */
+  private brewTutAt = 0;
+  private brewTutDraw(y0: number, D: number) {
+    const b = this.brew();
+    if (this.d.brewTut === undefined) {
+      this.d.brewTut = 0;
+      if (b.stock < 1) b.stock = 1; // první pivo zdarma, ať jde prodej hned vyzkoušet
+      store(this.d);
+      return this.openShop('brew', false);
+    }
+    const i = this.d.brewTut;
+    if (i < 0) return;
+    const steps = [
+      { r: [150, y0 + 100, W - 170, 30], text: t('pivo se vaří samo – i offline'), up: true },
+      { r: [10, y0 + 310, 255, 70], text: t('první pivo zdarma – prodej ho'), up: false },
+      { r: [10, y0 + 420, W - 20, 164], text: t('piva jdou i na pivní akce'), up: false },
+    ];
+    const st = steps[i];
+    if (!st) return;
+    const [x, y, w, h] = st.r;
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
+    const fr = add(this.add.graphics().setDepth(D + 6));
+    fr.lineStyle(4, col('gold')).strokeRoundedRect(x - 4, y - 4, w + 8, h + 8, 10);
+    this.tweens.add({ targets: fr, alpha: 0.35, yoyo: true, repeat: -1, duration: 450 });
+    // šipka u cíle (nahoru zespodu u tanku, jinak dolů shora) a pod/nad ní jeden řádek textu
+    const ax = x + w / 2, ay = st.up ? y + h + 34 : y - 34;
+    const ar = add(this.add.graphics().setDepth(D + 7).setPosition(ax, ay));
+    const tri = (c: number, g: number) => ar.fillStyle(c).fillTriangle(-20 - g, -12 - g, 20 + g, -12 - g, 0, 20 + g).fillRect(-8 - g, -36 - g, 16 + g * 2, 26);
+    tri(col('ink'), 4);
+    tri(col('gold'), 0);
+    if (st.up) ar.setAngle(180);
+    this.tweens.add({ targets: ar, y: ay + (st.up ? 8 : -8), yoyo: true, repeat: -1, duration: 380, ease: 'Sine.inOut' });
+    const tx = add(this.add.text(W / 2, st.up ? ay + 46 : ay - 58, st.text, txt(24, PAL.gold)).setOrigin(0.5).setDepth(D + 7).setBackgroundColor(PAL.ink).setPadding(12, 6, 12, 6));
+    tx.setScale(Math.min(1, (W - 30) / tx.width));
+    // kroky bez akce jdou dál samy (3,5 s); prodej čeká na ťuknutí na Prodat / Vylepšit
+    this.brewTutAt = i !== 1 ? Date.now() + 3500 : 0;
+  }
+
+  private brewTutNext() {
+    this.brewTutAt = 0;
+    const from = this.d.brewTut ?? -1;
+    // menu zavřené → krok počká, až se pivovar zase otevře
+    if (from < 0 || this.tab !== 'brew' || !this.shopObjs.length) return;
+    this.d.brewTut = from + 1 >= 3 ? -1 : from + 1;
+    store(this.d);
+    if (this.tab === 'brew' && this.shopObjs.length) this.openShop('brew', false);
   }
 
   brewBar?: Phaser.GameObjects.Graphics;
@@ -3639,6 +3693,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   update(_t: number, dms: number) {
+    if (this.brewTutAt && Date.now() > this.brewTutAt) this.brewTutNext();
     if (this.ntfQ.length) this.ntfNext();
     const dt = Math.min(dms / 1000, 0.25);
     this.comboT -= dt;
