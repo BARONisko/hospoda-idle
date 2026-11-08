@@ -263,3 +263,10 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Postupné odemykání: 1. hygiena krígly · první noc Kostnice/Sběrač · 2. pivovar · 3. Chrám · 4. výzdoba · 5. šipky ·
   6. Liga (tileLock). Při prvním otevření nové části menu šipka na hlavní tlačítko + 1 řádek (tabTut, d.tabTut).
   Chrám a Šipky mají návod při prvním otevření (pointAt v ui/juice.ts, S.tut / T.tut; Chrám až o víkendu).
+- Hrací plocha – návrh 4 (vybral uživatel, docs/navrhy-ui): spodní lišta Hospoda / Obchod / Úkoly / Menu (makeNav,
+  NAV_H 84; shopBtn = položka Menu, takže návod/průvodce míří na ni), Menu z hlavičky pryč (×1 zůstává nahoře),
+  krígl cíle mezi coins a ×1. Karty zjednodušené (CARD_H 88: název, úroveň, pruh, tlačítko; obsluha jen dokud není
+  najatá; varování „číšníci nestíhají“ a „ťukni sem!“ zůstaly). Úkol od hostinského je nahoře v záložce Úkoly
+  (UKAŽ zavře menu a ukáže šipkou, VYBER), lišta nad hospodou se nekreslí; tečka u Úkolů = je co vybrat.
+  Přepínání hospod (záložky nahoře) beze změny. Otevřené menu zatím překrývá spodní lištu.
+  Další kroky návrhu 4: Šťastná hodina / truhla / číšníci jako kulaté ikony vpravo ve scéně.
