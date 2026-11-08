@@ -8,7 +8,7 @@ interface St { lvl: number; auto: boolean }
 const fmt = (s: number) => (s < 3600 ? `${(s / 60).toFixed(1)} min` : `${(s / 3600).toFixed(2)} h`);
 
 /** goal: zastav, až krígly v běhu (kf) dosáhnou goal, a vrať čas v s; kf = varianta vzorce krígel */
-export function run(pubs: number, krigle: number, maxT = 6 * 3600, goal = 0, kf: (run: number, pubs: number) => number = (r) => kriglyFor(r)): any {
+export function run(pubs: number, krigle: number, maxT = 6 * 3600, goal = 0, kf: (run: number, pubs: number) => number = (r, p) => kriglyFor(r, p)): any {
   const st: St[][] = Array.from({ length: pubs }, (_, i) => STATIONS.map((d) => ({ lvl: d.id === 'tap' && i === 0 ? 1 : 0, auto: false })));
   const up: string[] = [];
   // číšníci: první nastoupí s kostlivcem na pípě, pípa vydělá jen to, co roznesou
@@ -140,9 +140,9 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600, goal = 0, kf:
     t += 1;
     for (const [name, v] of [['1K', 1e3], ['1M', 1e6], ['1B', 1e9]] as const) if (run >= v && !(name in marks)) marks[name] = t;
     if (goal && kf(run, pubs) >= goal) return t;
-    if (kriglyFor(run) >= PRESTIGE_FIRST && !('1. hygiena' in marks)) marks['1. hygiena'] = t;
-    if (kriglyFor(run) >= PRESTIGE_MIN && !('prestiž' in marks)) marks['prestiž'] = t;
-    if (kriglyFor(run) >= 4 * PRESTIGE_MIN && !('40 krígel' in marks)) marks['40 krígel'] = t;
+    if (kriglyFor(run, pubs) >= PRESTIGE_FIRST && !('1. hygiena' in marks)) marks['1. hygiena'] = t;
+    if (kriglyFor(run, pubs) >= PRESTIGE_MIN && !('prestiž' in marks)) marks['prestiž'] = t;
+    if (kriglyFor(run, pubs) >= 4 * PRESTIGE_MIN && !('40 krígel' in marks)) marks['40 krígel'] = t;
   }
   const res: Record<string, string> = Object.fromEntries(Object.entries(marks).map(([k, v]) => [k, fmt(v)]));
   res['nejdelší čekání na nákup'] = `${gap1} s (1. h), ${gapL} s (dál); čekání >60 s v 1. h: ${long1}×`;

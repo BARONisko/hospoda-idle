@@ -1559,7 +1559,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.row(y0, RH, D, t('Zavolat hygienu'), t('krígly: {k} (+{b} % výdělek)', { k: big(this.d.krigle), b: big(Math.round(this.d.krigle * KRIGL_BONUS * 100)) }), 'blood', PAL.sand);
     const pb = this.btn(W - 212, y0 + 12, 190, 62, () => this.askPrestige(), D + 2);
     this.hygBtn = pb;
-    const pm = prestigeMin(this.d.stats.prestiges);
+    const pm = prestigeMin(this.d.stats.prestiges, this.d.krigle);
     this.drawBtn(pb, k >= pm ? t('+{k} krígel', { k: big(k) }) : t('{k} / {m} krígel', { k: big(k), m: big(pm) }), k >= pm, 'red');
     this.shopObjs.push(pb.bg, pb.label, pb.zone);
     if (!offer.length) this.shopObjs.push(this.add.text(W / 2, y0 + 150, t('Teď tu nic není.\nOtevři další stanice.'), txt(22, PAL.fog)).setOrigin(0.5).setAlign('center').setDepth(D + 1));
@@ -2341,7 +2341,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     }
     const off = this.shopOffer().find((o) => o.cost <= d.coins);
     if (off) return { text: t('V Obchodě si můžeš koupit: {s}.', { s: off.title }), go: open('shop', 'up') };
-    const k = this.kriglyNow(), pm = prestigeMin(d.stats.prestiges);
+    const k = this.kriglyNow(), pm = prestigeMin(d.stats.prestiges, d.krigle);
     if (k >= pm && k >= d.krigle * 0.3) return { text: t('Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.', { k: big(k), v: big(Math.round(k * KRIGL_BONUS * 100)) }), go: open('shop', 'up') };
     if (!this.tileLock('krigl')) {
       const it = KRIGL_SHOP.find((x) => !kMaxed(x, this.kl(x.id)) && x.cost(this.kl(x.id)) <= d.krigle);
@@ -2546,12 +2546,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   // ---------- prestiž: hygiena ----------
   private askPrestige() {
     const k = this.kriglyNow();
-    if (k < prestigeMin(this.d.stats.prestiges)) return sfx.error();
+    if (k < prestigeMin(this.d.stats.prestiges, this.d.krigle)) return sfx.error();
     this.closeShop();
     const D = 520;
     const objs: Phaser.GameObjects.GameObject[] = [];
     const shade = this.add.rectangle(0, 0, W, H, 0x000000, 0.7).setOrigin(0).setDepth(D).setInteractive();
-    const bx = 30, by = 220, bw = W - 60, bh = 470;
+    const bx = 30, by = 190, bw = W - 60, bh = 560;
     const g = this.add.graphics().setDepth(D + 1);
     g.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
     g.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
@@ -2563,15 +2563,23 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       return o;
     };
     const next = this.d.pubs.length < MAX_PUBS ? PUB_NAMES[this.d.pubs.length + 1] : '';
-    tx(by + 24, t('Hygiena!'), 36, PAL.scarlet);
-    tx(by + 84, t('Hygienik hospodu zavře. Přijdeš o coins, úrovně, vylepšení i manažery.'), 20, PAL.bone);
-    tx(by + 170, t('Dostaneš +{k} krígel', { k: big(k) }), 30, PAL.gold);
-    tx(by + 212, t('každý krígl = +{b} % výdělek navždy', { b: String(Math.round(KRIGL_BONUS * 1000) / 10).replace('.', ',') }), 18, PAL.fog);
-    // o kolik se zlepší výdělek: bonus z krígel teď → po hygieně, a kolikrát víc
+    // návrh 2B (vybráno): před / po – krígly teď → po hygieně a kolikrát víc se bude vydělávat navždy
+    tx(by + 20, t('Hygiena!'), 40, PAL.scarlet);
+    tx(by + 70, t('zavře hospodu: coins, úrovně a vylepšení začnou od nuly'), 18, PAL.fog);
     const cur = this.d.krigle * KRIGL_BONUS, nw = (this.d.krigle + k) * KRIGL_BONUS;
-    tx(by + 240, t('výdělek z krígel: +{a} % → +{b} %', { a: big(Math.round(cur * 100)), b: big(Math.round(nw * 100)) }), 22, PAL.mint);
-    tx(by + 270, t('= vyděláváš ×{m} víc', { m: ((1 + nw) / (1 + cur)).toFixed(2) }), 22, PAL.gold);
-    if (next) tx(by + 310, t('a otevřeš novou hospodu: {n}', { n: next }), 22, PAL.mint);
+    const cy = by + 128;
+    const side = (x: number, head: string, val: string, c: string) => {
+      const h = this.add.text(x, cy, head, txt(22, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2);
+      const v = this.add.text(x, cy + 26, val, txt(40, c)).setOrigin(0.5, 0).setDepth(D + 2);
+      const m = this.add.image(x, cy + 96, 'obj', 'krigl0').setScale(3).setDepth(D + 2);
+      objs.push(h, v, m);
+    };
+    side(bx + 90, t('teď'), big(this.d.krigle), PAL.bone);
+    side(bx + bw - 90, t('po'), big(this.d.krigle + k), PAL.mint);
+    objs.push(this.add.text(W / 2, cy + 30, '➜', txt(48, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 2));
+    tx(cy + 132, '×' + ((1 + nw) / (1 + cur)).toFixed(2).replace('.', ','), 64, PAL.gold);
+    tx(cy + 206, t('výdělek navždy'), 22, PAL.bone);
+    if (next) tx(cy + 240, t('+ nová hospoda: {n}', { n: next }), 24, PAL.mint);
     const close = () => {
       objs.forEach((o) => o.destroy());
       this.awayObjs = []; // jinak zůstane hospoda zablokovaná
@@ -3387,7 +3395,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** krígly za hygienu teď (se Zlatou modlou +25 %) */
   private kriglyNow() {
-    return Math.floor(kriglyFor(this.d.run) * (this.has('idol') ? 1.25 : 1) * (1 + this.ts().krigly + kKrigly(this.kl('krigly'))));
+    return Math.floor(kriglyFor(this.d.run, this.d.pubs.length) * (this.has('idol') ? 1.25 : 1) * (1 + this.ts().krigly + kKrigly(this.kl('krigly'))));
   }
 
   shopSub: 'up' | 'decor' | 'bones' = 'up';
@@ -3845,7 +3853,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   static QH = 60;
 
   private qctx(): QCtx {
-    return { lock: (k) => this.tileLock(k), krigly: () => [this.kriglyNow(), prestigeMin(this.d.stats.prestiges)] };
+    return { lock: (k) => this.tileLock(k), krigly: () => [this.kriglyNow(), prestigeMin(this.d.stats.prestiges, this.d.krigle)] };
   }
 
   private qCur(): QuestDef | null {

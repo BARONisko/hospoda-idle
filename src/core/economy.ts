@@ -169,12 +169,16 @@ export const BOOST_CD = 300;
 
 /** prestiž: krígly za výdělek v běhu, každý +KRIGL_BONUS výdělku navždy */
 /** krígly rostou se čtvrtou odmocninou tržby (dřív druhou → tisíce až miliony krígel) */
-export const kriglyFor = (run: number) => Math.floor(2 * (run / 1e5) ** 0.25);
+/** krígly se počítají podle nejnovější hospody (tržba ÷ její násobek ×10 na hospodu) – jinak by 3. hospoda dávala
+ *  krígly 3× rychleji a kola by se zkracovala na 2 min (simulace tools/sim/chain.mjs) */
+export const kriglyFor = (run: number, pubs = 1) => Math.floor(2 * (run / (1e5 * ACT_STEP ** (pubs - 1))) ** 0.25);
 export const KRIGL_BONUS = 0.009;
 export const PRESTIGE_MIN = 6;
 /** první hygiena (cesta k 2. hospodě) jde dřív: stačí 4 krígly (~1,6M tržby, cca 15 min) */
 export const PRESTIGE_FIRST = 4;
-export const prestigeMin = (prestiges: number) => (prestiges > 0 ? PRESTIGE_MIN : PRESTIGE_FIRST);
+/** každá další hygiena musí přinést aspoň +10 % krígel, co už máš (kola se tak pomalu prodlužují: 9 → 14 → … → 22 min) */
+export const PRESTIGE_GROW = 0.1;
+export const prestigeMin = (prestiges: number, krigle = 0) => (prestiges > 0 ? Math.max(PRESTIGE_MIN, Math.ceil(PRESTIGE_GROW * krigle)) : PRESTIGE_FIRST);
 
 /** obchod s krígly: trvalá vylepšení (přežijí hygienu), platí se krígly; většina jde donekonečna (cena roste exponenciálně) */
 export type KriglId = 'speed' | 'start' | 'offline' | 'events' | 'keepMgr' | 'cthulhu' | 'krigly';
