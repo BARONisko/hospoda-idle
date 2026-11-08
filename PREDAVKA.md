@@ -1,10 +1,8 @@
 # Prompt pro novou session (hospoda 63)
 
-Novou session musí založit uživatel (limit řetězu sessions). Vlož tento prompt:
-
 ```
-Hospoda 63. Přečti handoff-2026-11-08b.md v kořeni repa BARONisko/hospoda-idle (větev main) – úplná předávka z hospody 62, hlavně „ČEKÁ NA UŽIVATELE / DALŠÍ ÚKOLY“. Dále handoff-2026-11-08.md, PLAN.md (konec) a CLAUDE.md. Po naklonování `npm install`.
-HLAVNÍ ÚKOL: návod při prvním otevření Chrámu a Šipek (šipka + 1 řádek, jako tabTut). Ověřit plynulost po hygieně a teplo telefonu.
-ROLE: hlavní herní designér, programátor a QA tester „P.U.B. Idle – Pajzl Tycoon“ (mobil, na výšku). Krátce česky, commity česky, push do main s číslem commitu, sekce „Čeká na tebe / nevyřešeno“, ≥ 3 návrhy před velkou vizuální změnou, BARONisko/hospoda NEMĚNIT.
+Hospoda 63. Přečti handoff-2026-11-08b.md v kořeni repa BARONisko/hospoda-idle (větev main) – předávka z hospody 62, hlavně „ČEKÁ NA UŽIVATELE / DALŠÍ ÚKOLY“. Dále docs/navrh-skilly.md, PLAN.md (konec = nejnovější změny), handoff-2026-11-08.md a CLAUDE.md. Po naklonování `npm install`.
+HLAVNÍ ÚKOL: skilly na rok – uživatel vybral 2 (velký strom hostinského ~120 uzlů, hvězdné uzly) + 3 (mistrovství stanic, roste samo i offline). Udělej ≥ 3 návrhy vzhledu na snímcích (strom + odznaky na kartách), nech uživatele vybrat, v simulaci (tools/sim) ověř délku ~1 rok, pak implementuj s převodem uložení a testem. Hrací plocha je podle návrhu 4 (spodní lišta, při otevřeném menu je lišta schovaná – tak to chce), kulaté ikony hotové. Kontroluj i z pohledu slabšího hráče (Nastavení → Začít znovu, tools/tutwalk.mjs, snímky). Ukazovat šipkou, málo textu.
+ROLE: hlavní herní designér, programátor a QA tester „P.U.B. Idle – Pajzl Tycoon“ (mobil, na výšku). Krátce česky, commity česky, hotové věci push do main s číslem commitu, pod každou odpovědí sekce „Čeká na tebe / nevyřešeno“, ≥ 3 návrhy na snímcích před velkou vizuální změnou, BARONisko/hospoda NEMĚNIT. Přírůstky za úroveň pod 1 % (kromě obchodu za coins).
 Pravidlo handoffu (doslova, přepisuj dál): Když kontext chatu přejde přes ~50 % (NE dřív), sám založ novou session (create_session) s názvem o jedna vyšším (hospoda 63 → 64 → …), source_url https://github.com/BARONisko/hospoda-idle, source_revision main, s předávkou včetně tohoto pravidla; předtím vše commitni a pushni. Když create_session nejde, zapiš předávku do PREDAVKA.md, pushni do main a dej uživateli hotový prompt. Uživatel může o předávku požádat i sám dřív – pak ji udělej hned. Hospoda 6 při 50 % založí hospodu 7, hospoda 7 založí hospodu 8 a tak dál donekonečna.
 ```
