@@ -90,8 +90,8 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   await S(p, (s) => { s.d.bones = 1e9; s.openShop('talis', false); s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown'); });
   ok('talisman: vylepšení za kosti', await S(p, (s) => Object.values(s.d.talis).some((x) => x >= 2)));
   // 5g) hostinský: XP → úroveň → dovednost
-  await S(p, (s) => { s.d.klvl = 1; s.d.xp = 0; s.d.skills = []; s.ktab = 0; s.ktSel = ''; s.xp(5); s.openShop('keeper', false); });
-  ok('hostinský: úroveň 2 a bod', await S(p, (s) => s.d.klvl === 2 && s.skillPoints() === 1));
+  await S(p, (s) => { s.d.klvl = 1; s.d.xp = 0; s.d.skills = []; s.ktab = 0; s.ktSel = ''; s.d.stars = {}; s.d.mast = {}; s.d.loy = {}; s.xp(15); s.openShop('keeper', false); });
+  ok('hostinský: úroveň 3 a 2 body', await S(p, (s) => s.d.klvl === 3 && s.skillPoints() === 2));
   await S(p, (s) => s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown'));
   ok('strom: koupen 1. uzel Výčepu (KOUPIT)', await S(p, (s) => s.d.skills.join() === 'v0' && s.skillPoints() === 0 && s.ts().income >= 0.006));
   ok('strom: další uzel bez bodů nejde', await S(p, (s) => { s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown'); return s.d.skills.length === 1; }));
@@ -99,19 +99,19 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   await S(p, (s) => { s.d.klvl = 300; s.d.skills = []; for (let i = 0; i <= 20; i++) s.d.skills.push('s' + i); });
   ok('strom: hvězda Dobrá pověst', await S(p, (s) => s.star('keep5') && !s.star('tray') && s.skillPoints() > 0));
   // 5g3) mistrovství: roste s časem obsluhy, zvedá výdělek a rychlost; štít na kartě
-  ok('mistrovství: výdělek roste, rychlost stejná', await S(p, (s) => {
-    s.d.mast = {}; const pub = s.d.pubs[0], def = s.cards[0].def; pub.st.tap.auto = true;
-    const p0 = s.pay(pub, def), c0 = s.cyc(def);
-    s.mastAdd(2e6); s.tsCache = undefined;
-    return s.mast('tap') >= 10 && s.pay(pub, def) > p0 * 1.09 && s.cyc(def) === c0;
+  ok('mistrovství, hvězdy a hosté dávají jen body do stromu', await S(p, (s) => {
+    s.d.mast = {}; s.d.stars = {}; s.d.loy = {}; const pub = s.d.pubs[0], def = s.cards[0].def; pub.st.tap.auto = true;
+    const p0 = s.pay(pub, def), c0 = s.cyc(def), b0 = s.skillPoints();
+    s.mastAdd(2e6); s.d.stars = { '1_tap': 2 }; s.d.loy = { guest0: 1750 }; s.tsCache = undefined;
+    return s.mast('tap') >= 10 && s.pay(pub, def) === p0 && s.cyc(def) === c0 && s.skillPoints() === b0 + s.mast('tap') + 2 + 2;
   }));
   ok('mistrovství: hodnost a tečky na kartě', await S(p, (s) => { s.refresh(); return s.cards[0].bnum.text === 'Tovaryš' || s.cards[0].bnum.text.length > 2; }));
   // 5g4) věrnost hostů: obsloužení druhu = bod, úroveň 1 po 10, spropitné od něj +1 %
-  ok('věrnost hostů: 10 obsloužení = úroveň 1, Sbírka s tečkami', await S(p, (s) => {
-    const v = s.views[0]; s.d.loy = {}; v.lastKey = 'guest3';
+  ok('věrnost hostů: 300 obsloužení = úroveň 1, Sbírka s tečkami', await S(p, (s) => {
+    const v = s.views[0]; s.d.loy = { guest3: 290 }; v.lastKey = 'guest3';
     for (let i = 0; i < 10; i++) s.tipReward(v);
     s.bookGrp = 0; s.bookSel = 'guest3'; s.d.seen.includes('guest3') || s.d.seen.push('guest3'); s.openShop('book', false);
-    return s.d.loy.guest3 === 10 && s.loyText('guest3').l === 1;
+    return s.d.loy.guest3 === 300 && s.loyText('guest3').l === 1;
   }));
   ok('sběrač: najmutí 500 kostí, bubliny nejvýš 5', await S(p, (s) => {
     s.d.coll = { 1: { spd: 0, amt: 5 } }; s.d.bones = 1e9; s.d.tabTut = [...(s.d.tabTut ?? []), 'coll']; s.openShop('coll', false);
@@ -137,7 +137,7 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   await S(p, (s) => { s.d.run = 1e8; s.d.pubs[0].st.tap.lvl = 500; s.askPrestige(); s.prestige(); });
   await p.waitForTimeout(800);
   ok('prestiž: 2 hospody a krígly', await S(p, (s) => s.d.pubs.length === 2 && s.d.krigle >= 11 && s.views.length === 2));
-  ok('hvězdy: pípa na 500 = po hygieně 1. hvězda, úrovně 10× dražší', await S(p, (s) => s.d.stars?.['1_tap'] === 1 && s.cards.length > 0 && s.offer(s.d.pubs[0], s.cards[0].def).price >= 10 * Math.ceil(5 * 1.07 ** s.d.pubs[0].st.tap.lvl) - 10));
+  ok('hvězdy: pípa na 500 = po hygieně hvězda (jen bod do stromu, úrovně nezdraží)', await S(p, (s) => { const st = s.d.stars; const a = st?.['1_tap'] >= 1 && s.offer(s.d.pubs[0], s.cards[0].def).price; s.d.stars = {}; const b = s.offer(s.d.pubs[0], s.cards[0].def).price; s.d.stars = st; return !!a && a === b; }));
   ok('prestiž: startovní kapitál a věrní manažeři', await S(p, (s) => s.d.coins >= 1000 && s.d.pubs[0].mgr === true));
   ok('prestiž: výzdoba zůstala', await S(p, (s) => s.has('portrait')));
   ok('bez chyb v konzoli', p.errors.length === 0);

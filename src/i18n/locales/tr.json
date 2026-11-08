@@ -947,5 +947,9 @@
  "spropitné od něj +{v} %": "bahşişi +%{v}",
  "na 5: ": "5'te: ",
  "Sezóna": "Sezon",
- "{n}: věrnost {l}!": "{n}: sadakat {l}!"
+ "{n}: věrnost {l}!": "{n}: sadakat {l}!",
+ "{n}: věrnost {l}! +1 bod": "{n}: sadakat {l}! +1 puan",
+ "{n} b. do stromu": "ağaca {n} p.",
+ "každá úroveň = 1 bod": "her seviye = 1 puan",
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "her kademe = 1 ağaç puanı · kendiliğinden büyür, çevrimdışı bile"
 }

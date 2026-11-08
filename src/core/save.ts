@@ -108,6 +108,8 @@ export interface Save {
   skills?: string[];
   /** skilly na rok: převedeno na velký strom (hospoda 63), počet přerozdělení bodů */
   sk2?: boolean;
+  /** nové ceny uzlů (hospoda 63b) – body jednou vráceny */
+  sk3?: boolean;
   skR?: number;
   /** mistrovství stanic: odsloužené sekundy podle stanice (součet hospod, přežije hygienu) */
   mast?: Record<string, number>;

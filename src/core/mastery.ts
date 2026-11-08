@@ -1,6 +1,6 @@
 // Mistrovství stanic (skilly na rok): roste samo – čas, kdy stanice běží s obsluhou (součet všech hospod, i offline,
 // přežije hygienu). Hodnosti Učeň → Tovaryš → Mistr → Velmistr → Legenda, každá 10 stupňů (50 stupňů na stanici).
-// Stupeň = +0,8 % výdělku stanice, každá dosažená hodnost (10 stupňů) = +2 % navíc. Rychlost stanic se NEmění (přání uživatele).
+// Každý stupeň = 1 bod do stromu hostinského (nic jiného – přání uživatele, hospoda 63). Rychlost ani výdělek se nemění.
 // Prahy: stupeň s potřebuje M0·s^P sekund → běžný hráč (12 h/den, 3 hospody) Legenda 10 ≈ za rok (tools/sim/skills.mjs).
 import { t } from '../i18n';
 
@@ -26,5 +26,3 @@ export const mastProg = (sec = 0) => {
   const s = mastStage(sec);
   return s >= MAST_MAX ? 1 : (sec - (s ? mastNeed(s) : 0)) / (mastNeed(s + 1) - (s ? mastNeed(s) : 0));
 };
-/** násobek výdělku stanice: +0,8 % za stupeň, +2 % za každou celou hodnost */
-export const mastPay = (s: number) => 1 + 0.008 * s + 0.02 * Math.floor(s / 10);

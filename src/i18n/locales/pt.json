@@ -947,5 +947,9 @@
  "spropitné od něj +{v} %": "gorjetas dele +{v} %",
  "na 5: ": "no 5: ",
  "Sezóna": "Temporada",
- "{n}: věrnost {l}!": "{n}: lealdade {l}!"
+ "{n}: věrnost {l}!": "{n}: lealdade {l}!",
+ "{n}: věrnost {l}! +1 bod": "{n}: lealdade {l}! +1 ponto",
+ "{n} b. do stromu": "{n} p. para a árvore",
+ "každá úroveň = 1 bod": "cada nível = 1 ponto",
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "cada grau = 1 ponto da árvore · cresce sozinho, até offline"
 }

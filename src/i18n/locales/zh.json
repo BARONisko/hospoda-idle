@@ -947,5 +947,9 @@
  "spropitné od něj +{v} %": "他的小费 +{v}%",
  "na 5: ": "5级：",
  "Sezóna": "季节",
- "{n}: věrnost {l}!": "{n}：忠诚 {l}！"
+ "{n}: věrnost {l}!": "{n}：忠诚 {l}！",
+ "{n}: věrnost {l}! +1 bod": "{n}：忠诚 {l}！+1 点",
+ "{n} b. do stromu": "技能树 {n} 点",
+ "každá úroveň = 1 bod": "每级 = 1 点",
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "每阶 = 1 技能点 · 自动成长，离线也会"
 }

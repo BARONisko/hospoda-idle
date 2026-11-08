@@ -295,3 +295,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Úrovně 1–5 (tečky) za 10/50/200/1000/5000; úroveň = +1 % spropitné od toho druhu; úroveň 5 = „věrný host“, zlatý rámeček
   a malý trvalý bonus (stat podle pořadí ve Sbírce, +0,9 %). Nová úroveň = jen plovoucí nápis u hosta (žádný banner).
   Sbírka: záložky po hospodách + Sezóna, velké karty (tečky + pruh), ťuknutí = detail dole. Test v npm test.
+- Hospoda 63b (přání uživatele): hvězda stanice, stupeň mistrovství i úroveň věrnosti hosta dávají JEN 1 bod do stromu
+  hostinského – žádné bonusy výdělku/spropitného, hvězdy už nezdražují úrovně (STAR_BONUS 0, STAR_COST 1).
+  skillPoints = (úroveň − 1) + hvězdy + Σ stupňů mistrovství + Σ úrovní věrnosti − utraceno. Ceny uzlů ×2,5 (2/5/8, hvězdy +6),
+  celý strom 654 bodů; koupené uzly jednou zdarma vráceny (d.sk3). Věrnost: prahy 300/1750/7500/18750/43000 → běžný hráč
+  (~125 obsloužení druhu/den) má hosta na max za ~344 dní. Body za rok: slabší ~370, běžný ~610, zapálený ~750 (tools/sim/skills.mjs).

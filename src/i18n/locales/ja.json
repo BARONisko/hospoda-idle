@@ -947,5 +947,9 @@
  "spropitné od něj +{v} %": "この客のチップ +{v}%",
  "na 5: ": "5で：",
  "Sezóna": "シーズン",
- "{n}: věrnost {l}!": "{n}：忠誠 {l}！"
+ "{n}: věrnost {l}!": "{n}：忠誠 {l}！",
+ "{n}: věrnost {l}! +1 bod": "{n}：忠誠 {l}！+1pt",
+ "{n} b. do stromu": "ツリーへ {n}pt",
+ "každá úroveň = 1 bod": "各レベル = 1pt",
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "各段階 = ツリー1pt · 自然に育つ、オフラインでも"
 }

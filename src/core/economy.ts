@@ -109,8 +109,9 @@ export const styleSupplyMult = (pubs: PubLike[], p: PubLike, id: string) => (pub
  *  úrovně té stanice pak STAR_COST× dražší za každou hvězdu */
 export const STAR_LVL: Record<string, number> = { tap: 500, kitchen: 400, cellar: 300, dice: 300 };
 export const STAR_MAX = 5;
-export const STAR_BONUS = 0.1;
-export const STAR_COST = 10;
+// hospoda 63 (přání uživatele): hvězda dává JEN 1 bod do stromu hostinského – žádný bonus výdělku ani zdražení
+export const STAR_BONUS = 0;
+export const STAR_COST = 1;
 export const starKey = (act: number, id: string) => `${act}_${id}`;
 export const starsOf = (stars: Record<string, number> | undefined, act: number, id: string) => stars?.[starKey(act, id)] ?? 0;
 /** násobek výdělku hospody z hvězd všech jejích stanic */

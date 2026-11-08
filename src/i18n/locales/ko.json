@@ -947,5 +947,9 @@
  "spropitné od něj +{v} %": "이 손님 팁 +{v}%",
  "na 5: ": "5에서: ",
  "Sezóna": "시즌",
- "{n}: věrnost {l}!": "{n}: 충성 {l}!"
+ "{n}: věrnost {l}!": "{n}: 충성 {l}!",
+ "{n}: věrnost {l}! +1 bod": "{n}: 충성 {l}! +1점",
+ "{n} b. do stromu": "트리에 {n}점",
+ "každá úroveň = 1 bod": "레벨마다 = 1점",
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "단계마다 = 트리 1점 · 저절로 자람, 오프라인에서도"
 }

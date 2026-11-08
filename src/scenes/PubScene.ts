@@ -22,8 +22,8 @@ import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weeken
 import { TALISMANS, STAT_NAMES, talisCost, stats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { TREE, TREE_BY_ID, TREE_BRANCHES, TREE_COLORS, STAR_TEXT, treeSpent, treeCan, hasStar, treeStats, xpNeed, oldXpNeed, lvlFromTotal, respecCost, pathX, type StarId, type TreeNode } from '../core/skilltree';
 import { collHire, collSpdCost, collAmtCost, COLL_AMT_MAX } from '../core/collector';
-import { loyLvl, loyProg, loyNext, loyTip, loyPerk, LOY_MAX } from '../core/loyalty';
-import { mastStage, mastRank, mastProg, mastPay, RANKS, RANK_COLORS, MAST_MAX } from '../core/mastery';
+import { loyLvl, loyProg, loyNext, LOY_MAX } from '../core/loyalty';
+import { mastStage, mastRank, mastProg, RANKS, RANK_COLORS, MAST_MAX } from '../core/mastery';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave, wipe } from '../core/save';
 import { PubView } from '../game/PubView';
@@ -242,6 +242,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.d.xp = r.xp;
       this.d.skills = [];
       this.d.sk2 = true;
+    }
+    // hospoda 63b: nové ceny uzlů (body i z hvězd, mistrovství, hostů) → koupené uzly jednou zdarma vrátit
+    if (!this.d.sk3) {
+      this.d.skills = [];
+      this.d.sk3 = true;
     }
     for (const p of this.d.pubs) {
       if (p.st.tap?.auto && !p.w?.length) p.w = START_CREW();
@@ -1210,10 +1215,6 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const a = stats(this.d.talis), b = treeStats(this.d.skills, stats({}));
     for (const k of Object.keys(a) as (keyof typeof a)[]) a[k] += b[k];
     for (const o of OSSUARY) a[o.stat] += (this.d.oss?.[o.stat] ?? 0) * o.per;
-    // štamgasti (věrnost hostů úroveň 5): každý druh vlastní malý bonus
-    this.allGuests().forEach((k, i) => {
-      if (loyLvl(this.d.loy?.[k]) >= LOY_MAX) a[loyPerk(i)[0]] += loyPerk(i)[1];
-    });
     // staty z chrámu: trvalé z truhel (d.oss) a týdenní z oltáře (platí jen do dalšího víkendu)
     for (const o of TEMPLE_STATS) a[o.stat] += (this.d.oss?.[o.stat] ?? 0) * o.per;
     const al = this.d.temple?.altar;
@@ -1375,7 +1376,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   private skillPoints() {
-    return (this.d.klvl ?? 1) - 1 - treeSpent(this.d.skills);
+    return (this.d.klvl ?? 1) - 1 + this.bonusPoints() - treeSpent(this.d.skills);
+  }
+
+  /** body do stromu z hvězd stanic, stupňů mistrovství a úrovní věrnosti hostů (každý = 1 bod) */
+  private bonusPoints() {
+    const st = Object.values(this.d.stars ?? {}).reduce((a, b) => a + b, 0);
+    const ms = STATIONS.reduce((a, d) => a + this.mast(d.id), 0);
+    const lo = Object.values(this.d.loy ?? {}).reduce((a, n) => a + loyLvl(n), 0);
+    return st + ms + lo;
   }
 
   // záložka Hostinský: 0–2 = cesty stromu (návrh B: stezka zdola nahoru), 3 = Mistrovství stanic
@@ -1578,14 +1587,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.shopObjs.push(
         this.add.text(86, y + 10, STATION_NAMES[1][def.id], txt(24, PAL.bone)).setDepth(D + 3),
         this.add.text(W - 26, y + 12, s > 0 ? `${RANKS[rank]} ${step}/10` : t('zatím nic'), txt(20, s > 0 ? PAL[RANK_COLORS[rank]] : PAL.fog)).setOrigin(1, 0).setDepth(D + 3),
-        this.add.text(86, y + 62, t('výdělek stanice +{a} %', { a: String(Math.round((mastPay(s) - 1) * 1000) / 10).replace('.', ',') }), txt(16, PAL.fog)).setDepth(D + 3),
+        this.add.text(86, y + 62, t('{n} b. do stromu', { n: s }), txt(16, PAL.fog)).setDepth(D + 3),
       );
       g.fillStyle(col('dusk')).fillRoundedRect(86, y + 40, W - 112, 14, 6);
       g.fillStyle(rc).fillRoundedRect(86, y + 40, Math.max(10, (W - 112) * mastProg(sec)), 14, 6);
     });
     const pg = this.add.graphics().setDepth(D + 1);
     pg.fillStyle(col('ink'), 0.6).fillRoundedRect(10, py, W - 20, H - py - 10, 10);
-    const tx = this.add.text(W / 2, py + (H - py - 10) / 2, t('roste samo – i offline, když má stanice obsluhu'), txt(20, PAL.bone)).setOrigin(0.5).setDepth(D + 2);
+    const tx = this.add.text(W / 2, py + (H - py - 10) / 2, t('každý stupeň = 1 bod do stromu · roste samo, i offline'), txt(20, PAL.bone)).setOrigin(0.5).setDepth(D + 2);
     tx.setScale(Math.min(1, (W - 50) / tx.width));
     this.shopObjs.push(pg, tx);
   }
@@ -2585,11 +2594,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
   /** popis věrnosti druhu: úroveň, postup, bonus */
   private loyText(key: string) {
-    const n = this.d.loy?.[key] ?? 0, l = loyLvl(n), i = this.allGuests().indexOf(key), [st, v] = loyPerk(i);
+    const n = this.d.loy?.[key] ?? 0, l = loyLvl(n);
     return {
       n, l,
       prog: l >= LOY_MAX ? t('věrný host!') : t('obslouženo {a} / {b}', { a: n, b: loyNext(n) }),
-      bonus: t('spropitné od něj +{v} %', { v: l }) + ' · ' + (l >= LOY_MAX ? '' : t('na 5: ')) + STAT_NAMES[st](v),
+      bonus: t('{n} b. do stromu', { n: l }) + ' · ' + t('každá úroveň = 1 bod'),
     };
   }
 
@@ -3551,7 +3560,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act) * mastPay(this.mast(def.id));
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act);
   }
 
   // ---------- obchod s krígly ----------
@@ -3590,15 +3599,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** odměna za spropitné (ťuknutí nebo sběrač): přes den coins, v noci kost */
   private tipReward(v: PubView) {
-    // věrnost hostů (varianta A): bod pro druh hosta, za úroveň +1 % spropitné od něj
+    // věrnost hostů (varianta A): obsloužení druhu; nová úroveň = 1 bod do stromu hostinského
     const lk = v.lastKey, loy = (this.d.loy ??= {});
     const lb = loyLvl(loy[lk]);
     if (lk) loy[lk] = (loy[lk] ?? 0) + 1;
     const lup = !!lk && loyLvl(loy[lk]) > lb;
-    if (lup && loyLvl(loy[lk]) >= LOY_MAX) this.tsCache = undefined;
     // zlatý host: občas dá spropitné ×10
     const gold = !this.night && Math.random() < Math.min(0.1, this.ts().golden);
-    const tip = (gold ? 10 : 1) * Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (pubStyle(v.pub) === 'tap' ? 2 : 1) * (1 + this.ts().tips + guestTips(this.d.gxp ?? 0)) * this.happyMult() * loyTip(loy[lk])));
+    const tip = (gold ? 10 : 1) * Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (pubStyle(v.pub) === 'tap' ? 2 : 1) * (1 + this.ts().tips + guestTips(this.d.gxp ?? 0)) * this.happyMult()));
     const bone = this.boneMult() * (1 + this.ts().nighttips);
     if (this.night) this.d.bones = (this.d.bones ?? 0) + bone;
     else this.gain(tip);
@@ -3608,7 +3616,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.week('tips');
     this.xp(1);
     this.task('tips', 1);
-    v.tipPop(lup ? t('{n}: věrnost {l}!', { n: this.guestName(lk), l: loyLvl(loy[lk]) }) : (gold ? t('ZLATÝ HOST! ') : '') + '+' + big(this.night ? bone : tip));
+    v.tipPop(lup ? t('{n}: věrnost {l}! +1 bod', { n: this.guestName(lk), l: loyLvl(loy[lk]) }) : (gold ? t('ZLATÝ HOST! ') : '') + '+' + big(this.night ? bone : tip));
   }
 
   // ---------- sběrač bublin (číšník): každá hospoda vlastní, kupuje se a vylepšuje za kosti ----------

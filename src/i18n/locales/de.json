@@ -947,5 +947,9 @@
  "spropitné od něj +{v} %": "sein Trinkgeld +{v} %",
  "na 5: ": "bei 5: ",
  "Sezóna": "Saison",
- "{n}: věrnost {l}!": "{n}: Treue {l}!"
+ "{n}: věrnost {l}!": "{n}: Treue {l}!",
+ "{n}: věrnost {l}! +1 bod": "{n}: Treue {l}! +1 Punkt",
+ "{n} b. do stromu": "{n} P. für den Baum",
+ "každá úroveň = 1 bod": "jede Stufe = 1 Punkt",
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "jede Stufe = 1 Baumpunkt · wächst von selbst, auch offline"
 }

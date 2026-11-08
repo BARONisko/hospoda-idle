@@ -947,5 +947,9 @@
  "spropitné od něj +{v} %": "ses pourboires +{v} %",
  "na 5: ": "au 5 : ",
  "Sezóna": "Saison",
- "{n}: věrnost {l}!": "{n} : fidélité {l} !"
+ "{n}: věrnost {l}!": "{n} : fidélité {l} !",
+ "{n}: věrnost {l}! +1 bod": "{n} : fidélité {l} ! +1 point",
+ "{n} b. do stromu": "{n} pts pour l'arbre",
+ "každá úroveň = 1 bod": "chaque niveau = 1 point",
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "chaque échelon = 1 point d'arbre · grandit seul, même hors ligne"
 }

@@ -80,10 +80,11 @@ function build(): TreeNode[] {
     let si = 0, mi = 0;
     const small = () => SMALL[b][si++ % SMALL[b].length];
     for (let i = 0; i < PATH; i++) {
-      const cost = 1 + Math.floor(i / 10);
+      // ceny ×2,5 (hospoda 63: body chodí i z hvězd stanic, mistrovství a věrnosti hostů)
+      const cost = [2, 5, 8][Math.floor(i / 10)];
       const st = STAR_AT.indexOf(i);
       const n: TreeNode = { id: `${key}${i}`, branch: b, idx: i, side: 0, dir: 0, parent: i ? `${key}${i - 1}` : null, cost };
-      if (st >= 0) (n.star = STARS[b][st]), (n.cost = cost + 2);
+      if (st >= 0) (n.star = STARS[b][st]), (n.cost = cost + 6);
       else if (i % 5 === 4) [n.stat, n.val] = MID[b][mi++ % MID[b].length];
       else [n.stat, n.val] = small();
       out.push(n);

@@ -947,5 +947,9 @@
  "spropitné od něj +{v} %": "sus propinas +{v} %",
  "na 5: ": "en 5: ",
  "Sezóna": "Temporada",
- "{n}: věrnost {l}!": "{n}: lealtad {l}!"
+ "{n}: věrnost {l}!": "{n}: lealtad {l}!",
+ "{n}: věrnost {l}! +1 bod": "{n}: lealtad {l}! +1 punto",
+ "{n} b. do stromu": "{n} p. para el árbol",
+ "každá úroveň = 1 bod": "cada nivel = 1 punto",
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "cada grado = 1 punto del árbol · crece solo, incluso offline"
 }

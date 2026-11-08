@@ -947,5 +947,9 @@
  "spropitné od něj +{v} %": "their tips +{v} %",
  "na 5: ": "at 5: ",
  "Sezóna": "Season",
- "{n}: věrnost {l}!": "{n}: loyalty {l}!"
+ "{n}: věrnost {l}!": "{n}: loyalty {l}!",
+ "{n}: věrnost {l}! +1 bod": "{n}: loyalty {l}! +1 point",
+ "{n} b. do stromu": "{n} pts to the tree",
+ "každá úroveň = 1 bod": "each level = 1 point",
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "each step = 1 tree point · grows by itself, even offline"
 }
