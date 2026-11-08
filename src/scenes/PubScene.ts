@@ -2810,6 +2810,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const i = this.d.tut ?? -1;
     if (i < 0 || this.views.length > 1) return;
     const done = PubScene.TUT[i].done;
+    // co hráč udělal už dřív (třeba najal číšníky o krok napřed), se počítá – návod jde dál
+    const p0 = this.d.pubs[0];
+    if ((done === 'hire' && this.st(p0, 'tap').auto) || (done === 'buy:kitchen' && this.st(p0, 'kitchen').lvl > 0) || (done === 'buy:tap' && this.st(p0, 'tap').lvl > 1)) return this.tut(done);
     if (done !== 'buy:tap' && done !== 'hire' && done !== 'buy:kitchen') return;
     const poor = this.tutNeed(done) > 0;
     const c = Math.floor(this.d.coins);
