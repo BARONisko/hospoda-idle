@@ -1654,6 +1654,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // výška řádku tak, aby se vešly všechny (zvuky, hudba, záloha, jazyk, složka, upozornění, začít znovu)
     const n = 5 + (location.protocol.startsWith('http') ? 1 : 0) + (notify.available ? 1 : 0);
     const RH = Math.min(96, Math.floor((H - y0 - 6) / n));
+    this.shopObjs.push(this.add.text(W - 12, y0 - 4, t('verze {v}', { v: __APP_VERSION__ }), txt(16, PAL.fog)).setOrigin(1, 1).setDepth(D + 2));
     // hlasitost: − / hodnota / + po 10 % (0 % = vypnuto)
     const vols: [string, () => number, (v: number) => void][] = [
       [t('Zvuky'), () => sfx.sfxVol, (v) => sfx.setSfxVol(v)],
