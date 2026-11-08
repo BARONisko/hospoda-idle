@@ -284,6 +284,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.events.on('guestSeen', (key: string) => {
       if (!this.d.seen.includes(key)) this.d.seen.push(key);
     });
+    // uvízlí v průvodci nové hospody bez peněz (před opravou dávala hygiena 0 coins) → dorovnat na rozjezd
+    const lastPub = this.d.pubs[this.d.pubs.length - 1];
+    if (this.d.pubs.length > 1 && (lastPub.st.tap?.lvl ?? 0) === 0 && this.d.coins < this.restartNeed()) this.d.coins = this.restartNeed();
     // mini průvodce pivovarem jen pro ty, kdo pivovar ještě neviděli
     if (this.d.brewTut === undefined && this.d.guides?.includes('tile:brew')) this.d.brewTut = -1;
     this.views = [];
@@ -2570,6 +2573,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     sfx.error();
   }
 
+  /** coins na rozjezd po hygieně: otevřít pípu nové hospody a najmout tam číšníky + číšníci v Pajzlu
+   *  (jinak průvodce „OTEVŘI PÍPU“ nejde dokončit – po hygieně nic nevydělává) */
+  private restartNeed() {
+    const tap = STATIONS[0], last = this.d.pubs[this.d.pubs.length - 1];
+    return Math.ceil(((tap.base + tap.staff) * actMult(last.act) + tap.staff * 2) * 1.2);
+  }
+
   private prestige() {
     const k = this.kriglyNow();
     // hvězdy stanic: úroveň STAR_LVL v tomhle běhu = +1 hvězda (nejvýš STAR_MAX)
@@ -2592,7 +2602,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // číšníci (zkušenosti a body) zůstávají i po hygieně
     this.d.pubs.forEach((p, i) => crews[i] && (p.w = crews[i]));
     if (keep) this.d.pubs.forEach((p, i) => (p.mgr = had[i] ?? false));
-    this.d.coins = startCoins(this.kl('start'));
+    this.d.coins = Math.max(startCoins(this.kl('start')), this.restartNeed());
     store(this.d);
     sfx.fanfare();
     this.awayObjs = [];
