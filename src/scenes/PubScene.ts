@@ -1958,24 +1958,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private tasksTab(y0: number, D: number) {
     const RH = 80;
     const head = (y: number, s: string) => this.shopObjs.push(this.add.text(20, y, s, txt(24, PAL.gold)).setDepth(D + 1));
-    // úkol od hostinského (dřív lišta nad hospodou): UKAŽ zavře menu a ukáže šipkou, VYBER dá odměnu
-    const q = this.qCur();
-    if (q) {
-      const done = questDone(q, this.d, this.qctx());
-      const [a, b] = q.prog(this.d, this.qctx());
-      this.row(y0 - 4, RH, D, q.text(), done ? t('hotovo!') : `${big(Math.min(a, b))} / ${big(b)} · +${big(this.qReward())} coins`, done ? 'green' : 'amber', PAL.gold);
-      const qb = this.btn(W - 172, y0 + 6, 150, 54, () => {
-        if (done) {
-          this.qClaim();
-          return this.openShop('tasks', false);
-        }
-        this.qPoint = q.id;
-        this.closeShop();
-      }, D + 2);
-      this.drawBtn(qb, done ? t('VYBER') : t('UKAŽ'), true, done ? 'green' : 'amber');
-      this.shopObjs.push(qb.bg, qb.label, qb.zone);
-      y0 += RH + 4;
-    }
+    // úkol od hostinského je jen v liště nad hospodou (přání uživatele: v záložce Úkoly ho nechce)
     // týdenní výzva
     {
       const w = this.weekly();
@@ -4899,8 +4882,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (this.navDots) {
       const act = !this.shopObjs.length ? 0 : this.tab === 'tasks' ? 2 : this.tab === 'shop' && this.shopSub === 'up' ? 1 : 3;
       this.navBtns.forEach((b, i) => b.label.setColor(i === act ? PAL.gold : PAL.bone));
-      const q = this.qCur(), wk = this.d.weekly;
-      const claim = (!!q && questDone(q, this.d, this.qctx())) || this.daily().tasks.some((tk) => !tk.claimed && tk.prog >= tk.goal) || (!!wk && !wk.claimed && wk.prog >= wk.goal);
+      const wk = this.d.weekly;
+      const claim = this.daily().tasks.some((tk) => !tk.claimed && tk.prog >= tk.goal) || (!!wk && !wk.claimed && wk.prog >= wk.goal);
       const nb = this.navBtns[2];
       this.navDots.clear();
       if (claim) this.navDots.fillStyle(col('ink')).fillCircle(nb.x + nb.w / 2 + 26, nb.y + 14, 11).fillStyle(col('scarlet')).fillCircle(nb.x + nb.w / 2 + 26, nb.y + 14, 8);
