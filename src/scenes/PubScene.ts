@@ -3974,6 +3974,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   qPoint: string | null = null;
   qPh = 0;
   qOffNow = -1;
+  /** lišta úkolu je teď vidět */
+  qVis = false;
   static QH = 60;
 
   private qctx(): QCtx {
@@ -3986,7 +3988,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** o kolik se posunou věci nahoře v hospodě (schopnost manažera, truhla, cedule stylu) kvůli liště úkolu */
   private qOff() {
-    return this.qCur() ? PubScene.QH + 10 : 0;
+    return this.qVis ? PubScene.QH + 10 : 0;
   }
 
   private qReward() {
@@ -4057,6 +4059,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** každý snímek: lišta úkolu, posun věcí nahoře, šipka UKAŽ */
   private qTick() {
+    // posun věcí nahoře jen tehdy, když je lišta úkolu opravdu vidět (dřív i skrytá odsunula Šťastnou hodinu doprostřed)
+    const q0 = this.qCur();
+    this.qVis = !!q0 && !this.guideCur && Date.now() >= this.tutFinaleUntil && !this.awayObjs.length;
     const off = this.qOff();
     if (off !== this.qOffNow) {
       this.qOffNow = off;
@@ -4208,7 +4213,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return [
       // v menu už jen šipka na dlaždici (žádná cedule ani „Rozumím“ – přání uživatele)
       { head: t('NOVÉ V MENU: {s}', { s: row[2].toUpperCase() }), text: (about[key] ? about[key] + '\n' : '') + t('ťukni na Menu'), done: 'menu', at: menuBtn },
-      { head: '', text: '', done: 'tile:' + key, at: tile(key) },
+      // menu zavřené dřív, než hráč ťukl na dlaždici → šipka zase na Menu (dřív průvodce visel neviditelný a schovával lištu úkolu)
+      { head: '', text: '', done: 'tile:' + key, at: () => (this.shopObjs.length ? tile(key)() : menuBtn()) },
     ];
   }
 
