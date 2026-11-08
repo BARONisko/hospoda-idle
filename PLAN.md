@@ -258,7 +258,7 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - ČEKÁ: zúžit lištu úkolu? Poslední krok návodu (HOTOVO) má v menu velkou ceduli.
 - Hospoda 62: vyvážení hygieny A+10 % (krígly = tržba ÷ 10^(hospody−1), každá další hygiena aspoň +10 % krígel; kola
   9 → 14 → 11 → … → 22 min, tools/sim/chain.mjs). Okno hygieny 2B (krígly teď → po, ×výdělek navždy, nová hospoda). 8bc52c4
-- Cíl na obzoru: vybráno 3C – krígl se plní vpravo ve scéně, pod ním procenta, pěna uvnitř rámečku (3B a přepínač smazány).
+- Cíl na obzoru: krígl s procenty v horní liště mezi coins a Menu (místo C; ve scéně zakrýval bubliny). Coins max 170 px.
   (výchozí krígl); ťuknutí otevře hygienu. ed9580b. Čeká na volbu uživatele.
 - Postupné odemykání: 1. hygiena krígly · první noc Kostnice/Sběrač · 2. pivovar · 3. Chrám · 4. výzdoba · 5. šipky ·
   6. Liga (tileLock). Při prvním otevření nové části menu šipka na hlavní tlačítko + 1 řádek (tabTut, d.tabTut).

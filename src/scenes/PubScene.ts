@@ -1887,12 +1887,6 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** ikona truhly v hospodě (jen když je připravená) */
   chestBg?: Phaser.GameObjects.Graphics;
   chestHud?: { img: Phaser.GameObjects.Image; dot: Phaser.GameObjects.Graphics; zone: Phaser.GameObjects.Zone };
-  /** spodní okraj truhly (nebo místa pro ni) – pod ní je krígl cíle (3C) */
-  private chestBot() {
-    const y = this.signBot ? this.signBot + 40 : TOP + (this.d.pubs.length > 1 ? TABH : 0) + 40 + this.qOff();
-    return this.chestHud?.img.visible ? y + 40 : y - 30;
-  }
-
   private chestHudDraw() {
     // cedule stylu je v rohu nahoře, truhla pod ní (přání uživatele)
     const y = this.signBot ? this.signBot + 40 : TOP + (this.d.pubs.length > 1 ? TABH : 0) + 40 + this.qOff();
@@ -3900,7 +3894,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.refresh();
   }
 
-  // ---------- cíl na obzoru: krígl se plní k další hospodě / hygieně (vybráno 3C, v procentech) ----------
+  // ---------- cíl na obzoru: krígl v horní liště se plní k další hospodě / hygieně (3C, procenta, místo C) ----------
   goalUi?: { g: Phaser.GameObjects.Graphics; num: Phaser.GameObjects.Text; zone: Phaser.GameObjects.Zone };
   goalKey = '';
   goalPh = 0;
@@ -3916,8 +3910,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   private goalTick() {
-    const on = this.goalOn() && !this.awayObjs.length && !this.shopObjs.length;
-    const D = 94;
+    const on = this.goalOn() && !this.awayObjs.length;
+    const D = 103;
     if (!this.goalUi) {
       const g = this.add.graphics().setDepth(D);
       const num = this.add.text(0, 0, '', txt(20, PAL.white)).setDepth(D + 1);
@@ -3944,26 +3938,25 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (full) this.goalPh += 0.1;
     const pulse = full ? Math.round((Math.sin(this.goalPh) + 1) * 1.5) : 0;
     const pct = full ? 100 : Math.floor(fr * 100);
-    const y = this.chestBot();
-    const key = `${pct}|${pulse}|${y}`;
+    // návrh C (vybráno): malý krígl v horní liště mezi coins a Menu, pod ním procenta – nic v hospodě nezakrývá
+    const left = this.coinsText.x + this.coinsText.displayWidth, right = this.shopBtn.x;
+    const mw = 26, mh = 36, mx = Math.round(Math.min(right - mw - 18, Math.max(left + 8, (left + right) / 2 - (mw + 9) / 2))), my = 12;
+    const key = `${pct}|${pulse}|${mx}`;
     if (key === this.goalKey) return;
     this.goalKey = key;
     parts.forEach((o) => o.setVisible(true));
-    // svislý krígl vpravo ve scéně se plní pivem (pěna se vejde dovnitř, nic nepřečnívá z rámečku), pod ním procenta
     const g = u.g.clear();
-    const mw = 40, mh = 90, mx = W - 12 - mw - 22, my = y + 8, bx = mx - 8, bw = mw + 36, bh = mh + 46;
-    g.fillStyle(col('ink'), 0.75).fillRoundedRect(bx, my - 8, bw, bh, 10);
     g.fillStyle(col('ink')).fillRect(mx - 3, my - 3, mw + 6, mh + 6);
-    g.lineStyle(5, col('ink')).strokeRoundedRect(mx + mw, my + 18, 14, 44, 7);
-    g.lineStyle(3, col('fog')).strokeRoundedRect(mx + mw, my + 18, 14, 44, 7);
+    g.lineStyle(5, col('ink')).strokeRoundedRect(mx + mw, my + 7, 9, 18, 4);
+    g.lineStyle(3, col('fog')).strokeRoundedRect(mx + mw, my + 7, 9, 18, 4);
     g.fillStyle(col('dusk')).fillRect(mx, my, mw, mh);
-    const foam = fr > 0 ? 8 + pulse : 0, fh = Math.round((mh - 11) * fr);
-    g.fillStyle(col('amber')).fillRect(mx, my + mh - fh, mw, fh).fillStyle(col('gold')).fillRect(mx + 6, my + mh - fh, 8, fh);
+    const foam = fr > 0 ? 4 + Math.min(2, pulse) : 0, fh = Math.round((mh - 6) * fr);
+    g.fillStyle(col('amber')).fillRect(mx, my + mh - fh, mw, fh).fillStyle(col('gold')).fillRect(mx + 4, my + mh - fh, 5, fh);
     if (foam) g.fillStyle(col('white')).fillRect(mx, my + mh - fh - foam, mw, foam);
-    if (full) g.lineStyle(3, col('mint'), 0.6 + pulse * 0.13).strokeRoundedRect(bx, my - 8, bw, bh, 10);
-    u.num.setText(`${pct} %`).setOrigin(0.5, 0).setPosition(bx + bw / 2, my + mh + 6).setColor(full ? PAL.mint : PAL.white);
-    u.num.setScale(Math.min(1, (bw - 8) / u.num.width));
-    u.zone.setPosition(bx, my - 8).setSize(bw, bh);
+    if (full) g.lineStyle(3, col('mint'), 0.6 + pulse * 0.13).strokeRoundedRect(mx - 7, my - 7, mw + 23, mh + 14, 6);
+    u.num.setText(`${pct} %`).setOrigin(0.5, 0).setPosition(mx + (mw + 9) / 2, my + mh + 4).setColor(full ? PAL.mint : PAL.white);
+    u.num.setScale(Math.min(1, 60 / u.num.width));
+    u.zone.setPosition(mx - 10, 0).setSize(mw + 29, my + mh + 26);
   }
 
   // ---------- úkol od hostinského: lišta nahoře (úkolníček, úkol, postup, UKAŽ / VYBER) ----------
@@ -4378,7 +4371,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private refresh() {
     const total = this.d.pubs.reduce((a, p) => a + this.rate(p), 0);
     this.coinsText.setText(`${big(this.d.coins)} coins`);
-    this.coinsText.setScale(Math.min(1, 226 / this.coinsText.width));
+    // vpravo od coins je krígl cíle (místo C) → coins se vejdou do 170 px
+    this.coinsText.setScale(Math.min(1, (this.goalOn() ? 170 : 226) / this.coinsText.width));
     this.rateText.setText(this.night ? t('+{n} kostí / s', { n: this.bonesPerSec() < 1 ? this.bonesPerSec().toFixed(2) : big(this.bonesPerSec()) }) : t('+{n} / s', { n: big(total) }));
     this.rateText.setColor(this.night ? PAL.ice : PAL.mint).setScale(Math.min(1, 220 / this.rateText.width));
     // během návodu noc nepřijde – čas dne stojí
