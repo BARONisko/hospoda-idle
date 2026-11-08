@@ -89,6 +89,8 @@ export interface VipState {
 export const VIP_EVERY = 6 * 3600_000;
 /** odměna = tolik hodin výdělku */
 export const VIP_H = 2;
+/** jak často chodí VIP (hvězda stromu „Slavná hospoda“ = 2× častěji; nastavuje scéna) */
+export const vipCfg = { every: VIP_EVERY };
 /** jak dlouho VIP čeká (30–60 min, podle času příchodu – stejné i po načtení) */
 export const vipWait = (at: number) => (30 + (Math.floor(at / 60_000) % 31)) * 60_000;
 
@@ -103,12 +105,12 @@ export function vipTick(v: VipState, now = Date.now(), missed?: { n: number }): 
   if (!v.until && now >= v.next) {
     // přeskočit příchody, které celé proběhly, když hra byla zavřená (missed.n = kolik jich bylo)
     while (v.next + vipWait(v.next) <= now) {
-      v.next += VIP_EVERY;
+      v.next += vipCfg.every;
       if (missed) missed.n++;
     }
     if (now < v.next) return null;
     v.until = v.next + vipWait(v.next);
-    v.next += VIP_EVERY;
+    v.next += vipCfg.every;
     return 'came';
   }
   return null;

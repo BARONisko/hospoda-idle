@@ -273,3 +273,15 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Kulaté ikony (návrh 4): Šťastná hodina = kulaté tlačítko s bleskem (čas uvnitř), číšníci kulaté ikony, truhla v kruhu.
   Menu přes spodní lištu: návrh A (schovaná, teď) / B (vidět) v docs/navrhy-ui/menu-lista-A-B.png – vybráno A (lišta pryč, jak je teď).
 - Skilly na rok: vybráno 2 (velký strom) + 3 (mistrovství stanic), návrh v docs/navrh-skilly.md – čeká na návrhy vzhledu.
+- HOTOVO hospoda 63 – SKILLY NA ROK (výběr uživatele: strom B „tři cesty“ + odznak 1 „štít“; návrhy docs/navrhy-skilly/):
+  - Velký strom hostinského (src/core/skilltree.ts): 3 cesty Výčep/Sklep/Noc × 40 uzlů = 120 (stezka 28 uzlů + 6 odboček
+    po 2), kupuje se jen za koupeným. Malé uzly +0,3–0,9 %, každý 5. střední +2–3 %, cena 1–3 body, 12 hvězd (3–5 b.):
+    Plný podnos, Spropitné samo (1×/min), Slavná hospoda (VIP 2×), Dlouhá hodina · Noční hlídač (+4 h offline), Druhý kotel,
+    Dobrá pověst (5 % úrovní po hygieně), Hluboký sklep · Kostěné spropitné, Kostňák hraje sám (1×/10 min), Pověstné večery, Šťastná ruka.
+    Celý strom ≈ 260 bodů. Body = úrovně; nová křivka XP: celkem 2,6·(L−1)^2,5 → běžný hráč ~200 bodů za rok (tools/sim/skills.mjs).
+    Přerozdělení bodů u koupeného uzlu za krígly (5, 10, 15…). Převod: starý strom 3×5 → úroveň z celkového XP na nové křivce, body zpět (d.sk2).
+  - UI: Menu → Hostinský: záložky Výčep/Sklep/Noc/Mistrovství, stezka zdola nahoru (posun prstem), šipka na další uzel,
+    dole panel uzlu + KOUPIT (návod tabTut ukáže na KOUPIT). Hostinský se odemyká od 5. úrovně; nápis o úrovni jen když body byly 0.
+  - Mistrovství stanic (src/core/mastery.ts): čas obsluhy stanice (součet hospod, i offline, přežije hygienu), stupeň s
+    = 2100·s^2,56 s, 50 stupňů (Učeň→Legenda po 10), stupeň +0,8 % výdělku stanice, každá hodnost +4 % rychlost. Štít v barvě
+    hodnosti s číslem na kartě vlevo u názvu; nápis jen při nové hodnosti. Test: npm test (strom, hvězda, mistrovství, převod, offline).

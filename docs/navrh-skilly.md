@@ -1,4 +1,4 @@
-# Skilly na rok – vybráno 2 + 3 (hospoda 62, čeká na návrhy vzhledu ≥ 3 a simulaci)
+# Skilly na rok – vybráno 2 + 3, vzhled B + štít 1 – HOTOVO (hospoda 63, viz PLAN.md)
 
 ## 2) Velký strom hostinského (náhrada dnešních 3×5 uzlů)
 - Síť ~120 uzlů, 3 začátky (Výčep / Sklep / Noc), uzel jde koupit jen vedle už koupeného.

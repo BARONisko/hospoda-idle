@@ -138,37 +138,4 @@ export function stats(levels: Record<string, number> = {}): Record<StatId, numbe
   return s;
 }
 
-/** strom dovedností hostinského: 3 větve po 5 uzlech, každý uzel = 1 bod, jde jen popořadě */
-export interface SkillNode {
-  id: string;
-  branch: number;
-  stat: StatId;
-  val: number;
-}
-export const BRANCHES = [t('Výčep'), t('Sklep'), t('Noc')];
-export const SKILLS: SkillNode[] = [
-  { id: 'v1', branch: 0, stat: 'tips', val: 0.25 },
-  { id: 'v2', branch: 0, stat: 'income', val: 0.05 },
-  { id: 'v3', branch: 0, stat: 'tips', val: 0.5 },
-  { id: 'v4', branch: 0, stat: 'income', val: 0.1 },
-  { id: 'v5', branch: 0, stat: 'skill', val: 0.25 },
-  { id: 's1', branch: 1, stat: 'cycle', val: 0.03 },
-  { id: 's2', branch: 1, stat: 'offline', val: 2 },
-  { id: 's3', branch: 1, stat: 'brew', val: 0.1 },
-  { id: 's4', branch: 1, stat: 'cycle', val: 0.05 },
-  { id: 's5', branch: 1, stat: 'krigly', val: 0.1 },
-  { id: 'n1', branch: 2, stat: 'bones', val: 0.2 },
-  { id: 'n2', branch: 2, stat: 'events', val: 0.25 },
-  { id: 'n3', branch: 2, stat: 'evfreq', val: 0.1 },
-  { id: 'n4', branch: 2, stat: 'bones', val: 0.4 },
-  { id: 'n5', branch: 2, stat: 'events', val: 0.5 },
-];
-/** XP na další úroveň hostinského */
-export const xpNeed = (lvl: number) => Math.round(100 * 1.4 ** (lvl - 1));
-
-/** staty ze stromu dovedností */
-export function skillStats(owned: string[] = []): Record<StatId, number> {
-  const s = stats({});
-  for (const n of SKILLS) if (owned.includes(n.id)) s[n.stat] += n.val;
-  return s;
-}
+// strom dovedností hostinského je v skilltree.ts (velký strom, hospoda 63)

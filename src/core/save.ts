@@ -106,6 +106,11 @@ export interface Save {
   xp?: number;
   klvl?: number;
   skills?: string[];
+  /** skilly na rok: převedeno na velký strom (hospoda 63), počet přerozdělení bodů */
+  sk2?: boolean;
+  skR?: number;
+  /** mistrovství stanic: odsloužené sekundy podle stanice (součet hospod, přežije hygienu) */
+  mast?: Record<string, number>;
   /** týdenní výzva */
   weekly?: Weekly;
   /** týdenní liga */

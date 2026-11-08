@@ -90,10 +90,22 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   await S(p, (s) => { s.d.bones = 1e9; s.openShop('talis', false); s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown'); });
   ok('talisman: vylepšení za kosti', await S(p, (s) => Object.values(s.d.talis).some((x) => x >= 2)));
   // 5g) hostinský: XP → úroveň → dovednost
-  await S(p, (s) => { s.d.klvl = 1; s.d.xp = 0; s.d.skills = []; s.xp(150); s.openShop('keeper', false); });
+  await S(p, (s) => { s.d.klvl = 1; s.d.xp = 0; s.d.skills = []; s.ktab = 0; s.ktSel = ''; s.xp(5); s.openShop('keeper', false); });
   ok('hostinský: úroveň 2 a bod', await S(p, (s) => s.d.klvl === 2 && s.skillPoints() === 1));
-  await S(p, (s) => s.shopObjs.filter((o) => o.type === 'Zone').find((z) => z.y > 450).emit('pointerdown'));
-  ok('hostinský: koupená dovednost', await S(p, (s) => s.d.skills.length === 1 && s.ts().tips >= 0.25));
+  await S(p, (s) => s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown'));
+  ok('strom: koupen 1. uzel Výčepu (KOUPIT)', await S(p, (s) => s.d.skills.join() === 'v0' && s.skillPoints() === 0 && s.ts().income >= 0.006));
+  ok('strom: další uzel bez bodů nejde', await S(p, (s) => { s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown'); return s.d.skills.length === 1; }));
+  // 5g2) hvězdný uzel a hygiena: Dobrá pověst nechá 5 % úrovní
+  await S(p, (s) => { s.d.klvl = 300; s.d.skills = []; for (let i = 0; i <= 20; i++) s.d.skills.push('s' + i); });
+  ok('strom: hvězda Dobrá pověst', await S(p, (s) => s.star('keep5') && !s.star('tray') && s.skillPoints() > 0));
+  // 5g3) mistrovství: roste s časem obsluhy, zvedá výdělek a rychlost; štít na kartě
+  ok('mistrovství: výdělek a rychlost rostou', await S(p, (s) => {
+    s.d.mast = {}; const pub = s.d.pubs[0], def = s.cards[0].def; pub.st.tap.auto = true;
+    const p0 = s.pay(pub, def), c0 = s.cyc(def);
+    s.mastAdd(2e6); s.tsCache = undefined;
+    return s.mast('tap') >= 10 && s.pay(pub, def) > p0 * 1.07 && s.cyc(def) < c0;
+  }));
+  ok('mistrovství: štít s číslem na kartě', await S(p, (s) => { s.refresh(); return s.cards[0].bnum.text !== '' && s.cards[0].name.x > 40; }));
   // 5h) týdenní výzva
   await S(p, (s) => { const w = s.weekly(); w.prog = w.goal; s.openShop('tasks', false); s.shopObjs.filter((o) => o.type === 'Zone').find((z) => z.y > 360).emit('pointerdown'); });
   ok('týdenní výzva: vyzvednuta', await S(p, (s) => s.weekly().claimed));
@@ -164,6 +176,21 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   await p.waitForTimeout(2500);
   ok('první noc: po Dál běží dál', await p.evaluate(() => window.__night.phaseLeft() < 58_500));
   ok('bez chyb v konzoli (první noc)', p.errors.length === 0);
+  await p.close();
+}
+// 6d) převod uložení: starý strom 3×5 → velký strom (úroveň podle celkového XP, body vrácené)
+{
+  const p = await page();
+  await S(p, (s) => { delete s.d.sk2; s.d.klvl = 6; s.d.xp = 0; s.d.skills = ['v1', 'v2', 's1']; s.d.tut = -1; });
+  await p.reload();
+  await p.waitForFunction(() => window.game?.scene?.getScene('Pub')?.d, null, { timeout: 15000 });
+  await p.waitForTimeout(300);
+  ok('převod skillů: nový strom, body vrácené', await S(p, (s) => s.d.sk2 && s.d.skills.length === 0 && s.d.klvl >= 10 && s.skillPoints() === s.d.klvl - 1));
+  // mistrovství i offline: hodina pryč s obsluhou na pípě
+  await S(p, (s) => { s.d.coins = 1e6; s.hire(0, s.cards[0].def); s.d.mast = {}; s.d.at = Date.now() - 3600_000; s.offline(); });
+  ok('mistrovství roste i offline', await S(p, (s) => (s.d.mast.tap ?? 0) >= 3500));
+  ok('bez chyb v konzoli (převod skillů)', p.errors.length === 0);
+  if (p.errors.length) console.log(p.errors);
   await p.close();
 }
 // 7) offline výdělek
