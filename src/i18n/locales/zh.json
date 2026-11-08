@@ -968,5 +968,8 @@
  "body: {n}  ?": "点数：{n}  ?",
  "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "等级、精通、星和忠实客人给点数——在技能树中使用",
  "NAŠETŘI {n} COINS: {c} / {n}": "攒 {n} 金币：{c} / {n}",
- "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "上面的酒头会自动赚钱。攒够 {n} 就开厨房。"
+ "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "上面的酒头会自动赚钱。攒够 {n} 就开厨房。",
+ "běží!": "进行中！",
+ "nabíjí se": "充能中",
+ "výdělek ×{m}": "收益 ×{m}"
 }

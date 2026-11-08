@@ -968,5 +968,8 @@
  "body: {n}  ?": "punkty: {n}  ?",
  "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "punkty z poziomów, mistrzostwa, gwiazdek i wiernych gości – wydaj w drzewku",
  "NAŠETŘI {n} COINS: {c} / {n}": "UZBIERAJ {n} COINS: {c} / {n}",
- "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "Nalewak u góry zarabia sam. Gdy będziesz mieć {n}, otwórz kuchnię."
+ "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "Nalewak u góry zarabia sam. Gdy będziesz mieć {n}, otwórz kuchnię.",
+ "běží!": "działa!",
+ "nabíjí se": "ładuje się",
+ "výdělek ×{m}": "zarobek ×{m}"
 }

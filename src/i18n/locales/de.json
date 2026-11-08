@@ -968,5 +968,8 @@
  "body: {n}  ?": "Punkte: {n}  ?",
  "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "Punkte aus Stufen, Meisterschaft, Sternen und treuen Gästen – gib sie im Baum aus",
  "NAŠETŘI {n} COINS: {c} / {n}": "SPARE {n} COINS: {c} / {n}",
- "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "Der Zapfhahn oben verdient sie von selbst. Wenn du {n} hast, öffne die Küche."
+ "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "Der Zapfhahn oben verdient sie von selbst. Wenn du {n} hast, öffne die Küche.",
+ "běží!": "läuft!",
+ "nabíjí se": "lädt",
+ "výdělek ×{m}": "Einnahmen ×{m}"
 }

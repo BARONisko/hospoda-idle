@@ -968,5 +968,8 @@
  "body: {n}  ?": "puntos: {n}  ?",
  "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "puntos de niveles, maestría, estrellas y clientes fieles – gástalos en el árbol",
  "NAŠETŘI {n} COINS: {c} / {n}": "AHORRA {n} COINS: {c} / {n}",
- "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "El grifo de arriba los gana solo. Cuando tengas {n}, abre la cocina."
+ "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "El grifo de arriba los gana solo. Cuando tengas {n}, abre la cocina.",
+ "běží!": "¡activo!",
+ "nabíjí se": "cargando",
+ "výdělek ×{m}": "ganancias ×{m}"
 }

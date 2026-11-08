@@ -227,6 +227,15 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
       await p.touchscreen.tap(xy[0], xy[1]);
       await p.waitForTimeout(400);
       ok('truhla: ťuknutí prstem otevře truhlu', await S(p, (s) => s.shopObjs.length > 0 && s.tab === 'chest'));
+      // blesk (schopnost manažera): nejdřív bez manažera (tlačítko skryté), pak najmout → ťuknutí prstem spustí ×3
+      await S(p, (s) => { s.closeShop(); s.d.pubs[0].mgr = false; s.d.pubs[0].boostReady = 0; s.d.pubs[0].boostUntil = 0; });
+      await p.waitForTimeout(300);
+      await S(p, (s) => { s.d.pubs[0].mgr = true; });
+      await p.waitForTimeout(300);
+      const bx = await S(p, (s) => { const b = s.skillBtns[0], rc = game.canvas.getBoundingClientRect(), k = rc.width / 540; return [rc.left + (b.x + b.w / 2) * k, rc.top + (b.y + b.h / 2) * k]; });
+      await p.touchscreen.tap(bx[0], bx[1]);
+      await p.waitForTimeout(300);
+      ok('blesk: po najmutí manažera ťuknutí prstem spustí Šťastnou hodinu', await S(p, (s) => s.boosted(s.d.pubs[0])));
     }
     await p.close();
   }

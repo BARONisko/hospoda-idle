@@ -310,3 +310,9 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   tlačítko obsluhy na kartě). Nový test 6e: žádné dotykové místo hlavní obrazovky není zakryté (1 hospoda, 3 hospody, noc)
   a truhla jde otevřít skutečným ťuknutím prstem (ověřeno, že bez opravy test selže).
 - Návod krok 5 (přání): „NAŠETŘI 60 COINS“ – šipka na Pípu (vydělává sama), světlé obě karty; na „Otevřít“ až když má coins.
+- Lišta úkolu nad hospodou ZPĚT (přání: „v čem pokračovat“ bylo dobré); úkol je i v záložce Úkoly.
+- OPRAVA blesk (Šťastná hodina) nešel ťuknout: po opravě truhly zůstala zóna skrytá i po najmutí manažera → drawSkill ji
+  zase ukáže. Pod bleskem popisek „výdělek ×3“ / „běží!“ / „nabíjí se“. Test: ťuknutí prstem po najmutí spustí ×3.
+  Kontrola neviditelných stěn: hlavní obrazovka (test 6e) i všechny části menu (tools/_tmp/occl2.mjs) – nic zakrytého.
+- Počítač (přání: rolovat jako Idle Obelisk Miner): hra pevně na výšku (šířka max 560 px), stránka se roluje kolečkem; telefon beze změny.
+- ČEKÁ: blesk „odporný“ → ≥ 3 návrhy nového vzhledu.

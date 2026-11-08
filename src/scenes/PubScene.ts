@@ -346,6 +346,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.pubTabs = [];
     this.skillBtns = [];
     this.skillIcons = [];
+    this.skillSubs = [];
     this.skillKeys = [];
     this.strips = [];
     this.scroll = 0;
@@ -2877,8 +2878,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const mine = this.views.length < 2 || i === this.sel;
     b.zone.input && (b.zone.input.enabled = mine);
     const ic = (this.skillIcons[i] ??= this.add.image(0, 0, 'icons', 'bolt').setDepth(61));
+    const sub = (this.skillSubs[i] ??= this.add.text(0, 0, '', txt(15, PAL.gold)).setOrigin(0.5, 0).setDepth(61));
     if (!p.mgr || !mine) {
       ic.setVisible(false);
+      sub.setVisible(false);
+      this.skillKeys[i] = '';
       return this.drawBtn(b, '', false, 'amber', false);
     }
     const now = Date.now();
@@ -2891,6 +2895,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const txt2 = boost ? mmss(p.boostUntil! - now) : wait ? mmss(p.boostReady! - now) : '';
     const key = `${boost}|${wait}|${txt2}|${b.x}|${b.y}`;
     b.visible = true;
+    b.zone.setVisible(true); // drawBtn(..., false) zónu skryl – po najmutí manažera musí jít zase ťuknout
     b.enabled = !wait;
     if (this.skillKeys[i] === key) return;
     this.skillKeys[i] = key;
@@ -2903,10 +2908,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     b.label.setVisible(!!txt2).setText(boost ? `×${BOOST_MULT}\n${txt2}` : txt2).setPosition(cx, wait ? cy + 16 : cy).setScale(1);
     b.label.setScale(Math.min(1, (b.w - 6) / Math.max(1, b.label.width)));
     b.zone.setPosition(b.x, b.y).setSize(b.w, b.h);
+    // popisek pod tlačítkem (hlášení: „co je tohle?“): připraveno = výdělek ×3, běží, nabíjí se
+    sub.setVisible(true).setPosition(cx, b.y + b.h + 4).setText(boost ? t('běží!') : wait ? t('nabíjí se') : t('výdělek ×{m}', { m: BOOST_MULT })).setColor(boost ? PAL.scarlet : wait ? PAL.fog : PAL.gold).setScale(1);
+    sub.setScale(Math.min(1, 86 / Math.max(1, sub.width)));
     void MANAGERS;
   }
   skillIcons: Phaser.GameObjects.Image[] = [];
   skillKeys: string[] = [];
+  skillSubs: Phaser.GameObjects.Text[] = [];
 
   // ---------- návštěvníci s rozhodnutím ----------
   visitT = 120;
@@ -4525,9 +4534,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private qTick() {
     // posun věcí nahoře jen tehdy, když je lišta úkolu opravdu vidět (dřív i skrytá odsunula Šťastnou hodinu doprostřed)
     const q0 = this.qCur();
-    // návrh 4: lišta úkolu je v záložce Úkoly (spodní lišta), na hlavní obrazovce se nekreslí
-    this.qVis = false;
-    void q0;
+    // lišta úkolu nad hospodou zpět (přání uživatele: „v čem pokračovat“ bylo dobré); je i v záložce Úkoly
+    this.qVis = !!q0 && !this.guideCur && Date.now() >= this.tutFinaleUntil && !this.awayObjs.length;
     const off = this.qOff();
     if (off !== this.qOffNow) {
       this.qOffNow = off;
@@ -4580,7 +4588,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const key = `${q.id}|${done}|${a}|${y}|${big(rw)}`;
     if (key !== this.qKey) {
       this.qKey = key;
-      parts.forEach((o) => o.setVisible(false));
+      parts.forEach((o) => o.setVisible(true));
       const QH = PubScene.QH, x0 = 8, w = W - 16;
       const c = done ? col('mint') : col('gold');
       u.g.clear();
@@ -4603,7 +4611,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       Object.assign(u.btn, { x: W - 14 - bw, y: y + 7, w: bw });
       u.btn.zone.setPosition(u.btn.x, u.btn.y).setSize(bw, 46);
       u.btn.label.setPosition(u.btn.x + bw / 2, u.btn.y + 23);
-      this.drawBtn(u.btn, done ? t('VYBER +{n}', { n: big(rw) }) : t('UKAŽ'), true, done ? 'green' : 'amber', false);
+      this.drawBtn(u.btn, done ? t('VYBER +{n}', { n: big(rw) }) : t('UKAŽ'), true, done ? 'green' : 'amber');
       u.btn.label.setScale(Math.min(1, (bw - 12) / u.btn.label.width));
     }
     // šipka UKAŽ

@@ -76,13 +76,28 @@ const game = new Phaser.Game({
   pixelArt: true,
   roundPixels: true,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-  input: { activePointers: 2 },
+  // kolečko myši roluje stránku (na počítači)
+  input: { activePointers: 2, mouse: { preventDefaultWheel: false } },
   // idle hra nepotřebuje 60–120 snímků/s: strop 30 = méně práce pro procesor i grafiku (telefon se nehřeje)
   fps: { target: 30, limit: 30 },
   render: { powerPreference: 'low-power' },
   scene: [BootScene, PubScene, TempleScene, DartsScene],
 });
 (window as unknown as { game: Phaser.Game }).game = game;
+
+// Počítač (hlášení: „nevidím to celé a nemůžu rolovat“, přání: rolovat jako Idle Obelisk Miner): hra má pevnou
+// velikost na výšku (šířka max 560 px) a stránka se roluje kolečkem myši. Na telefonu beze změny (celá obrazovka).
+const gameDiv = document.getElementById('game');
+function desktopLayout() {
+  if (!gameDiv || matchMedia('(pointer: coarse)').matches) return;
+  const w = Math.min(window.innerWidth, 560);
+  document.documentElement.style.overflowY = document.body.style.overflowY = 'auto';
+  document.body.style.touchAction = 'auto';
+  Object.assign(gameDiv.style, { position: 'relative', inset: 'auto', margin: '0 auto', width: w + 'px', height: Math.round((w * 960) / 540) + 'px' });
+  game.scale.refresh();
+}
+window.addEventListener('resize', desktopLayout);
+desktopLayout();
 
 // PWA: hraní bez internetu (jen v sestavené verzi, ne ve vývoji)
 if (import.meta.env.PROD && 'serviceWorker' in navigator && location.protocol === 'https:') {

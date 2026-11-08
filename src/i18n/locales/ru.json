@@ -968,5 +968,8 @@
  "body: {n}  ?": "очки: {n}  ?",
  "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "очки за уровни, мастерство, звёзды и верных гостей – трать в древе",
  "NAŠETŘI {n} COINS: {c} / {n}": "НАКОПИ {n} COINS: {c} / {n}",
- "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "Кран наверху зарабатывает сам. Когда будет {n}, открой кухню."
+ "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "Кран наверху зарабатывает сам. Когда будет {n}, открой кухню.",
+ "běží!": "идёт!",
+ "nabíjí se": "заряжается",
+ "výdělek ×{m}": "доход ×{m}"
 }

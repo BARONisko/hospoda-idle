@@ -968,5 +968,8 @@
  "body: {n}  ?": "ポイント：{n}  ?",
  "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "レベル・熟練・星・常連客からポイント――ツリーで使おう",
  "NAŠETŘI {n} COINS: {c} / {n}": "{n}コイン貯めよう：{c} / {n}",
- "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "上のビールサーバーが自動で稼ぐ。{n}たまったらキッチンを開こう。"
+ "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "上のビールサーバーが自動で稼ぐ。{n}たまったらキッチンを開こう。",
+ "běží!": "発動中！",
+ "nabíjí se": "チャージ中",
+ "výdělek ×{m}": "収入 ×{m}"
 }
