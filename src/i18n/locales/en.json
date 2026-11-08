@@ -868,5 +868,10 @@
  "pivo se vaří samo – i offline": "beer brews by itself – even offline",
  "první pivo zdarma – prodej ho": "first beer is free – sell it",
  "piva jdou i na pivní akce": "beer also pays for beer actions",
- "verze {v}": "version {v}"
+ "verze {v}": "version {v}",
+ "od 3. hospody": "from the 3rd pub",
+ "po 3. hygieně": "after the 3rd inspection",
+ "{d} d {h} h": "{d}d {h}h",
+ "končí za {t}": "ends in {t}",
+ "otevře za {t}": "opens in {t}"
 }

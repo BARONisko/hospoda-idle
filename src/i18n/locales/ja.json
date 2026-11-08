@@ -868,5 +868,10 @@
  "pivo se vaří samo – i offline": "ビールは自動で醸造 – オフラインでも",
  "první pivo zdarma – prodej ho": "最初のビールは無料 – 売ってみよう",
  "piva jdou i na pivní akce": "ビールはビールアクションにも使える",
- "verze {v}": "バージョン {v}"
+ "verze {v}": "バージョン {v}",
+ "od 3. hospody": "3軒目から",
+ "po 3. hygieně": "3回目の衛生検査後",
+ "{d} d {h} h": "{d}日{h}時間",
+ "končí za {t}": "残り {t}",
+ "otevře za {t}": "{t} 後に開く"
 }

@@ -868,5 +868,10 @@
  "pivo se vaří samo – i offline": "la bière brasse toute seule – même hors ligne",
  "první pivo zdarma – prodej ho": "première bière offerte – vends-la",
  "piva jdou i na pivní akce": "la bière sert aussi aux actions",
- "verze {v}": "version {v}"
+ "verze {v}": "version {v}",
+ "od 3. hospody": "dès le 3e bar",
+ "po 3. hygieně": "après la 3e inspection",
+ "{d} d {h} h": "{d} j {h} h",
+ "končí za {t}": "finit dans {t}",
+ "otevře za {t}": "ouvre dans {t}"
 }

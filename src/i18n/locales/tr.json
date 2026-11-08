@@ -868,5 +868,10 @@
  "pivo se vaří samo – i offline": "bira kendi kendine demlenir – çevrimdışı da",
  "první pivo zdarma – prodej ho": "ilk bira bedava – sat onu",
  "piva jdou i na pivní akce": "bira, bira etkinliklerinde de kullanılır",
- "verze {v}": "sürüm {v}"
+ "verze {v}": "sürüm {v}",
+ "od 3. hospody": "3. meyhaneden itibaren",
+ "po 3. hygieně": "3. denetimden sonra",
+ "{d} d {h} h": "{d} g {h} sa",
+ "končí za {t}": "{t} sonra biter",
+ "otevře za {t}": "{t} sonra açılır"
 }

@@ -250,4 +250,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - OPRAVA (hlášení: návod „NAJMI ČÍŠNÍKY“ visel, i když už číšníci byli najatí): tutTick posune návod, když je krok už splněný (číšníci, kuchyně, 2. úroveň pípy).
 - OPRAVA (hlášení: po hygieně průvodce „OTEVŘI PÍPU“ nejde dokončit – 0 coins a nic nevydělává): po hygieně coins aspoň restartNeed() = (pípa + číšníci) nové hospody + číšníci v Pajzlu, ×1,2 (Sklepní krčma 276). Kdo uvízl (nová hospoda bez pípy a málo coins), dostane je při načtení.
 - Zrušeny nápisy „KOMBO ×n“ (+ konfety a otřes) při rychlém ťukání na pípu – nic nedávaly a přes sebe zaplňovaly kartu; zůstal jen stoupající zvuk.
+- HOTOVO (přání: po hygieně průvodce ukázal celé menu bez vysvětlení): menu se odemyká postupně – Chrám od 3. hospody, Liga po 3. hygieně, Kostnice po první noci, Pivovar/Výzdoba až po otevření kuchyně/sklepa (už ne všechno hned po hygieně); co jednou bylo odemčené (menuOpen), zůstane. Průvodce novinkou vždy s vysvětlením na hlavní obrazovce (čeká na zavřené menu) a mezi novinkami 90 s pauza (guideGapUntil).
+- HOTOVO: Chrám – červená tečka jen do prvního otevření za den (d.templeSeen), na dlaždici „končí za 14 h 7 min“ / „otevře za 3 d 5 h“ (weekendLeft v temple.ts).
 - ČEKÁ: zúžit lištu úkolu? Poslední krok návodu (HOTOVO) má v menu velkou ceduli.

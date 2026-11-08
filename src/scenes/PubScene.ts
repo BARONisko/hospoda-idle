@@ -18,7 +18,7 @@ import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
 import { notify, NOTE, Note } from '../core/notify';
 import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, VIP_GEMS, GOLD_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs } from '../core/special';
-import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER } from '../core/temple';
+import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER, weekendLeft } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, SKILLS, BRANCHES, xpNeed, skillStats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave, wipe } from '../core/save';
@@ -601,7 +601,6 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     tx(by + 74, PUB_NAMES[act], 28, PAL.mint);
     tx(by + 124, about[act] ?? '', 21, PAL.bone);
     tx(by + 220, t('Vydělává {m}× víc než ta předchozí a běží vedle ostatních.', { m: ACT_STEP }), 20, PAL.sand);
-    if (act === 2) tx(by + 284, t('V menu se otevřela Kostnice.'), 20, PAL.ice);
     const ok = this.btn(W / 2 - 110, by + bh - 90, 220, 64, () => {
       this.awayObjs.forEach((o) => o.destroy());
       this.awayObjs = [];
@@ -615,7 +614,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** kdy se dlaždice menu odemkne (null = hned); vrací text podmínky, dokud je zamčená */
   private tileLock(name: string): string | null {
     const d = this.d, pre = d.stats.prestiges > 0;
-    const opened = (id: string) => pre || d.pubs.some((p) => (p.st[id]?.lvl ?? 0) > 0);
+    // co už jednou bylo odemčené, zůstává (po hygieně se úrovně vynulují)
+    if (d.menuOpen?.includes(name)) return null;
+    // menu se odemyká postupně (přání uživatele): ne všechno naráz po 1. hygieně
+    const opened = (id: string) => d.pubs.some((p) => (p.st[id]?.lvl ?? 0) > 0);
     switch (name) {
       case 'brew': return opened('kitchen') ? null : t('po otevření kuchyně');
       case 'decor': return opened('cellar') ? null : t('po otevření sklepa');
@@ -624,9 +626,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       case 'keeper': return (d.klvl ?? 1) >= 2 ? null : t('od 2. úrovně hostinského');
       case 'talis': return Object.keys(d.talis ?? {}).length ? null : t('po nálezu talismanu');
       case 'krigl': return pre ? null : t('po první hygieně');
-      case 'temple': return pre ? null : t('po první hygieně');
-      case 'league': return pre ? null : t('po první hygieně');
-      case 'bones': return d.pubs.length >= 2 ? null : t('od 2. hospody');
+      case 'temple': return d.pubs.length >= 3 ? null : t('od 3. hospody');
+      case 'league': return d.stats.prestiges >= 3 ? null : t('po 3. hygieně');
+      case 'bones': return d.nightInfo ? null : t('po první noci');
       case 'coll': return d.nightInfo && (d.bones ?? 0) > 0 ? null : t('až budeš mít kosti');
       default: return null;
     }
@@ -867,6 +869,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   // ---------- chrám R'lyeh (víkendová událost) ----------
   private openTemple() {
+    this.d.templeSeen = dayKey(); // červená tečka jen do prvního otevření za den
     this.closeShop();
     this.input.enabled = false;
     this.scene.launch('Temple', { host: this });
@@ -948,7 +951,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (id === 'keeper') return this.skillPoints() > 0;
     if (id === 'special') return (chestReady(this.d.chest) && (this.d.tut ?? -1) < 0) || (passOn(this.d.pass) && this.d.pass!.claim !== dayKey());
     if (id === 'darts') return !!this.d.darts && DART_UPS.some((u) => (this.d.darts!.up[u.id] ?? 0) < u.max && u.cost(this.d.darts!.up[u.id] ?? 0) <= this.d.darts!.pts);
-    if (id === 'temple') return isWeekend() && !this.tileLock('temple') && templeState(this.d.temple).used < ROUNDS_PER_DAY;
+    if (id === 'temple') return isWeekend() && !this.tileLock('temple') && templeState(this.d.temple).used < ROUNDS_PER_DAY && this.d.templeSeen !== dayKey();
     return false;
   }
 
@@ -1006,6 +1009,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         const lk = this.add.image(x + tw / 2, y + 50, 'icons', 'lock').setScale(3).setDepth(D + 5);
         this.shopObjs.push(lk);
         return;
+      }
+      if (tab === 'temple') {
+        // víkendový chrám: kolik zbývá do konce (nebo do otevření)
+        const wl = weekendLeft(), h = Math.floor(wl.ms / 3600_000), m = Math.floor((wl.ms % 3600_000) / 60_000);
+        const tt = h >= 24 ? t('{d} d {h} h', { d: Math.floor(h / 24), h: h % 24 }) : h ? t('{h} h {m} min', { h, m }) : t('{m} min', { m });
+        const tl = this.add.text(x + tw / 2, y + 12, wl.on ? t('končí za {t}', { t: tt }) : t('otevře za {t}', { t: tt }), txt(15, wl.on ? PAL.gold : PAL.fog)).setOrigin(0.5, 0).setDepth(D + 6).setBackgroundColor(PAL.ink).setPadding(4, 1, 4, 1);
+        tl.setScale(Math.min(1, (tw - 16) / tl.width));
+        this.shopObjs.push(tl);
       }
       if (!sub && this.tabAlert(tab) || (sub === 'up' && this.tabAlert('shop'))) {
         const dot = this.add.graphics().setDepth(D + 8);
@@ -3999,6 +4010,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   guideObjs: Phaser.GameObjects.GameObject[] = [];
   guideFollow: (() => void) | null = null;
   guideCur: { id: string; i: number } | null = null;
+  /** další novinka v menu nejdřív v (ms) – pauza mezi nimi */
+  guideGapUntil = 0;
 
   private guideAdd(id: string) {
     const q = (this.d.guideQ ??= []), seen = (this.d.guides ??= []);
@@ -4063,11 +4076,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (this.guideCur || this.awayObjs.length || (this.d.tut ?? -1) >= 0 || this.d.pubIntro || Date.now() < this.tutFinaleUntil) return;
     const id = this.d.guideQ?.[0];
     if (!id) return;
-    const steps = this.guideSteps(id);
-    // průvodce s cedulí (nová hospoda, noc) počká, až bude menu zavřené
-    if (this.shopObjs.length && steps[0]?.done !== 'menu') return;
-    // „nové v menu“ přeskočit krok Menu, když už je menu otevřené
-    this.guideCur = { id, i: steps[0]?.done === 'menu' && this.shopObjs.length && this.tab === 'home' ? 1 : 0 };
+    // vždy s vysvětlením na hlavní obrazovce: počká, až bude menu zavřené (dřív v otevřeném menu jen šipky po sobě)
+    if (this.shopObjs.length) return;
+    // novinky v menu po jedné a s pauzou (přání uživatele: pomalu a postupně)
+    if (id.startsWith('tile:') && Date.now() < this.guideGapUntil) return;
+    this.guideCur = { id, i: 0 };
     this.guideShow();
   }
 
@@ -4092,6 +4105,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.guideFollow = null;
     this.guideCur = null;
     if (!g) return;
+    if (g.id.startsWith('tile:')) this.guideGapUntil = Date.now() + 90_000;
     this.d.guideQ = (this.d.guideQ ?? []).filter((x) => x !== g.id);
     (this.d.guides ??= []).push(g.id);
     store(this.d);

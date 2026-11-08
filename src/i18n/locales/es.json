@@ -868,5 +868,10 @@
  "pivo se vaří samo – i offline": "la cerveza se hace sola, incluso sin conexión",
  "první pivo zdarma – prodej ho": "primera cerveza gratis: véndela",
  "piva jdou i na pivní akce": "la cerveza también sirve para acciones",
- "verze {v}": "versión {v}"
+ "verze {v}": "versión {v}",
+ "od 3. hospody": "desde la 3.ª taberna",
+ "po 3. hygieně": "tras la 3.ª inspección",
+ "{d} d {h} h": "{d} d {h} h",
+ "končí za {t}": "acaba en {t}",
+ "otevře za {t}": "abre en {t}"
 }

@@ -868,5 +868,10 @@
  "pivo se vaří samo – i offline": "맥주는 저절로 양조돼요 – 오프라인에도",
  "první pivo zdarma – prodej ho": "첫 맥주는 무료 – 팔아 보세요",
  "piva jdou i na pivní akce": "맥주는 맥주 이벤트에도 써요",
- "verze {v}": "버전 {v}"
+ "verze {v}": "버전 {v}",
+ "od 3. hospody": "3번째 술집부터",
+ "po 3. hygieně": "3번째 위생 점검 후",
+ "{d} d {h} h": "{d}일 {h}시간",
+ "končí za {t}": "{t} 후 종료",
+ "otevře za {t}": "{t} 후 열림"
 }

@@ -47,6 +47,20 @@ const early = (now: number) => now >= EARLY_FROM && now < EARLY_TO;
 
 export const isWeekend = (now = Date.now()) => force() || early(now) || [0, 6].includes(new Date(now).getDay());
 
+/** víkend v chrámu: kolik ms zbývá do konce (běží) nebo do začátku (neběží) */
+export function weekendLeft(now = Date.now()): { on: boolean; ms: number } {
+  if (early(now)) return { on: true, ms: EARLY_TO - now };
+  const d = new Date(now), day = d.getDay();
+  const t0 = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  if (day === 0 || day === 6) {
+    // konec = pondělí 0:00
+    t0.setDate(t0.getDate() + (day === 6 ? 2 : 1));
+    return { on: true, ms: t0.getTime() - now };
+  }
+  t0.setDate(t0.getDate() + (6 - day));
+  return { on: false, ms: t0.getTime() - now };
+}
+
 /** klíč víkendu = datum jeho soboty (ve všední den poslední minulé soboty) */
 export function weekendKey(now = Date.now()) {
   if (early(now)) return '2026-11-07';
