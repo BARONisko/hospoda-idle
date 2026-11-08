@@ -14,6 +14,9 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
   const ws: WaiterState[][] = Array.from({ length: pubs }, () => []);
   let coins = 0, run = 0, t = 0;
   const marks: Record<string, number> = {};
+  // mrtvá místa: nejdelší čekání mezi nákupy (do 1 h a 1–6 h), počet čekání > 60 s v 1. hodině
+  let lastBuy = 0, gap1 = 0, gapL = 0, long1 = 0;
+  const bought = () => { const g = t - lastBuy; if (t <= 3600) { gap1 = Math.max(gap1, g); if (g > 60) { long1++; if (process.env.GAPS) console.log(`  čekání ${g} s končí v ${(t / 60).toFixed(1)} min, příjem ${rate().toFixed(1)}/s`); } } else gapL = Math.max(gapL, g); lastBuy = t; };
   const kb = 1 + KRIGL_BONUS * krigle;
   const spent = Array(pubs).fill(0), lvls = Array(pubs).fill(0);
   const mc = (p: number, i: number) => (st[p][i].lvl > 0 ? milestoneCount(st[p][i].lvl) : -1);
@@ -43,7 +46,9 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
   };
   while (t < maxT) {
     // nákupy: nejlepší poměr přírůstek výdělku / cena
+    let anyAff = false;
     for (;;) {
+      anyAff = false;
       const r0 = rate();
       let best: { gain: number; price: number; act: () => void; pub: number } | null = null;
       const consider = (price: number, act: () => void, undo: () => void, pub = -1) => {
@@ -51,6 +56,7 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
         const g = rate() - r0;
         undo();
         const score = g / price;
+        if (g > 0 && price <= coins) anyAff = true;
         if (g > 0 && (!best || score > best.gain / best.price)) best = { gain: g, price, act, pub };
       };
       st.forEach((ps, p) => ps.forEach((s, i) => {
@@ -82,6 +88,7 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
       coins -= b.price;
       if (b.pub >= 0) spent[b.pub] += b.price, lvls[b.pub]++;
       b.act();
+      bought();
     }
     // skutečný hráč otevře a obsadí každou stanici, jakmile na ni má 3× (hladový výpočet to neumí)
     st.forEach((ps, p) => ps.forEach((s, i) => {
@@ -125,6 +132,7 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
         }
       }
     });
+    if (anyAff && process.env.REAL) bought();
     const r = rate();
     coins += r;
     run += r;
@@ -135,6 +143,7 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600) {
     if (kriglyFor(run) >= 4 * PRESTIGE_MIN && !('40 krígel' in marks)) marks['40 krígel'] = t;
   }
   const res: Record<string, string> = Object.fromEntries(Object.entries(marks).map(([k, v]) => [k, fmt(v)]));
+  res['nejdelší čekání na nákup'] = `${gap1} s (1. h), ${gapL} s (dál); čekání >60 s v 1. h: ${long1}×`;
   if (pubs > 1) res['útrata po hospodách %'] = spent.map((x) => ((100 * x) / spent.reduce((a, b) => a + b, 0)).toFixed(2)).join(' / ') + '; úrovně ' + lvls.join(' / ') + '  (konec: ' + st.map((ps) => ps.map((x) => x.lvl).join(',')).join(' | ') + ')';
   return res;
 }
