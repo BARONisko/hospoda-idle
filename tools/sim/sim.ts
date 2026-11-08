@@ -4,6 +4,9 @@ import { crew, beersPerCycle, START_CREW, hireCost, freePoints, UP_MAX, WAITER_M
 import { milestoneCount, styleSupplyMult } from '../../src/core/economy';
 import { STATIONS, StationDef, payout, cost, actMult, UPGRADES, upMult, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN, PRESTIGE_FIRST } from '../../src/core/economy';
 
+/** počítadla pro tools/sim/skills.mjs (koupené úrovně = XP hostinského) */
+export const simCount = { levels: 0 };
+
 interface St { lvl: number; auto: boolean }
 const fmt = (s: number) => (s < 3600 ? `${(s / 60).toFixed(1)} min` : `${(s / 3600).toFixed(2)} h`);
 
@@ -87,7 +90,7 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600, goal = 0, kf:
         break;
       }
       coins -= b.price;
-      if (b.pub >= 0) spent[b.pub] += b.price, lvls[b.pub]++;
+      if (b.pub >= 0) spent[b.pub] += b.price, lvls[b.pub]++, (simCount.levels += 1);
       b.act();
       bought();
     }
