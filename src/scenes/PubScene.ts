@@ -620,21 +620,23 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** kdy se dlaždice menu odemkne (null = hned); vrací text podmínky, dokud je zamčená */
   private tileLock(name: string): string | null {
-    const d = this.d, pre = d.stats.prestiges > 0;
+    const d = this.d;
     // co už jednou bylo odemčené, zůstává (po hygieně se úrovně vynulují)
     if (d.menuOpen?.includes(name)) return null;
     // menu se odemyká postupně (přání uživatele): ne všechno naráz po 1. hygieně
-    const opened = (id: string) => d.pubs.some((p) => (p.st[id]?.lvl ?? 0) > 0);
+    // pořadí (přání uživatele): nejvýš jedna novinka za kolo, vždy se šipkou a krátkým návodem
+    // 1. hygiena krígly · první noc kosti (Kostnice, Sběrač) · 2. pivovar · 3. Chrám · 4. výzdoba · 5. šipky · 6. Liga
+    const hyg = d.stats.prestiges, after = (n: number) => (hyg >= n ? null : t('po {n}. hygieně', { n: String(n) }));
     switch (name) {
-      case 'brew': return opened('kitchen') ? null : t('po otevření kuchyně');
-      case 'decor': return opened('cellar') ? null : t('po otevření sklepa');
+      case 'krigl': return after(1);
+      case 'brew': return after(2);
+      case 'temple': return after(3);
+      case 'decor': return after(4);
+      case 'darts': return after(5);
+      case 'league': return after(6);
       case 'daynight': return d.nightInfo ? null : t('po první noci');
-      case 'darts': return d.nightInfo ? null : t('po první noci');
       case 'keeper': return (d.klvl ?? 1) >= 2 ? null : t('od 2. úrovně hostinského');
       case 'talis': return Object.keys(d.talis ?? {}).length ? null : t('po nálezu talismanu');
-      case 'krigl': return pre ? null : t('po první hygieně');
-      case 'temple': return d.pubs.length >= 3 ? null : t('od 3. hospody');
-      case 'league': return d.stats.prestiges >= 3 ? null : t('po 3. hygieně');
       case 'bones': return d.nightInfo ? null : t('po první noci');
       case 'coll': return d.nightInfo && (d.bones ?? 0) > 0 ? null : t('až budeš mít kosti');
       default: return null;
@@ -1089,8 +1091,55 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     else if (tab === 'special') this.specialTab(y0, D);
     else if (tab === 'chest') this.chestTab(y0, D);
     else this.optsTab(cy0, D);
+    this.tabTut(tab === 'shop' ? this.shopSub : tab, y0 + 60, D);
     sfx.click();
     this.refresh();
+  }
+
+  /** krátký návod při prvním otevření nové části menu: šipka na hlavní tlačítko + jeden řádek (přání uživatele: šipkou, málo textu) */
+  private static TAB_TUT: Record<string, string> = {
+    krigl: t('za krígly kup vylepšení – platí navždy'),
+    bones: t('za kosti hoď kostkou – vylepší něco navždy'),
+    coll: t('kup sběrače – ťuká na bubliny za tebe'),
+    decor: t('kup ozdobu – bonus zůstane i po hygieně'),
+    league: t('vydělávej víc než ostatní a postoupíš'),
+    keeper: t('dej bod do dovednosti'),
+    talis: t('nasaď talisman – dá bonus'),
+  };
+  tabTutKey = '';
+  tabTutUntil = 0;
+  private tabTut(key: string, yMin: number, D: number) {
+    const text = PubScene.TAB_TUT[key];
+    if (!text) return;
+    const seen = (this.d.tabTut ??= []);
+    if (!seen.includes(key)) {
+      seen.push(key);
+      store(this.d);
+      this.tabTutKey = key;
+      this.tabTutUntil = Date.now() + 7000;
+    } else if (this.tabTutKey !== key || Date.now() > this.tabTutUntil) return;
+    // hlavní tlačítko = první aktivní tlačítko pod hlavičkou (v Kostnici druhé – první je Den a noc)
+    const zs = this.shopObjs.filter((o): o is Phaser.GameObjects.Zone => o instanceof Phaser.GameObjects.Zone && o.visible && o.y > yMin);
+    const z = zs[key === 'bones' ? 1 : 0];
+    // málo místa nad tlačítkem → šipka zespodu a text pod ní
+    const below = !!z && z.y - yMin < 110;
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
+    if (z) {
+      const { x, y } = z, w = z.width, h = z.height;
+      const fr = add(this.add.graphics().setDepth(D + 6));
+      fr.lineStyle(4, col('gold')).strokeRoundedRect(x - 4, y - 4, w + 8, h + 8, 10);
+      this.tweens.add({ targets: fr, alpha: 0.35, yoyo: true, repeat: -1, duration: 450 });
+      const ax = x + w / 2, ay = below ? y + h + 34 : y - 34;
+      const ar = add(this.add.graphics().setDepth(D + 7).setPosition(ax, ay));
+      const tri = (c: number, g: number) => ar.fillStyle(c).fillTriangle(-20 - g, -12 - g, 20 + g, -12 - g, 0, 20 + g).fillRect(-8 - g, -36 - g, 16 + g * 2, 26);
+      tri(col('ink'), 4);
+      tri(col('gold'), 0);
+      if (below) ar.setAngle(180);
+      this.tweens.add({ targets: ar, y: ay + (below ? 8 : -8), yoyo: true, repeat: -1, duration: 380, ease: 'Sine.inOut' });
+    }
+    const ty = !z ? yMin + 40 : below ? z.y + z.height + 92 : z.y - 96;
+    const tx = add(this.add.text(W / 2, ty, text, txt(24, PAL.gold)).setOrigin(0.5).setDepth(D + 7).setBackgroundColor(PAL.ink).setPadding(12, 6, 12, 6));
+    tx.setScale(Math.min(1, (W - 30) / tx.width));
   }
 
   /** další záložky ve 2. řádku (talismany, hostinský) */

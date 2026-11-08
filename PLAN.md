@@ -256,3 +256,10 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Test (npm test) 6b: hygiena jako skutečný hráč (lišta úkolu, VIP) – Ještě ne, hra po restartu běží, coins na rozjezd, průvodce novou hospodou; 6c: první noc stojí do Dál. (window.__night jen ve vývoji.)
 - VÝKON (hlášení: telefon se přehřívá): strop 30 snímků/s (fps.limit, dřív až 120 na iPhonu), powerPreference low-power; fillRoundedRect v Graphics nahrazen 5 obdélníky se schodkovým rohem (dřív earcut v každém snímku – největší žrout). Měření headless: skript na snímek 15,8 → 3,4 ms.
 - ČEKÁ: zúžit lištu úkolu? Poslední krok návodu (HOTOVO) má v menu velkou ceduli.
+- Hospoda 62: vyvážení hygieny A+10 % (krígly = tržba ÷ 10^(hospody−1), každá další hygiena aspoň +10 % krígel; kola
+  9 → 14 → 11 → … → 22 min, tools/sim/chain.mjs). Okno hygieny 2B (krígly teď → po, ×výdělek navždy, nová hospoda). 8bc52c4
+- Cíl na obzoru: 3C krígl se plní vpravo ve scéně / 3B proužek pod lištou úkolu, přepínač Nastavení → Ukazatel cíle
+  (výchozí krígl); ťuknutí otevře hygienu. ed9580b. Čeká na volbu uživatele.
+- Postupné odemykání: 1. hygiena krígly · první noc Kostnice/Sběrač · 2. pivovar · 3. Chrám · 4. výzdoba · 5. šipky ·
+  6. Liga (tileLock). Při prvním otevření nové části menu šipka na hlavní tlačítko + 1 řádek (tabTut, d.tabTut).
+  Chrám a Šipky (vlastní scény) zatím vlastní návod nemají.
