@@ -193,6 +193,15 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   await S(p, (s) => { s.sel = 1; s.d.coins = 1e6; s.d.pubs[1].st.tap = { lvl: 34, auto: true, prog: 0 }; });
   await p.waitForTimeout(2500);
   ok('průvodce nové hospody: splněné kroky přeskočí (nevisí)', await S(p, (s) => !s.guideCur || s.guideSteps(s.guideCur.id)[s.guideCur.i].done === 'ok'));
+  // hlášení: v kroku NAJMI ČÍŠNÍKY přepnul na jinou hospodu → šipka mířila na prázdné místo; teď na záložku té hospody
+  ok('průvodce: po přepnutí hospody šipka na záložku, po návratu na tlačítko', await S(p, (s) => {
+    s.d.pubs[1].st.tap = { lvl: 1, auto: false, prog: 0 }; s.guideCur = { id: 'pub2', i: 2 }; s.guideShow();
+    const st = s.guideSteps('pub2')[2];
+    s.sel = 0; s.refresh(); const a = st.at();
+    s.sel = 1; s.refresh(); const b = st.at();
+    const tab = s.pubTabs[1];
+    return !!a && a[0] === tab.x && a[1] === tab.y && !!b && b[1] > 400;
+  }));
   ok('bez chyb v konzoli (průvodce přeskočí)', p.errors.length === 0);
   await p.close();
 }

@@ -4645,7 +4645,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private guideSteps(id: string): { head: string; text: string; done: string; at?: () => number[] | null }[] {
     const card = (sid: string, what: 'buy' | 'staff') => () => {
       const c = this.cards.find((k) => k.def.id === sid)?.[what];
-      return c ? [c.x, c.y, c.w, c.h] : null;
+      return c && c.visible ? [c.x, c.y, c.w, c.h] : null;
     };
     const menuBtn = () => [this.shopBtn.x, this.shopBtn.y, this.shopBtn.w, this.shopBtn.h];
     const tile = (key: string) => () => {
@@ -4657,10 +4657,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (id.startsWith('pub')) {
       const n = Number(id.slice(3)), name = PUB_NAMES[this.d.pubs[n - 1]?.act ?? n];
       const tab = () => (this.pubTabs[n - 1] ? [this.pubTabs[n - 1].x, this.pubTabs[n - 1].y, this.pubTabs[n - 1].w, this.pubTabs[n - 1].h] : null);
+      // hráč přepnul na jinou hospodu (hlášení: šipka ukazovala na prázdné místo cizí karty) → šipka na záložku té nové hospody
+      const here = (f: () => number[] | null) => () => (this.views.length > 1 && this.sel !== n - 1 ? tab() : f());
       return [
         { head: t('NOVÁ HOSPODA!'), text: t('ťukni nahoře na „{n}“', { n: name }), done: 'pub:' + (n - 1), at: tab },
-        { head: t('OTEVŘI PÍPU'), text: t('i tady začínáš pípou – kup ji', { n: name }), done: 'buy:tap', at: card('tap', 'buy') },
-        { head: t('NAJMI ČÍŠNÍKY'), text: t('pak tahle hospoda vydělává sama'), done: 'hire', at: card('tap', 'staff') },
+        { head: t('OTEVŘI PÍPU'), text: t('i tady začínáš pípou – kup ji', { n: name }), done: 'buy:tap', at: here(card('tap', 'buy')) },
+        { head: t('NAJMI ČÍŠNÍKY'), text: t('pak tahle hospoda vydělává sama'), done: 'hire', at: here(card('tap', 'staff')) },
         { head: t('HOSPODY BĚŽÍ NARÁZ'), text: t('všechny vydělávají pořád. Přepínej záložkami nahoře nebo táhni prstem do strany.'), done: 'ok' },
       ];
     }
