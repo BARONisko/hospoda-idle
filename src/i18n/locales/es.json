@@ -971,5 +971,7 @@
  "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "El grifo de arriba los gana solo. Cuando tengas {n}, abre la cocina.",
  "běží!": "¡activo!",
  "nabíjí se": "cargando",
- "výdělek ×{m}": "ganancias ×{m}"
+ "výdělek ×{m}": "ganancias ×{m}",
+ "×{m} ještě {t}": "×{m} aún {t}",
+ "hodina za {t}": "hora en {t}"
 }

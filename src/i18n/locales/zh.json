@@ -971,5 +971,7 @@
  "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "上面的酒头会自动赚钱。攒够 {n} 就开厨房。",
  "běží!": "进行中！",
  "nabíjí se": "充能中",
- "výdělek ×{m}": "收益 ×{m}"
+ "výdělek ×{m}": "收益 ×{m}",
+ "×{m} ještě {t}": "×{m} 还剩 {t}",
+ "hodina za {t}": "{t} 后可用"
 }

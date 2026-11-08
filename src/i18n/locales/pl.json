@@ -971,5 +971,7 @@
  "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "Nalewak u góry zarabia sam. Gdy będziesz mieć {n}, otwórz kuchnię.",
  "běží!": "działa!",
  "nabíjí se": "ładuje się",
- "výdělek ×{m}": "zarobek ×{m}"
+ "výdělek ×{m}": "zarobek ×{m}",
+ "×{m} ještě {t}": "×{m} jeszcze {t}",
+ "hodina za {t}": "godzina za {t}"
 }

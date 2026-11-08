@@ -971,5 +971,7 @@
  "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "위의 맥주탭이 알아서 번다. {n}이 되면 주방을 열자.",
  "běží!": "진행 중!",
  "nabíjí se": "충전 중",
- "výdělek ×{m}": "수익 ×{m}"
+ "výdělek ×{m}": "수익 ×{m}",
+ "×{m} ještě {t}": "×{m} 남은 {t}",
+ "hodina za {t}": "{t} 후"
 }

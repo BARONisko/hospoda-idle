@@ -2899,66 +2899,28 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     b.enabled = !wait;
     if (this.skillKeys[i] === key) return;
     this.skillKeys[i] = key;
-    if (this.skillStyle) return this.drawSkillAlt(i, boost, wait, txt2, ic, sub);
-    const r = b.w / 2, cx = b.x + r, cy = b.y + r;
-    b.bg.clear().setVisible(true);
-    b.bg.fillStyle(col('ink')).fillCircle(cx, cy + 4, r).fillStyle(col(boost ? 'scarlet' : wait ? 'slate' : 'amber')).fillCircle(cx, cy, r);
-    b.bg.fillStyle(0xffffff, 0.15).fillCircle(cx, cy - r * 0.35, r * 0.55);
-    if (!wait && !boost) b.bg.lineStyle(3, col('gold')).strokeCircle(cx, cy, r + 2);
-    ic.setVisible(!boost).setPosition(cx, wait ? cy - 8 : cy).setScale(wait ? 2 : 3).setAlpha(wait ? 0.6 : 1);
-    b.label.setVisible(!!txt2).setText(boost ? `×${BOOST_MULT}\n${txt2}` : txt2).setPosition(cx, wait ? cy + 16 : cy).setScale(1);
-    b.label.setScale(Math.min(1, (b.w - 6) / Math.max(1, b.label.width)));
-    b.zone.setPosition(b.x, b.y).setSize(b.w, b.h);
-    // popisek pod tlačítkem (hlášení: „co je tohle?“): připraveno = výdělek ×3, běží, nabíjí se
-    sub.setVisible(true).setPosition(cx, b.y + b.h + 4).setText(boost ? t('běží!') : wait ? t('nabíjí se') : t('výdělek ×{m}', { m: BOOST_MULT })).setColor(boost ? PAL.scarlet : wait ? PAL.fog : PAL.gold).setScale(1);
-    sub.setScale(Math.min(1, 86 / Math.max(1, sub.width)));
+    // vzhled: dřevěná cedule (výběr uživatele – návrh 2, docs/navrhy-ui/blesk-3-navrhy.png)
+    this.drawSkillSign(i, boost, wait, txt2, ic, sub);
     void MANAGERS;
   }
-  /** návrhy vzhledu schopnosti manažera (1 krígl se plní, 2 cedule, 3 hodiny s kruhem) – 0 = kulatý blesk */
-  skillStyle = 0;
-  private drawSkillAlt(i: number, boost: boolean, wait: boolean, tt: string, ic: Phaser.GameObjects.Image, sub: Phaser.GameObjects.Text) {
+  /** schopnost manažera jako dřevěná cedule: připraveno = „ŠŤASTNÁ HODINA ×3“, nabíjí = pruh a čas, běží = červená a ubývá */
+  private drawSkillSign(i: number, boost: boolean, wait: boolean, tt: string, ic: Phaser.GameObjects.Image, sub: Phaser.GameObjects.Text) {
     const p = this.d.pubs[i], b = this.skillBtns[i], g = b.bg, now = Date.now();
-    // podíl nabití 0–1 (1 = připraveno), podíl zbývajícího běhu
-    const cd = (BOOST_S + BOOST_CD) * 1000;
-    const fill = wait ? 1 - Math.max(0, (p.boostReady! - now) / cd) : 1;
+    const fill = wait ? 1 - Math.max(0, (p.boostReady! - now) / ((BOOST_S + BOOST_CD) * 1000)) : 1;
     const run = boost ? Math.max(0, (p.boostUntil! - now) / (BOOST_S * 1000)) : 0;
     g.clear().setVisible(true);
     sub.setVisible(false);
-    const fr = (x: number, y: number, w: number, h: number, c: number) => g.fillStyle(col('ink')).fillRect(x - 3, y - 3, w + 6, h + 6).fillStyle(c).fillRect(x, y, w, h);
-    if (this.skillStyle === 1) {
-      // 1: pixelový krígl, který se nabíjením plní pivem; plný = ťukni (×3)
-      b.w = b.h = 64;
-      fr(b.x, b.y, 64, 64, col(boost ? 'blood' : 'dusk'));
-      g.lineStyle(3, col(wait ? 'slate' : 'gold')).strokeRect(b.x - 1, b.y - 1, 66, 66);
-      const mx = b.x + 14, my = b.y + 12, mw = 28, mh = 40;
-      g.fillStyle(col('bone'), 0.35).fillRect(mx, my, mw, mh);
-      const lv = boost ? run : fill;
-      g.fillStyle(col('amber')).fillRect(mx, my + mh * (1 - lv), mw, mh * lv);
-      if (!wait) g.fillStyle(col('white')).fillRect(mx - 2, my - 6, mw + 4, 8);
-      g.lineStyle(4, col('bone')).strokeRect(mx, my, mw, mh).strokeRect(mx + mw + 2, my + 10, 8, 18);
-      ic.setVisible(false);
-      b.label.setVisible(true).setText(boost ? tt : wait ? tt : `×${BOOST_MULT}`).setPosition(b.x + 32, b.y + 76).setColor(PAL.gold).setFontSize(18).setScale(1);
-    } else if (this.skillStyle === 2) {
-      // 2: dřevěná cedule s nápisem (připraveno = „ŠŤASTNÁ HODINA ×3“, nabíjí = pruh a čas, běží = červená)
-      b.w = 156;
-      b.h = 44;
-      fr(b.x, b.y, b.w, b.h, col(boost ? 'red' : wait ? 'olive' : 'rust'));
-      g.fillStyle(col('ink'), 0.25).fillRect(b.x, b.y + b.h - 8, b.w, 8);
-      if (wait) g.fillStyle(col('sand'), 0.5).fillRect(b.x, b.y + b.h - 6, b.w * fill, 6);
-      if (boost) g.fillStyle(col('gold')).fillRect(b.x, b.y + b.h - 6, b.w * run, 6);
-      if (!wait && !boost) g.lineStyle(3, col('gold')).strokeRect(b.x - 2, b.y - 2, b.w + 4, b.h + 4);
-      ic.setVisible(false);
-      b.label.setVisible(true).setText(boost ? t('×{m} ještě {t}', { m: BOOST_MULT, t: tt }) : wait ? t('hodina za {t}', { t: tt }) : t('ŠŤASTNÁ HODINA ×{m}', { m: BOOST_MULT })).setPosition(b.x + b.w / 2, b.y + 19).setColor(wait ? PAL.fog : PAL.gold).setFontSize(18).setScale(1);
-    } else {
-      // 3: pixelové hodiny v rámečku, kolem pruh nabíjení (kruh se doplňuje), běží = červený a ubývá
-      b.w = b.h = 64;
-      const cx = b.x + 32, cy = b.y + 32;
-      fr(b.x, b.y, 64, 64, col('dusk'));
-      g.lineStyle(6, col('ink')).strokeCircle(cx, cy, 24);
-      g.lineStyle(6, col(boost ? 'scarlet' : wait ? 'slate' : 'gold')).beginPath().arc(cx, cy, 24, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (boost ? run : fill)).strokePath();
-      ic.setTexture('icons', 'clock').setVisible(true).setPosition(cx, cy).setScale(2.4).setAlpha(wait ? 0.5 : 1);
-      b.label.setVisible(true).setText(boost ? tt : wait ? tt : `×${BOOST_MULT}`).setPosition(cx, b.y + 76).setColor(boost ? PAL.scarlet : PAL.gold).setFontSize(18).setScale(1);
-    }
+    ic.setVisible(false);
+    b.w = 156;
+    b.h = 44;
+    g.fillStyle(col('ink')).fillRect(b.x - 3, b.y - 3, b.w + 6, b.h + 6).fillStyle(col(boost ? 'red' : wait ? 'olive' : 'rust')).fillRect(b.x, b.y, b.w, b.h);
+    g.fillStyle(col('ink'), 0.25).fillRect(b.x, b.y + b.h - 8, b.w, 8);
+    if (wait) g.fillStyle(col('sand'), 0.5).fillRect(b.x, b.y + b.h - 6, b.w * fill, 6);
+    if (boost) g.fillStyle(col('gold')).fillRect(b.x, b.y + b.h - 6, b.w * run, 6);
+    if (!wait && !boost) g.lineStyle(3, col('gold')).strokeRect(b.x - 2, b.y - 2, b.w + 4, b.h + 4);
+    const name = MANAGERS[p.act].skill.toUpperCase();
+    b.label.setVisible(true).setText(boost ? t('×{m} ještě {t}', { m: BOOST_MULT, t: tt }) : wait ? t('hodina za {t}', { t: tt }) : `${name} ×${BOOST_MULT}`).setPosition(b.x + b.w / 2, b.y + 19).setColor(wait ? PAL.fog : PAL.gold).setFontSize(18).setScale(1);
+    b.label.setScale(Math.min(1, (b.w - 10) / Math.max(1, b.label.width)));
     b.zone.setPosition(b.x, b.y).setSize(b.w, b.h);
   }
   skillIcons: Phaser.GameObjects.Image[] = [];

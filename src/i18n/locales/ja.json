@@ -971,5 +971,7 @@
  "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "上のビールサーバーが自動で稼ぐ。{n}たまったらキッチンを開こう。",
  "běží!": "発動中！",
  "nabíjí se": "チャージ中",
- "výdělek ×{m}": "収入 ×{m}"
+ "výdělek ×{m}": "収入 ×{m}",
+ "×{m} ještě {t}": "×{m} 残り{t}",
+ "hodina za {t}": "あと{t}"
 }

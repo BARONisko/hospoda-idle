@@ -971,5 +971,7 @@
  "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "Yukarıdaki musluk kendi kazanır. {n} olunca mutfağı aç.",
  "běží!": "çalışıyor!",
  "nabíjí se": "şarj oluyor",
- "výdělek ×{m}": "kazanç ×{m}"
+ "výdělek ×{m}": "kazanç ×{m}",
+ "×{m} ještě {t}": "×{m} kalan {t}",
+ "hodina za {t}": "saat {t} sonra"
 }

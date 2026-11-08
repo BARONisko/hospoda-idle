@@ -971,5 +971,7 @@
  "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "La pompe au-dessus les gagne toute seule. Quand tu en as {n}, ouvre la cuisine.",
  "běží!": "actif !",
  "nabíjí se": "recharge",
- "výdělek ×{m}": "gains ×{m}"
+ "výdělek ×{m}": "gains ×{m}",
+ "×{m} ještě {t}": "×{m} encore {t}",
+ "hodina za {t}": "heure dans {t}"
 }

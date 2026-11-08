@@ -315,4 +315,4 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   zase ukáže. Pod bleskem popisek „výdělek ×3“ / „běží!“ / „nabíjí se“. Test: ťuknutí prstem po najmutí spustí ×3.
   Kontrola neviditelných stěn: hlavní obrazovka (test 6e) i všechny části menu (tools/_tmp/occl2.mjs) – nic zakrytého.
 - Počítač (přání: rolovat jako Idle Obelisk Miner): hra pevně na výšku (šířka max 560 px), stránka se roluje kolečkem; telefon beze změny.
-- ČEKÁ: blesk „odporný“ → ≥ 3 návrhy nového vzhledu.
+- Šťastná hodina = dřevěná cedule (výběr uživatele návrh 2, docs/navrhy-ui/blesk-3-navrhy.png): „ŠŤASTNÁ HODINA ×3“ (název schopnosti manažera), nabíjí = „hodina za m:ss“ + pruh, běží = červená „×3 ještě m:ss“ + ubývající pruh.
