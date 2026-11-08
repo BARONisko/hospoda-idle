@@ -1473,7 +1473,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const i = this.d.brewTut;
     if (i < 0) return;
     const steps = [
-      { r: [150, y0 + 100, W - 170, 30], text: t('pivo se vaří samo – i offline'), up: true },
+      { r: [150, this.brewY, 360, 22], text: t('pivo se vaří samo – i offline'), up: true },
       { r: [10, y0 + 310, 255, 70], text: t('první pivo zdarma – prodej ho'), up: false },
       { r: [10, y0 + 420, W - 20, 164], text: t('piva jdou i na pivní akce'), up: false },
     ];
