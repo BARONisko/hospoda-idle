@@ -1,4 +1,4 @@
-# Sestavení Android aplikace (Capacitor): AAB pro Google Play + APK pro instalaci do telefonu.
+# Sestavení Android aplikace (Capacitor): AAB pro Google Play + APK pro instalaci do telefonu (obojí podepsané nahrávacím klíčem → nové APK jde nainstalovat přes staré, postup zůstane).
 # Spouští se ručně (Actions → Android → Run workflow) nebo pushem tagu v*.
 # Podpis: tajemství KEYSTORE_BASE64 + KEYSTORE_PASSWORD (alias „upload“). Bez nich jen nepodepsaný AAB a ladicí APK.
 # Reklamy: proměnné (Variables) ADMOB_APP_ID + ADMOB_REWARDED; bez nich testovací reklamy Googlu.
@@ -43,10 +43,10 @@ jobs:
           KEY_ALIAS: upload
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon bundleRelease assembleDebug
+          ./gradlew --no-daemon bundleRelease assembleRelease
       - uses: actions/upload-artifact@v4
         with:
           name: pub-idle-${{ github.run_number }}
           path: |
             android/app/build/outputs/bundle/release/*.aab
-            android/app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/apk/release/*.apk
