@@ -252,4 +252,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Zrušeny nápisy „KOMBO ×n“ (+ konfety a otřes) při rychlém ťukání na pípu – nic nedávaly a přes sebe zaplňovaly kartu; zůstal jen stoupající zvuk.
 - HOTOVO (přání: po hygieně průvodce ukázal celé menu bez vysvětlení): menu se odemyká postupně – Chrám od 3. hospody, Liga po 3. hygieně, Kostnice po první noci, Pivovar/Výzdoba až po otevření kuchyně/sklepa (už ne všechno hned po hygieně); co jednou bylo odemčené (menuOpen), zůstane. Průvodce novinkou vždy s vysvětlením na hlavní obrazovce (čeká na zavřené menu) a mezi novinkami 90 s pauza (guideGapUntil).
 - HOTOVO: Chrám – červená tečka jen do prvního otevření za den (d.templeSeen), na dlaždici „končí za 14 h 7 min“ / „otevře za 3 d 5 h“ (weekendLeft v temple.ts).
+- HOTOVO (přání: hrál v menu a první noc mu utekla): první noc stojí na začátku (switchPhase(true) každý snímek), dokud hráč v průvodci noci neťukne na Dál; nápis „Padla noc“ se u první noci nezobrazí (je tam cedule).
+- Test (npm test) 6b: hygiena jako skutečný hráč (lišta úkolu, VIP) – Ještě ne, hra po restartu běží, coins na rozjezd, průvodce novou hospodou; 6c: první noc stojí do Dál. (window.__night jen ve vývoji.)
 - ČEKÁ: zúžit lištu úkolu? Poslední krok návodu (HOTOVO) má v menu velkou ceduli.

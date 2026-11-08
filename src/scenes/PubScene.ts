@@ -287,6 +287,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // uvízlí v průvodci nové hospody bez peněz (před opravou dávala hygiena 0 coins) → dorovnat na rozjezd
     const lastPub = this.d.pubs[this.d.pubs.length - 1];
     if (this.d.pubs.length > 1 && (lastPub.st.tap?.lvl ?? 0) === 0 && this.d.coins < this.restartNeed()) this.d.coins = this.restartNeed();
+    // pro headless test (jen ve vývoji): ovládání cyklu dne a noci
+    if (import.meta.env.DEV) (window as unknown as { __night: unknown }).__night = { switchPhase, phaseLeft };
     // mini průvodce pivovarem jen pro ty, kdo pivovar ještě neviděli
     if (this.d.brewTut === undefined && this.d.guides?.includes('tile:brew')) this.d.brewTut = -1;
     this.views = [];
@@ -3786,12 +3788,19 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.menuUnlocks();
     }
     const nn = this.nightNow();
+    const firstNight = !!this.d.guideQ?.includes('night');
     if (nn !== this.night) {
       this.night = nn;
       this.views.forEach((v) => v.setNight(nn));
       // noční várka platí jen do rána
       if (!nn && this.d.fx?.nightx2) delete this.d.fx.nightx2;
-      this.banner(this.views[0].cam, nn ? t('Padla noc – příšery platí kostmi!') : t('Svítá – lidé zase platí coins.'), true);
+      // první noc ohlásí průvodce (cedule s Dál) – nápis by se s ní překrýval
+      if (!(nn && firstNight)) this.banner(this.views[0].cam, nn ? t('Padla noc – příšery platí kostmi!') : t('Svítá – lidé zase platí coins.'), true);
+    }
+    // první noc stojí na začátku, dokud hráč v průvodci neťukne na Dál (přání: hrál v menu a noc mu utekla)
+    if (nn && firstNight && !(this.guideCur?.id === 'night' && this.guideCur.i > 0)) {
+      const dn = (this.d.dn ??= { lvl: 0, v2: true });
+      dn.shift = switchPhase(true);
     }
     if (this.tab === 'daynight' && this.shopObjs.length && (this.dnT -= dt) <= 0) {
       this.dnT = 1;

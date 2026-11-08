@@ -120,6 +120,52 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   if (p.errors.length) console.log(p.errors);
   await p.close();
 }
+// 6b) hygiena jako skutečný hráč (lišta úkolu, VIP, styl): „Ještě ne“ hru neblokuje, po hygieně hra běží dál,
+//     coins na rozjezd a průvodce novou hospodou jde dokončit (dřív zamrznutí / zaseknutí)
+{
+  const p = await page();
+  await S(p, (s) => { s.d.tut = -1; s.tutShow(); const pb = s.d.pubs[0];
+    for (const [id, l] of [['tap', 100], ['kitchen', 50], ['cellar', 50]]) pb.st[id] = { ...(pb.st[id] || {}), lvl: l, auto: true, prog: 0 };
+    pb.mgr = true; s.d.run = 1e13; s.d.vip = { next: Date.now() - 1000, until: 0 }; s.vipT = 0; });
+  await p.waitForTimeout(1500);
+  ok('hygiena: lišta úkolu a VIP jsou vidět', await S(p, (s) => !!s.qUi && !!s.vipBar));
+  await S(p, (s) => { s.askPrestige(); s.awayObjs.find((o) => o.type === 'Zone')?.emit('pointerdown'); });
+  ok('hygiena: „Ještě ne“ zavře okno a hospoda reaguje', await S(p, (s) => s.awayObjs.length === 0));
+  await S(p, (s) => { s.askPrestige(); s.prestige(); });
+  await p.waitForTimeout(1500);
+  const f0 = await p.evaluate(() => game.loop.frame);
+  await p.waitForTimeout(1000);
+  ok('hygiena: hra po restartu běží (nezamrzla)', (await p.evaluate(() => game.loop.frame)) > f0 + 5 && (await S(p, (s) => s.d.pubs.length === 2)));
+  ok('hygiena: coins na otevření pípy a číšníky v nové hospodě', await S(p, (s) => s.d.coins >= s.restartNeed()));
+  await S(p, (s) => { s.awayObjs.forEach((o) => o.destroy()); s.awayObjs = []; s.d.pubIntro = 0; });
+  for (let k = 0; k < 8; k++) {
+    await p.waitForTimeout(700);
+    const r = await S(p, (s) => { const g = s.guideCur; if (!g) return null; const st = s.guideSteps(g.id)[g.i]; if (st.done === 'ok') return s.guideEv('ok'), 1;
+      if (st.done.startsWith('pub:')) return s.selectPub?.(Number(st.done.slice(4))) ?? s.guideEv(st.done), 1;
+      if (st.done === 'buy:tap') return s.buy(1, s.cards.find((c) => c.pub === 1 && c.def.id === 'tap')?.def ?? s.cards[0].def), 1;
+      if (st.done === 'hire') return s.hire(1, s.cards.find((c) => c.def.id === 'tap').def), 1; return 1; });
+    if (r === null) break;
+  }
+  ok('hygiena: průvodce novou hospodou dokončen', await S(p, (s) => !s.guideCur && s.d.pubs[1].st.tap.lvl > 0 && s.d.pubs[1].st.tap.auto));
+  ok('bez chyb v konzoli (hygiena)', p.errors.length === 0);
+  if (p.errors.length) console.log(p.errors);
+  await p.close();
+}
+// 6c) první noc stojí, dokud hráč v průvodci neťukne na Dál
+{
+  const p = await page('?nightcycle=1');
+  await S(p, (s) => { s.d.tut = -1; s.tutShow(); s.d.nightInfo = false; s.d.dn = { lvl: 0, v2: true }; s.d.dn.shift = window.__night.switchPhase(true); s.openShop('shop', false); });
+  await p.waitForTimeout(3000);
+  ok('první noc: běží a průvodce čeká na zavřené menu', await S(p, (s) => s.night && !s.guideCur && s.d.guideQ.includes('night')));
+  ok('první noc: zatím neubývá', await p.evaluate(() => window.__night.phaseLeft() > 59_000 * 0.99 - 1000));
+  await S(p, (s) => s.closeShop());
+  await p.waitForTimeout(1500);
+  await S(p, (s) => s.guideEv('ok'));
+  await p.waitForTimeout(2500);
+  ok('první noc: po Dál běží dál', await p.evaluate(() => window.__night.phaseLeft() < 58_500));
+  ok('bez chyb v konzoli (první noc)', p.errors.length === 0);
+  await p.close();
+}
 // 7) offline výdělek
 {
   const p = await page('?pubs=2&away=3600');
