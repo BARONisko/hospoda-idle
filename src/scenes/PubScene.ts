@@ -4266,6 +4266,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.punchT -= dt;
     this.tutFollow?.();
     this.guideFollow?.();
+    this.guideSkipDone();
     const tipStep = PubScene.TUT[this.d.tut ?? -1]?.done === 'tip' || (this.guideCur && this.guideSteps(this.guideCur.id)[this.guideCur.i]?.done === 'tip');
     this.views.forEach((v) => (v.hold = !!tipStep));
     this.qTick();
@@ -4713,6 +4714,22 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (id.startsWith('tile:') && Date.now() < this.guideGapUntil) return;
     this.guideCur = { id, i: 0 };
     this.guideShow();
+  }
+
+  /** průvodce novou hospodou: krok, který už je splněný (hráč přepnul tažením, najal dřív…), se sám přeskočí –
+   *  dřív průvodce visel na „NAJMI ČÍŠNÍKY“, i když číšníci už byli najatí a tlačítko zmizelo (hlášení uživatele) */
+  private guideSkipDone() {
+    const g = this.guideCur;
+    if (!g || !g.id.startsWith('pub')) return;
+    const n = Number(g.id.slice(3)) - 1, p = this.d.pubs[n];
+    const st = this.guideSteps(g.id)[g.i];
+    if (!p || !st) return;
+    const tap = p.st.tap;
+    const done =
+      (st.done === 'pub:' + n && this.views.length > 1 && this.sel === n) ||
+      (st.done === 'buy:tap' && (tap?.lvl ?? 0) > 0) ||
+      (st.done === 'hire' && !!tap?.auto);
+    if (done) this.guideEv(st.done);
   }
 
   private guideEv(ev: string) {

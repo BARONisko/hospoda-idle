@@ -162,17 +162,38 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('hygiena: hra po restartu běží (nezamrzla)', (await p.evaluate(() => game.loop.frame)) > f0 + 5 && (await S(p, (s) => s.d.pubs.length === 2)));
   ok('hygiena: coins na otevření pípy a číšníky v nové hospodě', await S(p, (s) => s.d.coins >= s.restartNeed()));
   await S(p, (s) => { s.awayObjs.forEach((o) => o.destroy()); s.awayObjs = []; s.d.pubIntro = 0; });
-  for (let k = 0; k < 8; k++) {
-    await p.waitForTimeout(700);
-    const r = await S(p, (s) => { const g = s.guideCur; if (!g) return null; const st = s.guideSteps(g.id)[g.i]; if (st.done === 'ok') return s.guideEv('ok'), 1;
-      if (st.done.startsWith('pub:')) return s.selectPub?.(Number(st.done.slice(4))) ?? s.guideEv(st.done), 1;
-      if (st.done === 'buy:tap') return s.buy(1, s.cards.find((c) => c.pub === 1 && c.def.id === 'tap')?.def ?? s.cards[0].def), 1;
-      if (st.done === 'hire') return s.hire(1, s.cards.find((c) => c.def.id === 'tap').def), 1; return 1; });
-    if (r === null) break;
+  // průvodce jako skutečný hráč: ťuká PRSTEM přesně tam, kam ukazuje šipka (u „Dál“ na tlačítko cedule)
+  for (let k = 0; k < 10; k++) {
+    await p.waitForTimeout(900);
+    const xy = await S(p, (s) => {
+      const g = s.guideCur; if (!g) return null;
+      const st = s.guideSteps(g.id)[g.i];
+      let r = st.at?.();
+      if (st.done === 'ok') { const z = s.guideObjs.filter((o) => o.type === 'Zone').pop(); if (z) { const bd = z.getBounds(); r = [bd.x, bd.y, bd.width, bd.height]; } }
+      if (!r) return [];
+      const rc = game.canvas.getBoundingClientRect(), kk = rc.width / 540;
+      return [rc.left + (r[0] + r[2] / 2) * kk, rc.top + (r[1] + r[3] / 2) * kk];
+    });
+    if (xy === null) break;
+    if (xy.length) await p.touchscreen.tap(xy[0], xy[1]);
   }
-  ok('hygiena: průvodce novou hospodou dokončen', await S(p, (s) => !s.guideCur && s.d.pubs[1].st.tap.lvl > 0 && s.d.pubs[1].st.tap.auto));
+  ok('hygiena: průvodce novou hospodou dokončen ťukáním prstem', await S(p, (s) => !s.guideCur && s.d.pubs[1].st.tap.lvl > 0 && s.d.pubs[1].st.tap.auto));
   ok('bez chyb v konzoli (hygiena)', p.errors.length === 0);
   if (p.errors.length) console.log(p.errors);
+  await p.close();
+}
+// 6b2) hlášení: průvodce visel na „NAJMI ČÍŠNÍKY“, když hráč přepnul hospodu tažením a najal číšníky dřív
+{
+  const p = await page();
+  await S(p, (s) => { s.d.tut = -1; s.tutShow(); s.d.run = 1e13; s.d.pubs[0].st.tap.lvl = 100; s.prestige(); });
+  await p.waitForTimeout(1500);
+  await S(p, (s) => { s.awayObjs.forEach((o) => o.destroy()); s.awayObjs = []; s.d.pubIntro = 0; });
+  await p.waitForTimeout(1500);
+  // přepnutí tažením (bez události „pub:1“), koupě pípy a najmutí dřív, než o tom průvodce ví
+  await S(p, (s) => { s.sel = 1; s.d.coins = 1e6; s.d.pubs[1].st.tap = { lvl: 34, auto: true, prog: 0 }; });
+  await p.waitForTimeout(2500);
+  ok('průvodce nové hospody: splněné kroky přeskočí (nevisí)', await S(p, (s) => !s.guideCur || s.guideSteps(s.guideCur.id)[s.guideCur.i].done === 'ok'));
+  ok('bez chyb v konzoli (průvodce přeskočí)', p.errors.length === 0);
   await p.close();
 }
 // 6c) první noc stojí, dokud hráč v průvodci neťukne na Dál

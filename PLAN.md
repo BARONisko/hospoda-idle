@@ -316,3 +316,7 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Kontrola neviditelných stěn: hlavní obrazovka (test 6e) i všechny části menu (tools/_tmp/occl2.mjs) – nic zakrytého.
 - Počítač (přání: rolovat jako Idle Obelisk Miner): hra pevně na výšku (šířka max 560 px), stránka se roluje kolečkem; telefon beze změny.
 - Šťastná hodina = dřevěná cedule (výběr uživatele návrh 2, docs/navrhy-ui/blesk-3-navrhy.png): „ŠŤASTNÁ HODINA ×3“ (název schopnosti manažera), nabíjí = „hodina za m:ss“ + pruh, běží = červená „×3 ještě m:ss“ + ubývající pruh.
+- OPRAVA (hlášení: po hygieně „NAJMI ČÍŠNÍKY“ nejde – tlačítko prázdné): průvodce novou hospodou čekal na událost; když hráč
+  přepnul hospodu tažením a najal číšníky dřív, krok už nepřišel. guideSkipDone() v update: splněný krok (vybraná hospoda,
+  koupená pípa, najatí číšníci) se sám přeskočí. Test 6b teď prochází průvodce ŤUKÁNÍM PRSTEM na cíl šipky (dřív volal
+  hire() z kódu, proto chybu neviděl); nový test 6b2 = přesně hlášený případ (bez opravy selže).
