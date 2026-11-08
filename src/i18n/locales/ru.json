@@ -951,5 +951,20 @@
  "{n}: věrnost {l}! +1 bod": "{n}: верность {l}! +1 очко",
  "{n} b. do stromu": "{n} оч. в древо",
  "každá úroveň = 1 bod": "каждый уровень = 1 очко",
- "každý stupeň = 1 bod do stromu · roste samo, i offline": "каждая ступень = 1 очко древа · растёт само, даже офлайн"
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "каждая ступень = 1 очко древа · растёт само, даже офлайн",
+ "★ Nové hvězdy stanic: {n} – +{n} b. do stromu hostinského": "★ Новые звёзды станций: {n} – +{n} оч. в древо",
+ "úr. {n} · body {p}": "ур. {n} · оч. {p}",
+ "stanice s obsluhou sbírá stupně – každý = bod do stromu": "станция с персоналом копит ступени – каждая = очко",
+ "obsluhuj bubliny hostů – každá úroveň = bod do stromu": "обслуживай пузыри гостей – каждый уровень = очко",
+ "Úrovně hostinského": "Уровни трактирщика",
+ "XP za nákup úrovní, bubliny, akce": "XP за уровни, пузыри, акции",
+ "Mistrovství stanic": "Мастерство станций",
+ "roste samo, když má stanice obsluhu": "растёт само, если на станции персонал",
+ "Hvězdy stanic": "Звёзды станций",
+ "stanice na 500/400/300 úr. v kole → hvězda po hygieně": "станция на 500/400/300 ур. за раунд → звезда после проверки",
+ "Věrní hosté": "Верные гости",
+ "obsluhuj bubliny hostů (Sbírka)": "обслуживай пузыри гостей (Коллекция)",
+ "utraceno: {n} b.": "потрачено: {n} оч.",
+ "body: {n}  ?": "очки: {n}  ?",
+ "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "очки за уровни, мастерство, звёзды и верных гостей – трать в древе"
 }

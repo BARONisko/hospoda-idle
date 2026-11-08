@@ -951,5 +951,20 @@
  "{n}: věrnost {l}! +1 bod": "{n}: Treue {l}! +1 Punkt",
  "{n} b. do stromu": "{n} P. für den Baum",
  "každá úroveň = 1 bod": "jede Stufe = 1 Punkt",
- "každý stupeň = 1 bod do stromu · roste samo, i offline": "jede Stufe = 1 Baumpunkt · wächst von selbst, auch offline"
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "jede Stufe = 1 Baumpunkt · wächst von selbst, auch offline",
+ "★ Nové hvězdy stanic: {n} – +{n} b. do stromu hostinského": "★ Neue Stationssterne: {n} – +{n} P. für den Wirtsbaum",
+ "úr. {n} · body {p}": "St. {n} · P. {p}",
+ "stanice s obsluhou sbírá stupně – každý = bod do stromu": "besetzte Station sammelt Stufen – jede = Baumpunkt",
+ "obsluhuj bubliny hostů – každá úroveň = bod do stromu": "bediene Gästeblasen – jede Stufe = Baumpunkt",
+ "Úrovně hostinského": "Wirt-Stufen",
+ "XP za nákup úrovní, bubliny, akce": "XP für Stufenkäufe, Blasen, Aktionen",
+ "Mistrovství stanic": "Stationsmeisterschaft",
+ "roste samo, když má stanice obsluhu": "wächst von selbst, wenn die Station besetzt ist",
+ "Hvězdy stanic": "Stationssterne",
+ "stanice na 500/400/300 úr. v kole → hvězda po hygieně": "Station auf 500/400/300 St. in einer Runde → Stern nach Inspektion",
+ "Věrní hosté": "Treue Gäste",
+ "obsluhuj bubliny hostů (Sbírka)": "bediene Gästeblasen (Sammlung)",
+ "utraceno: {n} b.": "ausgegeben: {n} P.",
+ "body: {n}  ?": "Punkte: {n}  ?",
+ "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "Punkte aus Stufen, Meisterschaft, Sternen und treuen Gästen – gib sie im Baum aus"
 }

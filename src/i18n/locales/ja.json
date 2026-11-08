@@ -951,5 +951,20 @@
  "{n}: věrnost {l}! +1 bod": "{n}：忠誠 {l}！+1pt",
  "{n} b. do stromu": "ツリーへ {n}pt",
  "každá úroveň = 1 bod": "各レベル = 1pt",
- "každý stupeň = 1 bod do stromu · roste samo, i offline": "各段階 = ツリー1pt · 自然に育つ、オフラインでも"
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "各段階 = ツリー1pt · 自然に育つ、オフラインでも",
+ "★ Nové hvězdy stanic: {n} – +{n} b. do stromu hostinského": "★ 新しいステーションの星：{n} – ツリー +{n}pt",
+ "úr. {n} · body {p}": "Lv{n} · {p}pt",
+ "stanice s obsluhou sbírá stupně – každý = bod do stromu": "スタッフのいるステーションは段階を貯める――各段階=1pt",
+ "obsluhuj bubliny hostů – každá úroveň = bod do stromu": "客の吹き出しに対応――各レベル=1pt",
+ "Úrovně hostinského": "店主レベル",
+ "XP za nákup úrovní, bubliny, akce": "レベル購入・吹き出し・イベントでXP",
+ "Mistrovství stanic": "ステーション熟練",
+ "roste samo, když má stanice obsluhu": "スタッフがいると自然に育つ",
+ "Hvězdy stanic": "ステーションの星",
+ "stanice na 500/400/300 úr. v kole → hvězda po hygieně": "1ラウンドで500/400/300Lv→衛生検査後に星",
+ "Věrní hosté": "常連客",
+ "obsluhuj bubliny hostů (Sbírka)": "客の吹き出しに対応（コレクション）",
+ "utraceno: {n} b.": "使用済み：{n}pt",
+ "body: {n}  ?": "ポイント：{n}  ?",
+ "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "レベル・熟練・星・常連客からポイント――ツリーで使おう"
 }

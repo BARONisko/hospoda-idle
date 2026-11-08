@@ -137,7 +137,7 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   await S(p, (s) => { s.d.run = 1e8; s.d.pubs[0].st.tap.lvl = 500; s.askPrestige(); s.prestige(); });
   await p.waitForTimeout(800);
   ok('prestiž: 2 hospody a krígly', await S(p, (s) => s.d.pubs.length === 2 && s.d.krigle >= 11 && s.views.length === 2));
-  ok('hvězdy: pípa na 500 = po hygieně hvězda (jen bod do stromu, úrovně nezdraží)', await S(p, (s) => { const st = s.d.stars; const a = st?.['1_tap'] >= 1 && s.offer(s.d.pubs[0], s.cards[0].def).price; s.d.stars = {}; const b = s.offer(s.d.pubs[0], s.cards[0].def).price; s.d.stars = st; return !!a && a === b; }));
+  ok('hvězdy: pípa na 500 = po hygieně hvězda (bod do stromu, úrovně 10× dražší za hvězdu)', await S(p, (s) => { s.mode = 1; const st = s.d.stars, n = st?.['1_tap'] ?? 0; const a = s.offer(s.d.pubs[0], s.cards[0].def).price; s.d.stars = {}; const b = s.offer(s.d.pubs[0], s.cards[0].def).price; s.d.stars = st; return n >= 1 && a >= (b - 1) * 10 ** n && s.bonusPoints() >= n; }));
   ok('prestiž: startovní kapitál a věrní manažeři', await S(p, (s) => s.d.coins >= 1000 && s.d.pubs[0].mgr === true));
   ok('prestiž: výzdoba zůstala', await S(p, (s) => s.has('portrait')));
   ok('bez chyb v konzoli', p.errors.length === 0);

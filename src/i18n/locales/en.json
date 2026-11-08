@@ -951,5 +951,20 @@
  "{n}: věrnost {l}! +1 bod": "{n}: loyalty {l}! +1 point",
  "{n} b. do stromu": "{n} pts to the tree",
  "každá úroveň = 1 bod": "each level = 1 point",
- "každý stupeň = 1 bod do stromu · roste samo, i offline": "each step = 1 tree point · grows by itself, even offline"
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "each step = 1 tree point · grows by itself, even offline",
+ "★ Nové hvězdy stanic: {n} – +{n} b. do stromu hostinského": "★ New station stars: {n} – +{n} pts for the landlord tree",
+ "úr. {n} · body {p}": "lv. {n} · pts {p}",
+ "stanice s obsluhou sbírá stupně – každý = bod do stromu": "a staffed station earns steps – each = a tree point",
+ "obsluhuj bubliny hostů – každá úroveň = bod do stromu": "serve guests' bubbles – each level = a tree point",
+ "Úrovně hostinského": "Landlord levels",
+ "XP za nákup úrovní, bubliny, akce": "XP for buying levels, bubbles, events",
+ "Mistrovství stanic": "Station mastery",
+ "roste samo, když má stanice obsluhu": "grows by itself while the station is staffed",
+ "Hvězdy stanic": "Station stars",
+ "stanice na 500/400/300 úr. v kole → hvězda po hygieně": "station at 500/400/300 lv. in a run → star after inspection",
+ "Věrní hosté": "Loyal guests",
+ "obsluhuj bubliny hostů (Sbírka)": "serve guests' bubbles (Collection)",
+ "utraceno: {n} b.": "spent: {n} pts",
+ "body: {n}  ?": "points: {n}  ?",
+ "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "points from levels, mastery, stars and loyal guests – spend them in the tree"
 }

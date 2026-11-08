@@ -951,5 +951,20 @@
  "{n}: věrnost {l}! +1 bod": "{n}: sadakat {l}! +1 puan",
  "{n} b. do stromu": "ağaca {n} p.",
  "každá úroveň = 1 bod": "her seviye = 1 puan",
- "každý stupeň = 1 bod do stromu · roste samo, i offline": "her kademe = 1 ağaç puanı · kendiliğinden büyür, çevrimdışı bile"
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "her kademe = 1 ağaç puanı · kendiliğinden büyür, çevrimdışı bile",
+ "★ Nové hvězdy stanic: {n} – +{n} b. do stromu hostinského": "★ Yeni istasyon yıldızı: {n} – ağaca +{n} p.",
+ "úr. {n} · body {p}": "sv. {n} · p. {p}",
+ "stanice s obsluhou sbírá stupně – každý = bod do stromu": "personelli istasyon kademe toplar – her biri = puan",
+ "obsluhuj bubliny hostů – každá úroveň = bod do stromu": "misafir baloncuklarına hizmet et – her seviye = puan",
+ "Úrovně hostinského": "Meyhaneci seviyeleri",
+ "XP za nákup úrovní, bubliny, akce": "seviye alımı, baloncuk, etkinlik XP'si",
+ "Mistrovství stanic": "İstasyon ustalığı",
+ "roste samo, když má stanice obsluhu": "istasyonda personel varken kendiliğinden büyür",
+ "Hvězdy stanic": "İstasyon yıldızları",
+ "stanice na 500/400/300 úr. v kole → hvězda po hygieně": "bir turda 500/400/300 sv. → denetimden sonra yıldız",
+ "Věrní hosté": "Sadık misafirler",
+ "obsluhuj bubliny hostů (Sbírka)": "misafir baloncuklarına hizmet et (Koleksiyon)",
+ "utraceno: {n} b.": "harcanan: {n} p.",
+ "body: {n}  ?": "puan: {n}  ?",
+ "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "seviye, ustalık, yıldız ve sadık misafirlerden puan – ağaçta harca"
 }

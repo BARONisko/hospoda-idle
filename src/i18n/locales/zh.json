@@ -951,5 +951,20 @@
  "{n}: věrnost {l}! +1 bod": "{n}：忠诚 {l}！+1 点",
  "{n} b. do stromu": "技能树 {n} 点",
  "každá úroveň = 1 bod": "每级 = 1 点",
- "každý stupeň = 1 bod do stromu · roste samo, i offline": "每阶 = 1 技能点 · 自动成长，离线也会"
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "每阶 = 1 技能点 · 自动成长，离线也会",
+ "★ Nové hvězdy stanic: {n} – +{n} b. do stromu hostinského": "★ 新工位星：{n} – 技能树 +{n} 点",
+ "úr. {n} · body {p}": "{n}级 · {p}点",
+ "stanice s obsluhou sbírá stupně – každý = bod do stromu": "有人的工位会积累阶段——每阶=1点",
+ "obsluhuj bubliny hostů – každá úroveň = bod do stromu": "服务客人气泡——每级=1点",
+ "Úrovně hostinského": "老板等级",
+ "XP za nákup úrovní, bubliny, akce": "购买等级、气泡、活动获得经验",
+ "Mistrovství stanic": "工位精通",
+ "roste samo, když má stanice obsluhu": "工位有人时自动成长",
+ "Hvězdy stanic": "工位星",
+ "stanice na 500/400/300 úr. v kole → hvězda po hygieně": "一轮内工位达到500/400/300级→检查后得星",
+ "Věrní hosté": "忠实客人",
+ "obsluhuj bubliny hostů (Sbírka)": "服务客人气泡（收藏）",
+ "utraceno: {n} b.": "已花费：{n} 点",
+ "body: {n}  ?": "点数：{n}  ?",
+ "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "等级、精通、星和忠实客人给点数——在技能树中使用"
 }

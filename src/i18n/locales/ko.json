@@ -951,5 +951,20 @@
  "{n}: věrnost {l}! +1 bod": "{n}: 충성 {l}! +1점",
  "{n} b. do stromu": "트리에 {n}점",
  "každá úroveň = 1 bod": "레벨마다 = 1점",
- "každý stupeň = 1 bod do stromu · roste samo, i offline": "단계마다 = 트리 1점 · 저절로 자람, 오프라인에서도"
+ "každý stupeň = 1 bod do stromu · roste samo, i offline": "단계마다 = 트리 1점 · 저절로 자람, 오프라인에서도",
+ "★ Nové hvězdy stanic: {n} – +{n} b. do stromu hostinského": "★ 새 스테이션 별: {n} – 트리 +{n}점",
+ "úr. {n} · body {p}": "레벨 {n} · {p}점",
+ "stanice s obsluhou sbírá stupně – každý = bod do stromu": "직원 있는 스테이션은 단계를 쌓음 – 단계마다 1점",
+ "obsluhuj bubliny hostů – každá úroveň = bod do stromu": "손님 말풍선 응대 – 레벨마다 1점",
+ "Úrovně hostinského": "주인장 레벨",
+ "XP za nákup úrovní, bubliny, akce": "레벨 구매, 말풍선, 이벤트로 XP",
+ "Mistrovství stanic": "스테이션 숙련",
+ "roste samo, když má stanice obsluhu": "직원이 있으면 저절로 자람",
+ "Hvězdy stanic": "스테이션 별",
+ "stanice na 500/400/300 úr. v kole → hvězda po hygieně": "한 판에 500/400/300 레벨 → 점검 후 별",
+ "Věrní hosté": "단골손님",
+ "obsluhuj bubliny hostů (Sbírka)": "손님 말풍선 응대 (컬렉션)",
+ "utraceno: {n} b.": "사용: {n}점",
+ "body: {n}  ?": "포인트: {n}  ?",
+ "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "레벨, 숙련, 별, 단골손님에서 포인트 – 트리에 쓰세요"
 }

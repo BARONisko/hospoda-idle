@@ -300,3 +300,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   skillPoints = (úroveň − 1) + hvězdy + Σ stupňů mistrovství + Σ úrovní věrnosti − utraceno. Ceny uzlů ×2,5 (2/5/8, hvězdy +6),
   celý strom 654 bodů; koupené uzly jednou zdarma vráceny (d.sk3). Věrnost: prahy 300/1750/7500/18750/43000 → běžný hráč
   (~125 obsloužení druhu/den) má hosta na max za ~344 dní. Body za rok: slabší ~370, běžný ~610, zapálený ~750 (tools/sim/skills.mjs).
+- Hospoda 63c: hvězdy stanic zase zdražují úrovně té stanice 10× za hvězdu (přání: body nejdou získat hned všechny), bonus
+  výdělku dál 0. 5. hvězda světle fialová (PAL.pink, dřív plum – nebyla vidět). Dlaždice Hostinský ukazuje „úroveň N“ /
+  „úr. N · body P“. V Hostinském tlačítko „body: N ?“ → panel Odkud body (úrovně, mistrovství, hvězdy, věrní hosté, utraceno).
+  Návody (šipka + 1 řádek): Mistrovství (1. stanice), Sbírka (1. karta), Hostinský (KOUPIT). Po hygieně jeden nápis
+  „★ Nové hvězdy stanic: n – +n b. do stromu“. Celkový test: npm test, build, tutwalk, delší hraní tools/_tmp/play.mjs.

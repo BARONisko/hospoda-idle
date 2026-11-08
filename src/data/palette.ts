@@ -38,6 +38,8 @@ export const PAL = {
   sky: '#4d9be6',
   ice: '#8fd3ff',
   plum: '#6b3e75',
+  /** světle fialová (5. hvězda stanice – dřív tmavá plum, na kartě nebyla vidět) */
+  pink: '#e29bf0',
   // pleť
   skin: '#fdcbb0',
 } as const;
