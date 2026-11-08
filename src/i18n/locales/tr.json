@@ -974,5 +974,13 @@
  "výdělek ×{m}": "kazanç ×{m}",
  "×{m} ještě {t}": "×{m} kalan {t}",
  "hodina za {t}": "saat {t} sonra",
- "najdeš v něm další části hry": "oyunun diğer bölümleri orada"
+ "najdeš v něm další části hry": "oyunun diğer bölümleri orada",
+ "Zvuk výdělku": "Kazanç sesi",
+ "A melodie": "A melodi",
+ "B náhodně": "B rastgele",
+ "C střídání": "C karışık",
+ "cinkání stanic – ťukni = přepni a poslechni": "istasyon zilleri – dokun = değiştir ve dinle",
+ "1. 12. – 6. 1.": "1 Ara – 6 Oca",
+ "20. 10. – 3. 11.": "20 Eki – 3 Kas",
+ "15. 9. – 10. 10.": "15 Eyl – 10 Eki"
 }

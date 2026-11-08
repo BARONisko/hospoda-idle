@@ -324,3 +324,11 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Počítač (přání: „bez rolování“): celá hra se vejde do viditelné části okna (desktopFit v main.ts – když okno sahá pod lištu
   Windows, hra se zmenší na viditelnou výšku); rolování zrušeno. Telefon beze změny.
 - Menu B (výběr uživatele, docs/navrhy-ui/menu-obchod-ukoly-ABC.png, menu-B-ve-hre.png): spodní lišta Hospoda/Obchod/Úkoly/Menu je vidět i nad otevřeným menu (depth 350), menu začíná o lištu výš (MENU_Y0, obsah končí na MB = H − NAV_H), dlaždice Obchod a Úkoly z mřížky pryč; návod „ŤUKNI NA OBCHOD“ a úkoly ukazují na lištu. Ikona Menu = mřížka 3×3 dlaždic (dřív ozubené kolo jako Nastavení). Kontrola všech 16 částí menu: nic pod lištou, nic zakrytého.
+- Průvodce novou hospodou: po přepnutí na jinou hospodu šipka na záložku té hospody, po návratu na tlačítko (hlášení).
+- Červené tečky (přání): zmizí po prvním otevření záložky, znovu svítí, až přibude něco nového (víc bodů, další úkol, nový den…;
+  d.alertSeen, tabAlert/alertSig). Spodní lišta: tečka u Obchodu (jde koupit vylepšení) a Úkolů (je co vybrat), Menu jen za mřížku.
+  Plný Pivovar má tečku (fungovalo, ověřeno snímkem).
+- Zvuk výdělku (přání: „pořád stejné cinkání – ať se střídá“): Nastavení → Zvuk výdělku A melodie (výchozí, tóny pentatoniky
+  postupně) / B náhodně / C střídání (mince, sklenice, pokladna, šplouchnutí) / vypnuto; ťuknutí přepne a přehraje ukázku (opts cs).
+- Sbírka: skupina „Chrám Cthulhu“ pryč (4. hospoda ve hře není – hosté nešli získat); u sezónních hostů místo ??? název a data.
+- Nastavení: tlačítka podle výšky řádku (nepřesahují).

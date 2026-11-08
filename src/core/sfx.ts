@@ -157,10 +157,44 @@ class Sfx {
   buy() {
     [523, 659, 784, 1046].forEach((f, i) => this.tone(f, 0.1, 'square', 0.07, undefined, i * 0.05));
   }
-  /** výdělek stanice: tiché cinknutí (výška podle hospody, ať se tři hospody neslévají) */
+  /** zvuk výdělku (hraje pořád dokola – přání: ať se střídá): 0 = melodie, 1 = náhodně, 2 = střídání zvuků, 3 = vypnuto */
+  coinStyle = 0;
+  private coinI = 0;
+  /** výdělek stanice (výška podle hospody, ať se tři hospody neslévají) */
   coin(pitch = 1) {
-    this.tone(988 * pitch, 0.06, 'triangle', 0.035);
-    this.tone(1319 * pitch, 0.16, 'triangle', 0.035, undefined, 0.05);
+    const PENTA = [1047, 1175, 1319, 1568, 1760, 1568, 1319, 1175]; // C D E G A G E D – hospodská pentatonika
+    const i = this.coinI++;
+    if (this.coinStyle === 3) return;
+    if (this.coinStyle === 0) {
+      // A: každé cinknutí o tón dál – z výdělku vzniká jednoduchá melodie nahoru a dolů
+      this.tone(PENTA[i % PENTA.length] * pitch, 0.12, 'triangle', 0.03);
+      return;
+    }
+    if (this.coinStyle === 1) {
+      // B: náhodný tón ze stejné stupnice, náhodná délka, občas dvojité cinknutí a občas ticho
+      if (Math.random() < 0.25) return;
+      const f = PENTA[Math.floor(Math.random() * 5)] * pitch * (Math.random() < 0.3 ? 0.5 : 1);
+      this.tone(f, 0.05 + Math.random() * 0.12, 'triangle', 0.028);
+      if (Math.random() < 0.3) this.tone(f * 1.5, 0.08, 'triangle', 0.02, undefined, 0.07);
+      return;
+    }
+    // C: střídají se různé hospodské zvuky – mince, ťuknutí sklenic, pokladna, šplouchnutí
+    switch (i % 4) {
+      case 0:
+        this.tone(988 * pitch, 0.06, 'triangle', 0.035);
+        this.tone(1319 * pitch, 0.14, 'triangle', 0.035, undefined, 0.05);
+        break;
+      case 1:
+        this.tone(2093 * pitch, 0.09, 'sine', 0.03);
+        this.tone(2637 * pitch, 0.12, 'sine', 0.02, undefined, 0.03);
+        break;
+      case 2:
+        this.hiss(0.05, 3000, 0.03);
+        this.tone(1568 * pitch, 0.18, 'square', 0.012, undefined, 0.04);
+        break;
+      default:
+        this.hiss(0.18, 600, 0.03, 1400);
+    }
   }
   /** spropitné od hosta */
   tip() {

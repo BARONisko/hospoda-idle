@@ -144,6 +144,22 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   if (p.errors.length) console.log(p.errors);
   await p.close();
 }
+// 6a2) červená tečka zmizí po prvním otevření a znovu svítí, až přibude něco nového (Hostinský, Pivovar)
+{
+  const p = await page();
+  ok('tečky: Hostinský svítí → po otevření zmizí → nový bod znovu svítí', await S(p, (s) => {
+    s.d.tut = -1; s.d.klvl = 10; s.d.skills = []; s.d.alertSeen = {};
+    const a = s.tabAlert('keeper'); s.openShop('keeper', false); s.closeShop();
+    const b = s.tabAlert('keeper'); s.d.klvl = 11; const c = s.tabAlert('keeper');
+    return a && !b && c;
+  }));
+  ok('tečky: plný Pivovar svítí, po otevření zmizí', await S(p, (s) => {
+    const br = s.brew(); br.stock = 999; s.d.alertSeen = {};
+    const a = s.tabAlert('brew'); s.openShop('brew', false); s.closeShop();
+    return a && !s.tabAlert('brew');
+  }));
+  await p.close();
+}
 // 6b) hygiena jako skutečný hráč (lišta úkolu, VIP, styl): „Ještě ne“ hru neblokuje, po hygieně hra běží dál,
 //     coins na rozjezd a průvodce novou hospodou jde dokončit (dřív zamrznutí / zaseknutí)
 {

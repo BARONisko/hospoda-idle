@@ -87,6 +87,8 @@ export interface Save {
   pubIntro?: number;
   /** dlaždice menu, které už jsou odemčené (kvůli oznámení „nové v menu“) */
   menuOpen?: string[];
+  /** červené tečky: co hráč už viděl (záložka → podpis upozornění) */
+  alertSeen?: Record<string, string>;
   /** den, kdy hráč naposled otevřel chrám (červená tečka jen do prvního ťuknutí za den) */
   templeSeen?: string;
   /** kosti přepočtené na malá čísla (staré uložení ÷ 100) */

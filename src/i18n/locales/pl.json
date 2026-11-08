@@ -974,5 +974,13 @@
  "výdělek ×{m}": "zarobek ×{m}",
  "×{m} ještě {t}": "×{m} jeszcze {t}",
  "hodina za {t}": "godzina za {t}",
- "najdeš v něm další části hry": "znajdziesz tam kolejne części gry"
+ "najdeš v něm další části hry": "znajdziesz tam kolejne części gry",
+ "Zvuk výdělku": "Dźwięk zarobku",
+ "A melodie": "A melodia",
+ "B náhodně": "B losowo",
+ "C střídání": "C na zmianę",
+ "cinkání stanic – ťukni = přepni a poslechni": "dzwonienie – stuknij = zmień i posłuchaj",
+ "1. 12. – 6. 1.": "1.12 – 6.01",
+ "20. 10. – 3. 11.": "20.10 – 3.11",
+ "15. 9. – 10. 10.": "15.09 – 10.10"
 }

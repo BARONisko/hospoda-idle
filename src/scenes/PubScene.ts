@@ -11,6 +11,8 @@ import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { iap, ProductId, PRODUCTS } from '../core/shop';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
+/** kdy přijde sezónní host (karta ve Sbírce, dokud ho hráč neviděl; data podle core/season.ts) */
+const SEASON_WHEN: Record<string, string> = { monk: t('1. 12. – 6. 1.'), muertos0: t('20. 10. – 3. 11.'), brewer: t('15. 9. – 10. 10.') };
 import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
 import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward } from '../core/league';
 import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, nightLen, nightShare, switchPhase, nightCost, nightCostN, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
@@ -127,8 +129,9 @@ function downloadOffline() {
 function loadOpts() {
   try {
     // sv/mv = hlasitost zvuků/hudby 0–1; starší uložení měla jen zapnuto/vypnuto (snd/mus)
-    const o = JSON.parse(localStorage.getItem(OPTS_KEY) ?? '{}') as { snd?: boolean; mus?: boolean; sv?: number; mv?: number; nt?: boolean };
+    const o = JSON.parse(localStorage.getItem(OPTS_KEY) ?? '{}') as { snd?: boolean; mus?: boolean; sv?: number; mv?: number; nt?: boolean; cs?: number };
     notesOn = !!o.nt;
+    sfx.coinStyle = o.cs ?? 0;
     sfx.setSfxVol(o.sv ?? (o.snd === false ? 0 : 1));
     sfx.setMusVol(o.mv ?? (o.mus === false ? 0 : 1));
   } catch {
@@ -137,7 +140,7 @@ function loadOpts() {
 }
 function saveOpts() {
   try {
-    localStorage.setItem(OPTS_KEY, JSON.stringify({ sv: sfx.sfxVol, mv: sfx.musVol, nt: notesOn }));
+    localStorage.setItem(OPTS_KEY, JSON.stringify({ sv: sfx.sfxVol, mv: sfx.musVol, nt: notesOn, cs: sfx.coinStyle }));
   } catch {
     /* nic */
   }
@@ -986,7 +989,41 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.menuUnlocks();
   }
 
+  /** červená tečka: svítí, dokud hráč záložku neotevře; znovu se rozsvítí, až přibude něco nového
+   *  (přání uživatele: „po prvním kliknutí ať upozornění zmizí“) */
   private tabAlert(id: string) {
+    const raw = this.alertRaw(id);
+    const seen = (this.d.alertSeen ??= {});
+    if (!raw) {
+      if (id in seen) delete seen[id];
+      return false;
+    }
+    const sig = this.alertSig(id), old = seen[id];
+    if (old === undefined) return true;
+    // čísla (body, úkoly…): svítí jen když přibylo; po utracení se „viděno“ sníží, ať další přírůstek zase svítí
+    if (/^\d+$/.test(sig) && /^\d+$/.test(old)) {
+      if (Number(sig) < Number(old)) seen[id] = sig;
+      return Number(sig) > Number(old);
+    }
+    return sig !== old;
+  }
+
+  /** co přesně upozornění hlásí (když se změní – víc bodů, další úkol – tečka se rozsvítí znovu) */
+  private alertSig(id: string) {
+    if (id === 'keeper') return String(this.skillPoints());
+    if (id === 'tasks') return String(this.daily().tasks.filter((k) => !k.claimed && k.prog >= k.goal).length + this.d.ach.length * 100 + (this.weekly().claimed ? 0 : this.weekly().prog >= this.weekly().goal ? 1e4 : 0));
+    if (id === 'special') return dayKey();
+    if (id === 'darts') return String(Math.floor(this.d.darts?.pts ?? 0));
+    if (id === 'shop') return String(this.shopOffer().filter((u) => u.cost <= this.d.coins).length);
+    return '1';
+  }
+
+  /** otevřená záložka = upozornění viděno */
+  private alertSeenNow(id: string) {
+    if (this.alertRaw(id)) (this.d.alertSeen ??= {})[id] = this.alertSig(id);
+  }
+
+  private alertRaw(id: string) {
     if (id === 'shop') return this.shopOffer().some((u) => u.cost <= this.d.coins);
     if (id === 'tasks') return this.claimable();
     if (id === 'brew') return this.brewFull();
@@ -1010,6 +1047,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** spodní lišta (návrh 4): Hospoda / Obchod / Úkoly / Menu; menu otevřené přes ni se kreslí nad ní */
   navBtns: Btn[] = [];
   navDots?: Phaser.GameObjects.Graphics;
+  navDotAt = 0;
+  navDotOn = [false, false];
   private makeNav() {
     // lišta je nad otevřeným menu (D 300+) – výběr uživatele B; pod návodem (420) a okny
     const y = H - NAV_H, D = 350, bw = W / 4;
@@ -1122,6 +1161,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const menuStep = ['tile:shop', 'close'].includes(PubScene.TUT[this.d.tut ?? -1]?.done ?? '');
     if (!menuStep) this.tutObjs.forEach((o) => (o as unknown as Phaser.GameObjects.Components.Visible).setVisible(false));
     this.tab = tab;
+    this.alertSeenNow(tab === 'shop' && this.shopSub === 'up' ? 'shop' : tab);
     const D = 300, RH = 96;
     const y0 = MENU_Y0;
     const block = this.add.rectangle(0, TOP, W, H - TOP, 0x000000, 0.55).setOrigin(0).setDepth(D).setInteractive();
@@ -2027,7 +2067,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   // ---------- nastavení ----------
   private optsTab(y0: number, D: number) {
     // výška řádku tak, aby se vešly všechny (zvuky, hudba, záloha, jazyk, složka, upozornění, začít znovu)
-    const n = 5 + (location.protocol.startsWith('http') ? 1 : 0) + (notify.available ? 1 : 0);
+    const n = 6 + (location.protocol.startsWith('http') ? 1 : 0) + (notify.available ? 1 : 0);
     const RH = Math.min(96, Math.floor((MB - y0 - 6) / n));
     this.shopObjs.push(this.add.text(W - 12, y0 - 4, t('verze {v}', { v: __APP_VERSION__ }), txt(16, PAL.fog)).setOrigin(1, 1).setDepth(D + 2));
     // hlasitost: − / hodnota / + po 10 % (0 % = vypnuto)
@@ -2045,19 +2085,28 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         sfx.click();
         this.openShop('opts', false);
       };
-      const minus = this.btn(W - 232, y + 14, 60, 60, () => step(-0.1), D + 2);
+      // tlačítka podle výšky řádku (v Nastavení je řádků víc – nesmí přesahovat do dalšího)
+      const bs = Math.min(60, RH - 14), by = y + (RH - 8 - bs) / 2;
+      const minus = this.btn(W - 232, by, 60, bs, () => step(-0.1), D + 2);
       this.drawBtn(minus, '−', v > 0, 'plum');
-      const plus = this.btn(W - 82, y + 14, 60, 60, () => step(0.1), D + 2);
+      const plus = this.btn(W - 82, by, 60, bs, () => step(0.1), D + 2);
       this.drawBtn(plus, '+', v < 1, 'plum');
-      const val = this.add.text(W - 127, y + 44, v > 0 ? `${Math.round(v * 100)} %` : t('vypnuto'), txt(22, v > 0 ? PAL.gold : PAL.slate)).setOrigin(0.5).setDepth(D + 2);
+      const val = this.add.text(W - 127, by + bs / 2, v > 0 ? `${Math.round(v * 100)} %` : t('vypnuto'), txt(22, v > 0 ? PAL.gold : PAL.slate)).setOrigin(0.5).setDepth(D + 2);
       val.setScale(Math.min(1, 84 / val.width));
       // proužek hlasitosti pod názvem
       const bar = this.add.graphics().setDepth(D + 2);
-      bar.fillStyle(col('ink')).fillRoundedRect(26, y + 56, 230, 14, 6);
-      if (v > 0) bar.fillStyle(col('gold')).fillRoundedRect(26, y + 56, 230 * v, 14, 6);
+      bar.fillStyle(col('ink')).fillRoundedRect(26, y + RH - 30, 230, 12, 6);
+      if (v > 0) bar.fillStyle(col('gold')).fillRoundedRect(26, y + RH - 30, 230 * v, 12, 6);
       this.shopObjs.push(minus.bg, minus.label, minus.zone, plus.bg, plus.label, plus.zone, val, bar);
     });
+    const CS = [t('A melodie'), t('B náhodně'), t('C střídání'), t('vypnuto')];
     const rows: [string, string, () => void][] = [
+      // zvuk výdělku (cinkání, které hraje pořád): ťuknutí přepne a hned přehraje ukázku
+      [t('Zvuk výdělku'), CS[sfx.coinStyle] ?? CS[0], () => {
+        sfx.coinStyle = (sfx.coinStyle + 1) % 4;
+        saveOpts();
+        for (let k = 0; k < 6; k++) this.time.delayedCall(k * 300, () => sfx.coin(1));
+      }],
       [t('Jazyk / Language'), LANGS[lang], () => setLang(AVAILABLE[(AVAILABLE.indexOf(lang) + 1) % AVAILABLE.length])],
     ];
     // offline verze do složky (zip s index.html) – nabízí se jen na webu, ne ve hře spuštěné z disku
@@ -2067,12 +2116,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     {
       const y = y0 + vols.length * RH;
       this.row(y, RH, D, t('Záloha hry'), t('přenos mezi webem a složkou'));
-      const sv = this.btn(W - 232, y + 14, 102, 60, () => {
+      const bs = Math.min(60, RH - 14), by = y + (RH - 8 - bs) / 2;
+      const sv = this.btn(W - 232, by, 102, bs, () => {
         downloadBackup(exportSave(this.d));
         this.banner(this.views[0].cam, t('Záloha uložena'));
       }, D + 2);
       this.drawBtn(sv, t('Uložit'), true, 'green');
-      const ld = this.btn(W - 124, y + 14, 102, 60, () =>
+      const ld = this.btn(W - 124, by, 102, bs, () =>
         pickBackup((text) => {
           if (!importSave(text)) return this.banner(this.views[0].cam, t('Tohle není záloha hry'));
           location.reload();
@@ -2105,8 +2155,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     rows.forEach(([title, val, fn], i) => {
       i += vols.length + 1;
       const y = y0 + i * RH;
-      this.row(y, RH, D, title, title === t('Hra do složky') ? t('spustíš ji z disku bez internetu') : title === t('Upozornění') ? t('plná hospoda, VIP host, truhla, chrám') : title === t('Začít znovu') ? t('celá hra od začátku, i s návodem') : '');
-      const b = this.btn(W - 232, y + 14, 210, 60, () => {
+      this.row(y, RH, D, title, title === t('Hra do složky') ? t('spustíš ji z disku bez internetu') : title === t('Upozornění') ? t('plná hospoda, VIP host, truhla, chrám') : title === t('Začít znovu') ? t('celá hra od začátku, i s návodem') : title === t('Zvuk výdělku') ? t('cinkání stanic – ťukni = přepni a poslechni') : '');
+      const bs = Math.min(60, RH - 14);
+      const b = this.btn(W - 232, y + (RH - 8 - bs) / 2, 210, bs, () => {
         fn();
         saveOpts();
         this.openShop('opts', false);
@@ -2626,7 +2677,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   // ---------- bestiář ----------
   /** všechny druhy hostů ve Sbírce (pořadí = bonus štamgasta) */
   private allGuests() {
-    return [...new Set([...Object.values(GUESTS).flat(), ...Object.values(SEASONS).map((x) => x.guest)])];
+    // hosté jen z hospod, které ve hře jsou (4. „Chrám Cthulhu“ neexistuje – hosté by nešli nikdy získat)
+    return [...new Set([...[1, 2, 3].flatMap((a) => GUESTS[a]), ...Object.values(SEASONS).map((x) => x.guest)])];
   }
 
   private guestName(key: string) {
@@ -2653,9 +2705,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // Sbírka s věrností hostů (výběr uživatele A2): záložky po hospodách, velké karty s tečkami a pruhem; ťuknutí = detail dole
     const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
     const nameOf = (key: string, seen: boolean) => (seen ? this.guestName(key) : '???');
-    const groups = [...Object.values(GUESTS).map((g) => [...new Set(g)]), Object.values(SEASONS).map((x) => x.guest)];
-    const gn = [...Object.values(PUB_NAMES).slice(0, 4), t('Sezóna')];
-    const tw = (W - 20 - 4 * 4) / 5;
+    const groups = [...[1, 2, 3].map((a) => [...new Set(GUESTS[a])]), Object.values(SEASONS).map((x) => x.guest)];
+    const gn = [...[1, 2, 3].map((a) => PUB_NAMES[a]), t('Sezóna')];
+    const tw = (W - 20 - 3 * 4) / 4;
     gn.forEach((n, i) => {
       const b = this.btn(10 + i * (tw + 4), y0 - 50, tw, 40, () => ((this.bookGrp = i), (this.bookSel = ''), this.openShop('book', false)), D + 2);
       this.drawBtn(b, n, true, this.bookGrp === i ? 'gold' : 'plum');
@@ -2674,7 +2726,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       z.on('pointerdown', () => seen && ((this.bookSel = this.bookSel === key ? '' : key), sfx.click(), this.openShop('book', false)));
       const spr = add(this.add.sprite(x + cw / 2, y + 96, key, 1).setOrigin(0.5, 1).setScale(4.6).setDepth(D + 2));
       if (!seen) spr.setTintFill(col('dusk'));
-      const nm = add(this.add.text(x + cw / 2, y + 110, nameOf(key, seen), txt(18, seen ? PAL.bone : PAL.slate)).setOrigin(0.5).setDepth(D + 2));
+      const sez = Object.values(SEASONS).find((x) => x.guest === key);
+      const nm = add(this.add.text(x + cw / 2, y + 110, seen ? nameOf(key, seen) : sez ? sez.name : '???', txt(18, seen ? PAL.bone : sez ? PAL.sand : PAL.slate)).setOrigin(0.5).setDepth(D + 2));
+      if (!seen && sez) add(this.add.text(x + cw / 2, y + 140, SEASON_WHEN[key] ?? '', txt(15, PAL.fog)).setOrigin(0.5).setDepth(D + 2));
       nm.setScale(Math.min(1, (cw - 8) / nm.width));
       if (!seen) return;
       this.loyDots(g, x + cw / 2 - 28, y + 132, L.l, 14, 5);
@@ -4887,17 +4941,21 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.skillBtns.forEach((_, i) => this.drawSkill(i));
     this.stripRates.forEach((r, i) => r.setText(t('+{n} / s', { n: big(this.rate(this.d.pubs[i])) })));
 
-    const cheap = ['shop', 'tasks', 'brew', 'keeper', 'special'].some((id) => this.tabAlert(id) && !this.tileLock(id));
+    // tečka u Menu jen za části v mřížce (Obchod a Úkoly mají vlastní tečku v liště)
+    const cheap = ['brew', 'keeper', 'special', 'darts', 'temple'].some((id) => this.tabAlert(id) && !this.tileLock(id));
     this.shopDot.clear();
     // spodní lišta: aktivní položka zlatě, tečka u Úkolů, když je co vybrat
     if (this.navDots) {
       const act = !this.shopObjs.length ? 0 : this.tab === 'tasks' ? 2 : this.tab === 'shop' && this.shopSub === 'up' ? 1 : 3;
       this.navBtns.forEach((b, i) => b.label.setColor(i === act ? PAL.gold : PAL.bone));
-      const wk = this.d.weekly;
-      const claim = this.daily().tasks.some((tk) => !tk.claimed && tk.prog >= tk.goal) || (!!wk && !wk.claimed && wk.prog >= wk.goal);
-      const nb = this.navBtns[2];
+      // tečky v liště (hlášení: chybělo upozornění na vylepšení a úkol): Obchod = jde koupit vylepšení, Úkoly = je co vybrat
       this.navDots.clear();
-      if (claim) this.navDots.fillStyle(col('ink')).fillCircle(nb.x + nb.w / 2 + 26, nb.y + 14, 11).fillStyle(col('scarlet')).fillCircle(nb.x + nb.w / 2 + 26, nb.y + 14, 8);
+      const dot = (nb: Btn) => this.navDots!.fillStyle(col('ink')).fillCircle(nb.x + nb.w / 2 + 26, nb.y + 14, 11).fillStyle(col('scarlet')).fillCircle(nb.x + nb.w / 2 + 26, nb.y + 14, 8);
+      // výpočet nejvýš 2× za sekundu (refresh běží často – telefon se nemá hřát)
+      const now = Date.now();
+      if (now - this.navDotAt > 500) (this.navDotAt = now), (this.navDotOn = [(this.d.tut ?? -1) < 0 && this.tabAlert('shop'), this.tabAlert('tasks')]);
+      if (this.navDotOn[0]) dot(this.navBtns[1]);
+      if (this.navDotOn[1]) dot(this.navBtns[2]);
     }
     if (cheap) this.shopDot.fillStyle(col('ink')).fillCircle(this.shopBtn.x + this.shopBtn.w / 2 + 26, this.shopBtn.y + 14, 11).fillStyle(col('scarlet')).fillCircle(this.shopBtn.x + this.shopBtn.w / 2 + 26, this.shopBtn.y + 14, 8);
     for (const r of this.shopRows) this.drawBtn(r.b, big(r.o.cost), this.d.coins >= r.o.cost, 'green');

@@ -974,5 +974,13 @@
  "výdělek ×{m}": "수익 ×{m}",
  "×{m} ještě {t}": "×{m} 남은 {t}",
  "hodina za {t}": "{t} 후",
- "najdeš v něm další části hry": "게임의 다른 부분이 여기 있어요"
+ "najdeš v něm další části hry": "게임의 다른 부분이 여기 있어요",
+ "Zvuk výdělku": "수익 소리",
+ "A melodie": "A 멜로디",
+ "B náhodně": "B 무작위",
+ "C střídání": "C 번갈아",
+ "cinkání stanic – ťukni = přepni a poslechni": "스테이션 종소리 – 탭하면 바꾸고 듣기",
+ "1. 12. – 6. 1.": "12/1 – 1/6",
+ "20. 10. – 3. 11.": "10/20 – 11/3",
+ "15. 9. – 10. 10.": "9/15 – 10/10"
 }
