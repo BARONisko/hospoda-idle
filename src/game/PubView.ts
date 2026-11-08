@@ -459,11 +459,25 @@ export class PubView {
   }
 
   /** talíře čekající u kuchyně na číšníky */
+  private dishTable?: Phaser.GameObjects.Graphics;
+
   setDishes(n: number) {
+    // výdejní stolek u kuchyně – talíře stojí na něm, ne na zemi
+    if (!this.dishTable && (this.pub.st.kitchen?.lvl ?? 0) > 0) {
+      const x0 = this.ox + 13.2 * T - 6, top = 4 * T - 4;
+      const g = this.s.add.graphics().setDepth(4 * T + 6);
+      g.fillStyle(0x1b141c).fillRect(x0 - 1, top - 1, 32, 7);
+      g.fillStyle(0x8a4b2c).fillRect(x0, top, 30, 5).fillStyle(0xc77b3a).fillRect(x0, top, 30, 2);
+      g.fillStyle(0x1b141c).fillRect(x0 + 2, top + 5, 3, 7).fillRect(x0 + 25, top + 5, 3, 7);
+      g.fillStyle(0x5e3424).fillRect(x0 + 3, top + 5, 1, 6).fillRect(x0 + 26, top + 5, 1, 6);
+      this.dishTable = g;
+      this.objs.push(g);
+      this.s.events.emit('pubObj', g);
+    }
     const show = Math.min(4, n);
     while (this.dishes.length < show) {
       const i = this.dishes.length;
-      const m = this.s.add.image(this.ox + 13.2 * T + i * 7, 4 * T + 6, 'obj', FOOD[this.pub.act]).setOrigin(0.5, 1).setScale(0.45).setDepth(4 * T + 7 + i);
+      const m = this.s.add.image(this.ox + 13.2 * T + i * 7, 4 * T - 2, 'obj', FOOD[this.pub.act]).setOrigin(0.5, 1).setScale(0.45).setDepth(4 * T + 7 + i);
       this.objs.push(m);
       this.dishes.push(m);
       this.s.events.emit('pubObj', m);
