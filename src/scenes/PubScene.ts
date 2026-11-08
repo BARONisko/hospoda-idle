@@ -3721,8 +3721,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   /** násobek kostí ze statů (talismany, Kostnice…) */
-  private boneMult() {
-    return (1 + this.ts().bones) * (this.d.fx?.nightx2 && this.night ? 2 : 1);
+  private boneMult(p?: PubState) {
+    // schopnost manažera (šťastná hodina ×3) platí i na kosti
+    return (1 + this.ts().bones) * (this.d.fx?.nightx2 && this.night ? 2 : 1) * (p && this.boosted(p) ? BOOST_MULT : 1);
   }
 
   /** odměna za spropitné (ťuknutí nebo sběrač): přes den coins, v noci kost */
@@ -3735,7 +3736,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // zlatý host: občas dá spropitné ×10
     const gold = !this.night && Math.random() < Math.min(0.1, this.ts().golden);
     const tip = (gold ? 10 : 1) * Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (pubStyle(v.pub) === 'tap' ? 2 : 1) * (1 + this.ts().tips + guestTips(this.d.gxp ?? 0)) * this.happyMult()));
-    const bone = this.boneMult() * (1 + this.ts().nighttips);
+    const bone = this.boneMult(v.pub) * (1 + this.ts().nighttips);
     if (this.night) this.d.bones = (this.d.bones ?? 0) + bone;
     else this.gain(tip);
     // hvězda „Kostěné spropitné“: i ve dne kousek kosti (1 kost za 5 bublin)
@@ -3883,7 +3884,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       for (const def of STATIONS) {
         const s = p.st[def.id];
         if (!s || s.lvl === 0 || (autoOnly && !s.auto)) continue;
-        r += bonesFor(s.lvl) / this.cyc(def);
+        r += (bonesFor(s.lvl) / this.cyc(def)) * (!autoOnly && this.boosted(p) ? BOOST_MULT : 1);
       }
     return r * this.boneMult();
   }
@@ -4352,7 +4353,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
             bar.v += g;
             this.views[i].payout(def.id, 0, false, true);
           } else if (this.night) {
-            const b = bonesFor(p.st[def.id]!.lvl) * this.boneMult();
+            const b = bonesFor(p.st[def.id]!.lvl) * this.boneMult(p);
             this.d.bones = (this.d.bones ?? 0) + b;
             this.views[i].payout(def.id, b, true);
           } else {
