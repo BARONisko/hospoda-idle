@@ -4184,10 +4184,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const D = 300;
     const y0 = TOP + VIEW_H + 4;
     const objs = this.wPanel;
-    objs.push(this.add.zone(0, y0, W, H - y0).setOrigin(0).setInteractive().setDepth(D));
+    // panel končí nad spodní lištou – 3 řádky se vejdou bez rolování
+    const yb = H - NAV_H;
+    objs.push(this.add.zone(0, y0, W, yb - y0).setOrigin(0).setInteractive().setDepth(D));
     const g = this.add.graphics().setDepth(D);
-    g.fillStyle(col('dusk')).fillRoundedRect(4, y0, W - 8, H - y0 - 4, 14);
-    g.lineStyle(3, col('gold')).strokeRoundedRect(4, y0, W - 8, H - y0 - 4, 14);
+    g.fillStyle(col('dusk')).fillRoundedRect(4, y0, W - 8, yb - y0 - 4, 14);
+    g.lineStyle(3, col('gold')).strokeRoundedRect(4, y0, W - 8, yb - y0 - 4, 14);
     objs.push(g);
     objs.push(this.add.image(42, y0 + 44, WAITERS[k].key, 0).setScale(2.5).setDepth(D + 1));
     objs.push(this.add.text(74, y0 + 12, t('{n} · úroveň {l}', { n: WAITERS[k].name, l: waiterLvl(w) }), txt(28, PAL.gold)).setDepth(D + 1));
@@ -4209,14 +4211,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       { k: 'm', now: t('spropitné +{m} %', { m: Math.round(w.m * SMILE_STEP * 100) }), next: t('spropitné +{m} %', { m: Math.round((w.m + 1) * SMILE_STEP * 100) }) },
     ];
     rows.forEach((row, j) => {
-      const y = y0 + 96 + j * 110;
+      const rh = Math.min(110, Math.floor((yb - y0 - 100) / 3));
+      const y = y0 + 94 + j * rh;
       const lvl = w[row.k], max = lvl >= W_UP_MAX[row.k];
       const box = this.add.graphics().setDepth(D + 1);
-      box.fillStyle(col('ink'), 0.6).fillRoundedRect(16, y, W - 32, 100, 10);
+      box.fillStyle(col('ink'), 0.6).fillRoundedRect(16, y, W - 32, rh - 8, 10);
       objs.push(box);
-      objs.push(this.add.text(32, y + 10, `${wUpName(row.k)} ${lvl}/${W_UP_MAX[row.k]}`, txt(24, PAL.bone)).setDepth(D + 1));
-      objs.push(this.add.text(32, y + 46, max ? row.now : `${row.now} → ${row.next}`, txt(18, PAL.fog)).setDepth(D + 1));
-      const b = this.btn(W - 190, y + 20, 160, 60, () => {
+      objs.push(this.add.text(32, y + 8, `${wUpName(row.k)} ${lvl}/${W_UP_MAX[row.k]}`, txt(24, PAL.bone)).setDepth(D + 1));
+      objs.push(this.add.text(32, y + rh - 38, max ? row.now : `${row.now} → ${row.next}`, txt(18, PAL.fog)).setDepth(D + 1));
+      const b = this.btn(W - 190, y + (rh - 8 - 56) / 2, 160, 56, () => {
         if (max || freePoints(w) < 1) return sfx.error();
         w[row.k]++;
         sfx.buy();
@@ -5019,6 +5022,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.drawStyleSign();
     this.drawWaiterChips();
     // panel číšníka: nový bod za zkušenosti → překreslit
+    // otevřené menu / obchod / noc → panel číšníka pryč (jinak prosvítal pod menu)
+    if (this.wPanel.length && (this.shopObjs.length > 0 || this.night)) this.closeWaiter();
     if (this.wSel >= 0 && this.wPanel.length) {
       const w = this.d.pubs[this.wPub()]?.w?.[this.wSel];
       if (w && wEarned(w) !== this.wPanelPts) this.openWaiter(this.wPub(), this.wSel);
