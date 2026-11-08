@@ -966,5 +966,7 @@
  "obsluhuj bubliny hostů (Sbírka)": "serve guests' bubbles (Collection)",
  "utraceno: {n} b.": "spent: {n} pts",
  "body: {n}  ?": "points: {n}  ?",
- "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "points from levels, mastery, stars and loyal guests – spend them in the tree"
+ "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "points from levels, mastery, stars and loyal guests – spend them in the tree",
+ "NAŠETŘI {n} COINS: {c} / {n}": "SAVE {n} COINS: {c} / {n}",
+ "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "The Tap above earns them by itself. Once you have {n}, open the kitchen."
 }

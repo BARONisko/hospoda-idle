@@ -966,5 +966,7 @@
  "obsluhuj bubliny hostů (Sbírka)": "sers les bulles des clients (Collection)",
  "utraceno: {n} b.": "dépensé : {n} pts",
  "body: {n}  ?": "points : {n}  ?",
- "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "points des niveaux, maîtrise, étoiles et clients fidèles – dépense-les dans l'arbre"
+ "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "points des niveaux, maîtrise, étoiles et clients fidèles – dépense-les dans l'arbre",
+ "NAŠETŘI {n} COINS: {c} / {n}": "ÉCONOMISE {n} COINS : {c} / {n}",
+ "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "La pompe au-dessus les gagne toute seule. Quand tu en as {n}, ouvre la cuisine."
 }

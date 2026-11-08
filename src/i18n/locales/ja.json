@@ -966,5 +966,7 @@
  "obsluhuj bubliny hostů (Sbírka)": "客の吹き出しに対応（コレクション）",
  "utraceno: {n} b.": "使用済み：{n}pt",
  "body: {n}  ?": "ポイント：{n}  ?",
- "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "レベル・熟練・星・常連客からポイント――ツリーで使おう"
+ "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "レベル・熟練・星・常連客からポイント――ツリーで使おう",
+ "NAŠETŘI {n} COINS: {c} / {n}": "{n}コイン貯めよう：{c} / {n}",
+ "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "上のビールサーバーが自動で稼ぐ。{n}たまったらキッチンを開こう。"
 }

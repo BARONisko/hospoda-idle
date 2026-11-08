@@ -966,5 +966,7 @@
  "obsluhuj bubliny hostů (Sbírka)": "손님 말풍선 응대 (컬렉션)",
  "utraceno: {n} b.": "사용: {n}점",
  "body: {n}  ?": "포인트: {n}  ?",
- "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "레벨, 숙련, 별, 단골손님에서 포인트 – 트리에 쓰세요"
+ "body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu": "레벨, 숙련, 별, 단골손님에서 포인트 – 트리에 쓰세요",
+ "NAŠETŘI {n} COINS: {c} / {n}": "{n} 코인 모으기: {c} / {n}",
+ "Pípa nahoře je vydělává sama. Až jich budeš mít {n}, otevři kuchyni.": "위의 맥주탭이 알아서 번다. {n}이 되면 주방을 열자."
 }
