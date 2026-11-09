@@ -1281,5 +1281,10 @@
  "dubové stoly s běhounem · jen vzhled": "铺桌旗的橡木桌 · 仅外观",
  "bílá košile a zelená vesta · jen vzhled": "白衬衫配绿马甲 · 仅外观",
  "nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský": "仅在应用内购买 · 免费：VIP客人、黄金宝箱、任务、联赛、克苏鲁、卫生检查、老板",
- "Úkol splněn! +{n} coins a +{g} 💎": "任务完成！+{n} coins 和 +{g} 💎"
+ "Úkol splněn! +{n} coins a +{g} 💎": "任务完成！+{n} coins 和 +{g} 💎",
+ "Návštěvníci": "访客",
+ "+{n} 💎 za návštěvu": "来访奖励 +{n} 💎",
+ "štědrý návštěvník!": "慷慨的访客！",
+ "přijato {a} / {b}": "已接受 {a} / {b}",
+ "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "来访无收获 = +{a} 💎 · 每天最多 {m} 💎"
 }

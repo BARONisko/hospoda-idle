@@ -1281,5 +1281,10 @@
  "dubové stoly s běhounem · jen vzhled": "dębowe stoły z bieżnikiem · tylko wygląd",
  "bílá košile a zelená vesta · jen vzhled": "biała koszula i zielona kamizelka · tylko wygląd",
  "nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský": "zakupy tylko w aplikacji · za darmo: VIP, złota skrzynia, zadania, liga, Cthulhu, sanepid, karczmarz",
- "Úkol splněn! +{n} coins a +{g} 💎": "Zadanie zrobione! +{n} coins i +{g} 💎"
+ "Úkol splněn! +{n} coins a +{g} 💎": "Zadanie zrobione! +{n} coins i +{g} 💎",
+ "Návštěvníci": "Goście specjalni",
+ "+{n} 💎 za návštěvu": "+{n} 💎 za wizytę",
+ "štědrý návštěvník!": "hojny gość!",
+ "přijato {a} / {b}": "przyjęto {a} / {b}",
+ "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "nic z wizyty = +{a} 💎 · maks. {m} 💎 dziennie"
 }

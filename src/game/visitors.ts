@@ -13,6 +13,8 @@ export interface VisitCtx {
   boost(ms: number): void;
   later(ms: number, fn: () => void): void;
   say(text: string): void;
+  /** z návštěvy hráč nic neměl (zaplatil / přijal naprázdno) → 💎 (strop za den, štědrý návštěvník 2) */
+  gem(): void;
 }
 
 export interface Choice {
@@ -37,7 +39,7 @@ export const VISITORS: Visitor[] = [
     key: 'inspector',
     name: t('Hygienik'),
     text: t('Našel v guláši vlas. „To bude pokuta, pane hostinský…“'),
-    a: { label: t('Podplatit'), cost: (c) => c.income(120), run: (c) => c.say(t('Hygienik spokojeně odešel.')) },
+    a: { label: t('Podplatit'), cost: (c) => c.income(120), run: (c) => (c.say(t('Hygienik spokojeně odešel.')), c.gem()) },
     b: {
       label: t('Riskovat'),
       cost: () => 0,
@@ -77,7 +79,7 @@ export const VISITORS: Visitor[] = [
           if (chance(0.7)) {
             c.gain(back);
             c.say(t('Pepík splatil sekeru! +{n}', { n: big(back) }));
-          } else c.say(t('Pepík zmizel i se sekerou!'));
+          } else (c.say(t('Pepík zmizel i se sekerou!')), c.gem());
         });
       },
     },
@@ -95,7 +97,7 @@ export const VISITORS: Visitor[] = [
           const n = c.income(900);
           c.gain(n);
           c.say(t('Byla v něm zlatá jedenáctka! +{n}', { n: big(n) }));
-        } else c.say(t('Byl v něm jen ocet…'));
+        } else (c.say(t('Byl v něm jen ocet…')), c.gem());
       },
     },
     b: { label: t('Ne, díky'), cost: () => 0, run: (c) => c.say(t('Muž v kabátě zmizel ve tmě.')) },
@@ -115,9 +117,15 @@ export const VISITORS: Visitor[] = [
           const n = Math.min(c.coins(), c.income(120));
           c.spend(n);
           c.say(t('Dav rozbil půllitry! −{n}', { n: big(n) }));
+          c.gem();
         }
       },
     },
     b: { label: t('Zakázat'), cost: () => 0, run: (c) => c.say(t('Influencerka natočila stížnost.')) },
   },
 ];
+
+/** návštěvníci ve Sbírce: po VIS_GOLD přijetích „štědrý návštěvník“ (2 💎 místo 1); nejvýš VIS_GEMS_DAY 💎 denně */
+export const VIS_GOLD = 15;
+export const VIS_GEMS_DAY = 10;
+export const visGems = (accepted: number) => (accepted >= VIS_GOLD ? 2 : 1);

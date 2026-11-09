@@ -362,3 +362,7 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   pole PubView.objs drželo tisíce zničených objektů (zrušeno), setColor se stejnou barvou překresloval text ~16×/snímek
   (main.ts). Měření: po 30 min dřív 10 291 objektů / 4 988 posluchačů / 1 382 mrtvých tweenů → teď ~1 100 / 50 / 0.
   Zbývá (podezření z QA): koupě úrovně může snížit výdělek (styl, styleSupplyMult), rada „splněný úkol“ přebije radu hygieny.
+- Hospoda 66 – 💎 OD NÁVŠTĚVNÍKŮ (schváleno): +1 💎, když hráč zaplatí/přijme a nic z toho nemá (Hygienik Podplatit,
+  Pepík nesplatí sekeru, sud s octem, Influencerka rozbije půllitry; Sládek a odmítnutí nic). Sbírka → 5. záložka
+  „Návštěvníci“ (d.vis = počet přijetí, volba a); po VIS_GOLD=15 přijetích zlatý rámeček a 2 💎 místo 1; strop
+  VIS_GEMS_DAY=10 💎 denně (d.visG). visitors.ts (VisitCtx.gem), PubScene.visitGem/bookVisitors. Test 5c2.

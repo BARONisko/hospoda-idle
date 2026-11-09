@@ -1281,5 +1281,10 @@
  "dubové stoly s běhounem · jen vzhled": "дубовые столы с дорожкой · только вид",
  "bílá košile a zelená vesta · jen vzhled": "белая рубашка и зелёный жилет · только вид",
  "nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský": "покупки только в приложении · бесплатно: VIP, золотой сундук, задания, лига, Ктулху, санинспекция, трактирщик",
- "Úkol splněn! +{n} coins a +{g} 💎": "Задание выполнено! +{n} coins и +{g} 💎"
+ "Úkol splněn! +{n} coins a +{g} 💎": "Задание выполнено! +{n} coins и +{g} 💎",
+ "Návštěvníci": "Посетители",
+ "+{n} 💎 za návštěvu": "+{n} 💎 за визит",
+ "štědrý návštěvník!": "щедрый посетитель!",
+ "přijato {a} / {b}": "принято {a} / {b}",
+ "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "ничего с визита = +{a} 💎 · макс. {m} 💎 в день"
 }

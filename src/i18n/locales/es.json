@@ -1281,5 +1281,10 @@
  "dubové stoly s běhounem · jen vzhled": "mesas de roble con camino · solo estética",
  "bílá košile a zelená vesta · jen vzhled": "camisa blanca y chaleco verde · solo estética",
  "nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský": "compras solo en la app · gratis: VIP, cofre dorado, tareas, liga, Cthulhu, inspección, tabernero",
- "Úkol splněn! +{n} coins a +{g} 💎": "¡Tarea hecha! +{n} coins y +{g} 💎"
+ "Úkol splněn! +{n} coins a +{g} 💎": "¡Tarea hecha! +{n} coins y +{g} 💎",
+ "Návštěvníci": "Visitantes",
+ "+{n} 💎 za návštěvu": "+{n} 💎 por la visita",
+ "štědrý návštěvník!": "¡visitante generoso!",
+ "přijato {a} / {b}": "aceptado {a} / {b}",
+ "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "nada de la visita = +{a} 💎 · máx. {m} 💎 al día"
 }

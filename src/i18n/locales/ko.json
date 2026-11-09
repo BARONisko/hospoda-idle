@@ -1281,5 +1281,10 @@
  "dubové stoly s běhounem · jen vzhled": "러너 깔린 참나무 테이블 · 외형만",
  "bílá košile a zelená vesta · jen vzhled": "흰 셔츠와 초록 조끼 · 외형만",
  "nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský": "구매는 앱에서만 · 무료: VIP 손님, 황금 상자, 과제, 리그, 크툴루, 위생 검사, 주인장",
- "Úkol splněn! +{n} coins a +{g} 💎": "과제 완료! +{n} coins, +{g} 💎"
+ "Úkol splněn! +{n} coins a +{g} 💎": "과제 완료! +{n} coins, +{g} 💎",
+ "Návštěvníci": "방문자",
+ "+{n} 💎 za návštěvu": "방문 보상 +{n} 💎",
+ "štědrý návštěvník!": "후한 방문자!",
+ "přijato {a} / {b}": "수락 {a} / {b}",
+ "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "방문에서 얻은 게 없으면 = +{a} 💎 · 하루 최대 {m} 💎"
 }

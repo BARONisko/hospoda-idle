@@ -76,6 +76,26 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     }, k);
     ok(`návštěvník ${k + 1}: volba proběhne`, r);
   }
+  // 5c2) 💎 od návštěvníků (hospoda 66): Hygienik „Podplatit“ = +1 💎, od 15 přijetí +2 💎, strop 10 💎 denně; Sbírka
+  {
+    const r = await S(p, (s) => {
+      s.d.coins = 1e12; s.d.vis = {}; s.d.visG = undefined;
+      const g0 = s.d.gems ?? 0, out = [];
+      for (let k = 0; k < 16; k++) {
+        const before = s.d.gems ?? 0;
+        s.visit(s.visitList()[0]);
+        s.awayObjs.filter((o) => o.type === 'Zone')[0].emit('pointerdown');
+        out.push((s.d.gems ?? 0) - before);
+      }
+      s.bookGrp = 4; s.openShop('book', false);
+      const cards = s.shopObjs.filter((o) => o.type === 'Text' && o.text === '2 💎').length;
+      s.closeShop(); s.bookGrp = 0;
+      return { first: out[0], total: s.d.visG.n, vis: s.d.vis.inspector, cards, gained: (s.d.gems ?? 0) - g0 };
+    });
+    ok('návštěvník: Podplatit = +1 💎', r.first >= 1);
+    ok('návštěvník: strop 10 💎 denně', r.total === 10);
+    ok('návštěvník: Sbírka počítá přijetí a zlatá karta po 15', r.vis === 16 && r.cards === 1);
+  }
   // 5d) výzdoba
   await S(p, (s) => { s.d.coins = 1e16; s.shopSub = 'decor'; s.openShop('shop', false); s.decorRows[0].b.zone.emit('pointerdown'); });
   ok('výzdoba: koupě portrétu', await S(p, (s) => s.has('portrait')));

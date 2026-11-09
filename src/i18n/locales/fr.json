@@ -1281,5 +1281,10 @@
  "dubové stoly s běhounem · jen vzhled": "tables en chêne avec chemin de table · juste déco",
  "bílá košile a zelená vesta · jen vzhled": "chemise blanche et gilet vert · juste déco",
  "nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský": "achats seulement dans l'appli · gratuit : VIP, coffre doré, tâches, ligue, Cthulhu, inspection, tavernier",
- "Úkol splněn! +{n} coins a +{g} 💎": "Tâche finie ! +{n} coins et +{g} 💎"
+ "Úkol splněn! +{n} coins a +{g} 💎": "Tâche finie ! +{n} coins et +{g} 💎",
+ "Návštěvníci": "Visiteurs",
+ "+{n} 💎 za návštěvu": "+{n} 💎 pour la visite",
+ "štědrý návštěvník!": "visiteur généreux !",
+ "přijato {a} / {b}": "accepté {a} / {b}",
+ "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "rien de la visite = +{a} 💎 · max {m} 💎 par jour"
 }

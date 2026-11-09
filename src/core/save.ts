@@ -131,6 +131,10 @@ export interface Save {
   nightInfo?: boolean;
   /** věrnost hostů po druzích: počet obsloužení (klíč = druh hosta) */
   loy?: Record<string, number>;
+  /** návštěvníci: kolikrát hráč přijal / zaplatil (Sbírka) */
+  vis?: Record<string, number>;
+  /** 💎 od návštěvníků dnes (strop VIS_GEMS_DAY) */
+  visG?: { day: string; n: number };
   /** bestiář: viděné druhy hostů */
   seen: string[];
   /** koupená vylepšení z obchodu (id) */

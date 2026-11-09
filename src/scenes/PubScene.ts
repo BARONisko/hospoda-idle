@@ -13,7 +13,7 @@ import { iap, ProductId, PRODUCTS } from '../core/shop';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
 /** kdy přijde sezónní host (karta ve Sbírce, dokud ho hráč neviděl; data podle core/season.ts) */
 const SEASON_WHEN: Record<string, string> = { monk: t('1. 12. – 6. 1.'), muertos0: t('20. 10. – 3. 11.'), brewer: t('15. 9. – 10. 10.') };
-import { VISITORS, Visitor, VisitCtx } from '../game/visitors';
+import { VISITORS, Visitor, VisitCtx, VIS_GOLD, VIS_GEMS_DAY, visGems } from '../game/visitors';
 import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward, rivalInfo, rivalRate } from '../core/league';
 import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, nightLen, nightShare, switchPhase, nightCost, nightCostN, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
 import type { TempleHost } from './TempleScene';
@@ -1240,7 +1240,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   tabTutUntil = 0;
   private tabTut(key: string, yMin: number, D: number) {
     const text = PubScene.TAB_TUT[key];
-    if (!text) return;
+    if (!text || (key === 'book' && this.bookGrp === 4)) return; // nápověda o hostech, ne o návštěvnících
     const seen = (this.d.tabTut ??= []);
     if (!seen.includes(key)) {
       seen.push(key);
@@ -2845,8 +2845,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
     const nameOf = (key: string, seen: boolean) => (seen ? this.guestName(key) : '???');
     const groups = [...[1, 2, 3].map((a) => [...new Set(GUESTS[a])]), Object.values(SEASONS).map((x) => x.guest)];
-    const gn = [...[1, 2, 3].map((a) => PUB_NAMES[a]), t('Sezóna')];
-    const tw = (W - 20 - 3 * 4) / 4;
+    const gn = [...[1, 2, 3].map((a) => PUB_NAMES[a]), t('Sezóna'), t('Návštěvníci')];
+    const tw = (W - 20 - (gn.length - 1) * 4) / gn.length;
     gn.forEach((n, i) => {
       const b = this.btn(10 + i * (tw + 4), y0 - 50, tw, 40, () => ((this.bookGrp = i), (this.bookSel = ''), this.openShop('book', false)), D + 2);
       this.drawBtn(b, n, true, this.bookGrp === i ? 'gold' : 'plum');
@@ -2854,6 +2854,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (this.bookGrp === i) b.label.setColor(PAL.ink).setStroke(PAL.ink, 0);
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
+    if (this.bookGrp === 4) return this.bookVisitors(y0, D);
     (groups[this.bookGrp] ?? []).forEach((key, i) => {
       const cw = (W - 20 - 3 * 8) / 4, x = 10 + (i % 4) * (cw + 8), y = y0 + Math.floor(i / 4) * 178, seen = this.d.seen.includes(key);
       const L = this.loyText(key);
@@ -2885,6 +2886,40 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const bt = add(this.add.text(100, py + 90, L.bonus, txt(16, PAL.fog)).setDepth(D + 8));
       bt.setScale(Math.min(1, (W - 120) / bt.width));
     }
+  }
+
+  /** Sbírka → Návštěvníci: kolikrát hráč přijal / zaplatil; po VIS_GOLD zlatý rámeček = 2 💎 místo 1 */
+  private bookVisitors(y0: number, D: number) {
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
+    const cw = (W - 20 - 3 * 8) / 4;
+    VISITORS.forEach((v, i) => {
+      const x = 10 + (i % 4) * (cw + 8), y = y0 + Math.floor(i / 4) * 178;
+      const n = this.d.vis?.[v.key], seen = n !== undefined, gold = (n ?? 0) >= VIS_GOLD;
+      const g = add(this.add.graphics().setDepth(D + 1));
+      g.fillStyle(col('ink'), 0.6).fillRoundedRect(x, y, cw, 170, 10);
+      if (gold) g.lineStyle(4, col('gold')).strokeRoundedRect(x, y, cw, 170, 10);
+      if (this.bookSel === v.key) g.lineStyle(3, col('white')).strokeRoundedRect(x - 2, y - 2, cw + 4, 174, 11);
+      const z = add(this.add.zone(x, y, cw, 170).setOrigin(0).setInteractive().setDepth(D + 3));
+      z.on('pointerdown', () => seen && ((this.bookSel = this.bookSel === v.key ? '' : v.key), sfx.click(), this.openShop('book', false)));
+      const spr = add(this.add.sprite(x + cw / 2, y + 96, v.key, 1).setOrigin(0.5, 1).setScale(4.6).setDepth(D + 2));
+      if (!seen) spr.setTintFill(col('dusk'));
+      const nm = add(this.add.text(x + cw / 2, y + 110, seen ? v.name : '???', txt(18, seen ? PAL.bone : PAL.slate)).setOrigin(0.5).setDepth(D + 2));
+      nm.setScale(Math.min(1, (cw - 8) / nm.width));
+      if (!seen) return;
+      add(this.add.text(x + cw / 2, y + 134, gold ? '2 💎' : `${n}/${VIS_GOLD}`, txt(16, gold ? PAL.gold : PAL.fog)).setOrigin(0.5).setDepth(D + 2));
+      g.fillStyle(col('dusk')).fillRoundedRect(x + 10, y + 150, cw - 20, 10, 4).fillStyle(col('gold')).fillRoundedRect(x + 10, y + 150, Math.max(6, (cw - 20) * Math.min(1, (n ?? 0) / VIS_GOLD)), 10, 4);
+    });
+    const v = VISITORS.find((x) => x.key === this.bookSel);
+    if (!v) return;
+    const n = this.d.vis?.[v.key] ?? 0, py = MB - 128;
+    const g = add(this.add.graphics().setDepth(D + 7));
+    g.fillStyle(col('ink'), 0.97).fillRoundedRect(10, py, W - 20, 118, 12).lineStyle(3, col('gold')).strokeRoundedRect(10, py, W - 20, 118, 12);
+    add(this.add.sprite(56, py + 100, v.key, 1).setOrigin(0.5, 1).setScale(4).setDepth(D + 8));
+    add(this.add.text(100, py + 10, v.name, txt(26, PAL.gold)).setDepth(D + 8));
+    add(this.add.text(100, py + 46, n >= VIS_GOLD ? t('štědrý návštěvník!') : t('přijato {a} / {b}', { a: n, b: VIS_GOLD }), txt(18, PAL.bone)).setDepth(D + 8));
+    g.fillStyle(col('dusk')).fillRoundedRect(100, py + 72, W - 130, 10, 4).fillStyle(col('gold')).fillRoundedRect(100, py + 72, Math.max(8, (W - 130) * Math.min(1, n / VIS_GOLD)), 10, 4);
+    const bt = add(this.add.text(100, py + 90, t('nic z návštěvy = +{a} 💎 · max {m} 💎 denně', { a: visGems(n), m: VIS_GEMS_DAY }), txt(16, PAL.fog)).setDepth(D + 8));
+    bt.setScale(Math.min(1, (W - 120) / bt.width));
   }
 
   private closeShop() {
@@ -3122,9 +3157,22 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return VISITORS;
   }
 
-  private visitCtx(): VisitCtx {
+  /** 💎 od návštěvníka, ze kterého hráč nic neměl (strop za den; štědrý návštěvník 2) */
+  private visitGem(key: string) {
+    const day = dayKey();
+    if (this.d.visG?.day !== day) this.d.visG = { day, n: 0 };
+    const n = Math.min(visGems(this.d.vis?.[key] ?? 0), VIS_GEMS_DAY - this.d.visG.n);
+    if (n <= 0) return;
+    this.d.visG.n += n;
+    this.d.gems = (this.d.gems ?? 0) + n;
+    this.time.delayedCall(1300, () => this.banner(this.views[0].cam, t('+{n} 💎 za návštěvu', { n }), true));
+    store(this.d);
+  }
+
+  private visitCtx(key = ''): VisitCtx {
     const cam = this.views[0].cam;
     return {
+      gem: () => key && this.visitGem(key),
       income: (secs) => Math.max(50, Math.round(Math.max(this.totalRate(), this.pay(this.d.pubs[0], STATIONS[0]) / STATIONS[0].cycle) * secs)),
       coins: () => this.d.coins,
       spend: (n) => (this.d.coins = Math.max(0, this.d.coins - n)),
@@ -3137,7 +3185,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   private visit(v: Visitor) {
     const D = 520;
-    const c = this.visitCtx();
+    const c = this.visitCtx(v.key);
+    // Sbírka: návštěvník je „viděný“, jakmile přijde
+    this.d.vis = { ...this.d.vis, [v.key]: this.d.vis?.[v.key] ?? 0 };
     const objs: Phaser.GameObjects.GameObject[] = [];
     const shade = this.add.rectangle(0, 0, W, H, 0x000000, 0.6).setOrigin(0).setDepth(D).setInteractive();
     const bx = 30, by = 230, bw = W - 60, bh = 450;
@@ -3163,6 +3213,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         if (this.d.coins < cost) return sfx.error();
         this.d.coins -= cost;
         close();
+        // přijetí / zaplacení (volba a) se počítá do Sbírky
+        if (i === 0) this.d.vis = { ...this.d.vis, [v.key]: (this.d.vis?.[v.key] ?? 0) + 1 };
         ch.run(c);
         this.tryDrop(0.03);
         this.xp(10);

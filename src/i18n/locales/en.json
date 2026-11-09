@@ -1281,5 +1281,10 @@
  "dubové stoly s běhounem · jen vzhled": "oak tables with a runner · looks only",
  "bílá košile a zelená vesta · jen vzhled": "white shirt and green vest · looks only",
  "nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský": "purchases only in the mobile app · free: VIP guest, golden chest, tasks, league, Cthulhu, inspection, landlord",
- "Úkol splněn! +{n} coins a +{g} 💎": "Task done! +{n} coins and +{g} 💎"
+ "Úkol splněn! +{n} coins a +{g} 💎": "Task done! +{n} coins and +{g} 💎",
+ "Návštěvníci": "Visitors",
+ "+{n} 💎 za návštěvu": "+{n} 💎 for the visit",
+ "štědrý návštěvník!": "generous visitor!",
+ "přijato {a} / {b}": "accepted {a} / {b}",
+ "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "nothing from a visit = +{a} 💎 · max {m} 💎 a day"
 }

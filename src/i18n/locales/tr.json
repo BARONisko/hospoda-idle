@@ -1281,5 +1281,10 @@
  "dubové stoly s běhounem · jen vzhled": "örtülü meşe masalar · sadece görünüm",
  "bílá košile a zelená vesta · jen vzhled": "beyaz gömlek ve yeşil yelek · sadece görünüm",
  "nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský": "satın alma sadece uygulamada · bedava: VIP, altın sandık, görevler, lig, Cthulhu, denetim, meyhaneci",
- "Úkol splněn! +{n} coins a +{g} 💎": "Görev tamam! +{n} coins ve +{g} 💎"
+ "Úkol splněn! +{n} coins a +{g} 💎": "Görev tamam! +{n} coins ve +{g} 💎",
+ "Návštěvníci": "Ziyaretçiler",
+ "+{n} 💎 za návštěvu": "ziyaret için +{n} 💎",
+ "štědrý návštěvník!": "cömert ziyaretçi!",
+ "přijato {a} / {b}": "kabul {a} / {b}",
+ "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "ziyaretten bir şey yok = +{a} 💎 · günde en fazla {m} 💎"
 }

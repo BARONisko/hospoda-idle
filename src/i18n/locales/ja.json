@@ -1281,5 +1281,10 @@
  "dubové stoly s běhounem · jen vzhled": "ランナー付きオークのテーブル · 見た目のみ",
  "bílá košile a zelená vesta · jen vzhled": "白シャツと緑のベスト · 見た目のみ",
  "nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský": "購入はアプリのみ · 無料：VIP客、金の宝箱、タスク、リーグ、クトゥルフ、衛生検査、店主",
- "Úkol splněn! +{n} coins a +{g} 💎": "タスク達成！+{n} coins と +{g} 💎"
+ "Úkol splněn! +{n} coins a +{g} 💎": "タスク達成！+{n} coins と +{g} 💎",
+ "Návštěvníci": "訪問者",
+ "+{n} 💎 za návštěvu": "訪問で +{n} 💎",
+ "štědrý návštěvník!": "気前のいい訪問者！",
+ "přijato {a} / {b}": "受け入れ {a} / {b}",
+ "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "訪問で何も得られない = +{a} 💎 · 1日最大 {m} 💎"
 }
