@@ -56,6 +56,12 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     ok('Escape: podsekce menu → zpět do mřížky Menu', await S(p, (s) => s.shopObjs.length > 0 && s.tab === 'home'));
     await p.keyboard.press('Escape');
     ok('Escape: mřížka Menu se zavře', await S(p, (s) => s.shopObjs.length === 0));
+    await S(p, (s) => s.openShop('talis', false));
+    await p.keyboard.press('Escape');
+    ok('Escape: Talismany → zpět do Kostnice', await S(p, (s) => s.shopObjs.length > 0 && s.tab === 'shop' && s.shopSub === 'bones'));
+    await p.keyboard.press('Escape');
+    await p.keyboard.press('Escape');
+    ok('Escape: Kostnice → Menu → zavřeno', await S(p, (s) => { const r = s.shopObjs.length === 0; s.shopSub = 'up'; return r; }));
     await S(p, (s) => { s.d.coins = 1e9; s.visit(s.visitList()[0]); });
     await p.keyboard.press('Escape');
     ok('Escape zavře okno návštěvníka', await S(p, (s) => s.awayObjs.length === 0 && !s.visitLive));
