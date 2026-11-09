@@ -4066,12 +4066,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.shopObjs.push(b1.bg, b1.label, b1.zone, b10.bg, b10.label, b10.zone);
     // přehled statů z Kostnice
     add(this.add.text(20, y0 + 236, t('Zesíleno kostňákem ({n} hodů):', { n: rolls }), txt(18, PAL.gold)).setDepth(D + 2));
+    // výška řádku tak, aby se celý přehled vešel nad spodní lištu (hlášení: poslední řádek nebyl vidět)
+    const rh = Math.min(23, (MB - 8 - (y0 + 260)) / Math.ceil(OSSUARY.length / 2));
     OSSUARY.forEach((o, i) => {
       const lvl = this.d.oss?.[o.stat] ?? 0;
       const capped = o.cap !== undefined && (lvl + 1) * o.per > o.cap + 1e-9;
-      const x = 20 + (i % 2) * 262, y = y0 + 260 + Math.floor(i / 2) * 23;
+      const x = 20 + (i % 2) * 262, y = y0 + 260 + Math.floor(i / 2) * rh;
       const tx = add(this.add.text(x, y, STAT_NAMES[o.stat](lvl * o.per) + (capped ? ' (max)' : ''), txt(15, o.stat === this.ossLast ? PAL.gold : lvl ? PAL.mint : PAL.slate)).setDepth(D + 2));
-      tx.setScale(Math.min(1, 250 / tx.width));
+      tx.setScale(Math.min(1, 250 / tx.width, rh / tx.height));
     });
   }
 
@@ -4424,6 +4426,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.views.forEach((v) => (v.hold = !!tipStep));
     this.qTick();
     this.goalTick();
+    this.gemTick();
     this.tutTick();
     this.vipTick(dt);
     // Automatická šťastná hodina (za diamanty): manažeři pouští schopnost sami
@@ -4608,6 +4611,80 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     u.num.setText(`${pct} %`).setOrigin(0.5, 0).setPosition(mx + (mw + 9) / 2, my + mh + 4).setColor(full ? PAL.mint : PAL.white);
     u.num.setScale(Math.min(1, 60 / u.num.width));
     u.zone.setPosition(mx - 10, 0).setSize(mw + 29, my + mh + 26);
+  }
+
+  // ---------- počítadlo diamantů v horní liště (návrhy ?gem=a|b|c; ťuk = Speciální nabídka → Diamanty) ----------
+  gemStyle = (new URLSearchParams(location.search).get('gem') ?? 'x') as 'a' | 'b' | 'c' | 'x';
+  gemUi?: { g: Phaser.GameObjects.Graphics; num: Phaser.GameObjects.Text; zone: Phaser.GameObjects.Zone };
+  gemKey = '';
+
+  /** pixelový diamant (střed x, y, šířka w) */
+  private gemShape(g: Phaser.GameObjects.Graphics, x: number, y: number, w: number) {
+    const h = w * 0.85, t = h * 0.35;
+    const out = [{ x: x - w / 2, y: y - h / 2 + t }, { x: x - w / 4, y: y - h / 2 }, { x: x + w / 4, y: y - h / 2 }, { x: x + w / 2, y: y - h / 2 + t }, { x, y: y + h / 2 }];
+    g.fillStyle(col('ink')).fillPoints(out.map((q) => ({ x: q.x + 2, y: q.y + 2 })), true);
+    g.fillStyle(col('sky')).fillPoints(out, true);
+    g.fillStyle(col('ice')).fillPoints([out[0], out[1], out[2], out[3]], true);
+    g.fillStyle(col('white')).fillPoints([out[1], { x: x - w / 12, y: y - h / 2 }, { x: x - w / 5, y: y - h / 2 + t }, out[0]], true);
+    g.fillStyle(col('blue')).fillPoints([{ x: x + w / 6, y: y - h / 2 + t }, out[3], out[4]], true);
+  }
+
+  private gemTick() {
+    const on = this.gemStyle !== 'x' && (this.d.tut ?? -1) < 0 && !this.awayObjs.length;
+    const D = 103;
+    if (!this.gemUi) {
+      const g = this.add.graphics().setDepth(D);
+      const num = this.add.text(0, 0, '', txt(22, PAL.ice)).setDepth(D + 1);
+      const zone = this.add.zone(0, 0, 10, 10).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(D + 2);
+      zone.on('pointerdown', () => {
+        if (!zone.visible || this.awayObjs.length) return;
+        sfx.init();
+        sfx.click();
+        this.spSub = 'gems';
+        this.openShop('special', false);
+      });
+      this.gemUi = { g, num, zone };
+    }
+    const u = this.gemUi;
+    const parts = [u.g, u.num, u.zone];
+    if (!on) {
+      if (this.gemKey) parts.forEach((o) => o.setVisible(false)), (this.gemKey = '');
+      return;
+    }
+    const n = this.d.gems ?? 0;
+    const key = `${n}|${this.gemStyle}|${this.goalKey}`;
+    if (key === this.gemKey) return;
+    this.gemKey = key;
+    parts.forEach((o) => o.setVisible(true));
+    const g = u.g.clear();
+    u.num.setText(big(n)).setScale(1).setColor(PAL.ice);
+    const mb = this.modeBtn;
+    if (this.gemStyle === 'a') {
+      // A: pod tlačítkem ×1 vpravo, bez rámečku (řádek se dnem a kostmi je vlevo)
+      const nw = u.num.width, cx = mb.x + mb.w - nw - 2;
+      u.num.setOrigin(0, 0.5).setPosition(cx, 89);
+      this.gemShape(g, cx - 16, 89, 22);
+      u.zone.setPosition(cx - 34, 70).setSize(nw + 40, TOP - 72);
+    } else if (this.gemStyle === 'b') {
+      // B: kulatá cedulka vlevo od ×1 v horním řádku
+      const nw = u.num.width, w = nw + 44, h = 40, x = mb.x - 10 - w, y = 21;
+      g.fillStyle(col('ink')).fillRoundedRect(x - 2, y - 2, w + 4, h + 4, 12);
+      g.fillStyle(col('navy')).fillRoundedRect(x, y, w, h, 10);
+      this.gemShape(g, x + 18, y + h / 2, 22);
+      u.num.setOrigin(0, 0.5).setPosition(x + 33, y + h / 2);
+      u.zone.setPosition(x - 4, y - 8).setSize(w + 8, h + 16);
+    } else {
+      // C: cedulka s plusem vpravo dole v liště (jako měna v mobilních hrách)
+      const nw = u.num.width, w = nw + 74, h = 30, x = W - 12 - w, y = 74;
+      g.fillStyle(col('ink')).fillRoundedRect(x - 2, y - 2, w + 4, h + 4, 10);
+      g.fillStyle(col('navy')).fillRoundedRect(x, y, w, h, 8);
+      this.gemShape(g, x + 16, y + h / 2, 20);
+      u.num.setOrigin(0, 0.5).setPosition(x + 30, y + h / 2);
+      g.fillStyle(col('ink')).fillRoundedRect(x + w - 30, y + 2, 28, h - 4, 7);
+      g.fillStyle(col('mint')).fillRoundedRect(x + w - 29, y + 3, 26, h - 6, 6);
+      g.fillStyle(col('white')).fillRect(x + w - 21, y + h / 2 - 1.5, 10, 3).fillRect(x + w - 17.5, y + h / 2 - 5, 3, 10);
+      u.zone.setPosition(x - 4, y - 6).setSize(w + 8, h + 10);
+    }
   }
 
   // ---------- úkol od hostinského: lišta nahoře (úkolníček, úkol, postup, UKAŽ / VYBER) ----------
