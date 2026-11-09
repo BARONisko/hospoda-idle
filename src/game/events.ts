@@ -148,7 +148,8 @@ export class PubEvents {
       const need = Math.max(3, Math.round(10 * (1 - (this.host.brawlCut?.() ?? 0))));
       // jen na podlaze hospody (ne u horní zdi s policemi ani za barem): dlaždice x 2–17, y 6,7–12,5
       const fx0 = Math.max(x0 + 30, v.ox + 2 * 16), fx1 = Math.min(x1 - 30, v.ox + 17 * 16);
-      const fy0 = Math.max(y0 + 50, 6 * 16 + 12), fy1 = Math.min(y1 - 6, 12 * 16 + 8);
+      // ne za ikonami číšníků dole ve výřezu (řada ikon ~86 px obrazovky nad spodním okrajem)
+      const fy0 = Math.max(y0 + 50, 6 * 16 + 12), fy1 = Math.min(y1 + 10 - 90 / (v.cam?.zoom || 1), 12 * 16 + 8);
       const cx = fx1 > fx0 ? Phaser.Math.Between(Math.round(fx0), Math.round(fx1)) : v.ox + 9 * 16;
       const cy = fy1 > fy0 ? Phaser.Math.Between(Math.round(fy0), Math.round(fy1)) : 9 * 16;
       const pool = v.guestKeys();
