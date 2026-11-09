@@ -3076,7 +3076,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const off = this.shopOffer().find((o) => o.cost <= d.coins);
     if (off) return { text: t('V Obchodě si můžeš koupit: {s}.', { s: off.title }), go: open('shop', 'up') };
     if (!this.tileLock('krigl')) {
-      const it = KRIGL_SHOP.find((x) => !kMaxed(x, this.kl(x.id)) && x.cost(this.kl(x.id)) <= d.krigle);
+      // QA (hospoda 67): rada vedla do pasti – každý utracený krígl bere trvalý bonus výdělku. Radit až od 50 krígel,
+      // jen věci za nejvýš 5 % vlastněných krígel a nikdy Delší spánek.
+      const it = d.krigle < 50 ? undefined : KRIGL_SHOP.find((x) => x.id !== 'offline' && !kMaxed(x, this.kl(x.id)) && x.cost(this.kl(x.id)) <= d.krigle * 0.05);
       if (it) return { text: t('Za krígly si můžeš koupit: {s}.', { s: it.name }), go: open('krigl') };
     }
     if (!this.tileLock('keeper') && this.skillPoints() > 0) return { text: t('Hostinský má volný bod – vyber dovednost.'), go: open('keeper') };
