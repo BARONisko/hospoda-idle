@@ -8,7 +8,7 @@ import { confetti, bigText, popText, pointAt } from '../ui/juice';
 import { t } from '../i18n';
 import { big } from '../core/num';
 import { sfx } from '../core/sfx';
-import { DartsState, DART_UPS, dartMs, dartCap, START, NUMS, rings, aimFor, aimLand, autoOn, resolve, ThrowResult, THROW_GAP, migrateDarts } from '../core/darts';
+import { DartsState, DART_UPS, dartMs, dartCap, START, NUMS, rings, aimFor, aimLand, autoOn, resolve, ThrowResult, THROW_GAP, migrateDarts, tickDarts } from '../core/darts';
 import { makeDartboard, BOARD_R } from '../gfx/tourneyArt';
 import type { StatId } from '../core/talisman';
 
@@ -297,7 +297,12 @@ export class DartsScene extends Phaser.Scene {
       this.autoT = THROW_GAP;
       this.throwDart();
     }
-    if (Math.floor(this.tm * 2) !== Math.floor((this.tm - dt) * 2)) this.hudTick();
+    if (Math.floor(this.tm * 2) !== Math.floor((this.tm - dt) * 2)) {
+      // QA hospoda 66: šipky přibývají i s otevřeným terčem (dřív odpočet stál na 0:00)
+      const st = (this.scene.get('Pub') as unknown as { ts?: () => { dspeed: number; dextra: number } }).ts?.();
+      tickDarts(S, Date.now(), false, 0, st?.dspeed ?? 0, st?.dextra ?? 0);
+      this.hudTick();
+    }
   }
 
   // ---------- vylepšení ----------
@@ -317,7 +322,8 @@ export class DartsScene extends Phaser.Scene {
       this.shop();
     }));
     const list = DART_UPS.filter((u) => (this.shopTab === 'game') === !!u.stat);
-    const rh = this.shopTab === 'game' ? 88 : 64;
+    // poslední řádek se musí vejít (Terč má 13 řádků – „Bod navíc“ byl useknutý)
+    const rh = Math.min(this.shopTab === 'game' ? 88 : 64, Math.floor((H - 168) / Math.max(1, list.length)));
     list.forEach((u, i) => {
       const y = 158 + i * rh;
       const lvl = S.up[u.id] ?? 0;

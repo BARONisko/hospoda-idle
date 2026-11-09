@@ -366,3 +366,10 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Pepík nesplatí sekeru, sud s octem, Influencerka rozbije půllitry; Sládek a odmítnutí nic). Sbírka → 5. záložka
   „Návštěvníci“ (d.vis = počet přijetí, volba a); po VIS_GOLD=15 přijetích zlatý rámeček a 2 💎 místo 1; strop
   VIS_GEMS_DAY=10 💎 denně (d.visG). visitors.ts (VisitCtx.gem), PubScene.visitGem/bookVisitors. Test 5c2.
+- Hospoda 66 – CELÁ KONTROLA (5 agentů), opraveno: tlačítka se spouští až po zvednutí prstu a jen bez tažení (btn,
+  tapBlock 300 ms proti propadnutí dvojťuku do tlačítka pod zavřeným oknem); reklama: druhé ťuknutí během reklamy nic
+  (adBusy); Smazat hru: druhé ťuknutí nejdřív po 1 s; Delší noc už nepřepíná den/noc (night.retune drží fázi);
+  výsledek ligy počká na zavřené okno (dřív se ztratil i s talismanem); události jen ve vybrané hospodě; šipky
+  přibývají i s otevřeným terčem; obchod Šipek → Terč se vejde; pivovar „1,6“; poškozené uložení se opraví
+  (save.repair: null/NaN/chybějící pole); hodiny vrácené dozadu neposunou čas odchodu (store/offline) a truhla jen
+  den PO posledním otevření; denní úkoly podle místního dne (dřív UTC). Zbylé nálezy: QA-NALEZY.md.

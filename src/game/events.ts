@@ -74,7 +74,8 @@ export class PubEvents {
     return false;
   }
 
-  start(kind: EventKind, view = Phaser.Math.Between(0, this.host.views.length - 1)) {
+  // QA hospoda 66: událost jen v hospodě, kterou hráč právě vidí (v jiné ji nešlo najít a rvačka tam trvala donekonečna)
+  start(kind: EventKind, view = this.host.views.length > 1 ? (this.host as unknown as { sel: number }).sel ?? 0 : 0) {
     if (this.active) this.end(false);
     const v = this.host.views[view];
     const wv = v.cam.worldView;

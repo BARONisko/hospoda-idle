@@ -18,6 +18,18 @@ export const nightLen = (lvl = nightCfg.lvl) => (NIGHT_BASE + NIGHT_STEP * lvl) 
 const cycle = () => DAY_MS + nightLen();
 const phase = (now: number) => (((now + nightCfg.shift) % cycle()) + cycle()) % cycle();
 
+/** změna délky noci (koupě „Delší noc“, staty) bez přeskočení dne/noci: fáze zůstane, vrací nový posun
+ *  (QA hospoda 66: dřív každá koupě náhodně přepnula den a noc) */
+export function retune(mult: number, lvl: number, now = Date.now()): number {
+  if (mult === nightCfg.mult && lvl === nightCfg.lvl) return nightCfg.shift;
+  const p = phase(now);
+  nightCfg.mult = mult;
+  nightCfg.lvl = lvl;
+  const want = Math.min(p, cycle() - 1);
+  nightCfg.shift = (((want - now) % cycle()) + cycle()) % cycle();
+  return nightCfg.shift;
+}
+
 /** je teď noc? (cyklus podle reálného času) */
 export function isNight(now = Date.now()) {
   if (forced !== null) return forced === '1';

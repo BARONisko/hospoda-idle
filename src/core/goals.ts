@@ -24,7 +24,11 @@ export interface Daily {
   tasks: DailyTask[];
 }
 
-export const today = () => new Date().toISOString().slice(0, 10);
+// místní den (dřív UTC → denní úkoly se v ČR měnily v 1:00 / 2:00, truhla o půlnoci)
+export const today = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 
 /** nové denní úkoly (3 z nabídky); „vydělej“ podle aktuálního výdělku */
 export function newDaily(rate: number): Daily {

@@ -20,7 +20,8 @@ const yesterday = (now: number) => {
   return dayKey(d.getTime());
 };
 
-export const chestReady = (c: ChestState | undefined, now = Date.now()) => !c || c.last !== dayKey(now);
+// jen den PO posledním otevření (hodiny vrácené dozadu nedají truhlu znovu)
+export const chestReady = (c: ChestState | undefined, now = Date.now()) => !c || !c.last || dayKey(now) > c.last;
 /** kolikátý den série by se otevřel teď (1–7); vynechaný den = znovu od 1., po 7. dnu znovu 1. */
 export function chestDay(c: ChestState | undefined, now = Date.now()) {
   if (!c) return 1;

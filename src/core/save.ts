@@ -167,14 +167,30 @@ export function fresh(): Save {
   return { v: 2, coins: 6, earned: 0, pubs: [newPub(1)], up: [], run: 0, krigle: 0, ...extra(), at: Date.now() };
 }
 
+/** QA hospoda 66: poškozené uložení (null / chybějící pole / NaN) dřív zablokovalo hru nebo smazalo coins → opravit */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function repair(d: any): Save {
+  const def = extra() as Record<string, unknown>;
+  for (const k of Object.keys(def)) if (d[k] === null || d[k] === undefined || typeof d[k] !== typeof def[k]) d[k] = def[k];
+  if (!Array.isArray(d.seen)) d.seen = [];
+  if (!Array.isArray(d.up)) d.up = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  d.pubs = Array.isArray(d.pubs) ? d.pubs.filter((p: any) => p && typeof p === 'object') : [];
+  if (!d.pubs.length) return fresh();
+  for (const p of d.pubs) if (!p.st || typeof p.st !== 'object') p.st = {};
+  for (const k of ['coins', 'earned', 'run', 'krigle']) if (!Number.isFinite(d[k])) d[k] = 0;
+  if (!Number.isFinite(d.at)) d.at = Date.now();
+  return d as Save;
+}
+
 export function load(): Save {
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const d = JSON.parse(raw) as any;
-      if (d?.v === 1) return { v: 2, coins: d.coins, earned: d.earned, pubs: [{ act: 1, st: d.st }], up: [], run: d.earned, krigle: 0, ...extra(), at: d.at };
-      if (d?.v === 2) return { up: [], run: d.earned ?? 0, krigle: 0, ...extra(), ...d } as Save;
+      if (d?.v === 1) return repair({ v: 2, coins: d.coins, earned: d.earned, pubs: [{ act: 1, st: d.st }], up: [], run: d.earned, krigle: 0, ...extra(), at: d.at });
+      if (d?.v === 2) return repair({ up: [], run: d.earned ?? 0, krigle: 0, ...extra(), ...d } as Save);
     }
   } catch {
     /* poškozené nebo nedostupné úložiště → nová hra */
@@ -187,7 +203,9 @@ let locked = false;
 
 export function store(d: Save) {
   if (locked) return;
-  d.at = Date.now();
+  // hodiny vrácené dozadu nesmí posunout čas odchodu (přetáčení hodin = opakovaný offline výdělek); víc než den = oprava hodin
+  const now = Date.now();
+  d.at = d.at > now && d.at - now < 86_400_000 ? d.at : now;
   try {
     localStorage.setItem(KEY, JSON.stringify(d));
   } catch {

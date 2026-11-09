@@ -15,7 +15,7 @@ import { season, SEASONS, SEASON_BONUS } from '../core/season';
 const SEASON_WHEN: Record<string, string> = { monk: t('1. 12. – 6. 1.'), muertos0: t('20. 10. – 3. 11.'), brewer: t('15. 9. – 10. 10.') };
 import { VISITORS, Visitor, VisitCtx, VIS_GOLD, VIS_GEMS_DAY, visGems } from '../game/visitors';
 import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward, rivalInfo, rivalRate } from '../core/league';
-import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, nightLen, nightShare, switchPhase, nightCost, nightCostN, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
+import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, retune, nightLen, nightShare, switchPhase, nightCost, nightCostN, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
 import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
 import { notify, NOTE, Note } from '../core/notify';
@@ -536,6 +536,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** výdělek za dobu nepřítomnosti (běží jen stanice s kostlivcem), strop 8 h */
   private offline() {
+    if (!Number.isFinite(this.d.at)) this.d.at = Date.now(); // poškozené uložení → dřív NaN coins
     const leftAt = this.d.at;
     const raw = Math.max(0, (Date.now() - this.d.at) / 1000);
     const cap = this.offCap();
@@ -545,7 +546,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // reklamní kampaň a Štamgast platí jen po dobu, kdy běžely
     const base = rate / adMult(this.d.adv) / (passOn(this.d.pass) ? PASS_MULT : 1);
     const g = Math.floor(base * multSecs(leftAt, leftAt + secs * 1000, [[this.d.adv?.until ?? 0, adPower(this.d.adv)], [this.d.pass?.until ?? 0, PASS_MULT]]));
-    this.d.at = Date.now();
+    // hodiny vrácené dozadu čas odchodu neposunou (jinak přetáčení hodin = opakovaný offline výdělek)
+    if (!(this.d.at > Date.now() && this.d.at - Date.now() < 86_400_000)) this.d.at = Date.now();
     this.mastAdd(secs);
     // číšníci sbírají zkušenosti i offline (jen přes den, podle toho, jak moc mají práce)
     const daySecs = secs * (1 - nightShare());
@@ -1352,7 +1354,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private leagueCheck() {
     this.league();
     const r = this.leagueResult;
-    if (!r || this.awayObjs.length) return;
+    if (!r) return;
+    if (this.awayObjs.length) return void this.time.delayedCall(1000, () => this.leagueCheck());
     this.leagueResult = undefined;
     if (this.leagueWinDrop) {
       this.leagueWinDrop = false;
@@ -1825,7 +1828,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         store(this.d);
         this.openShop('brew', false);
       }, D + 2);
-      this.drawBtn(bt, `${BEERS[k].name}\n×${BEERS[k].value} · ${t('čas ×{t}', { t: BEERS[k].time })}`, true, b.kind === k ? 'amber' : 'slate');
+      this.drawBtn(bt, `${BEERS[k].name}\n×${BEERS[k].value} · ${t('čas ×{t}', { t: String(BEERS[k].time).replace('.', ',') })}`, true, b.kind === k ? 'amber' : 'slate');
       bt.label.setScale(Math.min(1, 150 / bt.label.width));
       this.shopObjs.push(bt.bg, bt.label, bt.zone);
     });
@@ -2192,6 +2195,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (ask) this.time.delayedCall(6100, () => this.tab === 'opts' && this.shopObjs.length && this.openShop('opts', false));
     rows.push([t('Začít znovu'), ask ? t('Opravdu? Ťukni znovu') : t('Smazat hru'), () => {
       if (!ask) return void (this.wipeAsk = Date.now());
+      if (Date.now() - this.wipeAsk < 1000) return; // dvojťuk nesmí smazat hru (QA hospoda 66)
       wipe();
       location.reload();
     }]);
@@ -2408,9 +2412,18 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   /** „reklama“: se Štamgastem nebo bez reklam hned true */
-  private async rewarded() {
+  /** běží reklama (QA hospoda 66: dvojťuk dal dvojí odměnu) */
+  private adBusy = false;
+  private async rewarded(): Promise<boolean> {
+    // druhé ťuknutí během reklamy (nebo hned po ní) se tiše ignoruje – slib se nikdy nesplní
+    if (this.adBusy) return new Promise<boolean>(() => undefined);
     if (passOn(this.d.pass) || this.d.noAds) return true;
-    return ads.rewarded();
+    this.adBusy = true;
+    try {
+      return await ads.rewarded();
+    } finally {
+      this.adBusy = false;
+    }
   }
 
   /** koupený vzhled hospody → PubView (jen vzhled) */
@@ -3736,18 +3749,38 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     });
   }
 
+  /** pojistka proti propadnutí dvojťuku do jiného tlačítka (viz btn) */
+  private tapBlock = 0;
+  private tapLast?: Btn;
   private btn(x: number, y: number, w: number, h: number, fn: () => void, depth = 10): Btn {
     const bg = this.add.graphics().setDepth(depth);
     const label = this.add.text(x + w / 2, y + h / 2, '', txt(h > 40 ? 22 : 16, PAL.white)).setOrigin(0.5).setAlign('center').setDepth(depth + 1);
     const zone = this.add.zone(x, y, w, h).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(depth + 2);
     const b: Btn = { bg, label, zone, x, y, w, h, enabled: true, visible: true };
-    zone.on('pointerdown', () => {
+    const fire = (real = true) => {
       if (!b.visible) return;
+      // ťuknutí těsně po jiném tlačítku (zavřené okno → tlačítko pod ním) se nepočítá; stejné tlačítko jde ťukat rychle
+      const now = Date.now();
+      if (real && now < this.tapBlock && this.tapLast !== b) return;
+      this.tapBlock = now + 300;
+      this.tapLast = b;
       sfx.init();
       if (!b.enabled) return sfx.error();
       fn();
       if (label.active) this.tweens.add({ targets: label, scale: { from: 0.88, to: 1 }, duration: 120 });
+    };
+    // QA hospoda 66: tlačítko se spustí až po zvednutí prstu a jen když se prst nepohnul (tažení nic nekoupí)
+    let start: { x: number; y: number } | null = null;
+    zone.on('pointerdown', (ptr?: Phaser.Input.Pointer) => {
+      if (!ptr) return fire(false); // umělé ťuknutí (testy, návod)
+      start = { x: ptr.x, y: ptr.y };
     });
+    zone.on('pointerup', (ptr: Phaser.Input.Pointer) => {
+      const s0 = start;
+      start = null;
+      if (s0 && Math.hypot(ptr.x - s0.x, ptr.y - s0.y) < 14) fire();
+    });
+    zone.on('pointerout', () => (start = null));
     return b;
   }
 
@@ -4050,6 +4083,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         if (k < 1 || (this.d.bones ?? 0) < c) return sfx.error();
         this.d.bones! -= c;
         dn.lvl += k;
+        this.applyKup();
         sfx.buy();
         refresh();
       }, D + 2);
@@ -4250,13 +4284,18 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   /** promítne vylepšení z krígel do systémů */
+  private nightTuned = false;
   private applyKup() {
     this.ev.freq = kEvents(this.kl('events')) / (1 + this.ts().evfreq) / (hasStyle(this.d.pubs, 'dice') ? 1.25 : 1);
     brewCfg.speed = 1 + this.ts().brew;
     brewCfg.tank = Math.floor(this.ts().tank);
-    nightCfg.mult = 1 + this.ts().night;
-    nightCfg.lvl = this.d.dn?.lvl ?? 0;
     nightCfg.shift = this.d.dn?.shift ?? 0;
+    // první nastavení (start scény) jen převezme hodnoty; každá další změna délky zachová fázi dne/noci
+    if (!this.nightTuned) (nightCfg.mult = 1 + this.ts().night), (nightCfg.lvl = this.d.dn?.lvl ?? 0), (this.nightTuned = true);
+    else {
+      const sh = retune(1 + this.ts().night, this.d.dn?.lvl ?? 0);
+      if (this.d.dn) this.d.dn.shift = sh;
+    }
     PubView.extraGuests = Math.floor(this.ts().guests);
     vipCfg.every = VIP_EVERY / (this.star('vip2') ? 2 : 1);
   }
