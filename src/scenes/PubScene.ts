@@ -3356,6 +3356,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // číšníci (zkušenosti a body) zůstávají i po hygieně
     this.d.pubs.forEach((p, i) => crews[i] && (p.w = crews[i]));
     if (keep) this.d.pubs.forEach((p, i) => (p.mgr = had[i] ?? false));
+    // QA (hospoda 67): kdo po hygieně hned odešel, vydělal offline 0 (bez obsluhy) → pípa 1. hospody rovnou otevřená a s číšníky
+    const tap0 = this.st(this.d.pubs[0], 'tap');
+    tap0.lvl = Math.max(1, tap0.lvl);
+    tap0.auto = true;
     this.d.coins = Math.max(startCoins(this.kl('start')), this.restartNeed());
     store(this.d);
     sfx.fanfare();
@@ -5031,8 +5035,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** kroky průvodce: pokyn, vysvětlení, čím se splní (událost nebo „ok“ = tlačítko), kam ukázat */
   private guideSteps(id: string): { head: string; text: string; done: string; at?: () => number[] | null }[] {
-    const card = (sid: string, what: 'buy' | 'staff') => () => {
-      const c = this.cards.find((k) => k.def.id === sid)?.[what];
+    const card = (sid: string, what: 'buy' | 'staff', pub?: number) => () => {
+      const c = this.cards.find((k) => k.def.id === sid && (pub === undefined || k.pub === pub))?.[what];
       return c && c.visible ? [c.x, c.y, c.w, c.h] : null;
     };
     const menuBtn = () => [this.shopBtn.x, this.shopBtn.y, this.shopBtn.w, this.shopBtn.h];
@@ -5049,8 +5053,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const here = (f: () => number[] | null) => () => (this.views.length > 1 && this.sel !== n - 1 ? tab() : f());
       return [
         { head: t('NOVÁ HOSPODA!'), text: t('ťukni nahoře na „{n}“', { n: name }), done: 'pub:' + (n - 1), at: tab },
-        { head: t('OTEVŘI PÍPU'), text: t('i tady začínáš pípou – kup ji', { n: name }), done: 'buy:tap', at: here(card('tap', 'buy')) },
-        { head: t('NAJMI ČÍŠNÍKY'), text: t('pak tahle hospoda vydělává sama'), done: 'hire', at: here(card('tap', 'staff')) },
+        { head: t('OTEVŘI PÍPU'), text: t('i tady začínáš pípou – kup ji', { n: name }), done: 'buy:tap', at: here(card('tap', 'buy', n - 1)) },
+        { head: t('NAJMI ČÍŠNÍKY'), text: t('pak tahle hospoda vydělává sama'), done: 'hire', at: here(card('tap', 'staff', n - 1)) },
         { head: t('HOSPODY BĚŽÍ NARÁZ'), text: t('všechny vydělávají pořád. Přepínej záložkami nahoře nebo táhni prstem do strany.'), done: 'ok' },
       ];
     }

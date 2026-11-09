@@ -247,8 +247,8 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('průvodce: po přepnutí hospody šipka na záložku, po návratu na tlačítko', await S(p, (s) => {
     s.d.pubs[1].st.tap = { lvl: 1, auto: false, prog: 0 }; s.guideCur = { id: 'pub2', i: 2 }; s.guideShow();
     const st = s.guideSteps('pub2')[2];
-    s.sel = 0; s.refresh(); const a = st.at();
-    s.sel = 1; s.refresh(); const b = st.at();
+    s.selectPub(0); const a = st.at();
+    s.selectPub(1); s.refresh(); const b = st.at();
     const tab = s.pubTabs[1];
     return !!a && a[0] === tab.x && a[1] === tab.y && !!b && b[1] > 400;
   }));
