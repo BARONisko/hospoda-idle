@@ -1,7 +1,7 @@
 # Podklady pro Google Play Console – P.U.B. Idle – Pajzl Tycoon
 
-Vše, co se vyplňuje v Play Console. Odpovědi jsou pravdivé pro současnou hru (reklamy za odměnu AdMob, žádné platby,
-žádné účty, uložení jen v telefonu). Když se hra změní (platby, přihlášení…), odpovědi se musí upravit.
+Vše, co se vyplňuje v Play Console. Odpovědi jsou pravdivé pro současnou hru (reklamy za odměnu AdMob, nákupy v aplikaci
+přes Google Play, žádné účty, uložení jen v telefonu). Když se hra změní (platby, přihlášení…), odpovědi se musí upravit.
 
 ## Základ (Vytvořit aplikaci)
 - Název aplikace: **P.U.B. Idle – Pajzl Tycoon**
@@ -45,7 +45,7 @@ Hraje se jednou rukou, na výšku, a i offline. Reklamy jsou jen dobrovolné –
    - **Alkohol: Ano – odkazy na alkohol / pití** (hra se odehrává v hospodě, točí se pivo).
    - Hazard: **Ne** skutečné peníze; simulovaný hazard: kostky v rohu jsou jen stanice vydělávající coins → odpověz **Ne**
      (pokud se dotazník ptá na „simulované hazardní hry“ a nejsi si jistý, zvol Ano – výsledné hodnocení bude jen přísnější).
-   - Interakce uživatelů / chat: **Ne** · Sdílení polohy: **Ne** · Nákupy digitálního zboží: **Ne** (zatím bez plateb)
+   - Interakce uživatelů / chat: **Ne** · Sdílení polohy: **Ne** · Nákupy digitálního zboží: **Ano** (diamanty, Štamgast, bez reklam – přes Google Play)
 5. **Cílová skupina a obsah:** věk **18 a více** (hospoda, alkohol). Aplikace neláká děti: **Ne**.
 6. **Bezpečnost údajů (Data safety)** – kvůli AdMob:
    - Shromažďuje nebo sdílí aplikace údaje? **Ano**
@@ -60,6 +60,22 @@ Hraje se jednou rukou, na výšku, a i offline. Reklamy jsou jen dobrovolné –
    - Ověř podle návodu Googlu „AdMob – příprava na Data safety“ (developers.google.com/admob/android/privacy/play-data-disclosure).
 7. **Vládní aplikace:** Ne · **Finanční funkce:** žádné · **Zdraví:** žádné · **Zpravodajská aplikace:** Ne
 8. **ID reklamy (Advertising ID):** aplikace ho **používá** – účel **Reklama nebo marketing** (a Analýza).
+
+## Nákupy v aplikaci (Google Play Billing)
+Hra je napojená (src/core/billing.ts, plugin @capgo/native-purchases). Produkty se dají založit až po nahrání
+první verze s Billingem (AAB z Actions) do kteréhokoli tracku.
+1. Play Console → **Nastavení → Platební profil**: založ obchodní platební profil (bez něj nejde nic prodávat).
+2. Play Console → aplikace → **Zpeněžení → Produkty → Produkty v aplikaci** → Vytvořit produkt. ID musí být PŘESNĚ:
+   - `gems100` – „100 diamantů“, 49 Kč
+   - `gems550` – „550 diamantů“, 199 Kč
+   - `pass` – „Štamgast na 30 dní“ (denní diamanty, výdělek navíc, odměny bez reklam), 99 Kč
+   - `noads` – „Bez reklam“ (všechny odměny bez reklamy, navždy), 99 Kč
+   U každého: Aktivovat. Ceny v ostatních zemích nech přepočítat Googlem.
+3. **Testování nákupů zdarma:** Play Console (hlavní stránka účtu) → Nastavení → **Testování licencí** → přidej Gmaily
+   testerů (stejné jako v Google skupině). Jejich nákupy jsou testovací („Testovací karta, vždy schválí“), nic neplatí.
+4. Hra ukáže ceny z obchodu (v měně hráče). „Bez reklam“ se po přeinstalaci obnoví samo; diamanty a Štamgast jsou
+   spotřební (dají se koupit znovu).
+5. Data safety: přidej **Finanční informace → Historie nákupů** – shromažďováno, účel Funkčnost aplikace, nesdíleno.
 
 ## AdMob (reklamy)
 1. Na https://admob.google.com přidej aplikaci (Android, „není zatím v obchodě“), název P.U.B. Idle.

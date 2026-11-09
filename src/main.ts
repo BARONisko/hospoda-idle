@@ -1,6 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { initAdMob } from './core/admob';
+import { initBilling } from './core/billing';
 import Phaser from 'phaser';
 import '@fontsource/jersey-10/latin-ext-400.css';
 import '@fontsource/jersey-10/latin-400.css';
@@ -163,6 +164,7 @@ else
 
 // mobilní aplikace: reklamy za odměnu (AdMob)
 void initAdMob();
+void initBilling();
 
 // PWA: hraní bez internetu (jen v sestavené verzi, ne ve vývoji; v aplikaci Capacitor netřeba)
 if (import.meta.env.PROD && 'serviceWorker' in navigator && location.protocol === 'https:' && !Capacitor.isNativePlatform()) {

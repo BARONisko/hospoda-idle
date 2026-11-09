@@ -10,7 +10,7 @@ import { milestoneCount } from '../core/economy';
 import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H, STYLES, pubStyle, styleGap, styleCount, hasStyle, isStyle, pubStyles, styleSupplyMult, supplyIn, supplyOut, STYLE_MIX, STAR_LVL, STAR_MAX, starsOf, starMult, starCost, starKey, ACT_STEP } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
-import { iap, ProductId, PRODUCTS } from '../core/shop';
+import { iap, ProductId, PRODUCTS, onIapReady } from '../core/shop';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
 /** kdy přijde sezónní host (karta ve Sbírce, dokud ho hráč neviděl; data podle core/season.ts) */
 const SEASON_WHEN: Record<string, string> = { monk: t('1. 12. – 6. 1.'), muertos0: t('20. 10. – 3. 11.'), brewer: t('15. 9. – 10. 10.') };
@@ -216,8 +216,16 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     super('Pub');
   }
 
+  /** právě běžící scéna (obchod se připojí později a jen jednou – viz onIapReady) */
+  static cur?: PubScene;
+  static iapHooked = false;
   create() {
     this.d = load();
+    PubScene.cur = this;
+    if (!PubScene.iapHooked) {
+      PubScene.iapHooked = true;
+      onIapReady(() => void PubScene.cur?.iapRestore());
+    }
     // Chrám Cthulhu už není 4. hospoda (je z něj víkendová událost) → ze starých uložení ho odebrat
     this.d.pubs = this.d.pubs.filter((p) => p.act <= 3).slice(0, MAX_PUBS);
     if (!this.d.pubs.length) this.d.pubs = [newPub(1)];
@@ -2576,6 +2584,18 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     store(this.d);
     sfx.levelUp();
     sfx.cheer();
+    if (this.tab === 'special' && this.shopObjs.length) this.openShop('special', false);
+  }
+
+  /** obchod připojen: obnovit trvalý nákup „bez reklam“ (po přeinstalaci) a překreslit ceny */
+  async iapRestore() {
+    const own = await iap.owned();
+    if (!this.sys.isActive()) return;
+    if (own.includes('noads') && !this.d.noAds) {
+      this.d.noAds = true;
+      store(this.d);
+      this.banner(this.views[0].cam, t('Odměny teď bez reklam'));
+    }
     if (this.tab === 'special' && this.shopObjs.length) this.openShop('special', false);
   }
 

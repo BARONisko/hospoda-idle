@@ -1,10 +1,12 @@
-// Nákupy za skutečné peníze – zatím jen rozhraní (jako ads.ts). Na webu se neprodává: tlačítka ukážou
-// „jen v mobilní aplikaci“. V aplikaci (Capacitor) se sem připojí Google Play / App Store přes setIapProvider().
+// Nákupy za skutečné peníze – rozhraní (jako ads.ts). Na webu se neprodává: tlačítka ukážou „jen v mobilní aplikaci“.
+// V aplikaci se sem připojí Google Play přes setIapProvider() (core/billing.ts).
 export interface IapProvider {
   /** koupí produkt; true = zaplaceno */
   buy(id: ProductId): Promise<boolean>;
   /** cena z obchodu (např. „49 Kč“); jinak se ukáže výchozí */
   price?(id: ProductId): string | undefined;
+  /** trvalé nákupy, které hráč vlastní (obnovení po přeinstalaci) */
+  owned?(): Promise<ProductId[]>;
 }
 
 export type ProductId = 'gems100' | 'gems550' | 'pass' | 'noads';
@@ -17,8 +19,15 @@ export const PRODUCTS: Record<ProductId, { gems?: number; price: string }> = {
 };
 
 let provider: IapProvider | null = null;
+const listeners: (() => void)[] = [];
 export function setIapProvider(p: IapProvider | null) {
   provider = p;
+  listeners.forEach((f) => f());
+}
+/** zavolá se, když se obchod připojí (hra pak obnoví trvalé nákupy a překreslí ceny) */
+export function onIapReady(f: () => void) {
+  listeners.push(f);
+  if (provider) f();
 }
 
 export const iap = {
@@ -34,6 +43,13 @@ export const iap = {
       return await provider.buy(id);
     } catch {
       return false;
+    }
+  },
+  async owned(): Promise<ProductId[]> {
+    try {
+      return (await provider?.owned?.()) ?? [];
+    } catch {
+      return [];
     }
   },
 };

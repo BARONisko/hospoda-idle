@@ -386,3 +386,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Hospoda 68: drobné písmo B natrvalo (výběr uživatele, docs/navrhy-ui/pismo-ABC.png): větší a světlejší štítky a zamčené
   dlaždice Menu, horní lišta Den/kosti, „ťukni sem!“ zlatě, Kostnice přehled 19 px, záložky Sbírky na 2 řádky,
   podzáložky a popisky Diamantů, patička jen „nákup jen v mobilní aplikaci“. Parametr ?font zrušen (PubScene.FONT).
+- Hospoda 68: nákupy přes Google Play Billing (core/billing.ts, @capgo/native-purchases 8.9.6): gems100/gems550/pass
+  spotřební, noads trvalý (obnoví se po přeinstalaci – shop.onIapReady → PubScene.iapRestore); ceny z obchodu.
+  Návod pro Play Console (produkty, platební profil, licenční testeři): docs/play-console.md.
