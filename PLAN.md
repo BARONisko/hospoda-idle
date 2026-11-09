@@ -377,3 +377,9 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   hygiena od 7 % krígel; oprava pádu „reading 'cut'“; po hygieně pípa s číšníky; Zpět/Escape; rada krígel; azbuka Handjet;
   VIP hvězda nad hlavou; větší neviditelná dotyková místa (ui/touch.ts). Čeká: písmo A/B/C, liga 💎, odemykání, dlaždice menu.
   Předávka: handoff-2026-11-09d.md.
+- Hospoda 68 (rozhodnutí uživatele): menu se odemyká pomaleji – krígly po 1., pivovar 3., Chrám 6., výzdoba 10., šipky 15.,
+  liga 20. hygieně (odemčené zůstává, d.menuOpen). Talismany už nejsou dlaždice – tlačítko v Kostnici vedle Den a noc
+  (zpět → Kostnice; úkol „Talismany“ ukazuje Menu → Kostnice → tlačítko). Pass (Štamgast) už byl ve Speciální nabídce.
+  Liga za 💎 (league.ts LG_BOOST/LG_WILD/LG_STOP, TIER_F beze změny): Posila ×2 = 20 💎, tržba do ligy ×2 na 1 h, 1× denně
+  (offline jen překryv – boostShare); Divoká karta = 50 💎, prohra bez sestupu, 1× týdně, od 2. ligy; Zavřít pípu = 30 💎,
+  soupeř 2 h nepřibývá, 1× denně. Hodiny vrácené dozadu okna neprodlouží (fxOn: from ≤ now). Testy 5i3, menu odemykání.

@@ -15,7 +15,7 @@ import { season, SEASONS, SEASON_BONUS } from '../core/season';
 /** kdy přijde sezónní host (karta ve Sbírce, dokud ho hráč neviděl; data podle core/season.ts) */
 const SEASON_WHEN: Record<string, string> = { monk: t('1. 12. – 6. 1.'), muertos0: t('20. 10. – 3. 11.'), brewer: t('15. 9. – 10. 10.') };
 import { VISITORS, Visitor, VisitCtx, VIS_GOLD, VIS_GEMS_DAY, visGems } from '../game/visitors';
-import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward, rivalInfo, rivalRate } from '../core/league';
+import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward, rivalInfo, rivalRate, LG_BOOST, LG_WILD, LG_STOP, fxOn, fxLeft, boostShare } from '../core/league';
 import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, retune, nightLen, nightShare, switchPhase, nightCost, nightCostN, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
 import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
@@ -574,7 +574,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const after = rivalTick(L);
       rival = { add: after - before, lead: 0 };
     }
-    this.gain(coins);
+    this.gain(coins, L.start <= leftAt ? boostShare(L, leftAt, Date.now()) : 0);
     this.d.bones = (this.d.bones ?? 0) + bones;
     if (rival) rival.lead = L.me - (L.rival ?? 0);
     store(this.d);
@@ -686,15 +686,16 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (d.menuOpen?.includes(name)) return null;
     // menu se odemyká postupně (přání uživatele): ne všechno naráz po 1. hygieně
     // pořadí (přání uživatele): nejvýš jedna novinka za kolo, vždy se šipkou a krátkým návodem
-    // 1. hygiena krígly · první noc kosti (Kostnice, Sběrač) · 2. pivovar · 3. Chrám · 4. výzdoba · 5. šipky · 6. Liga
+    // 1. hygiena krígly · první noc kosti (Kostnice, Sběrač) · 3. pivovar · 6. Chrám · 10. výzdoba · 15. šipky · 20. Liga
+    // (pomaleji – přání uživatele, dřív 1–6 a vše odemčené za ~1 h)
     const hyg = d.stats.prestiges, after = (n: number) => (hyg >= n ? null : t('po {n}. hygieně', { n: String(n) }));
     switch (name) {
       case 'krigl': return after(1);
-      case 'brew': return after(2);
-      case 'temple': return after(3);
-      case 'decor': return after(4);
-      case 'darts': return after(5);
-      case 'league': return after(6);
+      case 'brew': return after(3);
+      case 'temple': return after(6);
+      case 'decor': return after(10);
+      case 'darts': return after(15);
+      case 'league': return after(20);
       case 'daynight': return d.nightInfo ? null : t('po první noci');
       case 'keeper': return (d.klvl ?? 1) >= 5 ? null : t('od 5. úrovně hostinského');
       case 'talis': return Object.keys(d.talis ?? {}).length ? null : t('po nálezu talismanu');
@@ -1114,7 +1115,6 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     ['temple', null, t('Chrám'), 'obj', 'dIdol1'],
     ['brew', null, t('Pivovar'), 'obj', 'fermenter'],
     ['league', null, t('Liga'), 'obj', 'trophy'],
-    ['talis', null, t('Talismany'), 'icons', 'upAmulet'],
     ['shop', 'bones', t('Kostnice'), 'obj', 'dSkulls'],
     ['darts', null, t('Šipky'), 'tourney', 'dartRed'],
     ['coll', null, t('Sběrač'), 'icons', 'tray'],
@@ -1220,11 +1220,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // hlavička: v mřížce jen ✕, v sekci „← Menu“ + název
     if (tab !== 'home') {
       // Den a noc je teď v Kostnici → zpět do Kostnice
-      const dn = tab === 'daynight';
+      const dn = tab === 'daynight' || tab === 'talis';
       const back = this.btn(10, y0 + 10, 130, 42, () => (dn ? ((this.shopSub = 'bones'), this.openShop('shop', false)) : this.openShop('home', false)), D + 5);
       this.drawBtn(back, dn ? t('← Kostnice') : t('← Menu'), true, 'plum');
       const tile = PubScene.TILES.find(([tb, sub]) => tb === tab && (tab !== 'shop' || sub === this.shopSub));
-      const title = this.add.text(W / 2 + 30, y0 + 31, dn ? t('Den a noc') : tab === 'chest' ? t('Denní truhla') : tile?.[2] ?? '', txt(28, PAL.gold)).setOrigin(0.5).setDepth(D + 5);
+      const title = this.add.text(W / 2 + 30, y0 + 31, tab === 'talis' ? t('Talismany') : dn ? t('Den a noc') : tab === 'chest' ? t('Denní truhla') : tile?.[2] ?? '', txt(28, PAL.gold)).setOrigin(0.5).setDepth(D + 5);
       title.setScale(Math.min(1, 260 / title.width));
       this.shopObjs.push(back.bg, back.label, back.zone, title);
     }
@@ -1278,10 +1278,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.tabTutKey = key;
       this.tabTutUntil = Date.now() + 7000;
     } else if (this.tabTutKey !== key || Date.now() > this.tabTutUntil) return;
-    // hlavní tlačítko = první aktivní tlačítko pod hlavičkou (v Kostnici druhé – první je Den a noc)
+    // hlavní tlačítko = první aktivní tlačítko pod hlavičkou (v Kostnici třetí – před ním Den a noc a Talismany)
     const zs = this.shopObjs.filter((o): o is Phaser.GameObjects.Zone => o instanceof Phaser.GameObjects.Zone && o.visible && o.y > yMin);
     // Hostinský: KOUPIT u uzlu se šipkou; Mistrovství: 1. stanice (poslední zóna); Sbírka: 1. karta (za 5 záložkami)
-    const z = key === 'keeper' || key === 'mast' ? zs[zs.length - 1] : key === 'book' ? zs[5] : zs[key === 'bones' ? 1 : 0];
+    // Liga: bez šipky (tlačítka za 💎 dole nejsou hlavní akce)
+    const z = key === 'league' ? undefined : key === 'keeper' || key === 'mast' ? zs[zs.length - 1] : key === 'book' ? zs[5] : zs[key === 'bones' ? 2 : 0];
     // málo místa nad tlačítkem → šipka zespodu a text pod ní
     const below = !!z && z.y - yMin < 110;
     const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
@@ -1351,7 +1352,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (L) {
         const rival = rivalTick(L, weekEnd(L));
         const win = L.me > rival;
-        this.leagueResult = { win, me: L.me, rival, tier, name: rivalInfo(L).name };
+        this.leagueResult = { win, me: L.me, rival, tier, name: rivalInfo(L).name, wild: !win && !!L.wild && tier > 1 };
         this.d.leagueHist = [...(this.d.leagueHist ?? []), [tier, win] as [number, boolean]].slice(-8);
         if (win) {
           this.d.krigle += winReward(tier);
@@ -1360,7 +1361,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
           if (this.d.darts) this.d.darts.pts += 3;
           this.leagueWinDrop = true;
           tier = Math.min(LEAGUES.length, tier + 1);
-        } else tier = Math.max(1, tier - 1);
+        } else if (!L.wild) tier = Math.max(1, tier - 1); // Divoká karta: zůstává
       }
       // soupeř vyrovnaný podle minulého týdne (kolik hráč skutečně vydělal), vyšší liga o kus silnější
       const my = Math.max(1, this.totalRate());
@@ -1375,7 +1376,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   leagueLive?: () => void;
   leagueLiveT = 0;
   dnT = 1;
-  leagueResult?: { win: boolean; me: number; rival: number; tier: number; name: string };
+  leagueResult?: { win: boolean; me: number; rival: number; tier: number; name: string; wild?: boolean };
   leagueWinDrop = false;
 
   /** okno s výsledkem minulého týdne */
@@ -1399,7 +1400,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const tx = (y: number, s2: string, size: number, c: string) => objs.push(this.add.text(W / 2, y, s2, txt(size, c)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 100).setDepth(D + 2));
     tx(284, r.win ? t('Vyhrál jsi ligu!') : t('Prohrál jsi ligu…'), 34, r.win ? PAL.gold : PAL.scarlet);
     tx(344, t('Tvoje tržba: {a} coins\n{s}: {b} coins', { a: big(r.me), b: big(r.rival), s: r.name }), 22, PAL.bone);
-    tx(420, r.win ? t('Odměna: +{k} krígel, +{g} 💎 a talisman. Postupuješ do: {l}', { k: big(winReward(r.tier)), g: GEMS_FREE.league * r.tier, l: LEAGUES[Math.min(LEAGUES.length, r.tier + 1) - 1] }) : t('Sestupuješ do: {l}', { l: LEAGUES[Math.max(1, r.tier - 1) - 1] }), 22, r.win ? PAL.mint : PAL.fog);
+    tx(420, r.win ? t('Odměna: +{k} krígel, +{g} 💎 a talisman. Postupuješ do: {l}', { k: big(winReward(r.tier)), g: GEMS_FREE.league * r.tier, l: LEAGUES[Math.min(LEAGUES.length, r.tier + 1) - 1] }) : r.wild ? t('Divoká karta – zůstáváš: {l}', { l: LEAGUES[r.tier - 1] }) : t('Sestupuješ do: {l}', { l: LEAGUES[Math.max(1, r.tier - 1) - 1] }), 22, r.win ? PAL.mint : PAL.fog);
     const close = () => {
       objs.forEach((o) => o.destroy());
       this.awayObjs = [];
@@ -1481,6 +1482,45 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const cx = 140 + i * 46;
       g.fillStyle(col(win ? 'green' : 'red')).fillRoundedRect(cx, y0 + 460, 40, 32, 8);
       add(this.add.text(cx + 20, y0 + 476, `${win ? '✓' : '✗'}${tier}`, txt(16, PAL.white)).setOrigin(0.5).setDepth(D + 2));
+    });
+    this.leagueGems(L, y0 + 504, D);
+  }
+
+  /** utrácení 💎 v lize: Posila na směnu, Divoká karta, Zavřít soupeři pípu */
+  private leagueGems(L: LeagueState, y: number, D: number) {
+    const gems = this.d.gems ?? 0, today = dayKey(), now = Date.now();
+    const mm = (ms: number) => `${Math.floor(ms / 3600_000)}:${String(Math.floor((ms % 3600_000) / 60_000)).padStart(2, '0')}`;
+    const boostL = fxLeft(L.boostFrom, LG_BOOST.ms, now), stopL = fxLeft(L.stopFrom, LG_STOP.ms, now);
+    const items: { label: string; cost: number; state?: string; ok: boolean; color: 'green' | 'plum' | 'red'; buy: () => string }[] = [
+      { label: t('Posila ×2'), cost: LG_BOOST.gems, color: 'green',
+        state: boostL ? t('běží {t}', { t: mm(boostL) }) : L.boostDay === today ? t('zase zítra') : undefined,
+        ok: !boostL && L.boostDay !== today,
+        buy: () => ((L.boostFrom = Date.now()), (L.boostDay = today), t('Posila na směnu! Tržba do ligy ×2 na 1 h')) },
+      { label: t('Divoká karta'), cost: LG_WILD, color: 'plum',
+        state: L.wild ? t('máš ✓') : L.tier === 1 ? t('od 2. ligy') : undefined,
+        ok: !L.wild && L.tier > 1,
+        buy: () => ((L.wild = true), t('Divoká karta: tento týden nesestoupíš')) },
+      { label: t('Zavřít pípu'), cost: LG_STOP.gems, color: 'red',
+        state: stopL ? t('běží {t}', { t: mm(stopL) }) : L.stopDay === today ? t('zase zítra') : undefined,
+        ok: !stopL && L.stopDay !== today,
+        buy: () => ((L.stopFrom = Date.now()), (L.stopDay = today), t('Soupeři teče jen pěna – 2 h nepřibývá')) },
+    ];
+    const bw = (W - 40) / 3;
+    items.forEach((it, i) => {
+      const x = 10 + i * (bw + 10);
+      const b = this.btn(x, y, bw, 70, () => {
+        if (!it.ok) return sfx.error();
+        if ((this.d.gems ?? 0) < it.cost) return this.banner(this.views[0].cam, t('Málo 💎')), sfx.error();
+        rivalTick(L); // soupeř dopočítaný do teď, ať se zavřená pípa nepočítá zpětně
+        this.d.gems = (this.d.gems ?? 0) - it.cost;
+        this.banner(this.views[0].cam, it.buy(), true);
+        sfx.buy();
+        store(this.d);
+        this.openShop('league', false);
+      }, D + 3);
+      this.drawBtn(b, `${it.label}\n${it.state ?? it.cost + ' 💎'}`, it.ok && gems >= it.cost, it.color);
+      b.label.setScale(Math.min(1, (bw - 10) / b.label.width));
+      this.shopObjs.push(b.bg, b.label, b.zone);
     });
   }
 
@@ -3012,7 +3052,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (this.shopObjs.length) {
       // podsekce otevřená z mřížky Menu → zpět do mřížky (jako „← Menu“); Obchod, Úkoly a mřížka se zavřou (jako ✕)
       const inGrid = PubScene.TILES.some(([tb, sub]) => tb === this.tab && (tb !== 'shop' || sub === this.shopSub));
-      if (!tut && this.tab === 'daynight') (this.shopSub = 'bones'), this.openShop('shop', false);
+      if (!tut && (this.tab === 'daynight' || this.tab === 'talis')) (this.shopSub = 'bones'), this.openShop('shop', false);
       else if (!tut && inGrid) this.openShop('home', false);
       else {
         this.closeShop();
@@ -4305,6 +4345,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   ossBusy = false;
 
   /** Kostnice: zaplatíš kostňákovi, ten hodí kostkou a náhodný stat se trochu zvedne */
+  talisBtn?: Btn;
   private bonesTab(y0: number, D: number) {
     const bones = this.d.bones ?? 0;
     const rolls = this.d.ossRolls ?? 0;
@@ -4318,9 +4359,21 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     qt.setScale(Math.min(1, 34 / qt.height));
     add(this.add.text(130, y0 + 78, t('máš {n} kostí', { n: big(bones) }), txt(20, PAL.gold)).setDepth(D + 2));
     // Den a noc (dřív samostatná dlaždice v Menu, teď tu)
-    const dnb = this.btn(130, y0 + 104, 170, 38, () => this.openShop('daynight', false), D + 3);
+    const dnb = this.btn(130, y0 + 104, 136, 38, () => this.openShop('daynight', false), D + 3);
     this.drawBtn(dnb, t('Den a noc'), !this.tileLock('daynight'), 'blue');
-    this.shopObjs.push(dnb.bg, dnb.label, dnb.zone);
+    dnb.label.setScale(Math.min(1, 126 / dnb.label.width));
+    // Talismany (dřív samostatná dlaždice v Menu – méně dlaždic, přání uživatele)
+    const tlk = this.tileLock('talis');
+    const tb = this.btn(272, y0 + 104, 136, 38, () => {
+      if (tlk) return this.banner(this.views[0].cam, t('{s}: otevře se {c}', { s: t('Talismany'), c: tlk }));
+      this.qVisit('talis');
+      this.guideEv('tile:talis');
+      this.openShop('talis', false);
+    }, D + 3);
+    this.talisBtn = tb;
+    this.drawBtn(tb, t('Talismany'), !tlk, 'plum');
+    tb.label.setScale(Math.min(1, 126 / tb.label.width));
+    this.shopObjs.push(dnb.bg, dnb.label, dnb.zone, tb.bg, tb.label, tb.zone);
     // kostka
     const die = add(this.add.graphics().setDepth(D + 3));
     const dx = W - 90, dy = y0 + 75;
@@ -4514,11 +4567,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     vipCfg.every = VIP_EVERY / (this.star('vip2') ? 2 : 1);
   }
 
-  private gain(n: number) {
+  /** boost = podíl výdělku v Posile na směnu (offline jen překryv s ní); jinak podle toho, jestli běží teď */
+  private gain(n: number, boost?: number) {
     this.d.coins += n;
     this.d.earned += n;
     this.d.run += n;
-    if (this.d.league) this.d.league.me += n;
+    const L = this.d.league;
+    if (L) L.me += n * (1 + (boost ?? (fxOn(L.boostFrom, LG_BOOST.ms) ? 1 : 0)));
     this.task('earn', n);
   }
 
@@ -5069,6 +5124,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const tileR = (key: string) => {
       if (key === 'tasks' || key === 'up') return r(this.navBtns[key === 'up' ? 1 : 2]);
       if (!this.shopObjs.length) return r(this.shopBtn);
+      // Talismany jsou v Kostnici: Menu → Kostnice → tlačítko Talismany
+      if (key === 'talis') {
+        if (this.tab === 'shop' && this.shopSub === 'bones') return r(this.talisBtn);
+        key = 'bones';
+      }
       if (this.tab !== 'home') return null;
       const k = PubScene.TILES.findIndex(([tb, sub]) => (sub && tb === 'shop' ? sub : tb) === key);
       const y0 = MENU_Y0, tw = (W - 40) / 3;

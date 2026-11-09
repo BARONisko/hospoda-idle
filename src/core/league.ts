@@ -23,6 +23,32 @@ export interface LeagueState {
   slowUntil?: number;
   /** můj výdělek za sekundu na začátku týdne (pro vyrovnání dalšího týdne) */
   base?: number;
+  /** 💎 Posila na směnu: od kdy (ms) a v který den (max 1× denně) */
+  boostFrom?: number;
+  boostDay?: string;
+  /** 💎 Divoká karta: tento týden při prohře nesestoupíš */
+  wild?: boolean;
+  /** 💎 Zavřená pípa soupeře: od kdy (ms) a v který den (max 1× denně) */
+  stopFrom?: number;
+  stopDay?: string;
+}
+
+// ---------- utrácení 💎 v lize (přání uživatele) ----------
+/** Posila na směnu: tržba do ligy ×2 na 1 h, max 1× denně */
+export const LG_BOOST = { gems: 20, ms: 3600_000 };
+/** Divoká karta: při prohře nesestoupíš, 1× týdně (platí pro tento týden) */
+export const LG_WILD = 50;
+/** Zavřít soupeři pípu: soupeř 2 h nepřibývá, max 1× denně */
+export const LG_STOP = { gems: 30, ms: 2 * 3600_000 };
+/** běží teď okno [from, from + ms)? (hodiny vrácené dozadu → neběží, neprodlouží se) */
+export const fxOn = (from: number | undefined, ms: number, now = Date.now()) => from !== undefined && from <= now && now < from + ms;
+/** zbývající čas okna (ms) */
+export const fxLeft = (from: number | undefined, ms: number, now = Date.now()) => (fxOn(from, ms, now) ? from! + ms - now : 0);
+/** jaký podíl úseku [a, b) spadá do Posily (pro výdělek offline) */
+export function boostShare(L: LeagueState, a: number, b: number) {
+  if (L.boostFrom === undefined || b <= a) return fxOn(L.boostFrom, LG_BOOST.ms, b) ? 1 : 0;
+  const o = Math.min(b, L.boostFrom + LG_BOOST.ms) - Math.max(a, L.boostFrom);
+  return Math.max(0, Math.min(1, o / (b - a)));
 }
 
 // ---------- soupeř jako člověk: jméno, hospoda, postavička ----------
@@ -108,7 +134,8 @@ export function rivalTick(L: LeagueState, now = Date.now()) {
   while (L.rAt < end) {
     const dt = Math.min(60_000, end - L.rAt);
     const mid = L.rAt + dt / 2;
-    L.rival += rivalSpeed(L, mid) * push(L.me, L.rival, L.rate) * (mid < (L.slowUntil ?? 0) ? 0.5 : 1) * (dt / 1000);
+    const stop = L.stopFrom !== undefined && mid >= L.stopFrom && mid < L.stopFrom + LG_STOP.ms;
+    L.rival += stop ? 0 : rivalSpeed(L, mid) * push(L.me, L.rival, L.rate) * (mid < (L.slowUntil ?? 0) ? 0.5 : 1) * (dt / 1000);
     L.rAt += dt;
   }
   return L.rival;

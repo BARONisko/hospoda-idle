@@ -1290,5 +1290,16 @@
  "krígly: {k} (+{b} % výdělek) · 💎 zase zítra": "tankards: {k} (+{b} % income) · 💎 again tomorrow",
  "Ukončit hru?": "Quit the game?",
  "Ano": "Yes",
- "Ne": "No"
+ "Ne": "No",
+ "Divoká karta – zůstáváš: {l}": "Wild card – you stay in: {l}",
+ "Posila ×2": "Boost ×2",
+ "zase zítra": "again tomorrow",
+ "Divoká karta": "Wild card",
+ "máš ✓": "owned ✓",
+ "od 2. ligy": "from league 2",
+ "Zavřít pípu": "Close tap",
+ "Posila na směnu! Tržba do ligy ×2 na 1 h": "Shift boost! League earnings ×2 for 1 h",
+ "Divoká karta: tento týden nesestoupíš": "Wild card: no relegation this week",
+ "Soupeři teče jen pěna – 2 h nepřibývá": "Rival's tap only foams – no gain for 2 h",
+ "Málo 💎": "Not enough 💎"
 }

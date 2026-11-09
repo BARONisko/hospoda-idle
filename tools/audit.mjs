@@ -49,7 +49,7 @@ for (const lang of langs) {
     const s = game.scene.getScene('Pub');
     const d = s.d;
     d.tut = -1; d.coins = 3.3e12; d.gems = 1234; d.bones = 5.5e6; d.krigle = 4321; d.klvl = 40;
-    d.stats.prestiges = 6;
+    d.stats.prestiges = 20;
     // jednorázové nápovědy (šipka + řádek přes obsah, záměr) vypnout – audit hledá trvalé chyby
     d.tabTut = Object.keys(s.constructor.TAB_TUT); s.tabTutKey = ''; d.brewTut = -1;
     s.awayObjs.forEach((o) => o.destroy()); s.awayObjs = [];

@@ -1290,5 +1290,16 @@
  "krígly: {k} (+{b} % výdělek) · 💎 zase zítra": "Krüge: {k} (+{b} % Einkommen) · 💎 erst morgen wieder",
  "Ukončit hru?": "Spiel beenden?",
  "Ano": "Ja",
- "Ne": "Nein"
+ "Ne": "Nein",
+ "Divoká karta – zůstáváš: {l}": "Wildcard – du bleibst in: {l}",
+ "Posila ×2": "Verstärkung ×2",
+ "zase zítra": "morgen wieder",
+ "Divoká karta": "Wildcard",
+ "máš ✓": "hast du ✓",
+ "od 2. ligy": "ab Liga 2",
+ "Zavřít pípu": "Zapfhahn zu",
+ "Posila na směnu! Tržba do ligy ×2 na 1 h": "Verstärkung! Liga-Umsatz ×2 für 1 h",
+ "Divoká karta: tento týden nesestoupíš": "Wildcard: diese Woche kein Abstieg",
+ "Soupeři teče jen pěna – 2 h nepřibývá": "Beim Rivalen nur Schaum – 2 h kein Umsatz",
+ "Málo 💎": "Zu wenig 💎"
 }

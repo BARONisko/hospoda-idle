@@ -191,6 +191,50 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   });
   if (lg2 !== true) console.log(lg2);
   ok('liga: soupeř se jménem, síla podle minulého týdne', lg2 === true);
+  // 5i3) liga za 💎: Posila ×2 (tržba do ligy dvojnásob), Zavřít pípu (soupeř stojí), Divoká karta (prohra bez sestupu)
+  const lg3 = await S(p, (s) => {
+    s.d.gems = 200;
+    let L = s.league(); L.tier = 3;
+    s.openShop('league', false);
+    for (let i = 0; i < 3; i++) { s.openShop('league', false); s.shopObjs.filter((o) => o.type === 'Zone').slice(-3)[i].emit('pointerdown'); }
+    L = s.d.league;
+    const spent = s.d.gems === 200 - 20 - 50 - 30;
+    const m0 = L.me; s.gain(100); const boost = L.me - m0 === 200;
+    const stopOn = L.stopFrom > 0 && L.wild === true;
+    // druhé ťuknutí týž den nic nestojí
+    s.openShop('league', false);
+    for (let i = 0; i < 3; i++) { s.openShop('league', false); s.shopObjs.filter((o) => o.type === 'Zone').slice(-3)[i].emit('pointerdown'); }
+    const once = s.d.gems === 100;
+    s.closeShop();
+    // prohra s Divokou kartou: zůstává ve 3. lize
+    L.start -= 7 * 86400000; L.me = 0; L.rate = 100; s.leagueCheck();
+    const stay = s.d.league.tier === 3;
+    s.awayObjs.forEach((o) => o.destroy()); s.awayObjs = [];
+    return spent && boost && stopOn && once && stay ? true : JSON.stringify({ spent, boost, stopOn, once, stay, g: s.d.gems });
+  });
+  if (lg3 !== true) console.log(lg3);
+  ok('liga 💎: posila ×2, zavřená pípa, divoká karta (1× denně / týdně)', lg3 === true);
+  // odemykání menu pomaleji: pivovar po 3., Chrám 6., výzdoba 10., šipky 15., liga 20. hygieně; co bylo odemčené, zůstává
+  ok('menu: odemykání 1/3/6/10/15/20 hygien, odemčené zůstává', await S(p, (s) => {
+    const pr = s.d.stats.prestiges, mo = s.d.menuOpen; s.d.menuOpen = [];
+    const at = (n, k) => ((s.d.stats.prestiges = n - 1), !!s.tileLock(k)) && ((s.d.stats.prestiges = n), !s.tileLock(k));
+    const r = at(1, 'krigl') && at(3, 'brew') && at(6, 'temple') && at(10, 'decor') && at(15, 'darts') && at(20, 'league');
+    s.d.stats.prestiges = 0; s.d.menuOpen = ['league']; const keep = !s.tileLock('league');
+    s.d.stats.prestiges = pr; s.d.menuOpen = mo;
+    return r && keep && !s.constructor.TILES.some((x) => x[0] === 'talis');
+  }));
+  // zavřená pípa: soupeř 2 h nepřibývá (čistá funkce přes stav)
+  ok('liga 💎: soupeř se zavřenou pípou stojí, po 2 h zase přibývá', await S(p, (s) => {
+    const L = s.league(), now = Date.now();
+    L.stopFrom = now - 1800_000; L.rAt = now - 1200_000; L.rival = 5;
+    s.openShop('league', false);
+    const stood = L.rival === 5;
+    L.stopFrom = now - 3 * 3600_000; L.rAt = now - 1200_000;
+    s.openShop('league', false);
+    const runs = L.rival > 5;
+    s.closeShop();
+    return stood && runs;
+  }));
   // 6) prestiž
   await S(p, (s) => { s.d.run = 1e8; s.d.pubs[0].st.tap.lvl = 500; s.askPrestige(); s.prestige(); });
   await p.waitForTimeout(800);
