@@ -5,7 +5,7 @@ přes Google Play, žádné účty, uložení jen v telefonu). Když se hra změ
 
 ## Základ (Vytvořit aplikaci)
 - Název aplikace: **P.U.B. Idle – Pajzl Tycoon**
-- Výchozí jazyk: **čeština – cs-CZ**
+- Výchozí jazyk: **angličtina – en-US** (rozhodnutí uživatele h69; čeština jako překlad)
 - Aplikace nebo hra: **Hra** · Zdarma nebo placená: **Zdarma**
 - Balíček (package name, nastaví se nahráním AAB): `cz.baronisko.pubidle`
 
