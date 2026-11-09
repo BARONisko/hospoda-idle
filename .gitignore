@@ -5,3 +5,6 @@ tools/_tmp
 dist-offline
 *.jks
 *.keystore
+
+# pracovní kopie pomocníků Claude
+.claude/worktrees/
