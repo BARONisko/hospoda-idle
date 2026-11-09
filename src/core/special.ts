@@ -133,9 +133,13 @@ export const GEM_COST = {
   hhnow: 5, quiver: 5, brewnow: 10, vipnow: 15, skip4: 20, skip24: 90,
   // napořád
   chestbot: 400, off1: 250, off2: 500, off3: 750, vipdoor: 600, autohh: 900, chronicle: 1200,
+  // vzhled hospody (jen vzhled, výdělek nemění): selská pípa, dubové stoly, livreje číšníků
+  lookTap: 150, lookTables: 200, lookLivery: 300,
 } as const;
 /** trvalé položky (kupují se jednou) */
-export const GEM_PERM: GemItem[] = ['chestbot', 'off1', 'off2', 'off3', 'vipdoor', 'autohh', 'chronicle'];
+export const GEM_PERM: GemItem[] = ['chestbot', 'off1', 'off2', 'off3', 'vipdoor', 'autohh', 'chronicle', 'lookTap', 'lookTables', 'lookLivery'];
+/** vzhled hospody za diamanty */
+export const GEM_LOOK: GemItem[] = ['lookTap', 'lookTables', 'lookLivery'];
 /** Pivní kronika: trvalý bonus výdělku */
 export const CHRONICLE_BONUS = 0.1;
 export type GemItem = keyof typeof GEM_COST;

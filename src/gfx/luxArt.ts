@@ -1,8 +1,8 @@
 import { PixelCanvas, hash } from './pixel';
 import type { PalKey } from '../data/palette';
 
-// Vzhled hospody za diamanty (jen vzhled): pípa, stoly, lustr – tři styly návrhů (a = zlato a mahagon,
-// b = selská dubová, c = grand hotel). Klíče v atlasu „obj“: luxTap_<s>, luxTable_<s>, luxLamp_<s>.
+// Vzhled hospody za diamanty (jen vzhled): měděná pípa s chmelem a dubové stoly s běhounem (návrh B, docs/navrhy-ui/
+// hospoda-za-diamanty-ABC.png; ostatní styly a/b/c zůstávají v kódu pro případné další sady). Atlas „obj“: luxTap, luxTable.
 
 export type LuxStyle = 'a' | 'b' | 'c';
 
@@ -103,75 +103,10 @@ function luxTable(s: LuxStyle): PixelCanvas {
   return p;
 }
 
-/** vyřízne elipsu (průhledná) */
-function hole(p: PixelCanvas, cx: number, cy: number, rx: number, ry: number) {
-  for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++)
-    for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++) if (((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1) p.set(x, y, null);
-}
-
-/** lustr se svíčkami (visí od stropu) */
-function luxLamp(s: LuxStyle): PixelCanvas {
-  const p = new PixelCanvas(44, 34);
-  const metal: PalKey = s === 'b' ? 'dusk' : s === 'c' ? 'fog' : 'gold';
-  const metalHi: PalKey = s === 'b' ? 'slate' : s === 'c' ? 'white' : 'sand';
-  // řetěz
-  for (let y = 0; y < 12; y++) p.set(22, y, y % 2 ? metal : metalHi);
-  if (s === 'b') {
-    // kolo od vozu
-    p.ellipse(22, 22, 18, 5, metal);
-    hole(p, 22, 22, 15, 3);
-    p.hline(5, 39, 22, metal);
-    p.vline(22, 13, 27, metal);
-    p.hline(5, 39, 18, metalHi);
-    p.rect(20, 12, 5, 4, 'rust');
-  } else {
-    // ramena
-    p.rect(20, 12, 5, 9, metal);
-    p.vline(20, 12, 20, metalHi);
-    p.ellipse(22, 22, 17, 4, metal);
-    hole(p, 22, 21, 14, 2);
-    p.hline(6, 38, 20, metalHi);
-    p.ellipse(22, 25, 3, 3, metal);
-    if (s === 'c') {
-      // křišťálové ověsy
-      for (const x of [8, 13, 18, 26, 31, 36]) {
-        p.vline(x, 25, 28, 'ice');
-        p.set(x, 29, 'white');
-      }
-      p.vline(22, 28, 32, 'ice');
-      p.set(22, 33, 'white');
-    }
-  }
-  // svíčky
-  for (const x of [6, 13, 22, 31, 38]) {
-    p.rect(x - 1, 13, 3, 5, 'bone');
-    p.vline(x - 1, 13, 17, 'white');
-    p.set(x, 11, 'gold');
-    p.set(x, 12, 'amber');
-    p.set(x, 10, 'sand');
-  }
-  p.outline('ink');
-  return p;
-}
-
-/** záře lustru na podlaze */
-function luxGlow(): PixelCanvas {
-  const p = new PixelCanvas(60, 20);
-  for (let y = 0; y < 20; y++)
-    for (let x = 0; x < 60; x++) {
-      const dx = (x - 30) / 30, dy = (y - 10) / 10, r = dx * dx + dy * dy;
-      if (r < 1 && hash(x, y, 7) < 0.55 - r * 0.5) p.set(x, y, 'sand');
-    }
-  return p;
-}
-
 export function buildLux(): Record<string, PixelCanvas> {
   const o: Record<string, PixelCanvas> = {};
-  for (const s of ['a', 'b', 'c'] as LuxStyle[]) {
-    o[`luxTap_${s}`] = luxTap(s);
-    o[`luxTable_${s}`] = luxTable(s);
-    o[`luxLamp_${s}`] = luxLamp(s);
-  }
-  o.luxGlow = luxGlow();
+  // výběr uživatele: styl B (selská dubová), bez lustrů
+  o.luxTap = luxTap('b');
+  o.luxTable = luxTable('b');
   return o;
 }

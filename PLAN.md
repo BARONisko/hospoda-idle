@@ -337,3 +337,7 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Diamanty → stránka Napořád, balíčky „Koupit diamanty“ zablikají; krígl cíle se posune vlevo, coins se zmenší.
   Návrhy vzhledu hospody za 💎 (docs/navrhy-ui/hospoda-za-diamanty-ABC.png, src/gfx/luxArt.ts, ?lux=a|b|c, livreje
   LIVERY v characters.ts) – čeká na výběr uživatele.
+- Hospoda 65: VZHLED ZA 💎 (výběr uživatele B bez lustrů): Diamanty → 3. stránka „🎨 Vzhled“: Selská pípa 150, Dubové stoly 200,
+  Livreje číšníků 300 (GEM_LOOK v special.ts, jen vzhled). PubView.LOOK + applyLook() (přepne hned po koupi), portréty
+  číšníků v panelu také v livreji. Art src/gfx/luxArt.ts (luxTap, luxTable), livrej LOOKS `<waiter>_lux`. Snímek docs/navrhy-ui/vzhled-B-ve-hre.png.
+  Nové texty diamantů zatím bez překladů (zobrazí se česky, jako texty z hospody 64).

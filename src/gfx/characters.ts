@@ -923,14 +923,9 @@ export const LOOKS: Record<string, Look> = {
   },
 };
 
-/** livreje číšníků za diamanty (návrhy a/b/c): přepíše oblečení, obličej zůstane */
-export const LIVERY: Record<'a' | 'b' | 'c', Partial<Look>> = {
-  a: { shirt: 'maroon', shirtShade: 'blood', pants: 'ink', pantsShade: 'ink', vest: 'gold', coat: true, apron: false, jersey: undefined },
-  b: { shirt: 'white', shirtShade: 'bone', pants: 'olive', pantsShade: 'ink', vest: 'green', apron: true, coat: false },
-  c: { shirt: 'ink', shirtShade: 'dusk', pants: 'ink', pantsShade: 'ink', vest: 'white', coat: true, apron: false, hat: 'cap', hatColor: 'scarlet', hatShade: 'red' },
-};
-for (const w of ['waiter', 'waiterB', 'waiterC', 'waiterD'])
-  for (const [s, lv] of Object.entries(LIVERY)) LOOKS[`${w}_lux_${s}`] = { ...LOOKS[w], ...lv, ...(s === 'c' ? {} : { hat: LOOKS[w].hat }) };
+/** livreje číšníků za diamanty (výběr uživatele návrh B): bílá košile, zelená vesta, zástěra; obličej zůstane */
+const LIVERY: Partial<Look> = { shirt: 'white', shirtShade: 'bone', pants: 'olive', pantsShade: 'ink', vest: 'green', apron: true, coat: false };
+for (const w of ['waiter', 'waiterB', 'waiterC', 'waiterD']) LOOKS[`${w}_lux`] = { ...LOOKS[w], ...LIVERY };
 
 /** Vzhled zaměstnance: oblečení podle role, obličej/vlasy podle jeho čísla vzhledu. */
 export function employeeLook(role: string, lookIdx: number): Look {

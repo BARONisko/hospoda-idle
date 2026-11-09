@@ -19,7 +19,7 @@ import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, nightLen, nightShare, s
 import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
 import { notify, NOTE, Note } from '../core/notify';
-import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, GEM_PERM, CHRONICLE_BONUS, VIP_GEMS, GOLD_GEMS, GEMS_FREE, RESPEC_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
+import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, GEM_PERM, GEM_LOOK, CHRONICLE_BONUS, VIP_GEMS, GOLD_GEMS, GEMS_FREE, RESPEC_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
 import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER, weekendLeft } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { TREE, TREE_BY_ID, TREE_BRANCHES, TREE_COLORS, STAR_TEXT, treeSpent, treeCan, hasStar, treeStats, xpNeed, oldXpNeed, lvlFromTotal, respecCost, pathX, type StarId, type TreeNode } from '../core/skilltree';
@@ -28,7 +28,7 @@ import { loyLvl, loyProg, loyNext, LOY_MAX } from '../core/loyalty';
 import { mastStage, mastRank, mastProg, RANKS, RANK_COLORS, MAST_MAX } from '../core/mastery';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave, wipe } from '../core/save';
-import { PubView } from '../game/PubView';
+import { PubView, LOOK } from '../game/PubView';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
 import { GUESTS } from '../game/PubView';
 import { QUESTS, QCtx, QuestDef, currentQuest, questDone } from '../core/quests';
@@ -367,6 +367,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.sheet = -1;
     this.cameras.main.setBackgroundColor(PAL.ink);
     // hospody leží ve světě daleko vpravo (x ≥ 2000), aby je UI kamera neviděla; UI kamera je nad nimi
+    this.lookSync();
     this.d.pubs.forEach((p, i) => this.views.push(new PubView(this, p, 2000 + i * 1000)));
     const ui = this.cameras.main;
     this.cameras.remove(ui, false);
@@ -2399,6 +2400,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return ads.rewarded();
   }
 
+  /** koupený vzhled hospody → PubView (jen vzhled) */
+  private lookSync() {
+    LOOK.tap = this.owns('lookTap');
+    LOOK.tables = this.owns('lookTables');
+    LOOK.livery = this.owns('lookLivery');
+  }
+
   /** trvalý automat koupený za diamanty */
   private owns(id: string) {
     return !!this.d.own?.includes(id);
@@ -2446,6 +2454,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     } else {
       (this.d.own ??= []).push(id);
       if (id === 'chronicle') (this.tsCache = undefined), this.applyKup();
+      if (GEM_LOOK.includes(id)) this.lookSync(), this.views.forEach((v) => v.applyLook());
       this.banner(this.views[0].cam, t('Koupeno: {s}', { s: this.gemName(id) }));
     }
     store(this.d);
@@ -2460,6 +2469,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       skip4: t('Časoskok 4 h'), skip24: t('Časoskok 24 h'), chestbot: t('Sběrač truhel'),
       off1: t('Delší offline I'), off2: t('Delší offline II'), off3: t('Delší offline III'),
       vipdoor: t('VIP vrátný'), autohh: t('Automatická šťastná hodina'), chronicle: t('Pivní kronika'),
+      lookTap: t('Selská pípa'), lookTables: t('Dubové stoly'), lookLivery: t('Livreje číšníků'),
     };
     return names[id];
   }
@@ -2581,9 +2591,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
     const gems = this.d.gems ?? 0;
     add(this.add.text(W / 2, y + 14, t('Máš {n} 💎', { n: gems }), txt(26, PAL.ice)).setOrigin(0.5).setDepth(D + 2));
-    // dvě stránky (vše se nevejde): Rychlé · Napořád
-    ([[0, t('⚡ Rychlé')], [1, t('★ Napořád')]] as [number, string][]).forEach(([pg, label], i) => {
-      const b = this.btn(20 + i * ((W - 50) / 2 + 10), y + 34, (W - 50) / 2, 40, () => ((this.gemPage = pg), this.openShop('special', false)), D + 3);
+    // tři stránky (vše se nevejde): Rychlé · Napořád · Vzhled
+    const pw = (W - 60) / 3;
+    ([[0, t('⚡ Rychlé')], [1, t('★ Napořád')], [2, t('🎨 Vzhled')]] as [number, string][]).forEach(([pg, label], i) => {
+      const b = this.btn(20 + i * (pw + 10), y + 34, pw, 40, () => ((this.gemPage = pg), this.openShop('special', false)), D + 3);
       this.drawBtn(b, label, true, this.gemPage === pg ? 'amber' : 'plum');
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
@@ -2593,15 +2604,21 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       chestbot: ['📦', t('denní truhlu otevře sám')], off1: ['🌙', t('hospoda vydělává o 2 h déle bez tebe')],
       off2: ['🌙', t('další +2 h offline')], off3: ['🌙', t('další +2 h offline')], vipdoor: ['🚪', t('obslouží VIP, když to nestihneš')],
       autohh: ['🔁', t('manažeři pouští šťastnou hodinu sami')], chronicle: ['📖', t('výdělek +10 % napořád')],
+      lookTap: ['', t('měděná pípa s chmelem · jen vzhled')], lookTables: ['', t('dubové stoly s běhounem · jen vzhled')],
+      lookLivery: ['', t('bílá košile a zelená vesta · jen vzhled')],
     };
-    const ids: GemItem[] = this.gemPage === 0
+    // vzhled: místo emoji náhled skutečného obrázku
+    const lookIcon: Partial<Record<GemItem, [string, string, number]>> = { lookTap: ['obj', 'luxTap', 2.5], lookTables: ['obj', 'luxTable', 1.6], lookLivery: ['waiter_lux', '0', 2.2] };
+    const ids: GemItem[] = this.gemPage === 2 ? GEM_LOOK : this.gemPage === 0
       ? ['hhnow', 'quiver', 'brewnow', 'vipnow', 'skip4', 'skip24']
       : ['chestbot', (['off1', 'off2', 'off3'] as GemItem[]).find((o) => !this.owns(o)) ?? 'off3', 'vipdoor', 'autohh', 'chronicle'];
     let yy = y + 84;
     for (const id of ids) {
       const own = GEM_PERM.includes(id) && this.owns(id), can = this.gemCan(id);
       this.card(yy, 66, own ? 'green' : 'ink', D);
-      add(this.add.text(44, yy + 33, desc[id][0], txt(30, PAL.white)).setOrigin(0.5).setDepth(D + 2));
+      const li = lookIcon[id];
+      if (li) add(this.add.image(44, yy + 33, li[0], li[1] === '0' ? 0 : li[1]).setScale(li[2]).setDepth(D + 2));
+      else add(this.add.text(44, yy + 33, desc[id][0], txt(30, PAL.white)).setOrigin(0.5).setDepth(D + 2));
       add(this.add.text(80, yy + 8, this.gemName(id), txt(21, PAL.bone)).setDepth(D + 2));
       const ds = add(this.add.text(80, yy + 38, desc[id][1], txt(15, PAL.fog)).setDepth(D + 2));
       ds.setScale(Math.min(1, 290 / ds.width));
@@ -2614,7 +2631,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       yy += 72;
     }
     // balíčky za peníze jen na stránce Napořád (na Rychlé se nevejdou)
-    if (this.gemPage === 0) return;
+    if (this.gemPage !== 1) return;
     // zablikání jen jednou (další překreslení záložky už ne)
     this.time.delayedCall(0, () => (this.gemBuyHint = false));
     add(this.add.text(20, yy + 4, t('Koupit diamanty'), txt(20, PAL.gold)).setDepth(D + 2));
@@ -4215,7 +4232,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     for (let k = 0; k < WAITER_MAX; k++) {
       const x = 12 + k * 66;
       const bg = this.add.graphics().setDepth(50);
-      const face = this.add.image(x + 30, y + 34, WAITERS[k].key, 0).setScale(2).setDepth(51);
+      const face = this.add.image(x + 30, y + 34, WAITERS[k].key + (LOOK.livery ? '_lux' : ''), 0).setScale(2).setDepth(51);
       const name = this.add.text(x + 32, y + 56, '', txt(14, PAL.bone)).setOrigin(0.5).setDepth(52);
       const lvl = this.add.text(x + 60, y + 2, '', txt(15, PAL.ink)).setOrigin(0.5).setDepth(53);
       const zone = this.add.zone(x, y, 60, 70).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(54);
@@ -4306,7 +4323,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     g.fillStyle(col('dusk')).fillRoundedRect(4, y0, W - 8, yb - y0 - 4, 14);
     g.lineStyle(3, col('gold')).strokeRoundedRect(4, y0, W - 8, yb - y0 - 4, 14);
     objs.push(g);
-    objs.push(this.add.image(42, y0 + 44, WAITERS[k].key, 0).setScale(2.5).setDepth(D + 1));
+    objs.push(this.add.image(42, y0 + 44, WAITERS[k].key + (LOOK.livery ? '_lux' : ''), 0).setScale(2.5).setDepth(D + 1));
     objs.push(this.add.text(74, y0 + 12, t('{n} · úroveň {l}', { n: WAITERS[k].name, l: waiterLvl(w) }), txt(28, PAL.gold)).setDepth(D + 1));
     const r = waiterRate(w);
     const free = freePoints(w);
