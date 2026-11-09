@@ -554,7 +554,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const busy = Math.min(1, this.demand(p) / crew(p.w).rate);
       for (const w of p.w) w.xp = (w.xp ?? 0) + daySecs * busy;
     }
-    if (secs < OFFLINE_MIN || g < 1 || this.awayObjs.length) return;
+    if (secs < OFFLINE_MIN || g < 1) return;
     // část času byla noc: místo coins kosti
     const ns = nightShare();
     const coins = Math.floor(g * (1 - ns));
@@ -571,7 +571,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.d.bones = (this.d.bones ?? 0) + bones;
     if (rival) rival.lead = L.me - (L.rival ?? 0);
     store(this.d);
-    this.awayPopup(coins, secs, raw > cap, bones, rival);
+    // otevřené okno (návštěvník, noc, liga…): výdělek se připíše vždy, jen místo okna krátký nápis
+    if (this.awayObjs.length) this.banner(this.cameras.main, `+${big(coins)} coins`);
+    else this.awayPopup(coins, secs, raw > cap, bones, rival);
   }
 
   awayObjs: Phaser.GameObjects.GameObject[] = [];
