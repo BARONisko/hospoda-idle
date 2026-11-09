@@ -5,7 +5,8 @@ import { chromium } from 'playwright-core';
 
 const server = await createServer({ server: { port: 5199 }, logLevel: 'error' });
 await server.listen();
-const url = 'http://localhost:5199/';
+// skutečný port (když 5199 drží jiný běh testů, vite vezme další volný – dřív se test připojil k cizímu serveru)
+const url = `http://localhost:${server.httpServer.address().port}/`;
 const b = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
 let fails = 0;
 const ok = (name, cond) => {
