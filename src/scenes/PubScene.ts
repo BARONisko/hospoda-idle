@@ -345,6 +345,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.ntfBusy = 0;
     this.dartsNoticeObjs = [];
     this.awayObjs = [];
+    this.awayClose = undefined;
     this.guideObjs = [];
     this.guideCur = null;
     this.guideFollow = null;
@@ -579,6 +580,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   awayObjs: Phaser.GameObjects.GameObject[] = [];
+  /** jak zavřít právě otevřené okno (awayObjs) tlačítkem Zpět – stejně jako jeho vlastní tlačítko */
+  awayClose?: () => void;
 
   private awayPopup(g: number, secs: number, capped: boolean, bones = 0, rival?: { add: number; lead: number }) {
     const D = 500;
@@ -627,6 +630,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       objs.push(x2.bg, x2.label, x2.zone);
     }
     this.awayObjs = objs;
+    this.awayClose = done;
     sfx.tip();
   }
 
@@ -655,13 +659,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     tx(by + 74, PUB_NAMES[act], 28, PAL.mint);
     tx(by + 124, about[act] ?? '', 21, PAL.bone);
     tx(by + 220, t('Vydělává {m}× víc než ta předchozí a běží vedle ostatních.', { m: ACT_STEP }), 20, PAL.sand);
-    const ok = this.btn(W / 2 - 110, by + bh - 90, 220, 64, () => {
+    const close = () => {
       this.awayObjs.forEach((o) => o.destroy());
       this.awayObjs = [];
-    }, D + 3);
+    };
+    const ok = this.btn(W / 2 - 110, by + bh - 90, 220, 64, close, D + 3);
     this.drawBtn(ok, t('Jdeme na to!'), true, 'green');
     objs.push(ok.bg, ok.label, ok.zone);
     this.awayObjs = objs;
+    this.awayClose = close;
     sfx.fanfare();
   }
 
@@ -720,13 +726,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     tx(by + 84, t('V noci chodí příšery a platí kostmi – coins teď nepřibývají.'), 22, PAL.bone);
     tx(by + 170, t('Coins se vrátí ráno. Noc trvá {m} min.', { m: Math.round(nightLen() / 6000) / 10 }), 22, PAL.mint);
     tx(by + 236, t('Kosti utratíš v Obchodě (Kostnice) a za vylepšení talismanů.'), 22, PAL.gold);
-    const ok = this.btn(W / 2 - 110, by + bh - 90, 220, 64, () => {
+    const close = () => {
       this.awayObjs.forEach((o) => o.destroy());
       this.awayObjs = [];
-    }, D + 3);
+    };
+    const ok = this.btn(W / 2 - 110, by + bh - 90, 220, 64, close, D + 3);
     this.drawBtn(ok, t('Rozumím'), true, 'blue');
     objs.push(ok.bg, ok.label, ok.zone);
     this.awayObjs = objs;
+    this.awayClose = close;
   }
 
   /** oslava milníku stanice */
@@ -1372,13 +1380,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     tx(284, r.win ? t('Vyhrál jsi ligu!') : t('Prohrál jsi ligu…'), 34, r.win ? PAL.gold : PAL.scarlet);
     tx(344, t('Tvoje tržba: {a} coins\n{s}: {b} coins', { a: big(r.me), b: big(r.rival), s: r.name }), 22, PAL.bone);
     tx(420, r.win ? t('Odměna: +{k} krígel, +{g} 💎 a talisman. Postupuješ do: {l}', { k: big(winReward(r.tier)), g: GEMS_FREE.league * r.tier, l: LEAGUES[Math.min(LEAGUES.length, r.tier + 1) - 1] }) : t('Sestupuješ do: {l}', { l: LEAGUES[Math.max(1, r.tier - 1) - 1] }), 22, r.win ? PAL.mint : PAL.fog);
-    const ok = this.btn(W / 2 - 100, 560, 200, 60, () => {
+    const close = () => {
       objs.forEach((o) => o.destroy());
       this.awayObjs = [];
-    }, D + 3);
+    };
+    const ok = this.btn(W / 2 - 100, 560, 200, 60, close, D + 3);
     this.drawBtn(ok, t('Dál'), true, 'green');
     objs.push(ok.bg, ok.label, ok.zone);
     this.awayObjs = objs;
+    this.awayClose = close;
     if (r.win) sfx.fanfare();
     else sfx.error();
   }
@@ -2945,6 +2955,73 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.tutObjs.forEach((o) => (o as unknown as Phaser.GameObjects.Components.Visible).setVisible(true));
   }
 
+  // ---------- tlačítko Zpět (Android) / Escape (web) ----------
+  /** zavře nejvrchnější věc (stejně jako její ✕ / Zavřít): okno → rada → panel číšníka → hospoda (karty) → menu.
+   *  Na hlavní obrazovce se zeptá „Ukončit hru?“, jen když je `exit` (nativní aplikace). Vrací true, když něco udělal. */
+  back(exit?: () => void): boolean {
+    const tut = (this.d.tut ?? -1) >= 0;
+    if (this.awayObjs.length) {
+      const f = this.awayClose;
+      this.awayClose = undefined;
+      if (f) f();
+      else {
+        this.awayObjs.forEach((o) => o.destroy());
+        this.awayObjs = [];
+      }
+      sfx.click();
+      return true;
+    }
+    if (this.hintObjs.length) return this.hideHint(), true;
+    if (this.wPanel.length) return this.closeWaiter(), sfx.click(), true;
+    if (this.sheet >= 0 && this.views.length > 1) return this.closeSheet(), sfx.click(), true;
+    if (this.shopObjs.length) {
+      // podsekce otevřená z mřížky Menu → zpět do mřížky (jako „← Menu“); Obchod, Úkoly a mřížka se zavřou (jako ✕)
+      const inGrid = PubScene.TILES.some(([tb, sub]) => tb === this.tab && (tb !== 'shop' || sub === this.shopSub));
+      if (!tut && this.tab === 'daynight') (this.shopSub = 'bones'), this.openShop('shop', false);
+      else if (!tut && inGrid) this.openShop('home', false);
+      else {
+        this.closeShop();
+        this.tut('close');
+        sfx.click();
+      }
+      return true;
+    }
+    if (!exit) return false;
+    this.askExit(exit);
+    return true;
+  }
+
+  /** potvrzení ukončení hry (Zpět na hlavní obrazovce) */
+  private askExit(exit: () => void) {
+    const D = 540, bx = 50, by = 360, bw = W - 100, bh = 220;
+    const objs: Phaser.GameObjects.GameObject[] = [];
+    objs.push(this.add.rectangle(0, 0, W, H, 0x000000, 0.65).setOrigin(0).setDepth(D).setInteractive());
+    const g = this.add.graphics().setDepth(D + 1);
+    g.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
+    g.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
+    g.lineStyle(4, col('gold')).strokeRoundedRect(bx, by, bw, bh, 16);
+    objs.push(g);
+    const tx = this.add.text(W / 2, by + 36, t('Ukončit hru?'), txt(34, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 2);
+    tx.setScale(Math.min(1, (bw - 40) / tx.width));
+    objs.push(tx);
+    const close = () => {
+      objs.forEach((o) => o.destroy());
+      this.awayObjs = [];
+    };
+    const no = this.btn(bx + 24, by + bh - 88, 160, 64, close, D + 3);
+    this.drawBtn(no, t('Ne'), true, 'slate');
+    const yes = this.btn(bx + bw - 184, by + bh - 88, 160, 64, () => {
+      close();
+      store(this.d);
+      exit();
+    }, D + 3);
+    this.drawBtn(yes, t('Ano'), true, 'red');
+    objs.push(no.bg, no.label, no.zone, yes.bg, yes.label, yes.zone);
+    this.awayObjs = objs;
+    this.awayClose = close;
+    sfx.click();
+  }
+
   private buyUp(u: UpgradeDef) {
     if (this.d.coins < u.cost || this.d.up.includes(u.id)) return sfx.error();
     this.d.coins -= u.cost;
@@ -3251,6 +3328,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     });
     this.visitLive = () => draws.forEach((f) => f());
     this.awayObjs = objs;
+    this.awayClose = close; // Zpět = návštěvníka odmítnout bez volby
     sfx.hire();
   }
 
@@ -3302,6 +3380,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     objs.push(no.bg, no.label, no.zone, yes.bg, yes.label, yes.zone);
     yes.label.setScale(Math.min(1, 160 / yes.label.width));
     this.awayObjs = objs; // blokuje ťukání do hospody
+    this.awayClose = close;
     sfx.error();
   }
 

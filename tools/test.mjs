@@ -45,6 +45,29 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     ok(`Menu: záložka ${tab}`, await S(p, (s) => s.shopObjs.length > 5));
   }
   await S(p, (s) => s.closeShop());
+  // 2b) tlačítko Zpět / Escape: zavře menu, podsekce jde zpět do mřížky, okno návštěvníka se zavře, na hlavní obrazovce nic
+  {
+    await S(p, (s) => s.openShop('tasks', false));
+    await p.keyboard.press('Escape');
+    ok('Escape zavře otevřené menu (Úkoly)', await S(p, (s) => s.shopObjs.length === 0));
+    await S(p, (s) => { window.tut0 = s.d.tut; s.d.tut = -1; s.openShop('book', false); });
+    await p.keyboard.press('Escape');
+    ok('Escape: podsekce menu → zpět do mřížky Menu', await S(p, (s) => s.shopObjs.length > 0 && s.tab === 'home'));
+    await p.keyboard.press('Escape');
+    ok('Escape: mřížka Menu se zavře', await S(p, (s) => s.shopObjs.length === 0));
+    await S(p, (s) => { s.d.coins = 1e9; s.visit(s.visitList()[0]); });
+    await p.keyboard.press('Escape');
+    ok('Escape zavře okno návštěvníka', await S(p, (s) => s.awayObjs.length === 0 && !s.visitLive));
+    ok('Escape na hlavní obrazovce nic neotevře', await S(p, (s) => { s.hideHint(); const r = s.back(); return !r && !s.awayObjs.length; }));
+    ok('Zpět na hlavní obrazovce (aplikace): dotaz „Ukončit hru?“, Ne zavře', await S(p, (s) => {
+      let quit = false;
+      s.back(() => (quit = true));
+      const asked = s.awayObjs.length > 0;
+      s.back(() => (quit = true));
+      return asked && !s.awayObjs.length && !quit;
+    }));
+    await S(p, (s) => { s.d.tut = window.tut0; });
+  }
   ok('upozornění: plná hospoda naplánovaná za strop offline', await S(p, (s) => s.notes().some((n) => n.id === 1 && Math.abs(n.at - Date.now() - s.offCap() * 1000) < 5000)));
   // 3) obchod: vylepšení a manažer
   await S(p, (s) => { s.d.coins = 1e9; s.openShop('shop', false); s.shopRows[0].o.buy(); });

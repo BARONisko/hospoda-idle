@@ -1287,5 +1287,8 @@
  "štědrý návštěvník!": "großzügiger Besucher!",
  "přijato {a} / {b}": "angenommen {a} / {b}",
  "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "nichts vom Besuch = +{a} 💎 · max. {m} 💎 pro Tag",
- "krígly: {k} (+{b} % výdělek) · 💎 zase zítra": "Krüge: {k} (+{b} % Einkommen) · 💎 erst morgen wieder"
+ "krígly: {k} (+{b} % výdělek) · 💎 zase zítra": "Krüge: {k} (+{b} % Einkommen) · 💎 erst morgen wieder",
+ "Ukončit hru?": "Spiel beenden?",
+ "Ano": "Ja",
+ "Ne": "Nein"
 }

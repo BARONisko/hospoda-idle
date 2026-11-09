@@ -1287,5 +1287,8 @@
  "štědrý návštěvník!": "후한 방문자!",
  "přijato {a} / {b}": "수락 {a} / {b}",
  "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "방문에서 얻은 게 없으면 = +{a} 💎 · 하루 최대 {m} 💎",
- "krígly: {k} (+{b} % výdělek) · 💎 zase zítra": "맥주잔: {k} (수입 +{b} %) · 💎 는 내일 다시"
+ "krígly: {k} (+{b} % výdělek) · 💎 zase zítra": "맥주잔: {k} (수입 +{b} %) · 💎 는 내일 다시",
+ "Ukončit hru?": "게임을 종료할까요?",
+ "Ano": "예",
+ "Ne": "아니요"
 }

@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 import { initAdMob } from './core/admob';
 import Phaser from 'phaser';
 import '@fontsource/jersey-10/latin-ext-400.css';
@@ -144,6 +145,19 @@ window.addEventListener('resize', desktopFit);
 window.visualViewport?.addEventListener('resize', desktopFit);
 setInterval(desktopFit, 1000);
 desktopFit();
+
+// Tlačítko Zpět (Android) a Escape (web): zavře nejvrchnější okno / panel / menu (metoda back() nejvrchnější scény).
+// Bez obsluhy Zpět Android zavřel celou aplikaci. Na hlavní obrazovce aplikace se zeptá „Ukončit hru?“, web nic.
+function goBack(exit?: () => void) {
+  for (const s of game.scene.getScenes(true, true) as unknown as { back?: (exit?: () => void) => boolean }[])
+    if (s.back) return s.back(exit);
+  return false;
+}
+if (Capacitor.isNativePlatform()) void App.addListener('backButton', () => goBack(() => void App.exitApp()));
+else
+  window.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape' && goBack()) ev.preventDefault();
+  });
 
 // mobilní aplikace: reklamy za odměnu (AdMob)
 void initAdMob();

@@ -1287,5 +1287,8 @@
  "štědrý návštěvník!": "¡visitante generoso!",
  "přijato {a} / {b}": "aceptado {a} / {b}",
  "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "nada de la visita = +{a} 💎 · máx. {m} 💎 al día",
- "krígly: {k} (+{b} % výdělek) · 💎 zase zítra": "jarras: {k} (+{b} % ingresos) · 💎 de nuevo mañana"
+ "krígly: {k} (+{b} % výdělek) · 💎 zase zítra": "jarras: {k} (+{b} % ingresos) · 💎 de nuevo mañana",
+ "Ukončit hru?": "¿Salir del juego?",
+ "Ano": "Sí",
+ "Ne": "No"
 }

@@ -360,5 +360,12 @@ export class DartsScene extends Phaser.Scene {
     this.host.dartsSave();
     this.host.dartsClose();
   }
+
+  /** tlačítko Zpět / Escape: vylepšení → terč → zpět do hospody (stejně jako tlačítko Zpět) */
+  back(): boolean {
+    if (this.mode === 'shop') this.play();
+    else this.leave();
+    return true;
+  }
 }
 

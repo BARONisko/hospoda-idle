@@ -657,6 +657,13 @@ export class TempleScene extends Phaser.Scene {
     this.host.templeClose();
   }
 
+  /** tlačítko Zpět / Escape: obchod → úvod chrámu → ven; v boji, výsledku a truhlách nic (jen spolkne, ať nezavře aplikaci) */
+  back(): boolean {
+    if (this.mode === 'shop') this.lobby();
+    else if (this.mode === 'lobby') this.leave();
+    return true;
+  }
+
   private hpBar(x: number, y: number, w: number, h: number, list: Phaser.GameObjects.GameObject[]) {
     const g = this.add.graphics().setDepth(52);
     g.fillStyle(col('ink')).fillRoundedRect(x - 3, y - 3, w + 6, h + 6, 6);

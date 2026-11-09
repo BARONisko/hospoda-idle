@@ -1287,5 +1287,8 @@
  "štědrý návštěvník!": "慷慨的访客！",
  "přijato {a} / {b}": "已接受 {a} / {b}",
  "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "来访无收获 = +{a} 💎 · 每天最多 {m} 💎",
- "krígly: {k} (+{b} % výdělek) · 💎 zase zítra": "酒杯：{k}（收入 +{b} %）· 💎 明天再领"
+ "krígly: {k} (+{b} % výdělek) · 💎 zase zítra": "酒杯：{k}（收入 +{b} %）· 💎 明天再领",
+ "Ukončit hru?": "退出游戏？",
+ "Ano": "是",
+ "Ne": "否"
 }
