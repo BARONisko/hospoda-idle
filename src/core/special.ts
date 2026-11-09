@@ -128,14 +128,23 @@ export function vipServe(v: VipState) {
 
 // ---------- diamanty a Štamgast pass ----------
 /** ceny v diamantech: časoskoky (hned X h výdělku) a trvalé automaty */
-export const GEM_COST = { skip4: 20, skip24: 90, chestbot: 200, vipdoor: 300 } as const;
+export const GEM_COST = {
+  // rychlé (spotřební)
+  hhnow: 5, quiver: 5, brewnow: 10, vipnow: 15, skip4: 20, skip24: 90,
+  // napořád
+  chestbot: 400, off1: 250, off2: 500, off3: 750, vipdoor: 600, autohh: 900, chronicle: 1200,
+} as const;
+/** trvalé položky (kupují se jednou) */
+export const GEM_PERM: GemItem[] = ['chestbot', 'off1', 'off2', 'off3', 'vipdoor', 'autohh', 'chronicle'];
+/** Pivní kronika: trvalý bonus výdělku */
+export const CHRONICLE_BONUS = 0.1;
 export type GemItem = keyof typeof GEM_COST;
 /** diamanty zdarma: za obslouženého VIP a ve zlaté truhle (7. den) */
-export const VIP_GEMS = 2;
+export const VIP_GEMS = 1;
 export const GOLD_GEMS = 10;
 /** další diamanty zdarma (zakomponování do hry): poražený Cthulhu (× obtížnost), výhra v lize (× liga),
  *  hygiena, každá 5. úroveň hostinského, splněný úkol od hostinského */
-export const GEMS_FREE = { boss: 5, league: 5, prestige: 5, keeper5: 5, quest: 2 } as const;
+export const GEMS_FREE = { boss: 3, league: 2, prestige: 2, keeper5: 3, quest: 2 } as const;
 /** přerozdělení bodů stromu hostinského za diamanty (pevná cena; za krígly cena roste) */
 export const RESPEC_GEMS = 30;
 

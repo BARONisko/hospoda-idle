@@ -357,7 +357,10 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   await p.evaluate(() => game.scene.getScene('Pub').iapBuy('gems550'));
   ok('diamanty: balíček připsán', await S(p, (s) => s.d.gems === 550));
   ok('diamanty: časoskok 4 h dá výdělek, liga se nemění', await S(p, (s) => { const c = s.d.coins, l = s.d.league?.me ?? 0; s.gemBuy('skip4'); return s.d.coins > c && s.d.gems === 530 && (s.d.league?.me ?? 0) === l; }));
-  ok('diamanty: VIP vrátný napořád', await S(p, (s) => s.gemBuy('vipdoor') && s.d.own.includes('vipdoor') && !s.gemBuy('vipdoor')));
+  ok('diamanty: VIP vrátný napořád', await S(p, (s) => { s.d.gems += 600; return s.gemBuy('vipdoor') && s.d.own.includes('vipdoor') && !s.gemBuy('vipdoor'); }));
+  ok('diamanty: offline II až po offline I, +2 h za stupeň', await S(p, (s) => { s.d.gems = 2000; const c0 = s.offCap(); const no2 = !s.gemBuy('off2'); s.gemBuy('off1'); s.gemBuy('off2'); return no2 && s.offCap() - c0 === 4 * 3600; }));
+  ok('diamanty: Pivní kronika +10 % výdělku', await S(p, (s) => { s.d.gems = 2000; const r0 = s.pay(s.d.pubs[0], s.cards[0].def); s.gemBuy('chronicle'); s.tsCache = undefined; return Math.abs(s.pay(s.d.pubs[0], s.cards[0].def) / r0 - 1.1) < 0.02; }));
+  ok('diamanty: šťastná hodina hned', await S(p, (s) => { const pb = s.d.pubs[0]; pb.mgr = true; pb.boostUntil = 0; pb.boostReady = Date.now() + 3600e3; s.d.gems = 10; return s.gemBuy('hhnow') && pb.boostReady === 0 && s.d.gems === 5; }));
   await S(p, (s) => { window.p0 = s.pay(s.d.pubs[0], s.cards[0].def); });
   await p.evaluate(() => game.scene.getScene('Pub').iapBuy('pass'));
   ok('Štamgast: výdělek ×2', await S(p, (s) => Math.abs(s.pay(s.d.pubs[0], s.cards[0].def) / window.p0 - 2) < 1e-6));

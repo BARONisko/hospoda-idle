@@ -1,3 +1,4 @@
+import { GEMS_FREE } from '../core/special';
 // Chrám v potopeném R'lyeh – víkendový boss. Akční: ťukání do Cthulhu, swipe seká chapadla, inkoust se stírá,
 // hlubinní lezou na molo. Oltář má svíce (životy kola). Kultisté (max 2) po stranách sekají chapadla sami.
 import Phaser from 'phaser';
@@ -273,7 +274,7 @@ export class TempleScene extends Phaser.Scene {
     const tal = this.host.templeReward('talis', 1);
     const kr = this.host.templeReward('krigle', Math.round(this.kriglyGift() * DIFF_REW[d - 1]));
     const dp = this.host.templeReward('darts', 2 * d);
-    const gm = this.host.templeReward('gems', 5 * d);
+    const gm = this.host.templeReward('gems', GEMS_FREE.boss * d);
     let msg = t('CTHULHU PORAŽEN!') + '\n' + seal + '\n' + tal + '\n' + kr + '\n' + dp + '\n' + gm;
     if (d < DIFFS && (this.T.maxD ?? 1) <= d) {
       this.T.maxD = d + 1;

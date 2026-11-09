@@ -19,7 +19,7 @@ import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, nightLen, nightShare, s
 import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
 import { notify, NOTE, Note } from '../core/notify';
-import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, VIP_GEMS, GOLD_GEMS, GEMS_FREE, RESPEC_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
+import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, GEM_PERM, CHRONICLE_BONUS, VIP_GEMS, GOLD_GEMS, GEMS_FREE, RESPEC_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
 import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER, weekendLeft } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { TREE, TREE_BY_ID, TREE_BRANCHES, TREE_COLORS, STAR_TEXT, treeSpent, treeCan, hasStar, treeStats, xpNeed, oldXpNeed, lvlFromTotal, respecCost, pathX, type StarId, type TreeNode } from '../core/skilltree';
@@ -1298,6 +1298,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     a.dspeed += 0.005 * Math.max(0, (this.d.brew?.lvl ?? 1) - 1);
     a.tentacles += 0.003 * Object.values(this.d.coll ?? {}).reduce((x, c) => x + c.spd + c.amt, 0);
     a.temple += 0.005 * Math.max(0, (this.d.klvl ?? 1) - 1);
+    // Pivní kronika (za diamanty): trvale +10 % výdělku
+    if (this.owns('chronicle')) a.income += CHRONICLE_BONUS;
     const ds = dartStats(this.d.darts);
     for (const [k, v] of Object.entries(ds)) a[k as StatId] += v as number;
     if (al && al.wk === weekendKey()) for (const [k, n] of Object.entries(al.lv)) a[k as StatId] += (n as number) * ALTAR_PER;
@@ -2403,10 +2405,22 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   /** utratí diamanty za položku */
+  /** jde položku za diamanty teď koupit? (trvalé jen jednou a po pořadě; rychlé jen když mají smysl) */
+  gemCan(id: GemItem): boolean {
+    if (GEM_PERM.includes(id)) return !this.owns(id) && (id !== 'off2' || this.owns('off1')) && (id !== 'off3' || this.owns('off2'));
+    const now = Date.now();
+    if (id === 'hhnow') return this.d.pubs.some((p) => p.mgr && !this.boosted(p) && (p.boostReady ?? 0) > now);
+    if (id === 'quiver') return !!this.d.darts && this.d.darts.have < dartCap(this.d.darts.up);
+    if (id === 'brewnow') return !!this.d.brew && this.d.brew.stock < tank(this.d.brew);
+    if (id === 'vipnow') return !!this.d.vip && !(this.d.vip.until > now);
+    return true;
+  }
+
   gemBuy(id: GemItem) {
     const cost = GEM_COST[id];
-    if ((this.d.gems ?? 0) < cost || this.owns(id)) return false;
+    if ((this.d.gems ?? 0) < cost || !this.gemCan(id)) return false;
     this.d.gems = (this.d.gems ?? 0) - cost;
+    const now = Date.now();
     if (id === 'skip4' || id === 'skip24') {
       // časoskok: výdělek hned (do ligy se nepočítá)
       const n = this.hoursIncome(id === 'skip4' ? 4 : 24);
@@ -2415,14 +2429,39 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.d.run += n;
       this.banner(this.views[0].cam, t('Časoskok! +{n} coins', { n: big(n) }));
       coinFountain(this, W / 2, 400, 14);
+    } else if (id === 'hhnow') {
+      for (const p of this.d.pubs) if (p.mgr && !this.boosted(p)) p.boostReady = 0;
+      this.skillBtns.forEach((_, i) => this.drawSkill(i));
+      this.banner(this.views[0].cam, t('Šťastná hodina je připravená!'));
+    } else if (id === 'quiver') {
+      this.d.darts!.have = dartCap(this.d.darts!.up);
+      this.banner(this.views[0].cam, t('Toulec je plný!'));
+    } else if (id === 'brewnow') {
+      this.d.brew!.stock = tank(this.d.brew!);
+      this.d.brew!.at = now;
+      this.banner(this.views[0].cam, t('Tank je plný piva!'));
+    } else if (id === 'vipnow') {
+      this.d.vip!.next = now;
+      this.banner(this.views[0].cam, t('VIP host je na cestě!'));
     } else {
       (this.d.own ??= []).push(id);
-      this.banner(this.views[0].cam, t('Koupeno: {s}', { s: id === 'vipdoor' ? t('VIP vrátný') : t('Sběrač truhel') }));
+      if (id === 'chronicle') (this.tsCache = undefined), this.applyKup();
+      this.banner(this.views[0].cam, t('Koupeno: {s}', { s: this.gemName(id) }));
     }
     store(this.d);
     sfx.levelUp();
     if (this.tab === 'special' && this.shopObjs.length) this.openShop('special', false);
     return true;
+  }
+
+  private gemName(id: GemItem): string {
+    const names: Record<GemItem, string> = {
+      hhnow: t('Šťastná hodina hned'), quiver: t('Plný toulec'), brewnow: t('Várka hned'), vipnow: t('Přivolat VIP'),
+      skip4: t('Časoskok 4 h'), skip24: t('Časoskok 24 h'), chestbot: t('Sběrač truhel'),
+      off1: t('Delší offline I'), off2: t('Delší offline II'), off3: t('Delší offline III'),
+      vipdoor: t('VIP vrátný'), autohh: t('Automatická šťastná hodina'), chronicle: t('Pivní kronika'),
+    };
+    return names[id];
   }
 
   /** nákup za peníze (jen v aplikaci; ?fakeshop=1 na zkoušku) */
@@ -2458,6 +2497,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** podzáložka speciální nabídky */
   spSub: 'offer' | 'gems' | 'pass' = 'offer';
+  gemPage = 0;
 
   /** záložka Speciální nabídka: Nabídka (kampaň, truhla, bez reklam) · Diamanty · Štamgast */
   private specialTab(y0: number, D: number) {
@@ -2541,33 +2581,40 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
     const gems = this.d.gems ?? 0;
     add(this.add.text(W / 2, y + 14, t('Máš {n} 💎', { n: gems }), txt(26, PAL.ice)).setOrigin(0.5).setDepth(D + 2));
-    const rows: [string, GemItem, string, string, string, number][] = [
-      [t('Urychlení'), 'skip4', t('Časoskok 4 h'), t('hned 4 h výdělku'), 'clock', 0],
-      ['', 'skip24', t('Časoskok 24 h'), t('hned celý den výdělku'), 'clock', 0],
-      [t('Automatika (napořád)'), 'chestbot', t('Sběrač truhel'), t('denní truhlu otevře sám'), 'chest', 1],
-      ['', 'vipdoor', t('VIP vrátný'), t('obslouží VIP, když to nestihneš'), 'bouncer', 0],
-    ];
-    let yy = y + 40;
-    for (const [head, id, title, desc, icon, obj] of rows) {
-      if (head) {
-        add(this.add.text(20, yy + 4, head, txt(20, PAL.gold)).setDepth(D + 2));
-        yy += 32;
-      }
-      const own = this.owns(id);
-      this.card(yy, 80, own ? 'green' : 'ink', D);
-      add(this.add.image(48, yy + 40, obj ? 'obj' : 'icons', icon).setScale(obj ? 2.4 : 3).setDepth(D + 2));
-      add(this.add.text(88, yy + 10, title, txt(22, PAL.bone)).setDepth(D + 2));
-      const ds = add(this.add.text(88, yy + 44, desc, txt(16, PAL.fog)).setDepth(D + 2));
-      ds.setScale(Math.min(1, 270 / ds.width));
-      if (own) add(this.add.text(W - 86, yy + 40, t('koupeno ✓'), txt(20, PAL.white)).setOrigin(0.5).setDepth(D + 2));
+    // dvě stránky (vše se nevejde): Rychlé · Napořád
+    ([[0, t('⚡ Rychlé')], [1, t('★ Napořád')]] as [number, string][]).forEach(([pg, label], i) => {
+      const b = this.btn(20 + i * ((W - 50) / 2 + 10), y + 34, (W - 50) / 2, 40, () => ((this.gemPage = pg), this.openShop('special', false)), D + 3);
+      this.drawBtn(b, label, true, this.gemPage === pg ? 'amber' : 'plum');
+      this.shopObjs.push(b.bg, b.label, b.zone);
+    });
+    const desc: Record<GemItem, [string, string]> = {
+      hhnow: ['⚡', t('manažeři bez čekání')], quiver: ['🎯', t('šipky do plna')], brewnow: ['🍺', t('pivovar hned plný tank')],
+      vipnow: ['⭐', t('VIP host přijde hned')], skip4: ['⏩', t('hned 4 h výdělku')], skip24: ['⏩', t('hned celý den výdělku')],
+      chestbot: ['📦', t('denní truhlu otevře sám')], off1: ['🌙', t('hospoda vydělává o 2 h déle bez tebe')],
+      off2: ['🌙', t('další +2 h offline')], off3: ['🌙', t('další +2 h offline')], vipdoor: ['🚪', t('obslouží VIP, když to nestihneš')],
+      autohh: ['🔁', t('manažeři pouští šťastnou hodinu sami')], chronicle: ['📖', t('výdělek +10 % napořád')],
+    };
+    const ids: GemItem[] = this.gemPage === 0
+      ? ['hhnow', 'quiver', 'brewnow', 'vipnow', 'skip4', 'skip24']
+      : ['chestbot', (['off1', 'off2', 'off3'] as GemItem[]).find((o) => !this.owns(o)) ?? 'off3', 'vipdoor', 'autohh', 'chronicle'];
+    let yy = y + 84;
+    for (const id of ids) {
+      const own = GEM_PERM.includes(id) && this.owns(id), can = this.gemCan(id);
+      this.card(yy, 66, own ? 'green' : 'ink', D);
+      add(this.add.text(44, yy + 33, desc[id][0], txt(30, PAL.white)).setOrigin(0.5).setDepth(D + 2));
+      add(this.add.text(80, yy + 8, this.gemName(id), txt(21, PAL.bone)).setDepth(D + 2));
+      const ds = add(this.add.text(80, yy + 38, desc[id][1], txt(15, PAL.fog)).setDepth(D + 2));
+      ds.setScale(Math.min(1, 290 / ds.width));
+      if (own) add(this.add.text(W - 86, yy + 33, t('koupeno ✓'), txt(20, PAL.white)).setOrigin(0.5).setDepth(D + 2));
       else {
-        const b = this.btn(W - 150, yy + 15, 128, 50, () => this.gemBuy(id), D + 3);
-        this.drawBtn(b, `${GEM_COST[id]} 💎`, gems >= GEM_COST[id], 'plum');
+        const b = this.btn(W - 150, yy + 10, 128, 46, () => this.gemBuy(id), D + 3);
+        this.drawBtn(b, `${GEM_COST[id]} 💎`, gems >= GEM_COST[id] && can, 'plum');
         this.shopObjs.push(b.bg, b.label, b.zone);
       }
-      yy += 88;
+      yy += 72;
     }
-    // balíčky za peníze
+    // balíčky za peníze jen na stránce Napořád (na Rychlé se nevejdou)
+    if (this.gemPage === 0) return;
     add(this.add.text(20, yy + 4, t('Koupit diamanty'), txt(20, PAL.gold)).setDepth(D + 2));
     yy += 32;
     (['gems100', 'gems550'] as ProductId[]).forEach((id, i) => {
@@ -2955,13 +3002,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return (p.boostUntil ?? 0) > Date.now();
   }
 
-  private useSkill(i: number) {
+  private useSkill(i: number, quiet = false) {
     const p = this.d.pubs[i];
     const now = Date.now();
     if (!p.mgr || this.boosted(p) || (p.boostReady ?? 0) > now) return sfx.error();
     p.boostUntil = now + BOOST_S * 1000 * (this.has('sabre') ? 2 : 1) * (1 + this.ts().skill) * (pubStyle(p) === 'kitchen' ? 1.5 : 1) * (this.star('happy2') ? 2 : 1);
     p.boostReady = now + (BOOST_S + BOOST_CD * (1 - Math.min(0.5, this.ts().mgrcd))) * 1000;
-    this.banner(this.views[i].cam, t('{s}! Výdělek ×{m}', { s: MANAGERS[p.act].skill, m: BOOST_MULT }));
+    if (!quiet) this.banner(this.views[i].cam, t('{s}! Výdělek ×{m}', { s: MANAGERS[p.act].skill, m: BOOST_MULT }));
     store(this.d);
   }
 
@@ -3767,7 +3814,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   private offCap() {
-    return Math.min(OFFLINE_MAX_H * 3600, OFFLINE_CAP + (kOffline(this.kl('offline')) + (this.has('cuckoo') ? 4 : 0)) * 3600 + this.ts().offline * 3600) + (hasStyle(this.d.pubs, 'cellar') ? 3600 : 0);
+    // delší offline za diamanty: +2 h za každý stupeň (nad běžný strop)
+    const gemH = 2 * ['off1', 'off2', 'off3'].filter((id) => this.owns(id)).length;
+    return gemH * 3600 + Math.min(OFFLINE_MAX_H * 3600, OFFLINE_CAP + (kOffline(this.kl('offline')) + (this.has('cuckoo') ? 4 : 0)) * 3600 + this.ts().offline * 3600) + (hasStyle(this.d.pubs, 'cellar') ? 3600 : 0);
   }
 
   /** úroveň vylepšení za kosti */
@@ -4377,6 +4426,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.goalTick();
     this.tutTick();
     this.vipTick(dt);
+    // Automatická šťastná hodina (za diamanty): manažeři pouští schopnost sami
+    if (this.owns('autohh')) {
+      const now = Date.now();
+      this.d.pubs.forEach((p, i) => {
+        if (p.mgr && !this.boosted(p) && (p.boostReady ?? 0) <= now) this.useSkill(i, true);
+      });
+    }
     this.mastAdd(dt);
     this.starTick(dt);
     this.coinT -= dt;
