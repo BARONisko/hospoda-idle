@@ -56,6 +56,16 @@ guard(Phaser.Game.prototype, 'step');
     return this.color === c ? this.parent : orig.call(this, c);
   };
 }
+// Chyba od uživatele (hospoda 67): „Cannot read properties of null (reading 'cut') at setSize“ – text se překresluje
+// (setText / setFontSize / setStyle…) po svém zničení (frame.data = null) → zničený text už nekreslit
+{
+  const T = Phaser.GameObjects.Text.prototype as unknown as { updateText: () => unknown };
+  const orig = T.updateText;
+  T.updateText = function (this: Phaser.GameObjects.Text) {
+    if (!(this.frame as unknown as { data?: unknown } | undefined)?.data || !this.scene) { if (import.meta.env.DEV) console.error("DEADTEXT", JSON.stringify(this.text), new Error().stack); return this; }
+    return orig.call(this);
+  };
+}
 // Únik (QA hospoda 66): nekonečné tweeny (pohupování bublin, blikání) zůstávaly po zničených objektech a hra se
 // postupně zpomalovala → při zničení objektu odstranit jeho tweeny (s více cíli až když jsou zničené všechny)
 {

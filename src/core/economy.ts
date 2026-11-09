@@ -203,7 +203,7 @@ export const PRESTIGE_MIN = 6;
 /** první hygiena (cesta k 2. hospodě) jde dřív: stačí 4 krígly (~1,6M tržby, cca 15 min) */
 export const PRESTIGE_FIRST = 4;
 /** každá další hygiena musí přinést aspoň +10 % krígel, co už máš (kola se tak pomalu prodlužují: 9 → 14 → … → 22 min) */
-export const PRESTIGE_GROW = 0.05; // hospoda 67: dřív 0,1 (kolo 37 trvalo ~11 h)
+export const PRESTIGE_GROW = 0.07; // hospoda 67: dřív 0,1 (kolo 37 trvalo ~11 h); 7 % = 20. kolo ~15 min, 40. ~2 h
 export const prestigeMin = (prestiges: number, krigle = 0) => (prestiges > 0 ? Math.max(PRESTIGE_MIN, Math.ceil(PRESTIGE_GROW * krigle)) : PRESTIGE_FIRST);
 
 /** obchod s krígly: trvalá vylepšení (přežijí hygienu), platí se krígly; většina jde donekonečna (cena roste exponenciálně) */
