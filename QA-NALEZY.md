@@ -26,7 +26,7 @@ Seřazeno podle důležitosti; [R] = rozhodnutí uživatele / návrh na snímcí
   Nastavení – i de/fr) → zalamovat místo zmenšování.
 - [O] fr: Sběrač = „Serveur“ i Číšníci = „Serveurs“ → „Collecteur“. ja: Sběrač 給仕 ≈ číšník → jiné slovo.
   ko: „Jirka Jelínek이(가)“ zůstal zástupný tvar.
-- [R] Malé písmo 6–8 px: Kostnice seznam (šedé na tmavém), záložky Sbírky, podzáložky Diamantů, zamčené dlaždice Menu,
+- [HOTOVO h68: písmo B] Malé písmo 6–8 px: Kostnice seznam (šedé na tmavém), záložky Sbírky, podzáložky Diamantů, zamčené dlaždice Menu,
   štítky dlaždic, „ťukni sem“, patička Diamantů, lišta Den/kosti.
 - Ceny „49 Kč…“ ve všech jazycích (shop.ts výchozí; v obchodě Google je přepíše, na webu ne).
 - „Happy hour“ v Pivovaru vs. „Šťastná hodina ×3“ manažera – dvě věci, skoro stejné jméno. ru: Паб / трактир / кабак.
