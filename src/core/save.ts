@@ -185,12 +185,47 @@ function repair(d: any): Save {
   return d as Save;
 }
 
+/** po nahrání zálohy už se do znovunačtení nic neukládá (přepsalo by to nahranou hru) */
+let locked = false;
+let fullWarned = false;
+
+/** Problém s ukládáním pro hráče: druhá karta, novější verze uložení, plné úložiště (main.ts ukáže pruh). */
+export type SaveIssue = 'tab' | 'newer' | 'full';
+let issueCb: ((k: SaveIssue) => void) | undefined;
+const pending: SaveIssue[] = [];
+function issue(k: SaveIssue) {
+  if (issueCb) issueCb(k);
+  else if (!pending.includes(k)) pending.push(k);
+}
+export function onSaveIssue(cb: (k: SaveIssue) => void) {
+  issueCb = cb;
+  for (const k of pending.splice(0)) cb(k);
+}
+
+// Dvě karty prohlížeče (QA hospoda 66): obě ukládaly a přepisovaly se. Každá karta má svoje id; když jiná karta uloží,
+// tahle přestane ukládat a nabídne znovunačtení (pak je aktivní ona a zamkne se ta druhá).
+const TAB = Math.random().toString(36).slice(2);
+const OWNER = 'pubidle_tab';
+if (typeof window !== 'undefined')
+  window.addEventListener('storage', (e) => {
+    if (e.key === OWNER && e.newValue && e.newValue !== TAB && !locked) {
+      locked = true;
+      issue('tab');
+    }
+  });
+
 export function load(): Save {
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const d = JSON.parse(raw) as any;
+      // uložení z novější verze hry (v ≥ 3) nezahodit a nepřepsat – hrát bez ukládání a poradit aktualizaci
+      if (typeof d?.v === 'number' && d.v > 2) {
+        locked = true;
+        issue('newer');
+        return fresh();
+      }
       if (d?.v === 1) return repair({ v: 2, coins: d.coins, earned: d.earned, pubs: [{ act: 1, st: d.st }], up: [], run: d.earned, krigle: 0, ...extra(), at: d.at });
       if (d?.v === 2) return repair({ up: [], run: d.earned ?? 0, krigle: 0, ...extra(), ...d } as Save);
     }
@@ -200,8 +235,6 @@ export function load(): Save {
   return fresh();
 }
 
-/** po nahrání zálohy už se do znovunačtení nic neukládá (přepsalo by to nahranou hru) */
-let locked = false;
 
 export function store(d: Save) {
   if (locked) return;
@@ -210,8 +243,12 @@ export function store(d: Save) {
   d.at = d.at > now && d.at - now < 86_400_000 ? d.at : now;
   try {
     localStorage.setItem(KEY, JSON.stringify(d));
+    if (localStorage.getItem(OWNER) !== TAB) localStorage.setItem(OWNER, TAB);
+    fullWarned = false;
   } catch {
-    /* plné úložiště – nic */
+    // plné nebo zakázané úložiště – hráči to říct (jednou, dokud se zas nepovede uložit)
+    if (!fullWarned) issue('full');
+    fullWarned = true;
   }
 }
 

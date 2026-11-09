@@ -2,13 +2,17 @@
 const SHORT = ['', 'K', 'M', 'B', 'T'];
 
 export function big(n: number): string {
+  if (Number.isNaN(n)) return '0';
   if (!isFinite(n)) return '∞';
   const neg = n < 0;
   n = Math.abs(n);
   let s: string;
-  if (n < 1000) s = n < 10 && n % 1 !== 0 ? n.toFixed(1) : Math.floor(n).toString();
+  // 9.99 → „9.9“ (dřív toFixed zaokrouhlil na „10.0“)
+  if (n < 1000) s = n < 10 && n % 1 !== 0 ? String(Math.floor(n * 10 + 1e-9) / 10) : Math.floor(n).toString();
   else {
-    const e = Math.floor(Math.log10(n) / 3); // skupina po tisících
+    let e = Math.floor(Math.log10(n) / 3); // skupina po tisících
+    // log10(999999999999999) se zaokrouhlí na 15 → dřív „0.99aa“
+    if (n / 10 ** (e * 3) < 1) e--;
     const v = n / 10 ** (e * 3);
     const d = v >= 100 ? 0 : v >= 10 ? 1 : 2;
     s = String(Math.floor(v * 10 ** d) / 10 ** d) + suffix(e); // bez koncových nul: 5K, 1.5K, 12.34M

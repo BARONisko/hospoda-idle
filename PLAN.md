@@ -389,3 +389,10 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Hospoda 68: nákupy přes Google Play Billing (core/billing.ts, @capgo/native-purchases 8.9.6): gems100/gems550/pass
   spotřební, noads trvalý (obnoví se po přeinstalaci – shop.onIapReady → PubScene.iapRestore); ceny z obchodu.
   Návod pro Play Console (produkty, platební profil, licenční testeři): docs/play-console.md.
+- Hospoda 69 (zbylé [O] z QA-NALEZY.md, uživatel „oprav to“): big() (999999999999999 → 999T, 9.99 → 9.9, NaN → 0);
+  CSS safe-area (env()) + bez označování/lupy na canvasu; ukládání: druhá karta prohlížeče se zamkne (pruh „ťukni a načti
+  znovu“, pubidle_tab), uložení novější verze (v ≥ 3) se nepřepíše, plné úložiště hlásí pruh (save.onSaveIssue → main.ts);
+  přetáčení hodin: clampClock() (schopnost manažera, happy hour nesmí končit později než za plnou délku), liga se při
+  hodinách zpět nevyhodnotí; „vrátit body“ s potvrzením (askYesNo); nápisy nahoře pod lištou úkolu (qOff), první noc bez
+  nápisu přes ceduli průvodce; návod krok 4: šipka na bubliny hostů, hospoda neztmavená (~27 s místo ~60 s); liga 2. řádek
+  soupeře se vejde; dlouhé podtitulky řádků se zalomí; fr Collecteur, ja コレクター, ko „{s} 님이“.

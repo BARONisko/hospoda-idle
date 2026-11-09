@@ -14,6 +14,8 @@ import { PubScene } from './scenes/PubScene';
 import { TempleScene } from './scenes/TempleScene';
 import { DartsScene } from './scenes/DartsScene';
 import { PAL } from './data/palette';
+import { onSaveIssue } from './core/save';
+import { t } from './i18n';
 
 installCjkWrap();
 
@@ -161,6 +163,21 @@ else
   window.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape' && goBack()) ev.preventDefault();
   });
+
+// Problémy s ukládáním (druhá karta, novější verze uložení, plné úložiště) → pruh nahoře; u druhé karty ťuk = znovu načíst
+onSaveIssue((k) => {
+  const el = document.createElement('div');
+  el.style.cssText =
+    'position:fixed;left:0;right:0;top:env(safe-area-inset-top);z-index:98;background:#f9c22b;color:#2e222f;font:bold 15px/1.35 Arial,sans-serif;padding:10px 12px;text-align:center;cursor:pointer';
+  el.textContent =
+    k === 'tab'
+      ? t('Hra je otevřená v jiné kartě – tady se neukládá. Ťukni sem a načti ji znovu.')
+      : k === 'newer'
+        ? t('Uložená hra je z novější verze. Aktualizuj hru – tady se neukládá, ať o ni nepřijdeš.')
+        : t('Hru nejde uložit – úložiště je plné. Uvolni místo v telefonu.');
+  el.onclick = () => (k === 'tab' ? location.reload() : el.remove());
+  document.body.appendChild(el);
+});
 
 // mobilní aplikace: reklamy za odměnu (AdMob)
 void initAdMob();

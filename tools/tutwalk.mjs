@@ -17,7 +17,8 @@ while (Date.now() - t0 < 400_000) {
     const i = s.d.tut ?? -1;
     let r = s.tutRect;
     let tip = null;
-    if (i >= 0 && s.constructor.TUT?.[i]?.done === 'tip') { const q = s.views[0]?.tipTarget(); tip = q ? [q.x, q.y] : null; }
+    const dn = s.constructor.TUT?.[i]?.done;
+    if (i >= 0 && (dn === 'tip' || (dn === 'buy:kitchen' && s.tutPoor))) { const q = s.views[0]?.tipTarget(); tip = q ? [q.x, q.y] : null; }
     return { i, r, tip, coins: Math.floor(s.d.coins), night: s.night, text: (s.tutHead?.text ?? '') + ' – ' + (s.tutBub?.text ?? '') };
   });
   if (st.i !== last) {
