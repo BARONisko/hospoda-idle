@@ -1,5 +1,6 @@
 import { PixelCanvas, hash } from './pixel';
 import { PalKey } from '../data/palette';
+import { buildLux } from './luxArt';
 
 // Všechny předměty a nábytek (atlas „obj“).
 
@@ -878,5 +879,6 @@ export function buildObjects(): Record<string, PixelCanvas> {
   o.candle = candle();
   o.medkit = medkit();
   o.sheet = sheet();
+  Object.assign(o, buildLux());
   return o;
 }

@@ -2615,6 +2615,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     }
     // balíčky za peníze jen na stránce Napořád (na Rychlé se nevejdou)
     if (this.gemPage === 0) return;
+    // zablikání jen jednou (další překreslení záložky už ne)
+    this.time.delayedCall(0, () => (this.gemBuyHint = false));
     add(this.add.text(20, yy + 4, t('Koupit diamanty'), txt(20, PAL.gold)).setDepth(D + 2));
     yy += 32;
     (['gems100', 'gems550'] as ProductId[]).forEach((id, i) => {
@@ -2622,6 +2624,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const b = this.btn(10 + i * (bw + 10), yy, bw, 60, () => void this.iapBuy(id), D + 3);
       this.drawBtn(b, `${PRODUCTS[id].gems} 💎 · ${iap.price(id)}`, iap.available, 'amber');
       this.shopObjs.push(b.bg, b.label, b.zone);
+      // přišel z počítadla diamantů nahoře → balíčky zablikají
+      if (this.gemBuyHint) {
+        const hl = add(this.add.graphics().setDepth(D + 4));
+        hl.lineStyle(4, col('gold')).strokeRoundedRect(b.x - 4, b.y - 4, b.w + 8, b.h + 8, 10);
+        this.tweens.add({ targets: hl, alpha: 0.2, yoyo: true, repeat: 3, duration: 350 });
+      }
     });
     if (!iap.available) add(this.add.text(W / 2, yy + 80, t('nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský'), txt(15, PAL.fog)).setOrigin(0.5).setDepth(D + 2));
   }
@@ -4593,7 +4601,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const pulse = full ? Math.round((Math.sin(this.goalPh) + 1) * 1.5) : 0;
     const pct = full ? 100 : Math.floor(fr * 100);
     // návrh C (vybráno): malý krígl v horní liště mezi coins a Menu, pod ním procenta – nic v hospodě nezakrývá
-    const left = this.coinsText.x + this.coinsText.displayWidth, right = this.modeBtn.x;
+    const left = this.coinsText.x + this.coinsText.displayWidth, right = this.gemLeft && this.gemUi?.g.visible ? this.gemLeft : this.modeBtn.x;
     const mw = 26, mh = 36, mx = Math.round(Math.min(right - mw - 18, Math.max(left + 8, (left + right) / 2 - (mw + 9) / 2))), my = 12;
     const key = `${pct}|${pulse}|${mx}`;
     if (key === this.goalKey) return;
@@ -4613,10 +4621,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     u.zone.setPosition(mx - 10, 0).setSize(mw + 29, my + mh + 26);
   }
 
-  // ---------- počítadlo diamantů v horní liště (návrhy ?gem=a|b|c; ťuk = Speciální nabídka → Diamanty) ----------
-  gemStyle = (new URLSearchParams(location.search).get('gem') ?? 'x') as 'a' | 'b' | 'c' | 'x';
+  // ---------- počítadlo diamantů v horní liště vlevo od ×1 (výběr uživatele návrh B; ťuk = Diamanty → koupit) ----------
+  /** po ťuknutí na počítadlo zablikají balíčky diamantů */
+  gemBuyHint = false;
   gemUi?: { g: Phaser.GameObjects.Graphics; num: Phaser.GameObjects.Text; zone: Phaser.GameObjects.Zone };
   gemKey = '';
+  /** levý okraj cedulky diamantů v horním řádku (návrh B) – krígl cíle jde vlevo od ní */
+  gemLeft = 0;
 
   /** pixelový diamant (střed x, y, šířka w) */
   private gemShape(g: Phaser.GameObjects.Graphics, x: number, y: number, w: number) {
@@ -4630,7 +4641,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   private gemTick() {
-    const on = this.gemStyle !== 'x' && (this.d.tut ?? -1) < 0 && !this.awayObjs.length;
+    const on = (this.d.tut ?? -1) < 0 && !this.awayObjs.length;
     const D = 103;
     if (!this.gemUi) {
       const g = this.add.graphics().setDepth(D);
@@ -4641,6 +4652,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         sfx.init();
         sfx.click();
         this.spSub = 'gems';
+        this.gemPage = 1;
+        this.gemBuyHint = true;
         this.openShop('special', false);
       });
       this.gemUi = { g, num, zone };
@@ -4652,20 +4665,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       return;
     }
     const n = this.d.gems ?? 0;
-    const key = `${n}|${this.gemStyle}|${this.goalKey}`;
+    const key = `${n}|${this.goalKey}`;
     if (key === this.gemKey) return;
     this.gemKey = key;
     parts.forEach((o) => o.setVisible(true));
     const g = u.g.clear();
     u.num.setText(big(n)).setScale(1).setColor(PAL.ice);
     const mb = this.modeBtn;
-    if (this.gemStyle === 'a') {
-      // A: pod tlačítkem ×1 vpravo, bez rámečku (řádek se dnem a kostmi je vlevo)
-      const nw = u.num.width, cx = mb.x + mb.w - nw - 2;
-      u.num.setOrigin(0, 0.5).setPosition(cx, 89);
-      this.gemShape(g, cx - 16, 89, 22);
-      u.zone.setPosition(cx - 34, 70).setSize(nw + 40, TOP - 72);
-    } else if (this.gemStyle === 'b') {
+    {
       // B: kulatá cedulka vlevo od ×1 v horním řádku
       const nw = u.num.width, w = nw + 44, h = 40, x = mb.x - 10 - w, y = 21;
       g.fillStyle(col('ink')).fillRoundedRect(x - 2, y - 2, w + 4, h + 4, 12);
@@ -4673,17 +4680,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.gemShape(g, x + 18, y + h / 2, 22);
       u.num.setOrigin(0, 0.5).setPosition(x + 33, y + h / 2);
       u.zone.setPosition(x - 4, y - 8).setSize(w + 8, h + 16);
-    } else {
-      // C: cedulka s plusem vpravo dole v liště (jako měna v mobilních hrách)
-      const nw = u.num.width, w = nw + 74, h = 30, x = W - 12 - w, y = 74;
-      g.fillStyle(col('ink')).fillRoundedRect(x - 2, y - 2, w + 4, h + 4, 10);
-      g.fillStyle(col('navy')).fillRoundedRect(x, y, w, h, 8);
-      this.gemShape(g, x + 16, y + h / 2, 20);
-      u.num.setOrigin(0, 0.5).setPosition(x + 30, y + h / 2);
-      g.fillStyle(col('ink')).fillRoundedRect(x + w - 30, y + 2, 28, h - 4, 7);
-      g.fillStyle(col('mint')).fillRoundedRect(x + w - 29, y + 3, 26, h - 6, 6);
-      g.fillStyle(col('white')).fillRect(x + w - 21, y + h / 2 - 1.5, 10, 3).fillRect(x + w - 17.5, y + h / 2 - 5, 3, 10);
-      u.zone.setPosition(x - 4, y - 6).setSize(w + 8, h + 10);
+      this.gemLeft = x;
     }
   }
 
@@ -5121,7 +5118,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const total = this.d.pubs.reduce((a, p) => a + this.rate(p), 0);
     this.coinsText.setText(`${big(this.d.coins)} coins`);
     // vpravo od coins je krígl cíle (místo C) → coins se vejdou do 170 px
-    this.coinsText.setScale(Math.min(1, (this.goalOn() ? 260 : 330) / this.coinsText.width));
+    // a vpravo od krígla cedulka diamantů → coins jen do místa před kríglem
+    this.coinsText.setScale(Math.min(1, (this.goalOn() ? (this.gemLeft ? this.gemLeft - 76 - 52 : 260) : 330) / this.coinsText.width));
     this.rateText.setText(this.night ? t('+{n} kostí / s', { n: this.bonesPerSec() < 1 ? this.bonesPerSec().toFixed(2) : big(this.bonesPerSec()) }) : t('+{n} / s', { n: big(total) }));
     this.rateText.setColor(this.night ? PAL.ice : PAL.mint).setScale(Math.min(1, 220 / this.rateText.width));
     // během návodu noc nepřijde – čas dne stojí
