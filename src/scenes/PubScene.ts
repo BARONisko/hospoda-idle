@@ -1577,8 +1577,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       else this.treeIcon(dots, b, x, y, r, ic, has ? bc : can ? 0x5d4f6b : 0x3a3045);
       if (n.cost > 1 && !has) cont.add(this.add.text(x + r - 2, y + r - 10, String(n.cost), txt(16, PAL.sand)).setOrigin(0.5));
     }
-    // šipka na další uzel (když jsou body)
-    if (next && pts >= next.cost) {
+    // šipka na další uzel jen do koupě prvního uzlu (přání uživatele: ukázat jen první, ne všechny)
+    if (next && pts >= next.cost && own.length === 0) {
       const p = pos(next), ar = this.add.graphics().setPosition(p.x - 44, p.y);
       ar.fillStyle(col('ink')).fillTriangle(-6, -16, 16, 0, -6, 16).fillRect(-30, -7, 26, 14);
       ar.fillStyle(col('gold')).fillTriangle(-4, -12, 12, 0, -4, 12).fillRect(-27, -4, 24, 8);
