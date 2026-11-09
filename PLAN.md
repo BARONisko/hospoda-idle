@@ -406,3 +406,7 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Grafika Play v angličtině: docs/play/snimek-1…6 (hospoda, noc, menu, pivovar, liga, krígly), obrázek 1024×500 s anglickým
   podtitulkem. Návrhy ikony (7×, pixel art ze spritů hry): docs/navrhy-ui/ikona/ – čeká na výběr uživatele.
 - Hospoda 70: vybraná ikona č. 1 (krígl, sklenice na středu): docs/play/ikona-512.png, public/icon.png, Android mipmap-* (adaptivní vrstvy).
+- Hospoda 70: jména podle jazyka (přání uživatele) – soupeři v lize, jejich hospody a číšníci z src/i18n/names.ts
+  (cs beze změny); štamgasti a postavy v překladech: en Rusty, Fred, Granny Mabel, Doctor Smith, Jake, Uncle Bob,
+  Casey, Mr. Waters, Landlord Barney („Barney's Dive“), Vic; ostatní jazyky obdobně (pl Nowak, Wacek, Baran; ru
+  Петров, Вадик; ja 山田, クマ; …). Snímky pro Play znovu nafocené. Android běh č. 10.

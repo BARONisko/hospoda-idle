@@ -1,6 +1,7 @@
 // Číšníci: pípa točí piva na bar, číšníci je roznášejí ke stolům a teprve doručené pivo vydělá coins.
 // Nestíhají-li, piva čekají na baru (strop BAR_CAP) a pípa stojí. Každý číšník má vlastní vylepšení.
 import { t } from '../i18n';
+import { NAMES } from '../i18n/names';
 
 export interface WaiterState {
   /** úroveň rychlosti chůze */
@@ -17,10 +18,10 @@ export const WAITER_MAX = 3;
 export const BAR_CAP = 12;
 /** jména a postavy číšníků (lidé z P.U.B.) */
 export const WAITERS = [
-  { name: 'Franta', key: 'waiter' },
-  { name: 'Jarka', key: 'waiterB' },
-  { name: 'Bořek', key: 'waiterC' },
-  { name: 'Vilma', key: 'waiterD' },
+  { name: NAMES.waiters[0], key: 'waiter' },
+  { name: NAMES.waiters[1], key: 'waiterB' },
+  { name: NAMES.waiters[2], key: 'waiterC' },
+  { name: NAMES.waiters[3], key: 'waiterD' },
 ];
 
 /** čas na baru (naložení podnosu) a chůze tam a zpět bez vylepšení (s) */

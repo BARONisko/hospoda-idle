@@ -2,6 +2,7 @@
 // Soupeř zrychluje každý den, vyšší liga je silnější, a když vedeš, soupeř zabere víc (až +60 %).
 // Výhra = postup do vyšší ligy + krígly + talisman, prohra = sestup.
 import { t } from '../i18n';
+import { NAMES, fullName } from '../i18n/names';
 
 export const LEAGUES = [t('Okresní přebor'), t('Krajská liga'), t('Národní liga'), t('Pivní mistrovství'), t('Liga hlubin')];
 
@@ -52,14 +53,8 @@ export function boostShare(L: LeagueState, a: number, b: number) {
 }
 
 // ---------- soupeř jako člověk: jméno, hospoda, postavička ----------
-const FIRST = ['Pepa', 'Franta', 'Jarda', 'Mirek', 'Láďa', 'Venca', 'Honza', 'Zdeněk', 'Karel', 'Standa', 'Jirka', 'Bohouš',
-  'Marie', 'Jana', 'Hanka', 'Věra', 'Alena', 'Lenka', 'Zdena', 'Dana', 'Olga', 'Božena', 'Míla', 'Tonda'];
-const LAST = ['Novák', 'Dvořák', 'Svoboda', 'Černý', 'Procházka', 'Kučera', 'Veselý', 'Horák', 'Němec', 'Pokorný',
-  'Marek', 'Pospíšil', 'Hájek', 'Král', 'Jelínek', 'Růžička', 'Beneš', 'Fiala', 'Sedláček', 'Doležal'];
-const PUBS = ['U Lípy', 'U Zlatého soudku', 'Na Rychtě', 'U Tří volů', 'U Kance', 'Pod Kaštanem', 'U Pumpy', 'Na Růžku',
-  'U Dvou koček', 'U Šneka', 'Na Hrázi', 'U Černého koně', 'U Bílé labutě', 'Na Staré poště', 'U Kocoura', 'Pod Věží'];
-/** ženská příjmení (Novák → Nováková, Černý → Černá) */
-const fem = (s: string) => (s.endsWith('ý') ? s.slice(0, -1) + 'á' : s.endsWith('a') ? s.slice(0, -1) + 'ová' : s + 'ová');
+// jména podle jazyka hry (src/i18n/names.ts)
+const FIRST = NAMES.first, LAST = NAMES.last, PUBS = NAMES.pubs;
 
 const hashStr = (s: string) => {
   let h = 2166136261;
@@ -72,7 +67,7 @@ export function rivalInfo(L: Pick<LeagueState, 'week' | 'tier'>, guests = 16) {
   const h = hashStr(`${L.week}|${L.tier}`);
   const fi = h % FIRST.length, woman = fi >= 12 && fi < 23;
   const last = LAST[(h >>> 5) % LAST.length];
-  return { name: `${FIRST[fi]} ${woman ? fem(last) : last}`, pub: PUBS[(h >>> 10) % PUBS.length], look: (h >>> 15) % guests };
+  return { name: fullName(FIRST[fi], last, woman), pub: PUBS[(h >>> 10) % PUBS.length], look: (h >>> 15) % guests };
 }
 
 /** obtížnost lig: kolik soupeř vydělá oproti tomu, co hráč zvládl minulý týden */
