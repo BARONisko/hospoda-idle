@@ -1,12 +1,14 @@
 // Nákupy za skutečné peníze – rozhraní (jako ads.ts). Na webu se neprodává: tlačítka ukážou „jen v mobilní aplikaci“.
 // V aplikaci se sem připojí Google Play přes setIapProvider() (core/billing.ts).
 export interface IapProvider {
-  /** koupí produkt; true = zaplaceno */
-  buy(id: ProductId): Promise<boolean>;
+  /** koupí produkt; true = zaplaceno, 'pending' = platba čeká (hotově apod.) – připíše se přes unclaimed() */
+  buy(id: ProductId): Promise<boolean | 'pending'>;
   /** cena z obchodu (např. „49 Kč“); jinak se ukáže výchozí */
   price?(id: ProductId): string | undefined;
   /** trvalé nákupy, které hráč vlastní (obnovení po přeinstalaci) */
   owned?(): Promise<ProductId[]>;
+  /** zaplacené, ale nepřipsané spotřební nákupy (dřív čekající platba): spotřebuje je a vrátí, co připsat */
+  unclaimed?(): Promise<ProductId[]>;
 }
 
 export type ProductId = 'gems100' | 'gems550' | 'pass' | 'noads';
@@ -37,7 +39,7 @@ export const iap = {
   price(id: ProductId) {
     return provider?.price?.(id) ?? PRODUCTS[id].price;
   },
-  async buy(id: ProductId): Promise<boolean> {
+  async buy(id: ProductId): Promise<boolean | 'pending'> {
     if (!provider) return false;
     try {
       return await provider.buy(id);
@@ -48,6 +50,13 @@ export const iap = {
   async owned(): Promise<ProductId[]> {
     try {
       return (await provider?.owned?.()) ?? [];
+    } catch {
+      return [];
+    }
+  },
+  async unclaimed(): Promise<ProductId[]> {
+    try {
+      return (await provider?.unclaimed?.()) ?? [];
     } catch {
       return [];
     }

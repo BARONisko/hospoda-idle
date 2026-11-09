@@ -399,3 +399,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Hospoda 69b: přetáčení hodin i u Chrámu (denní pokusy), passu (denní 💎), denních a týdenních úkolů, limitů 💎 za
   návštěvníky a hygienu, ligy (Posila, Zavřít pípu) – den se obnoví jen dopředu (porovnání YYYY-MM-DD, weekNum).
   Ruština ověřena na snímcích (Nastavení, Pivovar, Hostinský, Liga). Hlavní jazyk obchodu: angličtina.
+- Hospoda 69c (celková kontrola před nahráním do Play): snímky všech záložek v angličtině bez chyb; nákupy: čekající platba
+  (purchaseState 2) → hláška „Platba čeká“, po zaplacení se při spuštění / návratu do hry spotřebuje a připíše
+  (billing.unclaimed → PubScene.iapGrant), jinak by ji Google po 3 dnech vrátil; zásady soukromí anglicky + česky, s nákupy.

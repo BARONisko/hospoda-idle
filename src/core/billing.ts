@@ -27,12 +27,30 @@ export async function initBilling() {
     price: (id) => prices[id],
     async buy(id) {
       const tr = await NativePurchases.purchaseProduct({ productIdentifier: id, productType: PURCHASE_TYPE.INAPP, quantity: 1, isConsumable: CONSUMABLE.includes(id) });
-      // Android: 1 = zaplaceno, 2 = čeká (platba v hotovosti apod.) – připíše se až po zaplacení při dalším spuštění
+      // Android: 1 = zaplaceno, 2 = čeká (platba v hotovosti apod.) – připíše se po zaplacení (unclaimed při spuštění / návratu)
+      if (tr?.purchaseState === '2') return 'pending';
       return !!tr && (tr.purchaseState === undefined || tr.purchaseState === '1');
     },
     async owned() {
       const { purchases } = await NativePurchases.getPurchases({ productType: PURCHASE_TYPE.INAPP });
       return purchases.filter((p) => p.purchaseState === undefined || p.purchaseState === '1').map((p) => p.productIdentifier as ProductId);
+    },
+    // Dřív čekající platba, která se mezitím zaplatila: Google ji vrací v getPurchases (nespotřebovanou). Bez spotřebování
+    // by ji po 3 dnech vrátil. Nejdřív spotřebovat, pak připsat (nikdy dvakrát).
+    async unclaimed() {
+      const { purchases } = await NativePurchases.getPurchases({ productType: PURCHASE_TYPE.INAPP });
+      const got: ProductId[] = [];
+      for (const p of purchases) {
+        const id = p.productIdentifier as ProductId;
+        if (!CONSUMABLE.includes(id) || p.purchaseState !== '1' || !p.purchaseToken) continue;
+        try {
+          await NativePurchases.consumePurchase({ purchaseToken: p.purchaseToken });
+          got.push(id);
+        } catch {
+          /* příště */
+        }
+      }
+      return got;
     },
   });
 }

@@ -506,6 +506,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const save = () => {
       if (document.visibilityState === 'visible') {
         void notify.cancel();
+        if (iap.available) void this.iapRestore();
         this.clampClock();
         this.offline();
         this.leagueCheck();
@@ -2590,7 +2591,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** nákup za peníze (jen v aplikaci; ?fakeshop=1 na zkoušku) */
   async iapBuy(id: ProductId) {
-    if (!(await iap.buy(id))) return this.banner(this.views[0].cam, iap.available ? t('Nákup se nepovedl') : t('Jen v mobilní aplikaci'));
+    const r = await iap.buy(id);
+    if (r === 'pending') return this.banner(this.views[0].cam, t('Platba čeká – připíše se, až bude zaplacená'));
+    if (!r) return this.banner(this.views[0].cam, iap.available ? t('Nákup se nepovedl') : t('Jen v mobilní aplikaci'));
+    this.iapGrant(id);
+  }
+
+  /** připsat koupený produkt */
+  private iapGrant(id: ProductId) {
     if (id === 'pass') {
       this.d.pass = passBuy(this.d.pass);
       this.banner(this.views[0].cam, t('Štamgast na {d} dní!', { d: PASS_DAYS }));
@@ -2609,6 +2617,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** obchod připojen: obnovit trvalý nákup „bez reklam“ (po přeinstalaci) a překreslit ceny */
   async iapRestore() {
+    // zaplacené dřív čekající platby (diamanty, Štamgast) – připsat
+    for (const id of await iap.unclaimed()) this.iapGrant(id);
     const own = await iap.owned();
     if (!this.sys.isActive()) return;
     if (own.includes('noads') && !this.d.noAds) {
