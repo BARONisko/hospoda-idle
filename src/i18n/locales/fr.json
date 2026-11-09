@@ -1286,5 +1286,6 @@
  "+{n} 💎 za návštěvu": "+{n} 💎 pour la visite",
  "štědrý návštěvník!": "visiteur généreux !",
  "přijato {a} / {b}": "accepté {a} / {b}",
- "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "rien de la visite = +{a} 💎 · max {m} 💎 par jour"
+ "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "rien de la visite = +{a} 💎 · max {m} 💎 par jour",
+ "krígly: {k} (+{b} % výdělek) · 💎 zase zítra": "chopes : {k} (+{b} % de gains) · 💎 à nouveau demain"
 }

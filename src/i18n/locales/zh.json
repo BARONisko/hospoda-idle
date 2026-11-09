@@ -1286,5 +1286,6 @@
  "+{n} 💎 za návštěvu": "来访奖励 +{n} 💎",
  "štědrý návštěvník!": "慷慨的访客！",
  "přijato {a} / {b}": "已接受 {a} / {b}",
- "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "来访无收获 = +{a} 💎 · 每天最多 {m} 💎"
+ "nic z návštěvy = +{a} 💎 · max {m} 💎 denně": "来访无收获 = +{a} 💎 · 每天最多 {m} 💎",
+ "krígly: {k} (+{b} % výdělek) · 💎 zase zítra": "酒杯：{k}（收入 +{b} %）· 💎 明天再领"
 }

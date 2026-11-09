@@ -135,6 +135,8 @@ export interface Save {
   vis?: Record<string, number>;
   /** 💎 od návštěvníků dnes (strop VIS_GEMS_DAY) */
   visG?: { day: string; n: number };
+  /** hygieny s 💎 dnes (strop PRESTIGE_GEMS_DAY) */
+  hygG?: { day: string; n: number };
   /** bestiář: viděné druhy hostů */
   seen: string[];
   /** koupená vylepšení z obchodu (id) */

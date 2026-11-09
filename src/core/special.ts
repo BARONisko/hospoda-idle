@@ -39,12 +39,12 @@ export const CHEST_REW: ChestRew[] = [
   { k: 'darts', n: 20, q: 1 },
   { k: 'coins', h: 8 },
   { k: 'bones', n: 10, h: 2 },
-  { k: 'krigle', n: 1, f: 0.05 },
+  { k: 'krigle', n: 1, f: 0.01 },
   { k: 'gold' },
 ];
 export const GOLD_KRIGLE = 3;
-/** zlatá truhla: krígly aspoň GOLD_KRIGLE, jinak 10 % vlastněných */
-export const GOLD_KRIGLE_F = 0.1;
+/** zlatá truhla: krígly aspoň GOLD_KRIGLE, jinak 2 % vlastněných (dřív 10 % = složený úrok ~×1800 za rok) */
+export const GOLD_KRIGLE_F = 0.02;
 
 /** otevře truhlu: vrátí den (1–7) a uloží sérii */
 export function openChest(c: ChestState | undefined, now = Date.now()): { st: ChestState; day: number } {
@@ -150,6 +150,8 @@ export const GOLD_GEMS = 10;
 /** další diamanty zdarma (zakomponování do hry): poražený Cthulhu (× obtížnost), výhra v lize (× liga),
  *  hygiena, každá 5. úroveň hostinského, splněný úkol od hostinského */
 export const GEMS_FREE = { boss: 3, league: 2, prestige: 2, keeper5: 3, quest: 2 } as const;
+/** 💎 za hygienu jen za první PRESTIGE_GEMS_DAY hygieny denně (dřív bez limitu: zapálený hráč ~12 💎/h) */
+export const PRESTIGE_GEMS_DAY = 3;
 /** přerozdělení bodů stromu hostinského za diamanty (pevná cena; za krígly cena roste) */
 export const RESPEC_GEMS = 30;
 

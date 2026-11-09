@@ -19,7 +19,7 @@ import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, retune, nightLen, night
 import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
 import { notify, NOTE, Note } from '../core/notify';
-import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, GEM_PERM, GEM_LOOK, CHRONICLE_BONUS, VIP_GEMS, GOLD_GEMS, GEMS_FREE, RESPEC_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
+import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, GEM_PERM, GEM_LOOK, CHRONICLE_BONUS, VIP_GEMS, GOLD_GEMS, GEMS_FREE, PRESTIGE_GEMS_DAY, RESPEC_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
 import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER, weekendLeft } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { TREE, TREE_BY_ID, TREE_BRANCHES, TREE_COLORS, STAR_TEXT, treeSpent, treeCan, hasStar, treeStats, xpNeed, oldXpNeed, lvlFromTotal, respecCost, pathX, type StarId, type TreeNode } from '../core/skilltree';
@@ -2000,7 +2000,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (this.shopSub === 'bones') return this.bonesTab(y0, D);
     const offer = this.shopOffer().slice(0, 4);
     const k = this.kriglyNow();
-    this.row(y0, RH, D, t('Zavolat hygienu'), t('krígly: {k} (+{b} % výdělek) · hygiena +{g} 💎', { k: big(this.d.krigle), b: big(Math.round(this.d.krigle * KRIGL_BONUS * 100)), g: GEMS_FREE.prestige }), 'blood', PAL.sand);
+    const kv = { k: big(this.d.krigle), b: big(Math.round(this.d.krigle * KRIGL_BONUS * 100)), g: GEMS_FREE.prestige };
+    this.row(y0, RH, D, t('Zavolat hygienu'), this.hygGemsLeft() > 0 ? t('krígly: {k} (+{b} % výdělek) · hygiena +{g} 💎', kv) : t('krígly: {k} (+{b} % výdělek) · 💎 zase zítra', kv), 'blood', PAL.sand);
     const pb = this.btn(W - 212, y0 + 12, 190, 62, () => this.askPrestige(), D + 2);
     this.hygBtn = pb;
     const pm = prestigeMin(this.d.stats.prestiges, this.d.krigle);
@@ -3311,6 +3312,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return Math.ceil(((tap.base + tap.staff) * actMult(last.act) + tap.staff * 2) * 1.2);
   }
 
+  /** kolik dnešních hygien ještě dá 💎 */
+  private hygGemsLeft() {
+    const day = dayKey();
+    if (this.d.hygG?.day !== day) this.d.hygG = { day, n: 0 };
+    return PRESTIGE_GEMS_DAY - this.d.hygG.n;
+  }
+
   /** kolik hvězd stanic přibylo při poslední hygieně (nápis po restartu scény) */
   starMsg = 0;
   private prestige() {
@@ -3324,7 +3332,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const n = Math.min(MAX_PUBS, this.d.pubs.length + 1);
     if (n > this.d.pubs.length) (this.d.pubIntro = n), ((this.d.guideQ ??= []).push('pub' + n));
     this.d.krigle += k;
-    this.d.gems = (this.d.gems ?? 0) + GEMS_FREE.prestige;
+    if (this.hygGemsLeft() > 0) {
+      this.d.hygG!.n++;
+      this.d.gems = (this.d.gems ?? 0) + GEMS_FREE.prestige;
+    }
     this.d.stats.prestiges++;
     this.d.run = 0;
     this.d.coins = 0;
