@@ -21,6 +21,49 @@ export interface LeagueState {
   rAt?: number;
   /** pivo pro soupeře: do kdy vydělává jen polovinu (ms) */
   slowUntil?: number;
+  /** můj výdělek za sekundu na začátku týdne (pro vyrovnání dalšího týdne) */
+  base?: number;
+}
+
+// ---------- soupeř jako člověk: jméno, hospoda, postavička ----------
+const FIRST = ['Pepa', 'Franta', 'Jarda', 'Mirek', 'Láďa', 'Venca', 'Honza', 'Zdeněk', 'Karel', 'Standa', 'Jirka', 'Bohouš',
+  'Marie', 'Jana', 'Hanka', 'Věra', 'Alena', 'Lenka', 'Zdena', 'Dana', 'Olga', 'Božena', 'Míla', 'Tonda'];
+const LAST = ['Novák', 'Dvořák', 'Svoboda', 'Černý', 'Procházka', 'Kučera', 'Veselý', 'Horák', 'Němec', 'Pokorný',
+  'Marek', 'Pospíšil', 'Hájek', 'Král', 'Jelínek', 'Růžička', 'Beneš', 'Fiala', 'Sedláček', 'Doležal'];
+const PUBS = ['U Lípy', 'U Zlatého soudku', 'Na Rychtě', 'U Tří volů', 'U Kance', 'Pod Kaštanem', 'U Pumpy', 'Na Růžku',
+  'U Dvou koček', 'U Šneka', 'Na Hrázi', 'U Černého koně', 'U Bílé labutě', 'Na Staré poště', 'U Kocoura', 'Pod Věží'];
+/** ženská příjmení (Novák → Nováková, Černý → Černá) */
+const fem = (s: string) => (s.endsWith('ý') ? s.slice(0, -1) + 'á' : s.endsWith('a') ? s.slice(0, -1) + 'ová' : s + 'ová');
+
+const hashStr = (s: string) => {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+  return h >>> 0;
+};
+
+/** soupeř tohoto týdne (stejný po celý týden): jméno, hospoda, číslo postavičky hosta */
+export function rivalInfo(L: Pick<LeagueState, 'week' | 'tier'>, guests = 16) {
+  const h = hashStr(`${L.week}|${L.tier}`);
+  const fi = h % FIRST.length, woman = fi >= 12 && fi < 23;
+  const last = LAST[(h >>> 5) % LAST.length];
+  return { name: `${FIRST[fi]} ${woman ? fem(last) : last}`, pub: PUBS[(h >>> 10) % PUBS.length], look: (h >>> 15) % guests };
+}
+
+/** obtížnost lig: kolik soupeř vydělá oproti tomu, co hráč zvládl minulý týden */
+export const TIER_F = [0.7, 0.85, 1, 1.15, 1.3];
+/** tržba soupeře za celý týden při daném rate (bez reakcí na hráče) */
+const weekTotal = (rate: number, tier: number) => ((rate * 86400) / Math.log(GROW)) * (GROW ** 7 - 1) * activity(tier);
+
+/** výdělek soupeře na začátku týdne: vyrovnaný podle toho, kolik hráč vydělal minulý týden
+ *  (s ohledem na to, jak od té doby zrychlil), jinak podle jeho výdělku za sekundu */
+export function rivalRate(tier: number, myRate: number, last?: { me: number; base?: number }) {
+  const byRate = (Math.max(1, myRate) * TIER_F[tier - 1]) / TIER_F[0];
+  // první týden (bez historie): mírnější, aby i slabší hráč měl šanci
+  if (!last || !(last.me > 0) || !last.base) return byRate * 0.45;
+  const grew = Math.min(6, Math.max(1, myRate / last.base));
+  const target = last.me * grew * TIER_F[tier - 1];
+  // nejvýš 2× a nejméně ¼ toho, co by dal výdělek za sekundu (aby jeden divný týden nerozhodil vše)
+  return Math.min(byRate * 2, Math.max(byRate / 4, target / weekTotal(1, tier)));
 }
 
 const WEEK = 7 * 86400_000;
@@ -49,8 +92,11 @@ export const winReward = (tier: number) => 5 * tier;
 /** jak rychle soupeř právě vydělává (coins/s) – bez reakce na hráče */
 const rivalSpeed = (L: LeagueState, at: number) => L.rate * activity(L.tier) * GROW ** ((at - L.start) / 86400_000);
 
-/** když vedeš, soupeř zabere: +0 až +60 % podle náskoku */
-const push = (me: number, rival: number, rate: number) => (me > rival ? 1 + 0.6 * Math.min(1, (me - rival) / Math.max(rival, rate * 3600)) : 1);
+/** když vedeš, soupeř zabere: +0 až +60 % podle náskoku; když soupeř vede o hodně, poleví (až na 60 %) – souboj je vyrovnaný */
+const push = (me: number, rival: number, rate: number) => {
+  const d = (me - rival) / Math.max(me, rival, rate * 3600);
+  return d > 0 ? 1 + 0.3 * Math.min(1, (me - rival) / Math.max(rival, rate * 3600)) : d < -0.2 ? Math.max(0.6, 1 + (d + 0.2)) : 1;
+};
 
 /** dopočítá tržbu soupeře do teď (po krocích max. 10 min, kvůli reakci na náskok) a vrátí ji */
 export function rivalTick(L: LeagueState, now = Date.now()) {

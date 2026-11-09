@@ -133,6 +133,20 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     return won && lost;
   });
   ok('liga: výhra = postup, prohra = sestup', lg);
+  // 5i2) liga: soupeř má jméno a hospodu (stejné celý týden) a sílu podle minulého týdne
+  const lg2 = await S(p, (s) => {
+    const L = s.league();
+    const okRate = Number.isFinite(L.rate) && L.rate > 0 && L.base > 0;
+    s.openShop('league', false);
+    const txt = s.shopObjs.filter((o) => o.type === 'Text').map((o) => o.text).join('|');
+    // jméno soupeře (dvě slova) se objeví i ve zprávě o vedení (nezávisle na jazyce)
+    const ts = s.shopObjs.filter((o) => o.type === 'Text').map((o) => o.text);
+    const named = ts.some((n) => / /.test(n) && n.length > 5 && ts.some((m) => m !== n && m.includes(n.split(' ')[0])));
+    s.closeShop();
+    return okRate && L.base > 0 && named && !!txt ? true : JSON.stringify([L, ts]);
+  });
+  if (lg2 !== true) console.log(lg2);
+  ok('liga: soupeř se jménem, síla podle minulého týdne', lg2 === true);
   // 6) prestiž
   await S(p, (s) => { s.d.run = 1e8; s.d.pubs[0].st.tap.lvl = 500; s.askPrestige(); s.prestige(); });
   await p.waitForTimeout(800);
