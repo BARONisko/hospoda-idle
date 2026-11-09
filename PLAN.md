@@ -405,3 +405,4 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Hospoda 70: zásady soukromí rozděleny – soukromi.html jen anglicky (URL v Play beze změny), soukromi-cs.html česky.
   Grafika Play v angličtině: docs/play/snimek-1…6 (hospoda, noc, menu, pivovar, liga, krígly), obrázek 1024×500 s anglickým
   podtitulkem. Návrhy ikony (7×, pixel art ze spritů hry): docs/navrhy-ui/ikona/ – čeká na výběr uživatele.
+- Hospoda 70: vybraná ikona č. 1 (krígl, sklenice na středu): docs/play/ikona-512.png, public/icon.png, Android mipmap-* (adaptivní vrstvy).
