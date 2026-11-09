@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { PAL } from '../data/palette';
 import { t, lang, LANGS, AVAILABLE, setLang } from '../i18n';
 import { txt } from '../ui/font';
+import { fitPads, type R } from '../ui/touch';
 import { confetti, rays, bigText, coinFountain, popText, punch, flashRect } from '../ui/juice';
 import { big, dur } from '../core/num';
 import { WAITERS, WAITER_MAX, BAR_CAP, crew, tripTime, smileBonus, hireCost as wHireCost, UP_MAX as W_UP_MAX, freePoints, xpProgress, xpFor, spent as wSpent, earned as wEarned, MAX_POINTS, upName as wUpName, waiterLvl, waiterRate, tray, SMILE_STEP, START_CREW, beersPerCycle, type WaiterUp } from '../core/waiters';
@@ -337,6 +338,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // po restartu scény (hygiena) jsou staré objekty zničené – odkazy na ně zahodit, jinak hra spadne (zamrzne)
     this.goalUi = undefined;
     this.goalKey = '';
+    this.gemUi = undefined;
+    this.gemKey = '';
     this.qUi = this.styleSign = this.chestHud = this.chestBg = this.vipBar = this.vipSpr = this.brewBar = this.brewTxt = undefined;
     this.scrollBar = this.hint = this.hygBtn = undefined;
     this.signBot = 0;
@@ -362,6 +365,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.skillIcons = [];
     this.skillSubs = [];
     this.skillKeys = [];
+    this.touchZones = [];
     this.strips = [];
     this.scroll = 0;
     this.drag = null;
@@ -1144,10 +1148,22 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const img = this.add.image(x + tw / 2, y + 50, atlas, frame).setDepth(D + 4);
       img.setScale(Math.min(5, 64 / Math.max(img.width, img.height)));
       if (lock) img.setTintFill(col('dusk'));
-      const lb = this.add.text(x + tw / 2, y + th - 24, label, txt(20, lock ? PAL.slate : PAL.bone)).setOrigin(0.5).setDepth(D + 4);
-      if (lock) lb.setText(lock).setFontSize(15).setWordWrapWidth(tw - 10).setAlign('center');
+      const F = PubScene.FONT;
+      const lb = this.add.text(x + tw / 2, y + th - 24, label, txt(F ? 24 : 20, lock ? (F === 'b' ? PAL.fog : PAL.slate) : F === 'b' ? PAL.white : PAL.bone)).setOrigin(0.5).setDepth(D + 4);
+      // A: kratší podmínka („po 3. hygieně“ → „3. hygieně“), B: větší a světlejší, C: jen název + odznak s číslem
+      if (lock && F !== 'c') lb.setText(F === 'a' ? lock.replace(/^(po|od|až) /, '') : lock).setFontSize(F ? 19 : 15).setWordWrapWidth(tw - 10).setAlign('center');
       lb.setScale(Math.min(1, (tw - 12) / lb.width));
       this.shopObjs.push(b.bg, b.label, b.zone, img, lb);
+      if (lock && F === 'c') {
+        // odznak podmínky: číslo hygieny, ⭐ úroveň hostinského, 🌙 první noc, 💀 kosti, ? talisman
+        const n = lock.match(/\d+/)?.[0], k = sub && tab === 'shop' ? sub : tab;
+        const badge = k === 'keeper' ? `⭐${n}` : k === 'talis' ? '?' : k === 'coll' ? '💀' : k === 'bones' || k === 'daynight' ? '🌙' : `${n}.`;
+        const bx = x + tw - 26, by = y + 22, br = badge.length > 2 ? 24 : 19;
+        const bd = this.add.graphics().setDepth(D + 5);
+        bd.fillStyle(col('ink')).fillRoundedRect(bx - br, by - 19, br * 2, 38, 19).fillStyle(col(k === 'keeper' ? 'navy' : 'plum')).fillRoundedRect(bx - br + 3, by - 16, br * 2 - 6, 32, 16);
+        const bt = this.add.text(bx, by, badge, txt(22, PAL.gold)).setOrigin(0.5).setDepth(D + 6);
+        this.shopObjs.push(bd, bt);
+      }
       if (lock) {
         const lk = this.add.image(x + tw / 2, y + 50, 'icons', 'lock').setScale(3).setDepth(D + 5);
         this.shopObjs.push(lk);
@@ -2636,7 +2652,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const pw = (W - 60) / 3;
     ([[0, t('⚡ Rychlé')], [1, t('★ Napořád')], [2, t('🎨 Vzhled')]] as [number, string][]).forEach(([pg, label], i) => {
       const b = this.btn(20 + i * (pw + 10), y + 34, pw, 40, () => ((this.gemPage = pg), this.openShop('special', false)), D + 3);
-      this.drawBtn(b, label, true, this.gemPage === pg ? 'amber' : 'plum');
+      const F = PubScene.FONT;
+      this.drawBtn(b, F === 'c' ? ['⚡', '★', '🎨'][i] : label, true, this.gemPage === pg ? 'amber' : 'plum');
+      if (F) b.label.setFontSize(F === 'c' ? 30 : 21).setScale(Math.min(1, (b.w - 10) / b.label.width));
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
     const desc: Record<GemItem, [string, string]> = {
@@ -2661,7 +2679,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (li) add(this.add.image(44, yy + 33, li[0], li[1] === '0' ? 0 : li[1]).setScale(li[2]).setDepth(D + 2));
       else add(this.add.text(44, yy + 33, desc[id][0], txt(30, PAL.white)).setOrigin(0.5).setDepth(D + 2));
       add(this.add.text(80, yy + 8, this.gemName(id), txt(21, PAL.bone)).setDepth(D + 2));
-      const ds = add(this.add.text(80, yy + 38, desc[id][1], txt(15, PAL.fog)).setDepth(D + 2));
+      const ds = add(this.add.text(80, yy + 36, desc[id][1], txt(PubScene.FONT ? 19 : 15, PubScene.FONT === 'b' ? PAL.bone : PAL.fog)).setDepth(D + 2));
       ds.setScale(Math.min(1, 290 / ds.width));
       if (own) add(this.add.text(W - 86, yy + 33, t('koupeno ✓'), txt(20, PAL.white)).setOrigin(0.5).setDepth(D + 2));
       else {
@@ -2691,8 +2709,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     });
     if (!iap.available) {
       // dlouhé překlady: zalomit a zmenšit, ať nepřetečou přes okraj ani pod lištu
-      const ft = add(this.add.text(W / 2, yy + 80, t('nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský'), txt(15, PAL.fog)).setOrigin(0.5).setAlign('center').setWordWrapWidth(W - 40).setDepth(D + 2));
-      ft.setScale(Math.min(1, (MB - 6 - (yy + 66)) / ft.height));
+      const F = PubScene.FONT;
+      // A: jen první věta, B: totéž světlejší, C: odznak „📱 jen v aplikaci“
+      const fs = F ? t('nákup jen v mobilní aplikaci') : t('nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský');
+      if (F === 'c') {
+        const pg = add(this.add.graphics().setDepth(D + 1));
+        pg.fillStyle(col('ink')).fillRoundedRect(W / 2 - 170, yy + 66, 340, 34, 17).lineStyle(2, col('fog')).strokeRoundedRect(W / 2 - 170, yy + 66, 340, 34, 17);
+      }
+      const ft = add(this.add.text(W / 2, yy + (F ? 83 : 80), F === 'c' ? '📱 ' + fs : fs, txt(F ? 19 : 15, F === 'b' ? PAL.bone : F === 'c' ? PAL.white : PAL.fog)).setOrigin(0.5).setAlign('center').setWordWrapWidth(W - 40).setDepth(D + 2));
+      ft.setScale(Math.min(1, (MB - 6 - (yy + 66)) / ft.height, (W - 30) / ft.width));
     }
   }
 
@@ -2880,8 +2905,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const tw = (W - 20 - (gn.length - 1) * 4) / gn.length;
     gn.forEach((n, i) => {
       const b = this.btn(10 + i * (tw + 4), y0 - 50, tw, 40, () => ((this.bookGrp = i), (this.bookSel = ''), this.openShop('book', false)), D + 2);
-      this.drawBtn(b, n, true, this.bookGrp === i ? 'gold' : 'plum');
-      b.label.setFontSize(15).setScale(Math.min(1, (tw - 8) / b.label.width));
+      const F = PubScene.FONT;
+      // A: jen první slovo názvu, B: na dva řádky, C: ikona (pivo + číslo hospody, sezóna, dveře)
+      const nn = F === 'a' ? n.split(' ')[0] : F === 'b' ? n.replace(' ', '\n') : F === 'c' ? ['🍺1', '🍺2', '🍺3', '🍂', '🚪'][i] : n;
+      this.drawBtn(b, nn, true, this.bookGrp === i ? 'gold' : 'plum');
+      b.label.setFontSize(F === 'c' ? 26 : F ? 20 : 15).setLineSpacing(F === 'b' ? -6 : 0).setScale(Math.min(1, (tw - 8) / b.label.width, F === 'b' ? (b.h - 2) / b.label.height : 1));
       if (this.bookGrp === i) b.label.setColor(PAL.ink).setStroke(PAL.ink, 0);
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
@@ -3886,7 +3914,50 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (s0 && Math.hypot(ptr.x - s0.x, ptr.y - s0.y) < 14) fire();
     });
     zone.on('pointerout', () => (start = null));
+    this.touchZones.push(zone);
     return b;
+  }
+
+  // ---------- neviditelně větší dotyková místa (src/ui/touch.ts) ----------
+  /** zóny, které smí mít větší neviditelné dotykové místo (tlačítka btn(), krígl a diamanty v horní liště) */
+  touchZones: Phaser.GameObjects.Zone[] = [];
+  /** ladění: ?touch=0 = původní (malá) dotyková místa */
+  static TOUCH_OFF = new URLSearchParams(location.search).get('touch') === '0';
+  /** NÁVRH drobného písma (QA hospoda 76), jen ladicí ?font=a|b|c: A = větší písmo + kratší texty, B = větší + světlejší
+   *  (kontrast), C = místo drobných popisků ikony/odznaky. Bez parametru beze změny. Obrázek: docs/navrhy-ui/pismo-ABC.png */
+  static FONT = (new URLSearchParams(location.search).get('font') ?? '') as '' | 'a' | 'b' | 'c';
+  /** každý snímek: zóně (viditelný obdélník = x, y, šířka, výška) nastaví větší hitArea; sousedy nepřekryje */
+  private fitTouch() {
+    if (PubScene.TOUCH_OFF) return;
+    this.touchZones = this.touchZones.filter((z) => z.active && z.scene);
+    const cam = this.cameras.main, im = this.input.manager as unknown as { inputCandidate: (o: Phaser.GameObjects.GameObject, c: Phaser.Cameras.Scene2D.Camera) => boolean };
+    const list = ((this.input as unknown as { _list: Phaser.GameObjects.GameObject[] })._list ?? []).filter((o) => im.inputCandidate(o, cam));
+    const rect = (o: Phaser.GameObjects.GameObject): R | null => {
+      if (o instanceof Phaser.GameObjects.Zone) return { x: o.x - o.displayOriginX, y: o.y - o.displayOriginY, w: o.width, h: o.height };
+      const g = o as unknown as { getBounds?: () => Phaser.Geom.Rectangle };
+      if (!g.getBounds) return null;
+      const r = g.getBounds();
+      return { x: r.x, y: r.y, w: r.width, h: r.height };
+    };
+    const live = this.touchZones.filter((z) => z.input?.enabled && list.includes(z) && z.width > 0 && z.height > 0);
+    const others = list.filter((o) => !live.includes(o as Phaser.GameObjects.Zone)).map((o) => ({ o, r: rect(o), d: (o as unknown as { depth: number }).depth ?? 0 })).filter((x) => x.r) as { o: Phaser.GameObjects.GameObject; r: R; d: number }[];
+    const BIG = W * H * 0.2;
+    const items = live.map((z) => {
+      const r = rect(z)!, cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+      // pozadí okna pod tlačítkem (velká ťukací plocha): co leží pod ním, je zakryté a nepočítá se
+      const floor = Math.max(-Infinity, ...others.filter((x) => x.r.w * x.r.h >= BIG && x.d <= z.depth && cx >= x.r.x && cx <= x.r.x + x.r.w && cy >= x.r.y && cy <= x.r.y + x.r.h).map((x) => x.d));
+      const obst = others.filter((x) => x.d >= floor && x.r.w * x.r.h < BIG).map((x) => x.r);
+      // nad spodní lištou zůstat nad ní
+      const bottom = r.y + r.h <= MB ? MB : H;
+      return { r, obst, bound: { x: 0, y: 0, w: W, h: bottom }, depth: z.depth, floor };
+    });
+    const pads = fitPads(items);
+    live.forEach((z, i) => {
+      const [l, t, r, b] = pads[i];
+      const ha = z.input!.hitArea as Phaser.Geom.Rectangle;
+      const w = z.width + l + r, h = z.height + t + b;
+      if (Math.abs(ha.x + l) + Math.abs(ha.y + t) + Math.abs(ha.width - w) + Math.abs(ha.height - h) > 0.01) ha.setTo(-l, -t, w, h);
+    });
   }
 
   private drawBtn(b: Btn, text: string, enabled: boolean, c: keyof typeof PAL, visible = true) {
@@ -4307,12 +4378,50 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     add(this.add.text(20, y0 + 236, t('Zesíleno kostňákem ({n} hodů):', { n: rolls }), txt(18, PAL.gold)).setDepth(D + 2));
     // výška řádku tak, aby se celý přehled vešel nad spodní lištu (hlášení: poslední řádek nebyl vidět)
     const rh = Math.min(23, (MB - 8 - (y0 + 260)) / Math.ceil(OSSUARY.length / 2));
+    if (PubScene.FONT) return this.ossListDraft(y0, D, add);
     OSSUARY.forEach((o, i) => {
       const lvl = this.d.oss?.[o.stat] ?? 0;
       const capped = o.cap !== undefined && (lvl + 1) * o.per > o.cap + 1e-9;
       const x = 20 + (i % 2) * 262, y = y0 + 260 + Math.floor(i / 2) * rh;
       const tx = add(this.add.text(x, y, STAT_NAMES[o.stat](lvl * o.per) + (capped ? ' (max)' : ''), txt(15, o.stat === this.ossLast ? PAL.gold : lvl ? PAL.mint : PAL.slate)).setDepth(D + 2));
       tx.setScale(Math.min(1, 250 / tx.width, rh / tx.height));
+    });
+  }
+
+  /** NÁVRH (?font=a|b|c) přehledu Kostnice: A = jen zesílené staty větším písmem + počet zbylých, B = vše větší a světlejší,
+   *  C = zesílené staty jako odznaky, zbytek jedním odznakem */
+  private ossListDraft(y0: number, D: number, add: <T extends Phaser.GameObjects.GameObject>(o: T) => T) {
+    const F = PubScene.FONT, top = y0 + 262, room = MB - 8 - top;
+    const rows = OSSUARY.map((o) => {
+      const lvl = this.d.oss?.[o.stat] ?? 0, capped = o.cap !== undefined && (lvl + 1) * o.per > o.cap + 1e-9;
+      return { o, lvl, txt: STAT_NAMES[o.stat](lvl * o.per) + (capped ? ' (max)' : '') };
+    });
+    const on = rows.filter((r) => r.lvl > 0), off = rows.length - on.length;
+    if (F === 'b') {
+      const rh = Math.min(30, room / Math.ceil(rows.length / 2));
+      rows.forEach((r, i) => {
+        const tx = add(this.add.text(20 + (i % 2) * 262, top + Math.floor(i / 2) * rh, r.txt, txt(19, r.o.stat === this.ossLast ? PAL.gold : r.lvl ? PAL.mint : PAL.fog)).setDepth(D + 2));
+        tx.setScale(Math.min(1, 250 / tx.width, rh / tx.height));
+      });
+      return;
+    }
+    const list = [...on.map((r) => ({ s: r.txt, c: r.o.stat === this.ossLast ? PAL.gold : PAL.mint })), ...(off ? [{ s: `+ ${off} × ${t('zatím nic')}`, c: PAL.fog }] : [])];
+    if (F === 'a') {
+      const rh = Math.min(32, room / Math.ceil(list.length / 2));
+      list.forEach((r, i) => {
+        const tx = add(this.add.text(20 + (i % 2) * 262, top + Math.floor(i / 2) * rh, r.s, txt(21, r.c)).setDepth(D + 2));
+        tx.setScale(Math.min(1, 250 / tx.width, rh / tx.height));
+      });
+      return;
+    }
+    // C: odznaky ve dvou sloupcích
+    const bh = Math.min(40, room / Math.ceil(list.length / 2)), g = add(this.add.graphics().setDepth(D + 1));
+    list.forEach((r, i) => {
+      const x = 14 + (i % 2) * 260, y = top + Math.floor(i / 2) * bh;
+      g.fillStyle(col(i < on.length ? 'navy' : 'ink')).fillRoundedRect(x, y + 2, 252, bh - 6, (bh - 6) / 2);
+      if (r.c === PAL.gold) g.lineStyle(2, col('gold')).strokeRoundedRect(x, y + 2, 252, bh - 6, (bh - 6) / 2);
+      const tx = add(this.add.text(x + 126, y + bh / 2 - 1, r.s, txt(20, r.c === PAL.fog ? PAL.bone : r.c)).setOrigin(0.5).setDepth(D + 2));
+      tx.setScale(Math.min(1, 236 / tx.width, (bh - 8) / tx.height));
     });
   }
 
@@ -4671,6 +4780,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.qTick();
     this.goalTick();
     this.gemTick();
+    this.fitTouch();
     this.tutTick();
     this.vipTick(dt);
     // Automatická šťastná hodina (za diamanty): manažeři pouští schopnost sami
@@ -4821,6 +4931,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         this.shopSub = 'up';
         this.openShop('shop', false);
       });
+      this.touchZones.push(zone);
       this.goalUi = { g, num, zone };
     }
     const u = this.goalUi;
@@ -4854,7 +4965,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (full) g.lineStyle(3, col('mint'), 0.6 + pulse * 0.13).strokeRoundedRect(mx - 7, my - 7, mw + 23, mh + 14, 6);
     u.num.setText(`${pct} %`).setOrigin(0.5, 0).setPosition(mx + (mw + 9) / 2, my + mh + 4).setColor(full ? PAL.mint : PAL.white);
     u.num.setScale(Math.min(1, 60 / u.num.width));
-    u.zone.setPosition(mx - 10, 0).setSize(mw + 29, my + mh + 26);
+    // zóna = jen krígl s uchem; větší dotykové místo (bez překryvu s diamanty) dopočítá fitTouch
+    u.zone.setPosition(mx - 3, 0).setSize(mw + 15, my + mh + 26);
   }
 
   // ---------- počítadlo diamantů v horní liště vlevo od ×1 (výběr uživatele návrh B; ťuk = Diamanty → koupit) ----------
@@ -4892,6 +5004,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         this.gemBuyHint = true;
         this.openShop('special', false);
       });
+      this.touchZones.push(zone);
       this.gemUi = { g, num, zone };
     }
     const u = this.gemUi;
@@ -4915,7 +5028,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       g.fillStyle(col('navy')).fillRoundedRect(x, y, w, h, 10);
       this.gemShape(g, x + 18, y + h / 2, 22);
       u.num.setOrigin(0, 0.5).setPosition(x + 33, y + h / 2);
-      u.zone.setPosition(x - 4, y - 8).setSize(w + 8, h + 16);
+      u.zone.setPosition(x - 2, y - 8).setSize(w + 4, h + 16);
       this.gemLeft = x;
     }
   }
@@ -5363,10 +5476,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.rateText.setColor(this.night ? PAL.ice : PAL.mint).setScale(Math.min(1, 220 / this.rateText.width));
     // během návodu noc nepřijde – čas dne stojí
     const left = Math.ceil(((this.d.tut ?? -1) >= 0 ? DAY_MS : phaseLeft()) / 1000);
+    const clock = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`, F = PubScene.FONT;
     this.infoText.setText(
-      `${this.night ? t('Noc') : t('Den')} ${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}  ·  ${t('kosti: {n}', { n: big(this.d.bones ?? 0) })}` +
-        (season ? `  ·  ${SEASONS[season].name} +${SEASON_BONUS * 100} %` : ''),
+      F === 'c' ? `${this.night ? '🌙' : '☀️'} ${clock}   💀 ${big(this.d.bones ?? 0)}` + (season ? `   🍂 +${SEASON_BONUS * 100} %` : '')
+      : `${this.night ? t('Noc') : t('Den')} ${clock}  ·  ${t('kosti: {n}', { n: big(this.d.bones ?? 0) })}` +
+        (season && F !== 'a' ? `  ·  ${SEASONS[season].name} +${SEASON_BONUS * 100} %` : ''),
     );
+    if (F) this.infoText.setFontSize(F === 'c' ? 23 : 24).setY(F === 'c' ? 77 : 76).setColor(F === 'b' ? PAL.white : PAL.bone);
     this.infoText.setScale(Math.min(1, (W - 32) / this.infoText.width));
     this.skillBtns.forEach((_, i) => this.drawSkill(i));
     this.stripRates.forEach((r, i) => r.setText(t('+{n} / s', { n: big(this.rate(this.d.pubs[i])) })));
@@ -5465,7 +5581,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       }
       c.bar.fillStyle(col('dusk')).fillRoundedRect(26, c.y + 57, bw, 16, 6);
       if (open && s.prog > 0) c.bar.fillStyle(col(s.auto ? 'mint' : 'amber')).fillRoundedRect(26, c.y + 57, Math.max(12, bw * Math.min(1, s.prog)), 16, 6);
-      if (open && !s.auto && s.prog === 0) c.info.setText(t('ťukni sem!'));
+      if (open && !s.auto && s.prog === 0) {
+        const F = PubScene.FONT;
+        c.info.setText(F === 'c' ? '👆' : t('ťukni sem!'));
+        if (F) c.info.setFontSize(F === 'c' ? 30 : 24).setColor(F === 'b' ? PAL.gold : PAL.white);
+      } else if (PubScene.FONT) c.info.setFontSize(18).setColor(PAL.white);
       c.info.setX(26 + bw / 2).setScale(1);
       c.info.setScale(Math.min(1, (bw - 4) / Math.max(1, c.info.width)));
     }

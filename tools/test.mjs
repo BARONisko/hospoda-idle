@@ -318,14 +318,48 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     const bad = await S(p, (s) => {
       const cam = s.cameras.main, im = s.input.manager;
       const list = (s.input._list ?? []).filter((o) => im.inputCandidate(o, cam) && o.getBounds);
+      // skutečné dotykové místo: zóna může mít neviditelně větší hitArea (fitTouch) – počítat s ní
+      const hb = (o) => {
+        const g = o.getBounds(), ha = o.type === 'Zone' && o.input?.hitArea;
+        const r = ha ? { x: o.x - o.displayOriginX + ha.x, y: o.y - o.displayOriginY + ha.y, w: ha.width, h: ha.height } : { x: g.x, y: g.y, w: g.width, h: g.height };
+        return { ...r, cx: g.centerX, cy: g.centerY, contains: (px, py) => px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h };
+      };
       return list.filter((o) => {
-        const bd = o.getBounds();
-        const hits = list.filter((x) => x.getBounds().contains(bd.centerX, bd.centerY));
+        const bd = hb(o);
+        const hits = list.filter((x) => hb(x).contains(bd.cx, bd.cy));
         return hits.some((x) => x !== o && x.depth > o.depth);
       }).map((o) => `${o.type} ${Math.round(o.x)},${Math.round(o.y)}`);
     });
     ok(`dotyky ${q}: nic zakrytého`, bad.length === 0);
     if (bad.length) console.log(bad);
+    // neviditelně zvětšená dotyková místa (fitTouch): žádná dvě se nepřekrývají, nic neleze pod spodní lištu; i v Menu a Diamantech
+    for (const scr of ['', "s.openShop('menu',false)", "s.spSub='gems';s.gemPage=0;s.openShop('special',false)", "s.ktab=0;s.openShop('keeper',false)"]) {
+      if (scr) { await p.evaluate(`(() => { const s = game.scene.getScene('Pub'); ${scr}; })()`); await p.waitForTimeout(300); }
+      const ov = await S(p, (s) => {
+        const cam = s.cameras.main, im = s.input.manager, MB = 960 - 84;
+        const zs = s.touchZones.filter((z) => z.active && z.input?.enabled && im.inputCandidate(z, cam)).map((z) => {
+          const ha = z.input.hitArea, x = z.x - z.displayOriginX, y = z.y - z.displayOriginY;
+          return { z, v: [x, y, x + z.width, y + z.height], h: [x + ha.x, y + ha.y, x + ha.x + ha.width, y + ha.y + ha.height] };
+        });
+        const x = (a, b) => Math.min(a[2], b[2]) - Math.max(a[0], b[0]) > 0.01 && Math.min(a[3], b[3]) - Math.max(a[1], b[1]) > 0.01;
+        const out = [];
+        for (let i = 0; i < zs.length; i++) {
+          const a = zs[i];
+          if (a.v[3] <= MB && a.h[3] > MB + 0.01) out.push(`pod lištou ${a.v.map(Math.round)}`);
+          for (let j = i + 1; j < zs.length; j++) {
+            const b = zs[j];
+            // jen tlačítka ve stejné vrstvě (okno vs. hospoda pod ním se nepočítá)
+            if (Math.abs(a.z.depth - b.z.depth) > 20) continue;
+            if (!x(a.v, b.v) && x(a.h, b.h)) out.push(`překryv ${a.v.map(Math.round)} × ${b.v.map(Math.round)}`);
+          }
+        }
+        return out;
+      });
+      ok(`dotyky ${q} ${scr.slice(0, 30)}: zvětšená místa se nepřekrývají`, ov.length === 0);
+      if (ov.length) console.log(ov);
+    }
+    await S(p, (s) => s.closeShop());
+    await p.waitForTimeout(200);
     if (q === '?night=0') {
       const xy = await S(p, (s) => { const z = s.chestHud.zone, rc = game.canvas.getBoundingClientRect(), k = rc.width / 540; return [rc.left + (z.x + 32) * k, rc.top + (z.y + 32) * k]; });
       await p.touchscreen.tap(xy[0], xy[1]);
