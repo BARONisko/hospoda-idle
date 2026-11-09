@@ -2769,9 +2769,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const spr = add(this.add.sprite(p.x, p.y, 'vampire', 1).setOrigin(0.5, 1).setScale(1.25).setDepth(p.y + 3));
     this.tweens.add({ targets: spr, y: p.y - 2, yoyo: true, repeat: -1, duration: 400, ease: 'Sine.inOut' });
     this.vipSpr = spr;
+    // hvězda těsně nad hlavou VIP (hlášení: visela vedle) a pohupuje se s ním
+    const sy = p.y - spr.displayHeight - 8;
     const bub = add(this.add.graphics().setDepth(p.y + 4));
-    bub.fillStyle(col('white')).fillCircle(p.x + 13, p.y - 34, 8);
-    const star = add(this.add.image(p.x + 13, p.y - 34, 'icons', 'star').setScale(0.75).setDepth(p.y + 5));
+    bub.fillStyle(col('white')).fillCircle(0, 0, 10).setPosition(p.x, sy);
+    const star = add(this.add.image(p.x, sy, 'icons', 'star').setScale(0.75).setDepth(p.y + 5));
+    this.tweens.add({ targets: [bub, star], y: sy - 2, yoyo: true, repeat: -1, duration: 400, ease: 'Sine.inOut' });
     this.tweens.add({ targets: star, scale: { from: 0.65, to: 0.85 }, yoyo: true, repeat: -1, duration: 450 });
     // pruh nahoře nad hospodou (UI) – ťuknutím taky obsloužit
     const c = v.cam;
