@@ -50,8 +50,6 @@ const TOP = 108;
 /** výška pruhu hospody při posouvání (4 hospody) */
 const STRIP = 380; // horní lišta s penězi
 const CARD_H = 88;
-/** NÁVRHY karty stanice (hospoda 67, jen ladění): ?ux=a|b|c */
-const UX = typeof location !== 'undefined' ? (new URLSearchParams(location.search).get('ux') ?? '') : '';
 /** spodní lišta Hospoda / Obchod / Úkoly / Menu (návrh 4) */
 const NAV_H = 84;
 /** ×2 za reklamu na stanici – minut */
@@ -3746,19 +3744,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const name = this.add.text(26, y + 4, '', txt(26, PAL.bone)).setDepth(depth);
       const lvl = this.add.text(26, y + 32, '', txt(17, PAL.fog)).setDepth(depth);
       const bar = this.add.graphics().setDepth(depth);
-      const info = this.add.text(161, y + 64, '', txt(UX ? 18 : 14, PAL.white)).setOrigin(0.5).setDepth(depth + 1);
+      const info = this.add.text(161, y + 64, '', txt(18, PAL.white)).setOrigin(0.5).setDepth(depth + 1);
       const tag = this.add.text(184, y + 64, '', txt(15, PAL.sand)).setOrigin(0, 0.5).setDepth(depth + 1);
       // ťuknutím na kartu se ručně spustí cyklus (dokud stanice nemá obsluhu)
       const tapZone = this.add.zone(10, y, 300, CARD_H - 8).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(depth);
       tapZone.on('pointerdown', () => this.manual(pubIdx, def));
-      // NÁVRHY (?ux=a|b|c, hospoda 67): větší tlačítko obsluhy
-      const buy = UX === 'a' ? this.btn(W - 112, y + 4, 92, 72, () => this.buy(pubIdx, def), depth)
-        : UX === 'b' ? this.btn(W - 212, y + 4, 190, 72, () => (this.uxHire(pubIdx, def) ? this.hire(pubIdx, def) : this.buy(pubIdx, def)), depth)
-        : UX === 'c' ? this.btn(W - 212, y + 2, 190, 38, () => this.buy(pubIdx, def), depth)
-        : this.btn(W - 212, y + 6, 190, 48, () => this.buy(pubIdx, def), depth);
-      const staff = UX === 'a' ? this.btn(W - 212, y + 4, 94, 72, () => this.hire(pubIdx, def), depth)
-        : UX === 'c' ? this.btn(W - 212, y + 44, 190, 36, () => this.hire(pubIdx, def), depth)
-        : this.btn(W - 212, y + 57, 190, 22, () => this.hire(pubIdx, def), depth);
+      // karta A (výběr uživatele, docs/navrhy-ui/karta-obsluha-ABC.png): bez obsluhy Číšníci a +1 vedle sebe,
+      // po najmutí obsluhy se +1 roztáhne přes celou šíři (pozice tlačítka +1 se nastavuje v update)
+      const buy = this.btn(W - 212, y + 4, 190, 72, () => this.buy(pubIdx, def), depth);
+      const staff = this.btn(W - 212, y + 4, 94, 72, () => this.hire(pubIdx, def), depth);
       const bnum = this.add.text(26, y + 32, '', txt(17, PAL.fog)).setDepth(depth + 1);
       const adG = this.add.graphics().setDepth(depth + 2);
       const adT = this.add.text(0, y + 20, '', txt(20, PAL.white)).setOrigin(0.5).setDepth(depth + 3).setStroke(PAL.ink, 4);
@@ -3825,12 +3819,6 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return (p.st[id] ??= { lvl: 0, auto: false, prog: 0 });
   }
 
-
-  /** návrh B: velké tlačítko nabízí najmutí, jakmile na obsluhu stačí coins */
-  private uxHire(i: number, def: StationDef) {
-    const p = this.d.pubs[i], s = this.st(p, def.id);
-    return s.lvl > 0 && !s.auto && this.d.coins >= def.staff * actMult(p.act) * (1 - this.ts().staff);
-  }
 
   private manual(i: number, def: StationDef) {
     const s = this.st(this.d.pubs[i], def.id);
@@ -5325,30 +5313,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       c.info.setText('');
       const sl = STAFF_LABEL[c.def.id];
       const noStaff = open && !s.auto;
-      if (UX === 'b' && this.uxHire(c.pub, c.def)) {
-        this.drawBtn(c.buy, `${t('Najmout')}\n${sl[0]} ${big(staff)}`, true, 'plum');
-        this.drawBtn(c.staff, '', false, 'plum', false);
-      } else {
-        this.drawBtn(c.buy, open ? `+${n}\n${big(price)}` : t('Otevřít\n{n}', { n: big(price) }), this.d.coins >= price, 'green');
-        if (UX === 'a' && noStaff) this.drawBtn(c.buy, `+${n}\n${big(price)}`, this.d.coins >= price, 'green');
-        this.drawBtn(c.staff, UX === 'a' ? `${sl[0]}\n${big(staff)}` : `${sl[0]} ${big(staff)}`, this.d.coins >= staff, 'plum', noStaff && UX !== 'b');
-      }
-      if (UX === 'c') {
-        // s obsluhou (nebo zavřená stanice) jedno velké tlačítko
-        c.buy.h = noStaff ? 38 : 72;
-        c.buy.y = c.y + (noStaff ? 2 : 4);
-        c.buy.zone.setPosition(c.buy.x, c.buy.y).setSize(c.buy.w, c.buy.h);
-        c.buy.label.setY(c.buy.y + c.buy.h / 2).setFontSize(noStaff ? 16 : 22);
-        this.drawBtn(c.buy, open ? `+${n}\n${big(price)}` : t('Otevřít\n{n}', { n: big(price) }), this.d.coins >= price, 'green');
-      }
-      if (UX === 'a') {
-        // bez obsluhy půlka a půlka, s obsluhou +1 přes celou šíři
-        c.buy.x = noStaff ? W - 112 : W - 212;
-        c.buy.w = noStaff ? 92 : 190;
+      const half = open && !s.auto;
+      if (c.buy.w !== (half ? 92 : 190)) {
+        c.buy.x = half ? W - 112 : W - 212;
+        c.buy.w = half ? 92 : 190;
         c.buy.zone.setPosition(c.buy.x, c.buy.y).setSize(c.buy.w, c.buy.h);
         c.buy.label.setX(c.buy.x + c.buy.w / 2);
-        this.drawBtn(c.buy, open ? `+${n}\n${big(price)}` : t('Otevřít\n{n}', { n: big(price) }), this.d.coins >= price, 'green');
       }
+      this.drawBtn(c.buy, open ? `+${n}\n${big(price)}` : t('Otevřít\n{n}', { n: big(price) }), this.d.coins >= price, 'green');
+      this.drawBtn(c.staff, `${sl[0]}\n${big(staff)}`, this.d.coins >= staff, 'plum', half);
       void sl;
       // styl hospody a zásobování (vedle pruhu)
       const tag = this.cardTag(p, c.def.id, open);

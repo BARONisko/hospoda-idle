@@ -203,7 +203,7 @@ export const PRESTIGE_MIN = 6;
 /** první hygiena (cesta k 2. hospodě) jde dřív: stačí 4 krígly (~1,6M tržby, cca 15 min) */
 export const PRESTIGE_FIRST = 4;
 /** každá další hygiena musí přinést aspoň +10 % krígel, co už máš (kola se tak pomalu prodlužují: 9 → 14 → … → 22 min) */
-export const PRESTIGE_GROW = 0.1;
+export const PRESTIGE_GROW = 0.05; // hospoda 67: dřív 0,1 (kolo 37 trvalo ~11 h)
 export const prestigeMin = (prestiges: number, krigle = 0) => (prestiges > 0 ? Math.max(PRESTIGE_MIN, Math.ceil(PRESTIGE_GROW * krigle)) : PRESTIGE_FIRST);
 
 /** obchod s krígly: trvalá vylepšení (přežijí hygienu), platí se krígly; většina jde donekonečna (cena roste exponenciálně) */
@@ -226,7 +226,7 @@ export const kSpeed = (n: number) => 0.991 ** n;
 export const OFFLINE_BASE_H = 8;
 export const OFFLINE_MAX_H = 12;
 /** hodiny navíc offline: +30 s za úroveň (strop 4 h → celkem 12 h) */
-export const kOffline = (n: number) => Math.min(OFFLINE_MAX_H - OFFLINE_BASE_H, n * 30 / 3600);
+export const kOffline = (n: number) => Math.min(OFFLINE_MAX_H - OFFLINE_BASE_H, n * 5 / 60); // hospoda 67: +5 min za úroveň (dřív +30 s, strop byl nedosažitelný)
 /** násobek intervalu událostí (nejméně 0,25): 2× −25 %, pak už jen −1 % za úroveň */
 export const kEvents = (n: number) => Math.max(0.25, 0.75 ** Math.min(n, 2) * 0.99 ** Math.max(0, n - 2));
 /** Zlatý výčep (dřív „Probudit Cthulhu“, id zůstává kvůli uložení): ×1,5, ×1,75, ×2 … */
@@ -249,7 +249,7 @@ export const kKrigly = (n: number) => 0.009 * n;
 export const KRIGL_SHOP: KriglItem[] = [
   { id: 'speed', name: t('Rychlejší obsluha'), cost: exp(5, 2), eff: (n) => t('cykly kratší o {v} %', { v: pc(100 - kSpeed(n) * 100) }) },
   { id: 'start', name: t('Startovní kapitál'), cost: (n) => (n < 3 ? [5, 25, 100][n] : Math.ceil(100 * 5 ** (n - 2))), eff: (n) => t('start s {c} coins', { c: big(startCoins(n)) }) },
-  { id: 'offline', name: t('Delší spánek'), cost: exp(2, 1.035), eff: (n) => t('spánek {h} (max 12 h)', { h: hm(OFFLINE_BASE_H + kOffline(n)) }) },
+  { id: 'offline', name: t('Delší spánek'), cost: exp(2, 1.08), eff: (n) => t('spánek {h} (max 12 h)', { h: hm(OFFLINE_BASE_H + kOffline(n)) }) },
   { id: 'events', name: t('Rušnější hospoda'), cost: (n) => (n < 2 ? [15, 45][n] : Math.ceil(45 * 1.15 ** (n - 1))), eff: (n) => t('události o {v} % častěji', { v: pc((1 / kEvents(n) - 1) * 100) }) },
   { id: 'krigly', name: t('Hlubší sklep'), cost: exp(40, 2.5), eff: (n) => t('krígly z hygieny +{v} %', { v: Math.round(kKrigly(n) * 100) }) },
   { id: 'keepMgr', name: t('Věrní manažeři'), cost: () => 200, max: 1, eff: (n) => (n ? t('manažeři zůstanou i po hygieně') : t('manažeři po hygieně odejdou')) },

@@ -6,7 +6,7 @@ const kf = (r, p) => Math.floor(2 * (r / (1e5 * 10 ** (p - 1))) ** 0.25);
 let k = 0, pubs = 1, tot = 0;
 simCount.levels = 0;
 for (let n = 0; n < 12; n++) {
-  const goal = n ? Math.max(6, Math.ceil(0.1 * k)) : 4;
+  const goal = n ? Math.max(6, Math.ceil(0.05 * k)) : 4;
   const t = run(pubs, k, 4 * 3600, goal, kf);
   if (typeof t !== 'number') break;
   tot += t; k += goal; pubs = Math.min(3, pubs + 1);
