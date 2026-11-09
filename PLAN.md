@@ -402,3 +402,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Hospoda 69c (celková kontrola před nahráním do Play): snímky všech záložek v angličtině bez chyb; nákupy: čekající platba
   (purchaseState 2) → hláška „Platba čeká“, po zaplacení se při spuštění / návratu do hry spotřebuje a připíše
   (billing.unclaimed → PubScene.iapGrant), jinak by ji Google po 3 dnech vrátil; zásady soukromí anglicky + česky, s nákupy.
+- Hospoda 70: zásady soukromí rozděleny – soukromi.html jen anglicky (URL v Play beze změny), soukromi-cs.html česky.
+  Grafika Play v angličtině: docs/play/snimek-1…6 (hospoda, noc, menu, pivovar, liga, krígly), obrázek 1024×500 s anglickým
+  podtitulkem. Návrhy ikony (7×, pixel art ze spritů hry): docs/navrhy-ui/ikona/ – čeká na výběr uživatele.

@@ -32,7 +32,7 @@ Hraje se jednou rukou, na výšku, a i offline. Reklamy jsou jen dobrovolné –
 - Snímky telefonu: `docs/play/snimek-1.png` … (na výšku)
 - Kategorie: **Hry → Simulace** (nebo Neformální) · Značky: Idle, Manažerské
 - Kontaktní e-mail: tvůj e-mail vývojáře · Web: https://baronisko.github.io/hospoda-idle/
-- Zásady ochrany soukromí (URL): **https://baronisko.github.io/hospoda-idle/soukromi.html**
+- Zásady ochrany soukromí (URL): **https://baronisko.github.io/hospoda-idle/soukromi.html** (jen anglicky; česky soukromi-cs.html)
 
 ## Obsah aplikace (App content)
 1. **Zásady ochrany soukromí:** URL výše.
