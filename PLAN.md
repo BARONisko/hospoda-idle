@@ -373,3 +373,7 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   přibývají i s otevřeným terčem; obchod Šipek → Terč se vejde; pivovar „1,6“; poškozené uložení se opraví
   (save.repair: null/NaN/chybějící pole); hodiny vrácené dozadu neposunou čas odchodu (store/offline) a truhla jen
   den PO posledním otevření; denní úkoly podle místního dne (dřív UTC). Zbylé nálezy: QA-NALEZY.md.
+- Hospoda 67: 💎 za hygienu 3× denně, zlatá truhla 2 % krígel; karta stanice A (Číšníci a +1 vedle sebe); Delší spánek +5 min/úr.;
+  hygiena od 7 % krígel; oprava pádu „reading 'cut'“; po hygieně pípa s číšníky; Zpět/Escape; rada krígel; azbuka Handjet;
+  VIP hvězda nad hlavou; větší neviditelná dotyková místa (ui/touch.ts). Čeká: písmo A/B/C, liga 💎, odemykání, dlaždice menu.
+  Předávka: handoff-2026-11-09d.md.
