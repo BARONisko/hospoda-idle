@@ -19,7 +19,7 @@ import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, nightLen, nightShare, s
 import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
 import { notify, NOTE, Note } from '../core/notify';
-import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, VIP_GEMS, GOLD_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
+import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, VIP_GEMS, GOLD_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
 import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER, weekendLeft } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { TREE, TREE_BY_ID, TREE_BRANCHES, TREE_COLORS, STAR_TEXT, treeSpent, treeCan, hasStar, treeStats, xpNeed, oldXpNeed, lvlFromTotal, respecCost, pathX, type StarId, type TreeNode } from '../core/skilltree';
@@ -2186,30 +2186,41 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return n === 1 ? t('{n} krígl', { n }) : n < 5 ? t('{n} krígly', { n }) : t('{n} krígel', { n });
   }
 
+  /** množství odměny truhly podle postupu (kosti z nočního výdělku, šipky z toulce, krígly z vlastněných) */
+  private chestN(r: ChestRew): number {
+    if (r.k === 'bones') return Math.max(r.n, Math.round(this.bonesPerSec() * 3600 * (r.h ?? 0)));
+    if (r.k === 'darts') return Math.max(r.n, Math.round(dartCap(this.dartsData().up) * (r.q ?? 0)));
+    if (r.k === 'krigle') return Math.max(r.n, Math.ceil(this.d.krigle * (r.f ?? 0)));
+    if (r.k === 'gold') return Math.max(GOLD_KRIGLE, Math.ceil(this.d.krigle * GOLD_KRIGLE_F));
+    return 0;
+  }
+
   /** popis odměny truhly (x = násobek za reklamu) */
   private chestRewText(r: ChestRew, x = 1): string {
     switch (r.k) {
-      case 'coins': return t('{h} h výdělku', { h: r.h * x });
-      case 'bones': return t('{n} kostí', { n: r.n * x });
-      case 'darts': return t('{n} šipek', { n: r.n * x });
-      case 'krigle': return this.krigleTxt(r.n * x);
-      case 'gold': return t('+{p} bod pro číšníka + {k} + {g} 💎', { p: x, k: this.krigleTxt(GOLD_KRIGLE * x), g: GOLD_GEMS * x });
+      case 'coins': return t('{n} coins', { n: big(this.hoursIncome(r.h * x)) });
+      case 'bones': return t('{n} kostí', { n: big(this.chestN(r) * x) });
+      case 'darts': return t('{n} šipek', { n: big(this.chestN(r) * x) });
+      case 'krigle': return this.krigleTxt(this.chestN(r) * x);
+      case 'gold': return t('+{p} bod pro číšníka + {k} + {g} 💎', { p: x, k: this.krigleTxt(this.chestN(r) * x), g: GOLD_GEMS * x });
     }
   }
 
   /** dá odměnu truhly, vrátí text na oslavu */
   private chestGive(r: ChestRew, x: number): string {
+    const txt0 = (r.k === 'gold' ? '' : '+') + this.chestRewText(r, x);
     if (r.k === 'coins') {
       const n = this.hoursIncome(r.h * x);
       this.gain(n);
       return t('+{n} coins', { n: big(n) });
     }
-    if (r.k === 'bones') this.d.bones = (this.d.bones ?? 0) + r.n * x;
-    else if (r.k === 'darts') this.dartsData().have += r.n * x;
-    else if (r.k === 'krigle') this.d.krigle += r.n * x;
+    const n = this.chestN(r) * x;
+    if (r.k === 'bones') this.d.bones = (this.d.bones ?? 0) + n;
+    else if (r.k === 'darts') this.dartsData().have += n;
+    else if (r.k === 'krigle') this.d.krigle += n;
     else {
       // zlatá truhla: bod číšníkovi s nejméně body (bez číšníků 8 h výdělku) + krígly
-      this.d.krigle += GOLD_KRIGLE * x;
+      this.d.krigle += n;
       this.d.gems = (this.d.gems ?? 0) + GOLD_GEMS * x;
       for (let i = 0; i < x; i++) {
         const ws = this.d.pubs.flatMap((p) => p.w ?? []).filter((w) => wEarned(w) < MAX_POINTS);
@@ -2221,7 +2232,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         w.xp = Math.max(w.xp ?? 0, xpFor(wEarned(w) + 1));
       }
     }
-    return (r.k === 'gold' ? '' : '+') + this.chestRewText(r, x);
+    return txt0;
   }
 
   /** otevře denní truhlu (x2 = za reklamu) */

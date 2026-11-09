@@ -28,18 +28,22 @@ export function chestDay(c: ChestState | undefined, now = Date.now()) {
   return c.last === yesterday(now) && c.day < 7 ? c.day + 1 : 1;
 }
 
-export type ChestRew = { k: 'coins'; h: number } | { k: 'bones'; n: number } | { k: 'darts'; n: number } | { k: 'krigle'; n: number } | { k: 'gold' };
+export type ChestRew = { k: 'coins'; h: number } | { k: 'bones'; n: number; h?: number } | { k: 'darts'; n: number; q?: number } | { k: 'krigle'; n: number; f?: number } | { k: 'gold' };
 /** odměny dnů 1–7 (7. den zlatá truhla: +1 bod číšníkovi a 3 krígly) */
+// množství rostou s postupem (přání uživatele): coins = hodiny výdělku, kosti = hodiny nočního výdělku kostí,
+// šipky = toulce, krígly = podíl z vlastněných krígel; n je minimum pro začátečníka
 export const CHEST_REW: ChestRew[] = [
-  { k: 'coins', h: 2 },
-  { k: 'bones', n: 5 },
-  { k: 'darts', n: 20 },
   { k: 'coins', h: 4 },
-  { k: 'bones', n: 10 },
-  { k: 'krigle', n: 1 },
+  { k: 'bones', n: 5, h: 1 },
+  { k: 'darts', n: 20, q: 1 },
+  { k: 'coins', h: 8 },
+  { k: 'bones', n: 10, h: 2 },
+  { k: 'krigle', n: 1, f: 0.05 },
   { k: 'gold' },
 ];
 export const GOLD_KRIGLE = 3;
+/** zlatá truhla: krígly aspoň GOLD_KRIGLE, jinak 10 % vlastněných */
+export const GOLD_KRIGLE_F = 0.1;
 
 /** otevře truhlu: vrátí den (1–7) a uloží sérii */
 export function openChest(c: ChestState | undefined, now = Date.now()): { st: ChestState; day: number } {
