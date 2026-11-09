@@ -332,3 +332,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   postupně) / B náhodně / C střídání (mince, sklenice, pokladna, šplouchnutí) / vypnuto; ťuknutí přepne a přehraje ukázku (opts cs).
 - Sbírka: skupina „Chrám Cthulhu“ pryč (4. hospoda ve hře není – hosté nešli získat); u sezónních hostů místo ??? název a data.
 - Nastavení: tlačítka podle výšky řádku (nepřesahují).
+- Hospoda 65: OPRAVA Kostnice – přehled zesílení se vejde nad spodní lištu (řádek výšky podle místa).
+  Počítadlo 💎 v horní liště vlevo od ×1 (výběr B, docs/navrhy-ui/diamanty-pocitadlo-ABC.png); ťuk = Speciální nabídka →
+  Diamanty → stránka Napořád, balíčky „Koupit diamanty“ zablikají; krígl cíle se posune vlevo, coins se zmenší.
+  Návrhy vzhledu hospody za 💎 (docs/navrhy-ui/hospoda-za-diamanty-ABC.png, src/gfx/luxArt.ts, ?lux=a|b|c, livreje
+  LIVERY v characters.ts) – čeká na výběr uživatele.
