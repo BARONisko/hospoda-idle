@@ -23,6 +23,8 @@ export interface PubState {
   boostReady?: number;
   /** ×2 za reklamu na stanici: id stanice → platí do (ms) */
   adx?: Record<string, number>;
+  /** styly hospody získané v tomto kole (economy.pubStyles) */
+  sty?: string[];
   /** číšníci (vylepšení každého zvlášť) */
   w?: import('./waiters').WaiterState[];
   /** piva čekající na baru: počet a jejich hodnota v coins */

@@ -79,31 +79,55 @@ export const STYLE_MIN = 2;
 export const STYLE_MIX = 0.25;
 /** zásobování (návrh A): každý milník stanice v nižší hospodě = +15 % stejné stanici ve všech vyšších */
 export const SUPPLY = 0.15;
-type PubLike = { act: number; st: Record<string, { lvl: number } | undefined> };
+type PubLike = { act: number; st: Record<string, { lvl: number } | undefined>; sty?: string[] };
 const ms = (p: PubLike, id: string) => milestoneCount(p.st[id]?.lvl ?? 0);
-/** id stanice, která určuje styl (nejvíc milníků, bez remízy, aspoň 1), jinak null */
-export function pubStyle(p: PubLike): string | null {
+/** stanice, které teď vedou (nejvíc milníků, aspoň STYLE_MIN, i při remíze) */
+const leaders = (p: PubLike) => {
   const m = STATIONS.map((d) => ms(p, d.id)), top = Math.max(...m);
-  return top >= STYLE_MIN && m.filter((x) => x === top).length === 1 ? STATIONS[m.indexOf(top)].id : null;
+  return top >= STYLE_MIN ? STATIONS.filter((_, i) => m[i] === top).map((d) => d.id) : [];
+};
+/** styly hospody v tomto kole (do hygieny): stanice, která kdy vedla (i remízou), styl si nechá.
+ *  QA hospoda 66: dřív při remíze / předběhnutí styl zmizel a koupě úrovně SNÍŽILA výdělek → styly jen přibývají */
+export function pubStyles(p: PubLike): string[] {
+  const now = leaders(p);
+  if (now.some((id) => !p.sty?.includes(id))) p.sty = STATIONS.map((d) => d.id).filter((id) => now.includes(id) || p.sty?.includes(id));
+  return p.sty ?? [];
 }
-/** kolik milníků chybí stanici, aby převzala styl hospody (0 = už vede) */
+/** hlavní styl hospody (první získaný podle pořadí stanic), jinak null */
+export const pubStyle = (p: PubLike): string | null => pubStyles(p)[0] ?? null;
+/** má hospoda styl stanice id */
+export const isStyle = (p: PubLike, id: string) => pubStyles(p).includes(id);
+/** kolik milníků chybí stanici, aby získala styl hospody (0 = už ho má) */
 export function styleGap(p: PubLike, id: string) {
-  const lead = pubStyle(p);
-  if (lead === id) return 0;
+  if (isStyle(p, id)) return 0;
   const top = Math.max(...STATIONS.map((d) => ms(p, d.id)));
-  return Math.max(1, Math.max(top + 1, STYLE_MIN) - ms(p, id));
+  return Math.max(1, Math.max(top, STYLE_MIN) - ms(p, id));
 }
-/** počet odlišných stylů ve všech hospodách */
-export const styleCount = (pubs: PubLike[]) => new Set(pubs.map(pubStyle).filter(Boolean)).size;
+/** počet odlišných stylů ve všech hospodách (každá hospoda počítá jeden svůj styl, nejvýhodněji) */
+export function styleCount(pubs: PubLike[]) {
+  const sets = pubs.map(pubStyles).filter((x) => x.length);
+  let best = 0;
+  const go = (i: number, used: Set<string>) => {
+    if (i === sets.length) return void (best = Math.max(best, used.size));
+    for (const id of sets[i]) {
+      const had = used.has(id);
+      used.add(id);
+      go(i + 1, used);
+      if (!had) used.delete(id);
+    }
+  };
+  go(0, new Set());
+  return best;
+}
 export const styleMix = (pubs: PubLike[]) => 1 + STYLE_MIX * Math.max(0, styleCount(pubs) - 1);
 /** má některá hospoda styl stanice id */
-export const hasStyle = (pubs: PubLike[], id: string) => pubs.some((p) => pubStyle(p) === id);
+export const hasStyle = (pubs: PubLike[], id: string) => pubs.some((p) => isStyle(p, id));
 /** násobek ze zásob od nižších hospod */
 export const supplyIn = (pubs: PubLike[], p: PubLike, id: string) => 1 + SUPPLY * pubs.filter((q) => q.act < p.act).reduce((a, q) => a + ms(q, id), 0);
 /** kolik % tahle stanice dodává vyšším hospodám (0 = žádná vyšší hospoda nebo bez milníku) */
 export const supplyOut = (pubs: PubLike[], p: PubLike, id: string) => (pubs.some((q) => q.act > p.act) ? SUPPLY * ms(p, id) : 0);
 /** celkový násobek stanice ze stylu, zásob a mixu stylů */
-export const styleSupplyMult = (pubs: PubLike[], p: PubLike, id: string) => (pubStyle(p) === id ? STYLE_MULT : 1) * supplyIn(pubs, p, id) * styleMix(pubs);
+export const styleSupplyMult = (pubs: PubLike[], p: PubLike, id: string) => (isStyle(p, id) ? STYLE_MULT : 1) * supplyIn(pubs, p, id) * styleMix(pubs);
 
 /** hvězdy stanic: úroveň STAR_LVL v běhu = po hygieně hvězda (max STAR_MAX); každá +10 % výdělek celé hospody,
  *  úrovně té stanice pak STAR_COST× dražší za každou hvězdu */
