@@ -595,8 +595,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     g0.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
     g0.lineStyle(4, col('gold')).strokeRoundedRect(bx, by, bw, bh, 16);
     const objs: Phaser.GameObjects.GameObject[] = [shade, g0];
-    const tx = (y: number, s: string, size: number, c: string) =>
-      objs.push(this.add.text(W / 2, y, s, txt(size, c)).setOrigin(0.5).setAlign('center').setDepth(D + 2));
+    // dlouhé řádky (ruština, jméno soupeře v lize) zmenšit na šířku okna
+    const tx = (y: number, s: string, size: number, c: string) => {
+      const o = this.add.text(W / 2, y, s, txt(size, c)).setOrigin(0.5).setAlign('center').setDepth(D + 2);
+      o.setScale(Math.min(1, (bw - 28) / o.width));
+      objs.push(o);
+    };
     tx(by + 44, t('Zatímco jsi byl pryč…'), 30, PAL.gold);
     tx(by + 96, t('obsluha pracovala {d}', { d: dur }), 22, PAL.fog);
     if (capped) tx(by + 126, t('(víc než {h} h se nepočítá)', { h: String(Math.round(this.offCap() / 360) / 10).replace('.', ',') }), 18, PAL.fog);
@@ -1994,13 +1998,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   /** řádek panelu: text vlevo, tlačítko vpravo */
-  private row(y: number, h: number, D: number, title: string, sub: string, boxCol: keyof typeof PAL = 'ink', titleCol: string = PAL.bone) {
+  private row(y: number, h: number, D: number, title: string, sub: string, boxCol: keyof typeof PAL = 'ink', titleCol: string = PAL.bone, maxW = h < 70 ? 240 : 300) {
     const box = this.add.graphics().setDepth(D + 1);
     box.fillStyle(col(boxCol), boxCol === 'ink' ? 0.6 : 0.7).fillRoundedRect(10, y, W - 20, h - 8, 10);
     const name = this.add.text(26, y + (h < 70 ? 5 : 8), title, txt(h > 85 ? 26 : 22, titleCol)).setDepth(D + 1);
-    name.setScale(Math.min(1, (h < 70 ? 240 : 300) / name.width));
+    name.setScale(Math.min(1, maxW / name.width));
     const st = this.add.text(26, y + (h > 85 ? 46 : h < 70 ? 33 : 40), sub, txt(h < 70 ? 16 : 18, PAL.fog)).setDepth(D + 1);
-    st.setScale(Math.min(1, (h < 70 ? 240 : 300) / st.width));
+    st.setScale(Math.min(1, maxW / st.width));
     this.shopObjs.push(box, name, st);
   }
 
@@ -2172,7 +2176,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // záloha hry: dvě tlačítka v jednom řádku
     {
       const y = y0 + vols.length * RH;
-      this.row(y, RH, D, t('Záloha hry'), t('přenos mezi webem a složkou'));
+      this.row(y, RH, D, t('Záloha hry'), t('přenos mezi webem a složkou'), 'ink', PAL.bone, Math.min(RH < 70 ? 240 : 300, W - 232 - 34));
       const bs = Math.min(60, RH - 14), by = y + (RH - 8 - bs) / 2;
       const sv = this.btn(W - 232, by, 102, bs, () => {
         downloadBackup(exportSave(this.d));
@@ -2213,7 +2217,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     rows.forEach(([title, val, fn], i) => {
       i += vols.length + 1;
       const y = y0 + i * RH;
-      this.row(y, RH, D, title, title === t('Hra do složky') ? t('spustíš ji z disku bez internetu') : title === t('Upozornění') ? t('plná hospoda, VIP host, truhla, chrám') : title === t('Začít znovu') ? t('celá hra od začátku, i s návodem') : title === t('Zvuk výdělku') ? t('cinkání stanic – ťukni = přepni a poslechni') : '');
+      this.row(y, RH, D, title, title === t('Hra do složky') ? t('spustíš ji z disku bez internetu') : title === t('Upozornění') ? t('plná hospoda, VIP host, truhla, chrám') : title === t('Začít znovu') ? t('celá hra od začátku, i s návodem') : title === t('Zvuk výdělku') ? t('cinkání stanic – ťukni = přepni a poslechni') : '', 'ink', PAL.bone, Math.min(RH < 70 ? 240 : 300, W - 232 - 34)); // text nesmí pod tlačítko (od W − 232)
       const bs = Math.min(60, RH - 14);
       const b = this.btn(W - 232, y + (RH - 8 - bs) / 2, 210, bs, () => {
         fn();

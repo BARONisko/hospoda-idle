@@ -12,8 +12,11 @@ export class BootScene extends Phaser.Scene {
 
   create() {
     const loading = this.add.text(270, 480, t('Načítám…'), { fontFamily: 'monospace', fontSize: '28px', color: PAL.bone }).setOrigin(0.5);
-    document.fonts
-      .load(`24px ${FONT}`, 'Příliš žluťoučký kůň úpěl ďábelské ódy') // i18n-ok
+    // obě písma (latinka i azbuka) načíst dopředu – Phaser kreslí do canvasu a pozdě dotažené písmo by nepřekreslil
+    Promise.all([
+      document.fonts.load(`24px ${FONT}`, 'Příliš žluťoučký kůň úpěl ďábelské ódy'), // i18n-ok
+      document.fonts.load(`24px ${FONT}`, 'Съешь ещё этих мягких булок'), // i18n-ok
+    ])
       .catch(() => undefined)
       .finally(() => {
         generateAll(this);

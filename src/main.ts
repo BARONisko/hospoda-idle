@@ -4,6 +4,8 @@ import { initAdMob } from './core/admob';
 import Phaser from 'phaser';
 import '@fontsource/jersey-10/latin-ext-400.css';
 import '@fontsource/jersey-10/latin-400.css';
+// Jersey 10 nemá azbuku → ruské znaky kreslí podobné úzké pixelové Handjet (jen azbuka, tučné 700, ~5 kB, offline)
+import '@fontsource/handjet/cyrillic-700.css';
 import './style.css';
 import { installCjkWrap } from './i18n/cjkWrap';
 import { BootScene } from './scenes/BootScene';
