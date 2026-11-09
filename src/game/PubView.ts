@@ -103,7 +103,10 @@ export class PubView {
   private mgr?: Phaser.GameObjects.Sprite;
   private decor: Record<string, Phaser.GameObjects.Image> = {};
   readonly cam: Phaser.Cameras.Scene2D.Camera;
-  readonly objs: Phaser.GameObjects.GameObject[] = [];
+  /** dřív pole všech objektů hospody – nikdo ho nečetl a drželo tisíce zničených objektů (únik) */
+  private readonly objs = { push: (..._o: Phaser.GameObjects.GameObject[]) => 0 };
+  /** úklid podnosu předchozí cesty číšníka (nová cesta ji může přerušit) */
+  private tripEnd: ((() => void) | undefined)[] = [];
   private guests: Guest[] = [];
   private seats: Seat[] = [];
   private spawnT = 0.5;
@@ -522,6 +525,7 @@ export class PubView {
     };
     const walk = Math.max(0.3, dur / 2 - 0.25);
     const speed = Math.max(len(there), 1) / walk;
+    this.tripEnd[i]?.();
     this.s.tweens.killTweensOf(spr);
     spr.setPosition(this.ox + home.x, home.y);
     // podnos s pivy nad hlavou
@@ -540,6 +544,11 @@ export class PubView {
       mugs.forEach((m, k) => m.active && m.setPosition(spr.x - (mugs.length - 1) * 3 + k * 6, spr.y - 18).setDepth(spr.y + 4 + k));
     };
     this.s.events.on('update', follow);
+    const end = (this.tripEnd[i] = () => {
+      this.tripEnd[i] = undefined;
+      carry.forEach((o) => o.active && o.destroy());
+      this.s.events.off('update', follow);
+    });
     this.walkPath(spr, there, speed, () => {
       spr.setFrame(13);
       // pivo na stůl
@@ -555,8 +564,8 @@ export class PubView {
       if (g) g.served = false;
       mugs.forEach((m) => m.destroy());
       this.s.time.delayedCall(250, () => {
-        tray.destroy();
-        this.s.events.off('update', follow);
+        if (this.tripEnd[i] !== end) return; // mezitím začala nová cesta (ta podnos uklidila)
+        end();
         this.walkPath(spr, back, speed, () => spr.setFlipX(false).setFrame(0).setDepth(home.y + 1));
       });
     });

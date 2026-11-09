@@ -356,3 +356,9 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Pepík „Nalít mu“, když nesplatí…), dostane +1 💎. Návštěvníky přidat do Sbírky (skupina „Návštěvníci“, počítá se,
   kolikrát jim hráč zaplatil/přijal); po nasbírání přiměřeného množství dává ten návštěvník místo 1 💎 → 2 💎.
   Přesná pravidla a prahy navrhnout uživateli před dokončením.
+- Hospoda 66 – QA (2 agenti: průběh hry + plynulost): OPRAVA offline výdělek se ztrácel, když bylo při návratu otevřené okno
+  (návštěvník, noc, liga…) – teď se připíše vždy (místo okna nápis). VÝKON: nekonečné tweeny po zničených objektech
+  (main.ts: při destroy se odstraní), podnos číšníka a posluchač update zůstávaly při přerušené cestě (PubView.tripEnd),
+  pole PubView.objs drželo tisíce zničených objektů (zrušeno), setColor se stejnou barvou překresloval text ~16×/snímek
+  (main.ts). Měření: po 30 min dřív 10 291 objektů / 4 988 posluchačů / 1 382 mrtvých tweenů → teď ~1 100 / 50 / 0.
+  Zbývá (podezření z QA): koupě úrovně může snížit výdělek (styl, styleSupplyMult), rada „splněný úkol“ přebije radu hygieny.

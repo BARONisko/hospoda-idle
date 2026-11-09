@@ -48,6 +48,31 @@ const guard = <T extends object>(proto: T, name: keyof T) => {
 // každá scéna zvlášť (ostatní dál běží a kreslí se) a celý snímek jako záloha
 guard(Phaser.Scenes.Systems.prototype, 'step');
 guard(Phaser.Game.prototype, 'step');
+// Výkon (QA hospoda 66): setColor v Phaseru vždy znovu kreslí text i se stejnou barvou (~16× za snímek) → jen při změně
+{
+  const TS = Phaser.GameObjects.TextStyle.prototype as unknown as { color: unknown; setColor: (c: unknown) => unknown; parent: unknown };
+  const orig = TS.setColor;
+  TS.setColor = function (this: typeof TS, c: unknown) {
+    return this.color === c ? this.parent : orig.call(this, c);
+  };
+}
+// Únik (QA hospoda 66): nekonečné tweeny (pohupování bublin, blikání) zůstávaly po zničených objektech a hra se
+// postupně zpomalovala → při zničení objektu odstranit jeho tweeny (s více cíli až když jsou zničené všechny)
+{
+  const GO = Phaser.GameObjects.GameObject.prototype as unknown as { destroy: (...a: unknown[]) => void };
+  const orig = GO.destroy;
+  GO.destroy = function (this: Phaser.GameObjects.GameObject, ...a: unknown[]) {
+    const tm = (this.scene as Phaser.Scene | undefined)?.tweens;
+    try {
+      if (tm)
+        for (const tw of tm.getTweensOf(this))
+          if (tw.targets.every((o: unknown) => o === this || (o as Phaser.GameObjects.GameObject).active === false)) tm.remove(tw);
+    } catch {
+      /* scéna se právě ruší */
+    }
+    orig.apply(this, a);
+  };
+}
 // Výkon (telefon se přehříval): zaoblený obdélník v Graphics se v každém snímku znovu trianguluje (earcut) –
 // místo toho 5 obyčejných obdélníků se „schodkovým“ rohem (pixel-art vzhled, nepřekrývají se → průhlednost sedí).
 {
