@@ -2659,7 +2659,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         this.tweens.add({ targets: hl, alpha: 0.2, yoyo: true, repeat: 3, duration: 350 });
       }
     });
-    if (!iap.available) add(this.add.text(W / 2, yy + 80, t('nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský'), txt(15, PAL.fog)).setOrigin(0.5).setDepth(D + 2));
+    if (!iap.available) {
+      // dlouhé překlady: zalomit a zmenšit, ať nepřetečou přes okraj ani pod lištu
+      const ft = add(this.add.text(W / 2, yy + 80, t('nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský'), txt(15, PAL.fog)).setOrigin(0.5).setAlign('center').setWordWrapWidth(W - 40).setDepth(D + 2));
+      ft.setScale(Math.min(1, (MB - 6 - (yy + 66)) / ft.height));
+    }
   }
 
   /** Štamgast pass (z B): 30 dní výhod */
@@ -3705,6 +3709,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     b.bg.fillStyle(col(enabled ? c : 'slate')).fillRoundedRect(b.x, b.y, b.w, b.h, 9);
     b.bg.fillStyle(0xffffff, enabled ? 0.15 : 0.06).fillRoundedRect(b.x + 3, b.y + 3, b.w - 6, b.h / 3, 6);
     b.label.setText(text).setColor(enabled ? PAL.white : PAL.fog);
+    // popisek se vždy vejde do tlačítka (dlouhé překlady přetékaly do vedlejšího tlačítka)
+    const lw = b.label.width, lh = b.label.height;
+    if (lw && lh) b.label.setScale(Math.min(1, (b.w - 10) / lw, (b.h - 4) / lh));
   }
 
   private st(p: PubState, id: string) {

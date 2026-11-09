@@ -341,3 +341,13 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Livreje číšníků 300 (GEM_LOOK v special.ts, jen vzhled). PubView.LOOK + applyLook() (přepne hned po koupi), portréty
   číšníků v panelu také v livreji. Art src/gfx/luxArt.ts (luxTap, luxTable), livrej LOOKS `<waiter>_lux`. Snímek docs/navrhy-ui/vzhled-B-ve-hre.png.
   Nové texty diamantů zatím bez překladů (zobrazí se česky, jako texty z hospody 64).
+- Hospoda 65 – LIGA (přání): soupeř = člověk (jméno, hospoda, postavička z hostů; rivalInfo v league.ts, stejný celý týden).
+  Vyrovnaný: síla podle hráčova minulého týdne (rivalRate: minulá tržba × zrychlení × TIER_F [0,7…1,3], 1. týden ×0,45),
+  soupeř přidá max +30 % když vedeš a poleví (až 60 %), když vede o víc než 20 %. Simulace tools/sim/league.mjs:
+  slabší/běžný/zapálený ~50 % výher, výsledky 0,94–1,14. Souboj s živými lidmi až později (server, ochrana proti podvodům).
+- Hospoda 65 – CELKOVÁ KONTROLA: tools/audit.mjs (všechny části menu + Chrám + Šipky, 12 jazyků: texty pod lištou,
+  mimo okraj, překryvy), tools/playbot.mjs (robot ťuká prstem, hlídá chyby), tools/i18n-missing.mjs (chybějící překlady).
+  Nalezeno a opraveno: 299 chybějících překladů ve všech 11 jazycích + ~20 anglických textů v cizích jazycích;
+  neviditelné dotykové zóny krígle a 💎 v levém horním rohu během návodu; popisky tlačítek přetékaly (drawBtn je teď
+  zmenší); úvod Talismanů, citát Kostnice, patička Diamantů, texty Chrámu v dlouhých jazycích. Zbylé hlášky auditu =
+  jednorázové nápovědy (šipka + řádek přes obsah, záměr).

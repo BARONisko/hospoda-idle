@@ -522,8 +522,11 @@ export class TempleScene extends Phaser.Scene {
     return g;
   }
 
-  private text(x: number, y: number, s: string, size: number, c: string = PAL.bone, ox = 0) {
+  private text(x: number, y: number, s: string, size: number, c: string = PAL.bone, ox = 0, maxW?: number) {
     const o = this.add.text(x, y, s, txt(size, c)).setOrigin(ox, 0).setDepth(52);
+    // dlouhé překlady: zmenšit, ať text nepřeteče přes okraj obrazovky
+    const room = maxW ?? (ox === 0.5 ? W - 20 : ox === 0 ? W - x - 8 : x - 8);
+    if (!s.includes('\n') && o.width > room) o.setScale(room / o.width);
     this.ui.push(o);
     return o;
   }
@@ -553,8 +556,9 @@ export class TempleScene extends Phaser.Scene {
     this.ui.push(g);
     const ic = this.add.image(36, 46, 'kTentacle').setScale(2.4).setAngle(-70).setDepth(52);
     this.ui.push(ic);
-    const ten = this.text(70, 6, t('{n} chapadel', { n: big(this.T.ten) }), 40, PAL.mint);
-    this.text(72, 56, sub, 20, PAL.fog);
+    // vpravo jsou tlačítka Zpět a Obchod → texty jen do x ≈ 300
+    const ten = this.text(70, 6, t('{n} chapadel', { n: big(this.T.ten) }), 40, PAL.mint, 0, 230);
+    this.text(72, 56, sub, 20, PAL.fog, 0, 230);
     return ten;
   }
 

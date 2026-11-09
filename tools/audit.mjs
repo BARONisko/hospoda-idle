@@ -12,11 +12,11 @@ const PARTS = [
   ['vyzdoba', "s.shopSub='decor';s.openShop('shop',false)"],
   ['kostnice', "s.shopSub='bones';s.openShop('shop',false)"],
   ['ukoly', "s.openShop('tasks',false)"],
-  ['chram', "s.openShop('temple',false)"],
+  ['chram', "s.openTemple()"],
   ['pivovar', "s.openShop('brew',false)"],
   ['liga', "s.openShop('league',false)"],
   ['talismany', "s.openShop('talis',false)"],
-  ['sipky', "s.openShop('darts',false)"],
+  ['sipky', "s.openDarts()"],
   ['sberac', "s.openShop('coll',false)"],
   ['hostinsky0', "s.ktab=0;s.openShop('keeper',false)"],
   ['hostinsky3', "s.ktab=3;s.openShop('keeper',false)"],
@@ -51,7 +51,7 @@ for (const lang of langs) {
     d.tut = -1; d.coins = 3.3e12; d.gems = 1234; d.bones = 5.5e6; d.krigle = 4321; d.klvl = 40;
     d.stats.prestiges = 6;
     // jednorázové nápovědy (šipka + řádek přes obsah, záměr) vypnout – audit hledá trvalé chyby
-    d.tabTut = Object.keys(s.constructor.TAB_TUT); s.tabTutKey = '';
+    d.tabTut = Object.keys(s.constructor.TAB_TUT); s.tabTutKey = ''; d.brewTut = -1;
     s.awayObjs.forEach((o) => o.destroy()); s.awayObjs = [];
   });
   for (const [name, js] of PARTS) {
@@ -67,13 +67,15 @@ for (const lang of langs) {
     r = await p.evaluate(() => {
       const s = game.scene.getScene('Pub');
       const W = 540, H = 960, MB = H - 84;
-      const objs = (s.shopObjs.length ? s.shopObjs : s.children.list).filter((o) => o.visible && o.alpha > 0.05 && o.active);
+      // Chrám a Šipky jsou samostatné scény přes hospodu
+      const ov = ['Temple', 'Darts'].map((k) => game.scene.getScene(k)).find((x) => x && game.scene.isActive(x.scene.key));
+      const objs = (ov ? ov.children.list : s.shopObjs.length ? s.shopObjs : s.children.list).filter((o) => o.visible && o.alpha > 0.05 && o.active);
       const texts = objs.filter((o) => o.type === 'Text' && o.text.trim());
       const out = [];
       const box = (o) => o.getBounds();
       for (const o of texts) {
         const q = box(o);
-        if (q.bottom > MB + 2 && q.top < H && s.shopObjs.length && (o.depth ?? 0) < 340) out.push(`pod lištou: "${o.text.slice(0, 40)}" (y ${Math.round(q.top)}–${Math.round(q.bottom)})`);
+        if (!ov && q.bottom > MB + 2 && q.top < H && s.shopObjs.length && (o.depth ?? 0) < 340) out.push(`pod lištou: "${o.text.slice(0, 40)}" (y ${Math.round(q.top)}–${Math.round(q.bottom)})`);
         if (q.right > W + 2 || q.left < -2) out.push(`mimo okraj: "${o.text.slice(0, 40)}" (x ${Math.round(q.left)}–${Math.round(q.right)})`);
       }
       for (let i = 0; i < texts.length; i++)
@@ -86,6 +88,8 @@ for (const lang of langs) {
       return out;
     });
     await p.screenshot({ path: `tools/_tmp/audit/${lang}-${name}.png` });
+    // zavřít Chrám / Šipky
+    await p.evaluate(() => { for (const k of ['Temple', 'Darts']) if (game.scene.isActive(k)) { game.scene.stop(k); const s = game.scene.getScene('Pub'); s.input.enabled = true; } });
     for (const x of r) console.log(`[${lang}] ${name}: ${x}`);
     problems += r.length;
   }
