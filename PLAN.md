@@ -351,3 +351,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   neviditelné dotykové zóny krígle a 💎 v levém horním rohu během návodu; popisky tlačítek přetékaly (drawBtn je teď
   zmenší); úvod Talismanů, citát Kostnice, patička Diamantů, texty Chrámu v dlouhých jazycích. Zbylé hlášky auditu =
   jednorázové nápovědy (šipka + řádek přes obsah, záměr).
+- ÚKOL (přání hospody 66, udělat PO testech): Návštěvníci s rozhodnutím (src/game/visitors.ts: Hygienik, Štamgast Pepík
+  na sekeru, Sládek, Muž v kabátě, Influencerka). U voleb, kde hráč zaplatí / přijme a NIC z toho nemá (Hygienik „Podplatit“,
+  Pepík „Nalít mu“, když nesplatí…), dostane +1 💎. Návštěvníky přidat do Sbírky (skupina „Návštěvníci“, počítá se,
+  kolikrát jim hráč zaplatil/přijal); po nasbírání přiměřeného množství dává ten návštěvník místo 1 💎 → 2 💎.
+  Přesná pravidla a prahy navrhnout uživateli před dokončením.
