@@ -33,7 +33,7 @@ import { PubView, LOOK } from '../game/PubView';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
 import { GUESTS } from '../game/PubView';
 import { QUESTS, QCtx, QuestDef, currentQuest, questDone } from '../core/quests';
-import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today, WeekKind, newWeekly, weekId, weekText } from '../core/goals';
+import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today, WeekKind, newWeekly, weekId, weekNum, weekText } from '../core/goals';
 
 const W = 540;
 /** kolik talířů z kuchyně může čekat na číšníky */
@@ -1071,7 +1071,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (id === 'tasks') return this.claimable();
     if (id === 'brew') return this.brewFull();
     if (id === 'keeper') return this.skillPoints() > 0;
-    if (id === 'special') return (chestReady(this.d.chest) && (this.d.tut ?? -1) < 0) || (passOn(this.d.pass) && this.d.pass!.claim !== dayKey());
+    if (id === 'special') return (chestReady(this.d.chest) && (this.d.tut ?? -1) < 0) || (passOn(this.d.pass) && (this.d.pass!.claim ?? '') < dayKey());
     if (id === 'darts') return !!this.d.darts && DART_UPS.some((u) => (this.d.darts!.up[u.id] ?? 0) < u.max && u.cost(this.d.darts!.up[u.id] ?? 0) <= this.d.darts!.pts);
     if (id === 'temple') return isWeekend() && !this.tileLock('temple') && templeState(this.d.temple).used < ROUNDS_PER_DAY && this.d.templeSeen !== dayKey();
     return false;
@@ -1496,16 +1496,16 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const boostL = fxLeft(L.boostFrom, LG_BOOST.ms, now), stopL = fxLeft(L.stopFrom, LG_STOP.ms, now);
     const items: { label: string; cost: number; state?: string; ok: boolean; color: 'green' | 'plum' | 'red'; buy: () => string }[] = [
       { label: t('Posila ×2'), cost: LG_BOOST.gems, color: 'green',
-        state: boostL ? t('běží {t}', { t: mm(boostL) }) : L.boostDay === today ? t('zase zítra') : undefined,
-        ok: !boostL && L.boostDay !== today,
+        state: boostL ? t('běží {t}', { t: mm(boostL) }) : (L.boostDay ?? '') >= today ? t('zase zítra') : undefined,
+        ok: !boostL && (L.boostDay ?? '') < today,
         buy: () => ((L.boostFrom = Date.now()), (L.boostDay = today), t('Posila na směnu! Tržba do ligy ×2 na 1 h')) },
       { label: t('Divoká karta'), cost: LG_WILD, color: 'plum',
         state: L.wild ? t('máš ✓') : L.tier === 1 ? t('od 2. ligy') : undefined,
         ok: !L.wild && L.tier > 1,
         buy: () => ((L.wild = true), t('Divoká karta: tento týden nesestoupíš')) },
       { label: t('Zavřít pípu'), cost: LG_STOP.gems, color: 'red',
-        state: stopL ? t('běží {t}', { t: mm(stopL) }) : L.stopDay === today ? t('zase zítra') : undefined,
-        ok: !stopL && L.stopDay !== today,
+        state: stopL ? t('běží {t}', { t: mm(stopL) }) : (L.stopDay ?? '') >= today ? t('zase zítra') : undefined,
+        ok: !stopL && (L.stopDay ?? '') < today,
         buy: () => ((L.stopFrom = Date.now()), (L.stopDay = today), t('Soupeři teče jen pěna – 2 h nepřibývá')) },
     ];
     const bw = (W - 40) / 3;
@@ -2105,7 +2105,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   // ---------- úkoly a úspěchy ----------
   private daily() {
-    if (this.d.daily.day !== today()) this.d.daily = newDaily(this.totalRate());
+    if (this.d.daily.day < today()) this.d.daily = newDaily(this.totalRate());
     return this.d.daily;
   }
 
@@ -2127,7 +2127,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   private weekly() {
-    if (this.d.weekly?.week !== weekId()) this.d.weekly = newWeekly();
+    // jen novější týden (hodiny zpět nesmí výzvu obnovit znovu)
+    if (!this.d.weekly || weekNum(this.d.weekly.week) < weekNum(weekId())) this.d.weekly = newWeekly();
     return this.d.weekly!;
   }
 
@@ -2621,7 +2622,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** denní diamanty Štamgasta */
   passClaim() {
     const p = this.d.pass;
-    if (!passOn(p) || p!.claim === dayKey()) return;
+    // hodiny vrácené dozadu: den už vyzvednutý (claim v „budoucnosti“) se znovu nedá
+    if (!passOn(p) || (p!.claim ?? '') >= dayKey()) return;
     p!.claim = dayKey();
     this.d.gems = (this.d.gems ?? 0) + PASS_GEMS;
     store(this.d);
@@ -2799,7 +2801,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.drawBtn(b, on ? t('Prodloužit o {d} dní · {p}', { d: PASS_DAYS, p: iap.price('pass') }) : t('Stát se štamgastem · {p}', { p: iap.price('pass') }), iap.available, 'green');
     this.shopObjs.push(b.bg, b.label, b.zone);
     if (on) {
-      const got = this.d.pass!.claim === dayKey();
+      const got = (this.d.pass!.claim ?? '') >= dayKey();
       const c = this.btn(30, y + 420, W - 60, 64, () => this.passClaim(), D + 3);
       this.drawBtn(c, got ? t('Dnešní diamanty vyzvednuty ✓') : t('Vyzvednout {n} 💎', { n: PASS_GEMS }), !got, 'amber');
       this.shopObjs.push(c.bg, c.label, c.zone);
@@ -3375,7 +3377,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** 💎 od návštěvníka, ze kterého hráč nic neměl (strop za den; štědrý návštěvník 2) */
   private visitGem(key: string) {
     const day = dayKey();
-    if (this.d.visG?.day !== day) this.d.visG = { day, n: 0 };
+    if (!this.d.visG || this.d.visG.day < day) this.d.visG = { day, n: 0 };
     const n = Math.min(visGems(this.d.vis?.[key] ?? 0), VIS_GEMS_DAY - this.d.visG.n);
     if (n <= 0) return;
     this.d.visG.n += n;
@@ -3518,7 +3520,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** kolik dnešních hygien ještě dá 💎 */
   private hygGemsLeft() {
     const day = dayKey();
-    if (this.d.hygG?.day !== day) this.d.hygG = { day, n: 0 };
+    if (!this.d.hygG || this.d.hygG.day < day) this.d.hygG = { day, n: 0 };
     return PRESTIGE_GEMS_DAY - this.d.hygG.n;
   }
 

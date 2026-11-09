@@ -396,3 +396,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   hodinách zpět nevyhodnotí; „vrátit body“ s potvrzením (askYesNo); nápisy nahoře pod lištou úkolu (qOff), první noc bez
   nápisu přes ceduli průvodce; návod krok 4: šipka na bubliny hostů, hospoda neztmavená (~27 s místo ~60 s); liga 2. řádek
   soupeře se vejde; dlouhé podtitulky řádků se zalomí; fr Collecteur, ja コレクター, ko „{s} 님이“.
+- Hospoda 69b: přetáčení hodin i u Chrámu (denní pokusy), passu (denní 💎), denních a týdenních úkolů, limitů 💎 za
+  návštěvníky a hygienu, ligy (Posila, Zavřít pípu) – den se obnoví jen dopředu (porovnání YYYY-MM-DD, weekNum).
+  Ruština ověřena na snímcích (Nastavení, Pivovar, Hostinský, Liga). Hlavní jazyk obchodu: angličtina.

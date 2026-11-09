@@ -134,7 +134,8 @@ export function templeState(s: TempleState | undefined, now = Date.now()): Templ
     s.lv = {};
     s.idleAt = now;
   }
-  if (s.day !== todayKey(now)) {
+  // jen nový den dopředu: hodiny vrácené dozadu (a zase dopředu) nesmí vrátit denní pokusy
+  if (todayKey(now) > s.day) {
     s.day = todayKey(now);
     s.used = 0;
   }

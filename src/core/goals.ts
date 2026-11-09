@@ -120,6 +120,9 @@ export const weekText = (k: WeekKind, n: number) =>
     tips: t('Vyber spropitné od {n} hostů', { n }),
   })[k];
 /** číslo týdne (pondělí–neděle) */
+/** týden „2026-46“ jako číslo (porovnání: novější týden = větší) */
+export const weekNum = (w: string) => w.split('-').reduce((a, b, i) => (i ? a * 100 + Number(b) : Number(b)), 0);
+
 export function weekId(d = new Date()) {
   const x = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   const day = x.getUTCDay() || 7;

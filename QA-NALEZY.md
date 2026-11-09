@@ -19,7 +19,7 @@ Seřazeno podle důležitosti; [R] = rozhodnutí uživatele / návrh na snímcí
 - [HOTOVO h69] První noc: nápis „Padla noc – příšery platí kostmi!“ přes ceduli průvodce „PADLA NOC!“ (PubScene ~4560 firstNight
   nezabere, když hra startuje v noci). Tělo cedule průvodce (~4955) je v jiném (nepixelovém) písmu.
 - [HOTOVO h69] Nápisy událostí (Rvačka, Zlatý sud, Padla noc) leží přes lištu úkolu nad hospodou (bannerRaw top).
-- [O] Ruština: písmo Jersey 10 se načítá jen latin/latin-ext (main.ts) → azbuka v záložním širším písmu, přetéká
+- [HOTOVO h67 Handjet, ověřeno h69] Ruština: písmo Jersey 10 se načítá jen latin/latin-ext (main.ts) → azbuka v záložním širším písmu, přetéká
   (Nastavení podtitulky, záložka „Забегаловка Берана“, Šipky nápověda dole useknutá, offline okno řádek ligy, Pivovar,
   Hostinský záložka). Zkusit @fontsource/jersey-10 cyrillic (pokud existuje), jinak zmenšovat.
 - [HOTOVO h69: liga, zalamování dlouhých podtitulků] ja/ko Liga: 2. řádek popisu soupeře přetéká rámeček. Zmáčknuté podtitulky (Chrám pod „0 chapadel“, Obchod hygiena,
@@ -34,7 +34,7 @@ Seřazeno podle důležitosti; [R] = rozhodnutí uživatele / návrh na snímcí
 ## Ukládání / hodiny
 - [HOTOVO h69] Dvě karty prohlížeče se přepisují (web) – posluchač 'storage' → znovu načíst / zamknout.
 - [HOTOVO h69] Novější verze uložení (v:3) se tiše zahodí a přepíše; plné úložiště store() mlčí.
-- [ČÁST h69: Šťastná hodina, happy hour, liga hotovo; Chrám, sezóny, pass zbývá] Přetáčení hodin ještě funguje u: Šťastné hodiny (boostUntil/boostReady absolutní), ligy (týden vyhodnocen předčasně
+- [HOTOVO h69: + Chrám, pass, denní/týdenní úkoly, 💎 limity, liga Posila/Zavřít pípu; sezóna = hodiny dopředu nejdou bez internetu poznat] Přetáčení hodin ještě funguje u: Šťastné hodiny (boostUntil/boostReady absolutní), ligy (týden vyhodnocen předčasně
   při hodinách zpět → krígly a 💎 znovu), Chrámu (denní pokusy), sezón, passu/kampaně. Návrh: uložit nejpozdější viděný čas.
 - Offline výdělek z minulého týdne se po přelomu přičte do ligy nového týdne (gain až po league()).
 - Šipky: odchod Zpět během letu vítězné šipky → +3 kosti a XP se nepřipíšou. Chrám: zavření během 0,9 s animace truhly
@@ -42,7 +42,7 @@ Seřazeno podle důležitosti; [R] = rozhodnutí uživatele / návrh na snímcí
 - Rvačka v jiné hospodě už nevznikne (opraveno), ale dur = Infinity zůstává.
 
 ## Balanc (tools/sim, simulace agenta)
-- [O] Hygiena na konci sezení = 0 coins offline (po prestiži žádná obsluha) → pípa 1. hospody rovnou s obsluhou, nebo varovat.
+- [HOTOVO h67: pípa s číšníky] Hygiena na konci sezení = 0 coins offline (po prestiži žádná obsluha) → pípa 1. hospody rovnou s obsluhou, nebo varovat.
 - [R] Rada „Za krígly si můžeš koupit“ vede do pasti (utracený krígl = −0,9 % výdělku; nabízí „Delší spánek“ za 2 krígly
   = +30 s). Běžný hráč, který rady poslouchá, má po 9 dnech 10× menší výdělek než slabý, který krígly neutrácí.
   Návrh: radit krígly jen když se vyplatí / od 50 krígel; Delší spánek v radě nenabízet.
