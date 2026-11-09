@@ -19,7 +19,7 @@ import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, nightLen, nightShare, s
 import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
 import { notify, NOTE, Note } from '../core/notify';
-import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, VIP_GEMS, GOLD_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
+import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, VIP_GEMS, GOLD_GEMS, GEMS_FREE, RESPEC_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
 import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER, weekendLeft } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { TREE, TREE_BY_ID, TREE_BRANCHES, TREE_COLORS, STAR_TEXT, treeSpent, treeCan, hasStar, treeStats, xpNeed, oldXpNeed, lvlFromTotal, respecCost, pathX, type StarId, type TreeNode } from '../core/skilltree';
@@ -946,7 +946,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return Math.max(5, Math.round(this.d.krigle * 0.03));
   }
 
-  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal' | 'stat' | 'darts', n: number): string {
+  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal' | 'stat' | 'darts' | 'gems', n: number): string {
+    if (kind === 'gems') {
+      this.d.gems = (this.d.gems ?? 0) + n;
+      return t('+{n} 💎', { n });
+    }
     if (kind === 'krigle') {
       this.d.krigle += n;
       return t('+{k} krígel', { k: big(n) });
@@ -1316,6 +1320,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         this.d.leagueHist = [...(this.d.leagueHist ?? []), [tier, win] as [number, boolean]].slice(-8);
         if (win) {
           this.d.krigle += winReward(tier);
+          this.d.gems = (this.d.gems ?? 0) + GEMS_FREE.league * tier;
           // liga → šipky: +3 body
           if (this.d.darts) this.d.darts.pts += 3;
           this.leagueWinDrop = true;
@@ -1356,7 +1361,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const tx = (y: number, s2: string, size: number, c: string) => objs.push(this.add.text(W / 2, y, s2, txt(size, c)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 100).setDepth(D + 2));
     tx(284, r.win ? t('Vyhrál jsi ligu!') : t('Prohrál jsi ligu…'), 34, r.win ? PAL.gold : PAL.scarlet);
     tx(344, t('Tvoje tržba: {a} coins\nSoupeř: {b} coins', { a: big(r.me), b: big(r.rival) }), 22, PAL.bone);
-    tx(420, r.win ? t('Odměna: +{k} krígel a talisman. Postupuješ do: {l}', { k: big(winReward(r.tier)), l: LEAGUES[Math.min(LEAGUES.length, r.tier + 1) - 1] }) : t('Sestupuješ do: {l}', { l: LEAGUES[Math.max(1, r.tier - 1) - 1] }), 22, r.win ? PAL.mint : PAL.fog);
+    tx(420, r.win ? t('Odměna: +{k} krígel, +{g} 💎 a talisman. Postupuješ do: {l}', { k: big(winReward(r.tier)), g: GEMS_FREE.league * r.tier, l: LEAGUES[Math.min(LEAGUES.length, r.tier + 1) - 1] }) : t('Sestupuješ do: {l}', { l: LEAGUES[Math.max(1, r.tier - 1) - 1] }), 22, r.win ? PAL.mint : PAL.fog);
     const ok = this.btn(W / 2 - 100, 560, 200, 60, () => {
       objs.forEach((o) => o.destroy());
       this.awayObjs = [];
@@ -1419,7 +1424,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     g.fillStyle(col('pine'), 0.8).fillRoundedRect(10, y0 + 376, W / 2 - 15, 76, 12);
     g.fillStyle(col('blood'), 0.8).fillRoundedRect(W / 2 + 5, y0 + 376, W / 2 - 15, 76, 12);
     add(this.add.text(W / 4 + 2, y0 + 384, t('VÝHRA'), txt(18, PAL.mint)).setOrigin(0.5, 0).setDepth(D + 2));
-    add(this.add.text(W / 4 + 2, y0 + 408, t('+{k} krígel, talisman\na postup', { k: big(winReward(L.tier)) }), txt(16, PAL.bone)).setOrigin(0.5, 0).setAlign('center').setDepth(D + 2));
+    add(this.add.text(W / 4 + 2, y0 + 408, t('+{k} krígel, +{g} 💎,\ntalisman a postup', { k: big(winReward(L.tier)), g: GEMS_FREE.league * L.tier }), txt(16, PAL.bone)).setOrigin(0.5, 0).setAlign('center').setDepth(D + 2));
     add(this.add.text((W * 3) / 4 - 2, y0 + 384, t('PROHRA'), txt(18, PAL.scarlet)).setOrigin(0.5, 0).setDepth(D + 2));
     add(this.add.text((W * 3) / 4 - 2, y0 + 408, L.tier > 1 ? t('sestup do ligy {n}', { n: L.tier - 1 }) : t('zůstaneš v 1. lize'), txt(16, PAL.bone)).setOrigin(0.5, 0).setDepth(D + 2));
     // historie posledních týdnů
@@ -1442,7 +1447,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const quiet = this.skillPoints() > 0 || !!this.tileLock('keeper');
       this.d.xp -= xpNeed(this.d.klvl);
       this.d.klvl++;
-      if (!quiet && !this.tileLock('keeper')) this.banner(this.views[0].cam, t('Hostinský úroveň {n}! +1 bod dovedností', { n: this.d.klvl }), true);
+      // každá 5. úroveň: diamanty
+      const gm = this.d.klvl % 5 === 0 ? GEMS_FREE.keeper5 : 0;
+      if (gm) this.d.gems = (this.d.gems ?? 0) + gm;
+      if (gm && !this.tileLock('keeper')) this.banner(this.views[0].cam, t('Hostinský úroveň {n}! +1 bod dovedností a +{g} 💎', { n: this.d.klvl, g: gm }), true);
+      else if (!quiet && !this.tileLock('keeper')) this.banner(this.views[0].cam, t('Hostinský úroveň {n}! +1 bod dovedností', { n: this.d.klvl }), true);
     }
   }
 
@@ -1617,21 +1626,33 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const has = own.includes(sel.id), can = treeCan(sel, own);
     // u koupeného uzlu: přerozdělení všech bodů za krígly
     if (has) {
-      const rc = respecCost(this.d.skR ?? 0);
-      const rb = this.btn(W - 230, py + 70, 210, 44, () => {
-        if (this.d.krigle < rc) return sfx.error();
-        this.d.krigle -= rc;
-        this.d.skR = (this.d.skR ?? 0) + 1;
+      // dvě cesty: za krígly (cena roste) nebo za diamanty (pevná cena)
+      const rc = respecCost(this.d.skR ?? 0), gems = this.d.gems ?? 0;
+      const reset = () => {
         this.d.skills = [];
         this.tsCache = undefined;
         this.applyKup();
         store(this.d);
         sfx.fanfare();
+        this.banner(this.views[0].cam, t('Strom vynulován – body jsou zpět'));
         this.openShop('keeper', false);
+      };
+      const rb = this.btn(20, py + 76, 240, 44, () => {
+        if (this.d.krigle < rc) return sfx.error();
+        this.d.krigle -= rc;
+        this.d.skR = (this.d.skR ?? 0) + 1;
+        reset();
       }, D + 6);
       this.drawBtn(rb, t('vrátit body: {n} krígel', { n: rc }), this.d.krigle >= rc, 'plum');
-      rb.label.setScale(Math.min(1, 196 / rb.label.width));
-      this.shopObjs.push(rb.bg, rb.label, rb.zone);
+      rb.label.setScale(Math.min(1, 226 / rb.label.width));
+      const gb = this.btn(W - 260, py + 76, 240, 44, () => {
+        if (gems < RESPEC_GEMS) return sfx.error();
+        this.d.gems = gems - RESPEC_GEMS;
+        reset();
+      }, D + 6);
+      this.drawBtn(gb, t('vrátit body: {n} 💎 (máš {m})', { n: RESPEC_GEMS, m: gems }), gems >= RESPEC_GEMS, 'plum');
+      gb.label.setScale(Math.min(1, 226 / gb.label.width));
+      this.shopObjs.push(rb.bg, rb.label, rb.zone, gb.bg, gb.label, gb.zone);
     }
     pg.fillStyle(col('ink')).fillCircle(50, py + 40, 28).fillStyle(sel.star ? col('gold') : bc).fillCircle(50, py + 40, 25);
     if (sel.star) this.starShape(pg, 50, py + 40, 16, col('ink'));
@@ -1960,7 +1981,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (this.shopSub === 'bones') return this.bonesTab(y0, D);
     const offer = this.shopOffer().slice(0, 4);
     const k = this.kriglyNow();
-    this.row(y0, RH, D, t('Zavolat hygienu'), t('krígly: {k} (+{b} % výdělek)', { k: big(this.d.krigle), b: big(Math.round(this.d.krigle * KRIGL_BONUS * 100)) }), 'blood', PAL.sand);
+    this.row(y0, RH, D, t('Zavolat hygienu'), t('krígly: {k} (+{b} % výdělek) · hygiena +{g} 💎', { k: big(this.d.krigle), b: big(Math.round(this.d.krigle * KRIGL_BONUS * 100)), g: GEMS_FREE.prestige }), 'blood', PAL.sand);
     const pb = this.btn(W - 212, y0 + 12, 190, 62, () => this.askPrestige(), D + 2);
     this.hygBtn = pb;
     const pm = prestigeMin(this.d.stats.prestiges, this.d.krigle);
@@ -2555,7 +2576,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.drawBtn(b, `${PRODUCTS[id].gems} 💎 · ${iap.price(id)}`, iap.available, 'amber');
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
-    if (!iap.available) add(this.add.text(W / 2, yy + 80, t('nákup jen v mobilní aplikaci · diamanty zdarma: VIP host, zlatá truhla'), txt(15, PAL.fog)).setOrigin(0.5).setDepth(D + 2));
+    if (!iap.available) add(this.add.text(W / 2, yy + 80, t('nákup jen v mobilní aplikaci · zdarma: VIP host, zlatá truhla, úkoly, liga, Cthulhu, hygiena, hostinský'), txt(15, PAL.fog)).setOrigin(0.5).setDepth(D + 2));
   }
 
   /** Štamgast pass (z B): 30 dní výhod */
@@ -3148,6 +3169,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const n = Math.min(MAX_PUBS, this.d.pubs.length + 1);
     if (n > this.d.pubs.length) (this.d.pubIntro = n), ((this.d.guideQ ??= []).push('pub' + n));
     this.d.krigle += k;
+    this.d.gems = (this.d.gems ?? 0) + GEMS_FREE.prestige;
     this.d.stats.prestiges++;
     this.d.run = 0;
     this.d.coins = 0;
@@ -4607,10 +4629,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (!q || !questDone(q, this.d, this.qctx())) return;
     const n = this.qReward();
     this.d.coins += n;
+    this.d.gems = (this.d.gems ?? 0) + GEMS_FREE.quest;
     (this.d.q ??= []).push(q.id);
     this.qPoint = null;
     sfx.fanfare();
-    this.banner(this.views[0].cam, t('Úkol splněn! +{n} coins', { n: big(n) }));
+    this.banner(this.views[0].cam, t('Úkol splněn! +{n} coins a +{g} 💎', { n: big(n), g: GEMS_FREE.quest }));
     if (!this.qCur()) this.time.delayedCall(1500, () => this.banner(this.views[0].cam, t('Všechny úkoly od hostinského splněny!')));
     store(this.d);
   }

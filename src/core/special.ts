@@ -133,6 +133,11 @@ export type GemItem = keyof typeof GEM_COST;
 /** diamanty zdarma: za obslouženého VIP a ve zlaté truhle (7. den) */
 export const VIP_GEMS = 2;
 export const GOLD_GEMS = 10;
+/** další diamanty zdarma (zakomponování do hry): poražený Cthulhu (× obtížnost), výhra v lize (× liga),
+ *  hygiena, každá 5. úroveň hostinského, splněný úkol od hostinského */
+export const GEMS_FREE = { boss: 5, league: 5, prestige: 5, keeper5: 5, quest: 2 } as const;
+/** přerozdělení bodů stromu hostinského za diamanty (pevná cena; za krígly cena roste) */
+export const RESPEC_GEMS = 30;
 
 export interface PassState {
   /** platí do (ms) */
