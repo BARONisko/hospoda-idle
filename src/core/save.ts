@@ -150,6 +150,9 @@ export interface Save {
   pass?: import('./special').PassState;
   own?: string[];
   noAds?: boolean;
+  /** už se zeptal na upozornění; kolikrát vyzval k hodnocení v obchodě */
+  ntfAsk?: boolean;
+  rev?: number;
   /** čas posledního uložení (ms) – pro výdělek offline */
   at: number;
 }

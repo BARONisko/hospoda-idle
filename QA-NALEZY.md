@@ -56,19 +56,21 @@ Seřazeno podle důležitosti; [R] = rozhodnutí uživatele / návrh na snímcí
 
 # Kontrola „bude to oblíbené?“ (hospoda 70, 2026-11-12) – robot-hráč 14 min anglicky, všechny obrazovky, simulace
 Seřazeno podle dopadu na udržení hráčů. [R] = čeká na rozhodnutí uživatele.
-- [R] **Upozornění na Androidu nefungují**: v balíčku chybí @capacitor/local-notifications (android/app/capacitor.build.gradle má jen
+- [HOTOVO h70: @capacitor/local-notifications, dotaz po 3 úkolech, bez přesných budíků] **Upozornění na Androidu nefungují**: v balíčku chybí @capacitor/local-notifications (android/app/capacitor.build.gradle má jen
   admob, app, native-purchases) → notify.available = false, řádek v Nastavení se v aplikaci vůbec neukáže. Přidat plugin + povolení.
-- [R] **Návštěvník trestá nového hráče**: první návštěvník přijde vždy 120 s po startu (visitT = 120), náhodně z 5. Hygienik: úplatek
+- [HOTOVO h70: do 1. hygieny sázky vždy vyjdou, cena ≤ polovina coins, pokuta ≤ 30 %] **Návštěvník trestá nového hráče**: první návštěvník přijde vždy 120 s po startu (visitT = 120), náhodně z 5. Hygienik: úplatek
   = výdělek za 120 s (aktivní hráč ho nikdy nemá, „chybí 5,46K“), Riskovat = 50 % ztráta min(coins, výdělek za 300 s) = všech coins.
   Muž v kabátě: „chybí 128K“. Návrh: do 1. hygieny jen návštěvníci bez ztráty; cena nejvýš polovina coins; pokuta nejvýš 30 % coins.
-- [R] **Past „bar plný – číšníci nestíhají“**: od 3. do 10. minuty robot kupoval úrovně pípy/kuchyně a výdělek stál (706 → 772 /s),
+- [HOTOVO h70: úkoly waiter3 a wpoint se šipkou, tlačítko „Číšník 400“ na kartě] **Past „bar plný – číšníci nestíhají“**: od 3. do 10. minuty robot kupoval úrovně pípy/kuchyně a výdělek stál (706 → 772 /s),
   protože 3. číšník (400 coins) a body číšníků jsou schované v malých kolečkách bez popisu a žádný úkol na ně nevede.
   Návrh: úkol „Najmi 3. číšníka“ + šipka, při plném baru tlačítko na kartě pípy „Číšníci“ místo zbytečného +1.
-- [R] Chybí výzva k hodnocení v obchodě (Play In-App Review) – po 3. hygieně / 2. den.
-- [R] Název v obchodě „Pajzl Tycoon“ anglicky nikdo nehledá → „P.U.B. Idle: Pub Tycoon“; popis obchodu přeložit do všech 11 jazyků hry.
-- [R] Snímky v obchodě bez titulků (tmavé, hodně textu) – přidat velký nápis nad každý snímek.
-- [R] Žádné měření (analytika) – po vydání nepůjde poznat, kde hráči odcházejí. Žádná záloha do cloudu (jen ruční Uložit/Nahrát).
+- [HOTOVO h70: @capacitor-community/in-app-review po 3. a 10. hygieně] Chybí výzva k hodnocení v obchodě (Play In-App Review) – po 3. hygieně / 2. den.
+- [HOTOVO h70: texty v docs/play/listing/, vložit do Play Console musí uživatel] Název v obchodě „Pajzl Tycoon“ anglicky nikdo nehledá → „P.U.B. Idle: Pub Tycoon“; popis obchodu přeložit do všech 11 jazyků hry.
+- [HOTOVO h70: docs/play/snimek-1…8, styly A/C v docs/navrhy-ui/snimky-obchod/] Snímky v obchodě bez titulků (tmavé, hodně textu) – přidat velký nápis nad každý snímek.
+- [PŘIPRAVENO h70: src/core/stats.ts (GA4 gtag), čeká na měřicí ID G-… od uživatele; pak doplnit zásady soukromí a Data safety] Žádné měření (analytika) – po vydání nepůjde poznat, kde hráči odcházejí. Žádná záloha do cloudu (jen ruční Uložit/Nahrát).
 - [HOTOVO h70] Okno po návratu psalo o soupeři v lize, i když je liga zamčená (do 20. hygieny). npm run sim po jménech podle jazyka.
 - V pořádku: návod 45–70 s bez zaseknutí, 14 min hry bez chyby v konzoli, 26 obrazovek anglicky bez přetečení, okno po návratu (×2 za
   reklamu), potvrzení hygieny, první noc, nová hospoda; skript 6–7 % jádra, 20 MB paměti; první hygiena ~9 min (sim).
 - Neověřeno (jen na telefonu): reklamy, nákupy, tlačítko Zpět, zvuk, výkon na slabém telefonu.
+- Drobnost (už dřív): ruština, Šipky – první nápověda „нажми на мишень = бросок“ překrývá čísla 12 a 18 na terči.
+- Sběrač: dlaždice se odemkne až od 500 kostí (dřív od 1 kosti a průvodce ukazoval na nákup, na který hráč neměl).

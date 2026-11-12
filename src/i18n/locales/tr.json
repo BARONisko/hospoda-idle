@@ -1308,5 +1308,14 @@
  "Vrátit všechny body?": "Tüm puanlar geri alınsın mı?",
  "Všechny koupené uzly se smažou a body dostaneš zpět.": "Satın alınan tüm düğümler silinir ve puanların geri gelir.",
  "Ťukej na bubliny hostů – coins přibudou rychleji. Pak otevři kuchyni.": "Müşterilerin balonlarına dokun – coins daha hızlı gelir. Sonra mutfağı aç.",
- "Platba čeká – připíše se, až bude zaplacená": "Ödeme bekliyor – ödendiğinde eklenecek"
+ "Platba čeká – připíše se, až bude zaplacená": "Ödeme bekliyor – ödendiğinde eklenecek",
+ "Najmi {n}. číšníka": "{n}. garsonu işe al",
+ "Vylepši číšníka – ťukni na něj": "Bir garsonu geliştir – ona dokun",
+ "Číšník": "Garson",
+ "vylepšit": "geliştir",
+ "od {n} kostí": "{n} kemikten itibaren",
+ "Dát vědět, až bude kasa plná?": "Kasa dolunca haber verelim mi?",
+ "Pošleme upozornění, když hospoda vydělá maximum, a na denní truhlu.": "Meyhane en fazla kazancına ulaşınca ve günlük sandık için bildirim göndeririz.",
+ "Statistiky": "İstatistikler",
+ "anonymní – pomáhají hru vylepšovat": "anonim – oyunu geliştirmeye yardımcı olur"
 }

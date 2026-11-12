@@ -15,6 +15,10 @@ export interface VisitCtx {
   say(text: string): void;
   /** z návštěvy hráč nic neměl (zaplatil / přijal naprázdno) → 💎 (strop za den, štědrý návštěvník 2) */
   gem(): void;
+  /** nový hráč (do 1. hygieny): návštěva nikdy neskončí ztrátou – sázky vždy vyjdou */
+  safe: boolean;
+  /** pokuta: výdělek za tolik sekund, nejvýš 30 % toho, co hráč má (dřív klidně všechny coins) */
+  fine(secs: number): number;
 }
 
 export interface Choice {
@@ -32,7 +36,8 @@ export interface Visitor {
   b: Choice;
 }
 
-const chance = (p: number) => Math.random() < p;
+/** sázka vyjde s pravděpodobností p; novému hráči (c.safe) vždy */
+const chance = (p: number, c: VisitCtx) => c.safe || Math.random() < p;
 
 export const VISITORS: Visitor[] = [
   {
@@ -44,8 +49,8 @@ export const VISITORS: Visitor[] = [
       label: t('Riskovat'),
       cost: () => 0,
       run: (c) => {
-        if (chance(0.5)) return c.say(t('Vlas byl tvůj. Hygienik se omluvil!'));
-        const n = Math.min(c.coins(), c.income(300));
+        if (chance(0.5, c)) return c.say(t('Vlas byl tvůj. Hygienik se omluvil!'));
+        const n = c.fine(300);
         c.spend(n);
         c.say(t('Pokuta! −{n}', { n: big(n) }));
       },
@@ -76,7 +81,7 @@ export const VISITORS: Visitor[] = [
         c.say(t('Pepík pije na sekeru…'));
         const back = c.income(240);
         c.later(90_000, () => {
-          if (chance(0.7)) {
+          if (chance(0.7, c)) {
             c.gain(back);
             c.say(t('Pepík splatil sekeru! +{n}', { n: big(back) }));
           } else (c.say(t('Pepík zmizel i se sekerou!')), c.gem());
@@ -93,7 +98,7 @@ export const VISITORS: Visitor[] = [
       label: t('Koupit sud'),
       cost: (c) => c.income(300),
       run: (c) => {
-        if (chance(0.5)) {
+        if (chance(0.5, c)) {
           const n = c.income(900);
           c.gain(n);
           c.say(t('Byla v něm zlatá jedenáctka! +{n}', { n: big(n) }));
@@ -110,11 +115,11 @@ export const VISITORS: Visitor[] = [
       label: t('Pustit ji'),
       cost: () => 0,
       run: (c) => {
-        if (chance(0.6)) {
+        if (chance(0.6, c)) {
           c.boost(180_000);
           c.say(t('Video je virální! ×2 výdělek na 3 min'));
         } else {
-          const n = Math.min(c.coins(), c.income(120));
+          const n = c.fine(120);
           c.spend(n);
           c.say(t('Dav rozbil půllitry! −{n}', { n: big(n) }));
           c.gem();

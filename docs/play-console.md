@@ -4,7 +4,9 @@ Vše, co se vyplňuje v Play Console. Odpovědi jsou pravdivé pro současnou hr
 přes Google Play, žádné účty, uložení jen v telefonu). Když se hra změní (platby, přihlášení…), odpovědi se musí upravit.
 
 ## Základ (Vytvořit aplikaci)
-- Název aplikace: **P.U.B. Idle – Pajzl Tycoon**
+- Název aplikace (en-US a ostatní jazyky): **P.U.B. Idle: Pub Tycoon** (hospoda 70; „Pajzl“ anglicky nikdo nehledá); česky **P.U.B. Idle – Pajzl Tycoon**
+- Texty záznamu ve 12 jazycích (název ≤ 30, krátký popis ≤ 80, úplný popis): `docs/play/listing/<jazyk>.md` (en-US, cs-CZ, de-DE, es-ES, fr-FR, pl-PL, pt-BR, ru-RU, tr-TR, ja-JP, ko-KR, zh-CN)
+- Snímky telefonu s nápisy (1080×1920, anglicky): `docs/play/snimek-1.png` … `snimek-8.png`
 - Výchozí jazyk: **angličtina – en-US** (rozhodnutí uživatele h69; čeština jako překlad)
 - Aplikace nebo hra: **Hra** · Zdarma nebo placená: **Zdarma**
 - Balíček (package name, nastaví se nahráním AAB): `cz.baronisko.pubidle`

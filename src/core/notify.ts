@@ -1,7 +1,10 @@
 // Upozornění na mobilu („hospoda je plná“, „víkend v chrámu“ …) – rozhraní jako ads.ts.
-// V mobilní aplikaci (Capacitor) se použije plugin LocalNotifications (přes window.Capacitor, bez závislosti v balíčku):
+// V mobilní aplikaci (Capacitor) se použije plugin @capacitor/local-notifications:
 // upozornění přijdou i při zavřené hře. Na webu (PWA) jde jen Notification API a časovač stránky – upozornění přijde,
 // jen dokud prohlížeč stránku na pozadí nechá žít (mobilní prohlížeče ji často brzy uspí). Bez push serveru to jinak nejde.
+import { Capacitor } from '@capacitor/core';
+import { LocalNotifications } from '@capacitor/local-notifications';
+
 export interface Note {
   /** stálé číslo druhu upozornění (stejné id = nahradí předchozí) */
   id: number;
@@ -23,25 +26,22 @@ export interface NotifyProvider {
 /** druhy upozornění (id) */
 export const NOTE = { full: 1, darts: 2, chest: 3, temple: 4, vip: 5 } as const;
 
-type CapLN = {
-  requestPermissions(): Promise<{ display: string }>;
-  schedule(o: { notifications: { id: number; title: string; body: string; schedule: { at: Date; allowWhileIdle?: boolean } }[] }): Promise<unknown>;
-  cancel(o: { notifications: { id: number }[] }): Promise<unknown>;
-};
-
-/** Capacitor LocalNotifications (mobilní aplikace) */
+/** Capacitor LocalNotifications (mobilní aplikace) – plugin @capacitor/local-notifications (kontrola hospoda 70: dřív v balíčku
+ *  chyběl, takže v aplikaci upozornění nešla vůbec). Bez přesných budíků (isExactNotification: false) – jinak by plugin na
+ *  Androidu 12+ otevíral systémovou obrazovku „Budíky a připomenutí“. */
 function capacitor(): NotifyProvider | null {
-  const ln = (globalThis as { Capacitor?: { Plugins?: { LocalNotifications?: CapLN } } }).Capacitor?.Plugins?.LocalNotifications;
-  if (!ln) return null;
+  if (!Capacitor.isNativePlatform()) return null;
+  const ln = LocalNotifications;
   const all = Object.values(NOTE).map((id) => ({ id }));
   return {
-    permit: async () => (await ln.requestPermissions()).display === 'granted',
+    permit: async () => (await ln.checkPermissions()).display === 'granted' || (await ln.requestPermissions()).display === 'granted',
     cancel: async () => {
       await ln.cancel({ notifications: all });
     },
     schedule: async (list) => {
       await ln.cancel({ notifications: all });
-      if (list.length) await ln.schedule({ notifications: list.map((n) => ({ id: n.id, title: n.title, body: n.body, schedule: { at: new Date(n.at), allowWhileIdle: true } })) });
+      if (list.length)
+        await ln.schedule({ notifications: list.map((n) => ({ id: n.id, title: n.title, body: n.body, schedule: { at: new Date(n.at), allowWhileIdle: true }, isExactNotification: false })) });
     },
   };
 }

@@ -1308,5 +1308,14 @@
  "Vrátit všechny body?": "Odzyskać wszystkie punkty?",
  "Všechny koupené uzly se smažou a body dostaneš zpět.": "Wszystkie kupione węzły znikną, a punkty wrócą do ciebie.",
  "Ťukej na bubliny hostů – coins přibudou rychleji. Pak otevři kuchyni.": "Stukaj w dymki gości – coins przybędzie szybciej. Potem otwórz kuchnię.",
- "Platba čeká – připíše se, až bude zaplacená": "Płatność oczekuje – zostanie dodana po opłaceniu"
+ "Platba čeká – připíše se, až bude zaplacená": "Płatność oczekuje – zostanie dodana po opłaceniu",
+ "Najmi {n}. číšníka": "Zatrudnij kelnera nr {n}",
+ "Vylepši číšníka – ťukni na něj": "Ulepsz kelnera – stuknij w niego",
+ "Číšník": "Kelner",
+ "vylepšit": "ulepsz",
+ "od {n} kostí": "od {n} kości",
+ "Dát vědět, až bude kasa plná?": "Dać znać, gdy kasa będzie pełna?",
+ "Pošleme upozornění, když hospoda vydělá maximum, a na denní truhlu.": "Wyślemy powiadomienie, gdy knajpa zarobi maksimum, oraz o codziennej skrzyni.",
+ "Statistiky": "Statystyki",
+ "anonymní – pomáhají hru vylepšovat": "anonimowe – pomagają ulepszać grę"
 }

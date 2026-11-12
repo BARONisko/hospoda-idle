@@ -2,5 +2,13 @@
   "appId": "cz.baronisko.pubidle",
   "appName": "P.U.B. Idle",
   "webDir": "dist",
-  "android": { "backgroundColor": "#2e222f" }
+  "android": {
+    "backgroundColor": "#2e222f"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_mug",
+      "iconColor": "#F9C22B"
+    }
+  }
 }

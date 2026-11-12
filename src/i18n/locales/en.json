@@ -1308,5 +1308,14 @@
  "Vrátit všechny body?": "Refund all points?",
  "Všechny koupené uzly se smažou a body dostaneš zpět.": "All bought nodes are removed and you get your points back.",
  "Ťukej na bubliny hostů – coins přibudou rychleji. Pak otevři kuchyni.": "Tap the guests' bubbles – coins come faster. Then open the kitchen.",
- "Platba čeká – připíše se, až bude zaplacená": "Payment pending – it will be added once paid"
+ "Platba čeká – připíše se, až bude zaplacená": "Payment pending – it will be added once paid",
+ "Najmi {n}. číšníka": "Hire waiter no. {n}",
+ "Vylepši číšníka – ťukni na něj": "Upgrade a waiter – tap them",
+ "Číšník": "Waiter",
+ "vylepšit": "upgrade",
+ "od {n} kostí": "from {n} bones",
+ "Dát vědět, až bude kasa plná?": "Notify you when the till is full?",
+ "Pošleme upozornění, když hospoda vydělá maximum, a na denní truhlu.": "We'll send a notification when the pub has earned its maximum, and for the daily chest.",
+ "Statistiky": "Statistics",
+ "anonymní – pomáhají hru vylepšovat": "anonymous – they help improve the game"
 }

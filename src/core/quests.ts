@@ -1,6 +1,7 @@
 // Úkol od hostinského: pořád jeden aktuální cíl nahoře (lišta s úkolníčkem), tlačítko UKAŽ ukáže šipkou kam ťuknout.
 // Po splnění malá odměna a hned další. ~30 úkolů postupně představí celou hru.
 import { t } from '../i18n';
+import { freePoints, spent } from './waiters';
 import { STATIONS, pubStyle } from './economy';
 import type { Save } from './save';
 
@@ -11,6 +12,7 @@ export type QAt =
   | { k: 'up' }
   | { k: 'hyg' }
   | { k: 'tip' }
+  | { k: 'waiter'; hire?: boolean }
   | { k: 'style' };
 
 /** co úkol potřebuje ze scény */
@@ -44,11 +46,17 @@ const ups = (n: number): QuestDef => ({ id: `up_${n}`, text: () => (n === 1 ? t(
 /** podívej se do části menu (stačí ji otevřít) */
 const tile = (key: string, name: () => string): QuestDef => ({ id: `tile_${key}`, text: () => t('Podívej se do menu: {s}', { s: name() }), prog: (d) => [d.qTiles?.includes(key) ? 1 : 0, 1], avail: (_d, c) => !c.lock(key), at: { k: 'tile', key } });
 
+/** nejvíc číšníků v jedné hospodě */
+const crewMax = (d: Save) => Math.max(0, ...d.pubs.map((p) => p.w?.length ?? 0));
+
 export const QUESTS: QuestDef[] = [
   level('tap', 10),
   level('kitchen', 10),
+  // kontrola hospoda 70: bez 3. číšníka a bodů číšníků výdělek stojí („bar plný“) a nic na ně nevedlo
+  { id: 'waiter3', text: () => t('Najmi {n}. číšníka', { n: 3 }), prog: (d) => [Math.min(3, crewMax(d)), 3], avail: (d) => crewMax(d) >= 2, at: { k: 'waiter', hire: true } },
   staff('kitchen'),
   level('tap', 25),
+  { id: 'wpoint', text: () => t('Vylepši číšníka – ťukni na něj'), prog: (d) => [d.pubs.some((p) => p.w?.some((w) => spent(w) > 0)) ? 1 : 0, 1], avail: (d) => d.pubs.some((p) => p.w?.some((w) => freePoints(w) > 0 || spent(w) > 0)), at: { k: 'waiter' } },
   ups(1),
   open('cellar'),
   level('kitchen', 25),

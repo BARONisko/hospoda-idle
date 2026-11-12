@@ -413,3 +413,10 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Hospoda 70 (kontrola oblíbenosti, robot-hráč 14 min + všechny obrazovky): nálezy a návrhy v QA-NALEZY.md (konec) – upozornění na
   Androidu nefungují (chybí plugin), návštěvník trestá nového hráče, past „číšníci nestíhají“, chybí hodnocení v obchodě, název a
   snímky v obchodě. Čeká na rozhodnutí uživatele, co z toho udělat.
+- Hospoda 70 (uživatel schválil po kontrole oblíbenosti): upozornění v aplikaci (plugin local-notifications, ikona ic_stat_mug,
+  dotaz „Dát vědět, až bude kasa plná?“ po 3 úkolech – d.ntfAsk); výzva k hodnocení v Google Play po 3. a 10. hygieně (d.rev);
+  návštěvníci: do 1. hygieny bez ztráty, cena ≤ polovina coins, pokuta ≤ 30 %; úkoly „Najmi 3. číšníka“ a „Vylepši číšníka“
+  se šipkou na kolečko, při plném baru tlačítko „Číšník 400“ / „Číšníci vylepšit“ na kartě (staffTap, waiterFix); Sběrač až od
+  500 kostí; název mimo češtinu „P.U.B. Idle: Pub Tycoon“; statistiky připravené (core/stats.ts, GA4, zapne se VITE_GA_ID,
+  vypínač v Nastavení); texty obchodu ve 12 jazycích docs/play/listing/; snímky s nápisy docs/play/snimek-1…8.
+  Čeká: měřicí ID GA4 od uživatele, rozhodnutí o záloze do cloudu, propagace. Android běh č. 11.

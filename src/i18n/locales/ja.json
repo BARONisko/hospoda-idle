@@ -1308,5 +1308,14 @@
  "Vrátit všechny body?": "ポイントを全部戻す？",
  "Všechny koupené uzly se smažou a body dostaneš zpět.": "購入したノードはすべて消え、ポイントが戻ります。",
  "Ťukej na bubliny hostů – coins přibudou rychleji. Pak otevři kuchyni.": "客の吹き出しをタップ――コインが早く貯まる。それから厨房を開けよう。",
- "Platba čeká – připíše se, až bude zaplacená": "支払い待ち――支払いが済むと反映されます"
+ "Platba čeká – připíše se, až bude zaplacená": "支払い待ち――支払いが済むと反映されます",
+ "Najmi {n}. číšníka": "{n}人目のウェイターを雇う",
+ "Vylepši číšníka – ťukni na něj": "ウェイターを強化 – タップしよう",
+ "Číšník": "ウェイター",
+ "vylepšit": "強化",
+ "od {n} kostí": "骨{n}個から",
+ "Dát vědět, až bude kasa plná?": "レジが満杯になったら知らせる？",
+ "Pošleme upozornění, když hospoda vydělá maximum, a na denní truhlu.": "酒場の稼ぎが上限に達したときと、デイリー宝箱のときに通知します。",
+ "Statistiky": "統計",
+ "anonymní – pomáhají hru vylepšovat": "匿名 – ゲームの改善に役立ちます"
 }

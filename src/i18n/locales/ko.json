@@ -1308,5 +1308,14 @@
  "Vrátit všechny body?": "포인트를 모두 돌려받을까요?",
  "Všechny koupené uzly se smažou a body dostaneš zpět.": "구매한 노드가 모두 지워지고 포인트를 돌려받아요.",
  "Ťukej na bubliny hostů – coins přibudou rychleji. Pak otevři kuchyni.": "손님 말풍선을 탭하세요 – coins가 더 빨리 모여요. 그다음 주방을 여세요.",
- "Platba čeká – připíše se, až bude zaplacená": "결제 대기 중 – 결제되면 지급돼요"
+ "Platba čeká – připíše se, až bude zaplacená": "결제 대기 중 – 결제되면 지급돼요",
+ "Najmi {n}. číšníka": "{n}번째 웨이터 고용",
+ "Vylepši číšníka – ťukni na něj": "웨이터 강화 – 웨이터를 탭하세요",
+ "Číšník": "웨이터",
+ "vylepšit": "강화",
+ "od {n} kostí": "뼈 {n}개부터",
+ "Dát vědět, až bude kasa plná?": "금고가 가득 차면 알려 드릴까요?",
+ "Pošleme upozornění, když hospoda vydělá maximum, a na denní truhlu.": "술집 수익이 최대치에 도달했을 때와 일일 상자가 준비됐을 때 알림을 보냅니다.",
+ "Statistiky": "통계",
+ "anonymní – pomáhají hru vylepšovat": "익명 – 게임 개선에 도움이 됩니다"
 }

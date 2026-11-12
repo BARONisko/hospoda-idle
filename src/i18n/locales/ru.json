@@ -1308,5 +1308,14 @@
  "Vrátit všechny body?": "Вернуть все очки?",
  "Všechny koupené uzly se smažou a body dostaneš zpět.": "Все купленные узлы удалятся, а очки вернутся.",
  "Ťukej na bubliny hostů – coins přibudou rychleji. Pak otevři kuchyni.": "Нажимай на пузыри гостей – coins пойдут быстрее. Потом открой кухню.",
- "Platba čeká – připíše se, až bude zaplacená": "Платёж ожидается – зачислим после оплаты"
+ "Platba čeká – připíše se, až bude zaplacená": "Платёж ожидается – зачислим после оплаты",
+ "Najmi {n}. číšníka": "Найми официанта № {n}",
+ "Vylepši číšníka – ťukni na něj": "Улучши официанта – нажми на него",
+ "Číšník": "Официант",
+ "vylepšit": "улучшить",
+ "od {n} kostí": "от {n} костей",
+ "Dát vědět, až bude kasa plná?": "Сообщить, когда касса заполнится?",
+ "Pošleme upozornění, když hospoda vydělá maximum, a na denní truhlu.": "Пришлём уведомление, когда паб заработает максимум, и о ежедневном сундуке.",
+ "Statistiky": "Статистика",
+ "anonymní – pomáhají hru vylepšovat": "анонимная – помогает улучшать игру"
 }

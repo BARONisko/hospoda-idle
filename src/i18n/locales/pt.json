@@ -1308,5 +1308,14 @@
  "Vrátit všechny body?": "Recuperar todos os pontos?",
  "Všechny koupené uzly se smažou a body dostaneš zpět.": "Todos os nós comprados são apagados e você recebe os pontos de volta.",
  "Ťukej na bubliny hostů – coins přibudou rychleji. Pak otevři kuchyni.": "Toque nos balões dos clientes – os coins vêm mais rápido. Depois abra a cozinha.",
- "Platba čeká – připíše se, až bude zaplacená": "Pagamento pendente – será creditado quando for pago"
+ "Platba čeká – připíše se, až bude zaplacená": "Pagamento pendente – será creditado quando for pago",
+ "Najmi {n}. číšníka": "Contrate o garçom nº {n}",
+ "Vylepši číšníka – ťukni na něj": "Melhore um garçom – toque nele",
+ "Číšník": "Garçom",
+ "vylepšit": "melhorar",
+ "od {n} kostí": "a partir de {n} ossos",
+ "Dát vědět, až bude kasa plná?": "Avisar quando o caixa estiver cheio?",
+ "Pošleme upozornění, když hospoda vydělá maximum, a na denní truhlu.": "Enviaremos um aviso quando o bar tiver ganhado o máximo e para o baú diário.",
+ "Statistiky": "Estatísticas",
+ "anonymní – pomáhají hru vylepšovat": "anônimas – ajudam a melhorar o jogo"
 }
