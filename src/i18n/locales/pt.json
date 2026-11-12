@@ -1319,5 +1319,18 @@
  "Statistiky": "Estatísticas",
  "anonymní – pomáhají hru vylepšovat": "anônimas – ajudam a melhorar o jogo",
  "hygiena {n} %": "vigilância {n} %",
- "ťukej na Pípu nahoře, pak kup tlačítkem dole": "toca na torneira em cima e compra com o botão de baixo"
+ "ťukej na Pípu nahoře, pak kup tlačítkem dole": "toca na torneira em cima e compra com o botão de baixo",
+ "pak hospoda vydělává sama": "depois a taberna ganha sozinha",
+ "další věci se odemknou časem": "o resto se desbloqueia com o tempo",
+ "příšery platí kostmi, ráno zase coins": "os monstros pagam em ossos; de manhã voltam os coins",
+ "utratíš je v Menu → Kostnice": "gaste no Menu → Ossário",
+ "přepínej nahoře nebo tažením do strany": "mude em cima ou deslize para o lado",
+ "za body kupuj dovednosti": "compre habilidades com pontos",
+ "vydělej za týden víc než soupeř": "ganhe na semana mais que o rival",
+ "Zatím nic – hoď kostkou.": "Nada ainda – jogue o dado.",
+ "Vše ({n})": "Tudo ({n})",
+ "Jen zesílené": "Só turbinados",
+ "+{g} 💎 · +{k} krígel\ntalisman · výdělek +{p} % na týden": "+{g} 💎 · +{k} canecas\ntalismã · renda +{p} % por uma semana",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nPostupuješ do: {l}": "Prêmio: +{g} 💎, +{k} canecas e um talismã.\nTaça da liga: renda +{p} % a semana toda.\nVocê sobe para: {l}",
+ "Ligový pohár: výdělek +{p} % do konce týdne": "Taça da liga: renda +{p} % até o fim da semana"
 }

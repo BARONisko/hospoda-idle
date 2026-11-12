@@ -1319,5 +1319,18 @@
  "Statistiky": "Statistiques",
  "anonymní – pomáhají hru vylepšovat": "anonymes – elles aident à améliorer le jeu",
  "hygiena {n} %": "inspection {n} %",
- "ťukej na Pípu nahoře, pak kup tlačítkem dole": "touche la pression en haut, puis achète avec le bouton en bas"
+ "ťukej na Pípu nahoře, pak kup tlačítkem dole": "touche la pression en haut, puis achète avec le bouton en bas",
+ "pak hospoda vydělává sama": "ensuite le bistrot gagne tout seul",
+ "další věci se odemknou časem": "le reste se débloque avec le temps",
+ "příšery platí kostmi, ráno zase coins": "les monstres paient en os, les coins reviennent le matin",
+ "utratíš je v Menu → Kostnice": "dépense-les dans Menu → Ossuaire",
+ "přepínej nahoře nebo tažením do strany": "change en haut ou glisse sur le côté",
+ "za body kupuj dovednosti": "achète des compétences avec tes points",
+ "vydělej za týden víc než soupeř": "gagne plus que ton rival sur la semaine",
+ "Zatím nic – hoď kostkou.": "Rien pour l’instant – lance le dé.",
+ "Vše ({n})": "Tout ({n})",
+ "Jen zesílené": "Renforcés seulement",
+ "+{g} 💎 · +{k} krígel\ntalisman · výdělek +{p} % na týden": "+{g} 💎 · +{k} chopes\ntalisman · gains +{p} % pendant une semaine",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nPostupuješ do: {l}": "Récompense : +{g} 💎, +{k} chopes et un talisman.\nCoupe de la ligue : gains +{p} % toute la semaine.\nPromu en : {l}",
+ "Ligový pohár: výdělek +{p} % do konce týdne": "Coupe de la ligue : gains +{p} % jusqu’à la fin de la semaine"
 }

@@ -1319,5 +1319,18 @@
  "Statistiky": "Статистика",
  "anonymní – pomáhají hru vylepšovat": "анонимная – помогает улучшать игру",
  "hygiena {n} %": "санэпидем {n} %",
- "ťukej na Pípu nahoře, pak kup tlačítkem dole": "нажимай кран сверху, потом покупай кнопкой снизу"
+ "ťukej na Pípu nahoře, pak kup tlačítkem dole": "нажимай кран сверху, потом покупай кнопкой снизу",
+ "pak hospoda vydělává sama": "потом трактир зарабатывает сам",
+ "další věci se odemknou časem": "остальное откроется со временем",
+ "příšery platí kostmi, ráno zase coins": "монстры платят костями, утром снова coins",
+ "utratíš je v Menu → Kostnice": "трать их в Меню → Костница",
+ "přepínej nahoře nebo tažením do strany": "переключай вверху или свайпом в сторону",
+ "za body kupuj dovednosti": "покупай навыки за очки",
+ "vydělej za týden víc než soupeř": "заработай за неделю больше соперника",
+ "Zatím nic – hoď kostkou.": "Пока ничего – брось кость.",
+ "Vše ({n})": "Все ({n})",
+ "Jen zesílené": "Только усиленные",
+ "+{g} 💎 · +{k} krígel\ntalisman · výdělek +{p} % na týden": "+{g} 💎 · +{k} кружек\nталисман · доход +{p} % на неделю",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nPostupuješ do: {l}": "Награда: +{g} 💎, +{k} кружек и талисман.\nКубок лиги: доход +{p} % на всю неделю.\nПовышение в: {l}",
+ "Ligový pohár: výdělek +{p} % do konce týdne": "Кубок лиги: доход +{p} % до конца недели"
 }

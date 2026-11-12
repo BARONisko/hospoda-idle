@@ -1319,5 +1319,18 @@
  "Statistiky": "통계",
  "anonymní – pomáhají hru vylepšovat": "익명 – 게임 개선에 도움이 됩니다",
  "hygiena {n} %": "위생 검사 {n} %",
- "ťukej na Pípu nahoře, pak kup tlačítkem dole": "위의 맥주탭을 누르고 아래 버튼으로 사세요"
+ "ťukej na Pípu nahoře, pak kup tlačítkem dole": "위의 맥주탭을 누르고 아래 버튼으로 사세요",
+ "pak hospoda vydělává sama": "그러면 술집이 알아서 벌어요",
+ "další věci se odemknou časem": "나머지는 차차 열려요",
+ "příšery platí kostmi, ráno zase coins": "괴물은 뼈로 계산해요. 아침엔 다시 코인",
+ "utratíš je v Menu → Kostnice": "메뉴 → 납골당에서 써요",
+ "přepínej nahoře nebo tažením do strany": "위에서 바꾸거나 옆으로 밀어요",
+ "za body kupuj dovednosti": "포인트로 스킬을 사세요",
+ "vydělej za týden víc než soupeř": "일주일 동안 라이벌보다 많이 버세요",
+ "Zatím nic – hoď kostkou.": "아직 없어요 – 주사위를 굴려요.",
+ "Vše ({n})": "전체 ({n})",
+ "Jen zesílené": "강화된 것만",
+ "+{g} 💎 · +{k} krígel\ntalisman · výdělek +{p} % na týden": "+{g} 💎 · +{k} 맥주잔\n부적 · 일주일간 수입 +{p} %",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nPostupuješ do: {l}": "보상: +{g} 💎, +{k} 맥주잔, 부적.\n리그 컵: 일주일 내내 수입 +{p} %.\n승격: {l}",
+ "Ligový pohár: výdělek +{p} % do konce týdne": "리그 컵: 이번 주 끝까지 수입 +{p} %"
 }

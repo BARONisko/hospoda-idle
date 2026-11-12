@@ -32,6 +32,8 @@ export interface LeagueState {
   /** 💎 Zavřená pípa soupeře: od kdy (ms) a v který den (max 1× denně) */
   stopFrom?: number;
   stopDay?: string;
+  /** Ligový pohár: liga (1–5), kterou hráč vyhrál minulý týden → tento týden výdělek +LG_CUP × liga */
+  cup?: number;
 }
 
 // ---------- utrácení 💎 v lize (přání uživatele) ----------
@@ -108,7 +110,18 @@ export function rivalScore(L: LeagueState, now = Date.now()) {
 }
 
 export const weekEnd = (L: LeagueState) => L.start + WEEK;
-export const winReward = (tier: number) => 5 * tier;
+// ---------- odměny za výhru (přání uživatele, hospoda 72: kdo platí 💎 za Posilu / Zavřenou pípu, musí za výhru dostat víc) ----------
+/** 💎 za výhru = LG_WIN_GEMS × liga (30 … 150; dřív 2 × liga – míň než jedna Posila za 20 💎) */
+export const LG_WIN_GEMS = 30;
+/** krígly za výhru: aspoň LG_WIN_KRIGLE × liga, jinak LG_WIN_KRIGLE_F × liga z vlastněných (roste s hráčem jako truhla; dřív pevných 5 × liga) */
+export const LG_WIN_KRIGLE = 10;
+export const LG_WIN_KRIGLE_F = 0.01;
+/** Ligový pohár: po výhře výdělek +10 % × vyhraná liga po celý další týden (nesčítá se, každý týden znovu) */
+export const LG_CUP = 0.1;
+export const winGems = (tier: number) => LG_WIN_GEMS * tier;
+export const winReward = (tier: number, krigle = 0) => Math.max(LG_WIN_KRIGLE * tier, Math.floor(Math.max(0, krigle) * LG_WIN_KRIGLE_F * tier));
+/** násobek výdělku z poháru za minulý týden */
+export const cupMult = (L?: Pick<LeagueState, 'cup'>) => 1 + LG_CUP * Math.min(5, Math.max(0, L?.cup ?? 0));
 
 /** jak rychle soupeř právě vydělává (coins/s) – bez reakce na hráče */
 const rivalSpeed = (L: LeagueState, at: number) => L.rate * activity(L.tier) * GROW ** ((at - L.start) / 86400_000);

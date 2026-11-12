@@ -1319,5 +1319,18 @@
  "Statistiky": "Statistics",
  "anonymní – pomáhají hru vylepšovat": "anonymous – they help improve the game",
  "hygiena {n} %": "inspection {n} %",
- "ťukej na Pípu nahoře, pak kup tlačítkem dole": "tap the Tap at the top, then buy with the button below"
+ "ťukej na Pípu nahoře, pak kup tlačítkem dole": "tap the Tap at the top, then buy with the button below",
+ "pak hospoda vydělává sama": "then the pub earns on its own",
+ "další věci se odemknou časem": "more unlocks as you play",
+ "příšery platí kostmi, ráno zase coins": "monsters pay in bones, coins return in the morning",
+ "utratíš je v Menu → Kostnice": "spend them in Menu → Ossuary",
+ "přepínej nahoře nebo tažením do strany": "switch at the top or swipe sideways",
+ "za body kupuj dovednosti": "spend points on skills",
+ "vydělej za týden víc než soupeř": "earn more than your rival this week",
+ "Zatím nic – hoď kostkou.": "Nothing yet – roll the die.",
+ "Vše ({n})": "All ({n})",
+ "Jen zesílené": "Boosted only",
+ "+{g} 💎 · +{k} krígel\ntalisman · výdělek +{p} % na týden": "+{g} 💎 · +{k} tankards\ntalisman · income +{p} % for a week",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nPostupuješ do: {l}": "Reward: +{g} 💎, +{k} tankards and a talisman.\nLeague Cup: income +{p} % for the whole week.\nPromoted to: {l}",
+ "Ligový pohár: výdělek +{p} % do konce týdne": "League Cup: income +{p} % until the week ends"
 }

@@ -1319,5 +1319,18 @@
  "Statistiky": "Statystyki",
  "anonymní – pomáhají hru vylepšovat": "anonimowe – pomagają ulepszać grę",
  "hygiena {n} %": "sanepid {n} %",
- "ťukej na Pípu nahoře, pak kup tlačítkem dole": "stukaj w nalewak u góry, potem kup przyciskiem na dole"
+ "ťukej na Pípu nahoře, pak kup tlačítkem dole": "stukaj w nalewak u góry, potem kup przyciskiem na dole",
+ "pak hospoda vydělává sama": "potem karczma zarabia sama",
+ "další věci se odemknou časem": "reszta odblokuje się z czasem",
+ "příšery platí kostmi, ráno zase coins": "potwory płacą kośćmi, rano znów coins",
+ "utratíš je v Menu → Kostnice": "wydasz je w Menu → Kostnica",
+ "přepínej nahoře nebo tažením do strany": "przełączaj u góry lub przesuń w bok",
+ "za body kupuj dovednosti": "kupuj umiejętności za punkty",
+ "vydělej za týden víc než soupeř": "zarób w tydzień więcej niż rywal",
+ "Zatím nic – hoď kostkou.": "Na razie nic – rzuć kością.",
+ "Vše ({n})": "Wszystko ({n})",
+ "Jen zesílené": "Tylko wzmocnione",
+ "+{g} 💎 · +{k} krígel\ntalisman · výdělek +{p} % na týden": "+{g} 💎 · +{k} kufli\ntalizman · zarobek +{p} % na tydzień",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nPostupuješ do: {l}": "Nagroda: +{g} 💎, +{k} kufli i talizman.\nPuchar ligi: zarobek +{p} % przez cały tydzień.\nAwansujesz do: {l}",
+ "Ligový pohár: výdělek +{p} % do konce týdne": "Puchar ligi: zarobek +{p} % do końca tygodnia"
 }

@@ -1319,5 +1319,18 @@
  "Statistiky": "统计",
  "anonymní – pomáhají hru vylepšovat": "匿名 – 帮助改进游戏",
  "hygiena {n} %": "卫生检查 {n} %",
- "ťukej na Pípu nahoře, pak kup tlačítkem dole": "点上面的酒头，然后用下面的按钮购买"
+ "ťukej na Pípu nahoře, pak kup tlačítkem dole": "点上面的酒头，然后用下面的按钮购买",
+ "pak hospoda vydělává sama": "之后酒馆会自动赚钱",
+ "další věci se odemknou časem": "其他内容会逐步解锁",
+ "příšery platí kostmi, ráno zase coins": "怪物用骨头付账，早上恢复 coins",
+ "utratíš je v Menu → Kostnice": "在菜单 → 骨堂里花掉",
+ "přepínej nahoře nebo tažením do strany": "在上方切换或左右滑动",
+ "za body kupuj dovednosti": "用点数购买技能",
+ "vydělej za týden víc než soupeř": "一周内赚得比对手多",
+ "Zatím nic – hoď kostkou.": "还没有——掷骰子吧。",
+ "Vše ({n})": "全部({n})",
+ "Jen zesílené": "只看已加成",
+ "+{g} 💎 · +{k} krígel\ntalisman · výdělek +{p} % na týden": "+{g} 💎 · +{k} 酒杯\n护身符 · 一周收入 +{p} %",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nPostupuješ do: {l}": "奖励：+{g} 💎、+{k} 酒杯和一个护身符。\n联赛奖杯：整周收入 +{p} %。\n晋级到：{l}",
+ "Ligový pohár: výdělek +{p} % do konce týdne": "联赛奖杯：本周结束前收入 +{p} %"
 }

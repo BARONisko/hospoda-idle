@@ -1319,5 +1319,18 @@
  "Statistiky": "Statistik",
  "anonymní – pomáhají hru vylepšovat": "anonym – hilft, das Spiel zu verbessern",
  "hygiena {n} %": "Inspektion {n} %",
- "ťukej na Pípu nahoře, pak kup tlačítkem dole": "tippe oben auf den Zapfhahn, dann kaufe mit dem Knopf unten"
+ "ťukej na Pípu nahoře, pak kup tlačítkem dole": "tippe oben auf den Zapfhahn, dann kaufe mit dem Knopf unten",
+ "pak hospoda vydělává sama": "dann verdient die Kneipe allein",
+ "další věci se odemknou časem": "Weiteres schaltet sich mit der Zeit frei",
+ "příšery platí kostmi, ráno zase coins": "Monster zahlen mit Knochen, morgens gibt es wieder Coins",
+ "utratíš je v Menu → Kostnice": "ausgeben im Menü → Beinhaus",
+ "přepínej nahoře nebo tažením do strany": "wechsle oben oder wische seitlich",
+ "za body kupuj dovednosti": "kauf mit Punkten Fähigkeiten",
+ "vydělej za týden víc než soupeř": "verdiene in der Woche mehr als dein Rivale",
+ "Zatím nic – hoď kostkou.": "Noch nichts – wirf den Würfel.",
+ "Vše ({n})": "Alle ({n})",
+ "Jen zesílené": "Nur Verstärkte",
+ "+{g} 💎 · +{k} krígel\ntalisman · výdělek +{p} % na týden": "+{g} 💎 · +{k} Krüge\nTalisman · Einkommen +{p} % für eine Woche",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nPostupuješ do: {l}": "Belohnung: +{g} 💎, +{k} Krüge und ein Talisman.\nLigapokal: Einkommen +{p} % die ganze Woche.\nAufstieg in: {l}",
+ "Ligový pohár: výdělek +{p} % do konce týdne": "Ligapokal: Einkommen +{p} % bis Wochenende"
 }

@@ -1319,5 +1319,18 @@
  "Statistiky": "İstatistikler",
  "anonymní – pomáhají hru vylepšovat": "anonim – oyunu geliştirmeye yardımcı olur",
  "hygiena {n} %": "denetim {n} %",
- "ťukej na Pípu nahoře, pak kup tlačítkem dole": "üstteki musluğa dokun, sonra alttaki düğmeyle satın al"
+ "ťukej na Pípu nahoře, pak kup tlačítkem dole": "üstteki musluğa dokun, sonra alttaki düğmeyle satın al",
+ "pak hospoda vydělává sama": "sonra meyhane kendi kazanır",
+ "další věci se odemknou časem": "gerisi zamanla açılır",
+ "příšery platí kostmi, ráno zase coins": "canavarlar kemikle öder, sabah yine coin",
+ "utratíš je v Menu → Kostnice": "Menü → Kemiklik'te harca",
+ "přepínej nahoře nebo tažením do strany": "yukarıdan geç ya da yana kaydır",
+ "za body kupuj dovednosti": "puanla yetenek al",
+ "vydělej za týden víc než soupeř": "haftada rakibinden çok kazan",
+ "Zatím nic – hoď kostkou.": "Henüz yok – zar at.",
+ "Vše ({n})": "Tümü ({n})",
+ "Jen zesílené": "Yalnızca güçlenenler",
+ "+{g} 💎 · +{k} krígel\ntalisman · výdělek +{p} % na týden": "+{g} 💎 · +{k} kupa\ntılsım · bir hafta gelir +{p} %",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nPostupuješ do: {l}": "Ödül: +{g} 💎, +{k} kupa ve tılsım.\nLig bonusu: tüm hafta gelir +{p} %.\nYükseldiğin lig: {l}",
+ "Ligový pohár: výdělek +{p} % do konce týdne": "Lig bonusu: hafta sonuna kadar gelir +{p} %"
 }

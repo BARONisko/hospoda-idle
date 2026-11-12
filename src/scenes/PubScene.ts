@@ -18,7 +18,7 @@ import { season, SEASONS, SEASON_BONUS } from '../core/season';
 /** kdy přijde sezónní host (karta ve Sbírce, dokud ho hráč neviděl; data podle core/season.ts) */
 const SEASON_WHEN: Record<string, string> = { monk: t('1. 12. – 6. 1.'), muertos0: t('20. 10. – 3. 11.'), brewer: t('15. 9. – 10. 10.') };
 import { VISITORS, Visitor, VisitCtx, VIS_GOLD, VIS_GEMS_DAY, visGems } from '../game/visitors';
-import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward, rivalInfo, rivalRate, LG_BOOST, LG_WILD, LG_STOP, fxOn, fxLeft, boostShare } from '../core/league';
+import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward, winGems, cupMult, LG_CUP, rivalInfo, rivalRate, LG_BOOST, LG_WILD, LG_STOP, fxOn, fxLeft, boostShare } from '../core/league';
 import { isNight, phaseLeft, DAY_MS, bonesFor, nightCfg, retune, nightLen, nightShare, switchPhase, nightCost, nightCostN, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
 import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
@@ -739,7 +739,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (d.menuOpen?.includes(name)) return null;
     // menu se odemyká postupně (přání uživatele): ne všechno naráz po 1. hygieně
     // pořadí (přání uživatele): nejvýš jedna novinka za kolo, vždy se šipkou a krátkým návodem
-    // 1. hygiena krígly · první noc kosti (Kostnice, Sběrač) · 3. pivovar · 6. Chrám · 10. výzdoba · 15. šipky · 20. Liga
+    // 1. hygiena krígly · 2. Hostinský · první noc kosti (Kostnice, Sběrač) · 3. pivovar · 6. Chrám · 10. výzdoba · 15. šipky · 20. Liga
     // (pomaleji – přání uživatele, dřív 1–6 a vše odemčené za ~1 h)
     const hyg = d.stats.prestiges, after = (n: number) => (hyg >= n ? null : t('po {n}. hygieně', { n: String(n) }));
     switch (name) {
@@ -750,7 +750,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       case 'darts': return after(15);
       case 'league': return after(20);
       case 'daynight': return d.nightInfo ? null : t('po první noci');
-      case 'keeper': return (d.klvl ?? 1) >= 5 ? null : t('od 5. úrovně hostinského');
+      // přání uživatele (hospoda 72): strom až po 2. hygieně (dřív od 5. úrovně = v prvních minutách hry); kdo už ve stromu utrácel, tomu zůstane
+      case 'keeper': return treeSpent(d.skills) > 0 ? null : after(2);
       case 'talis': return Object.keys(d.talis ?? {}).length ? null : t('po nálezu talismanu');
       case 'bones': return d.nightInfo ? null : t('po první noci');
       // až když je na prvního sběrače (dřív stačila 1 kost a průvodce ukazoval na nákup, na který hráč neměl)
@@ -1393,15 +1394,18 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     let L = this.d.league;
     // hodiny vrácené dozadu (ws < start): týden se nevyhodnotí předčasně (dřív = krígly a 💎 znovu), počká se na skutečný konec
     if (!L || L.start < ws) {
-      let tier = L?.tier ?? 1;
+      let tier = L?.tier ?? 1, cup = 0;
       if (L) {
         const rival = rivalTick(L, weekEnd(L));
         const win = L.me > rival;
-        this.leagueResult = { win, me: L.me, rival, tier, name: rivalInfo(L).name, wild: !win && !!L.wild && tier > 1 };
+        // odměny (hospoda 72): 💎 30 × liga, krígly podle vlastněných, Ligový pohár = výdělek +10 % × liga na celý další týden
+        const k = win ? winReward(tier, this.d.krigle) : 0, gm = win ? winGems(tier) : 0;
+        cup = win ? tier : 0;
+        this.leagueResult = { win, me: L.me, rival, tier, name: rivalInfo(L).name, wild: !win && !!L.wild && tier > 1, k, g: gm };
         this.d.leagueHist = [...(this.d.leagueHist ?? []), [tier, win] as [number, boolean]].slice(-8);
         if (win) {
-          this.d.krigle += winReward(tier);
-          this.d.gems = (this.d.gems ?? 0) + GEMS_FREE.league * tier;
+          this.d.krigle += k;
+          this.d.gems = (this.d.gems ?? 0) + gm;
           // liga → šipky: +3 body
           if (this.d.darts) this.d.darts.pts += 3;
           this.leagueWinDrop = true;
@@ -1410,7 +1414,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       }
       // soupeř vyrovnaný podle minulého týdne (kolik hráč skutečně vydělal), vyšší liga o kus silnější
       const my = Math.max(1, this.totalRate());
-      L = { week: String(ws), start: ws, tier, rate: rivalRate(tier, my, L ? { me: L.me, base: L.base } : undefined), me: 0, rival: 0, rAt: ws, base: my };
+      L = { week: String(ws), start: ws, tier, rate: rivalRate(tier, my, L ? { me: L.me, base: L.base } : undefined), me: 0, rival: 0, rAt: ws, base: my, ...(cup ? { cup } : {}) };
       this.d.league = L;
       store(this.d);
     }
@@ -1421,7 +1425,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   leagueLive?: () => void;
   leagueLiveT = 0;
   dnT = 1;
-  leagueResult?: { win: boolean; me: number; rival: number; tier: number; name: string; wild?: boolean };
+  leagueResult?: { win: boolean; me: number; rival: number; tier: number; name: string; wild?: boolean; k?: number; g?: number };
   leagueWinDrop = false;
 
   /** okno s výsledkem minulého týdne */
@@ -1445,7 +1449,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const tx = (y: number, s2: string, size: number, c: string) => objs.push(this.add.text(W / 2, y, s2, txt(size, c)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 100).setDepth(D + 2));
     tx(284, r.win ? t('Vyhrál jsi ligu!') : t('Prohrál jsi ligu…'), 34, r.win ? PAL.gold : PAL.scarlet);
     tx(344, t('Tvoje tržba: {a} coins\n{s}: {b} coins', { a: big(r.me), b: big(r.rival), s: r.name }), 22, PAL.bone);
-    tx(420, r.win ? t('Odměna: +{k} krígel, +{g} 💎 a talisman. Postupuješ do: {l}', { k: big(winReward(r.tier)), g: GEMS_FREE.league * r.tier, l: LEAGUES[Math.min(LEAGUES.length, r.tier + 1) - 1] }) : r.wild ? t('Divoká karta – zůstáváš: {l}', { l: LEAGUES[r.tier - 1] }) : t('Sestupuješ do: {l}', { l: LEAGUES[Math.max(1, r.tier - 1) - 1] }), 22, r.win ? PAL.mint : PAL.fog);
+    tx(420, r.win ? t('Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nPostupuješ do: {l}', { k: big(r.k ?? winReward(r.tier)), g: r.g ?? winGems(r.tier), p: Math.round(LG_CUP * r.tier * 100), l: LEAGUES[Math.min(LEAGUES.length, r.tier + 1) - 1] }) : r.wild ? t('Divoká karta – zůstáváš: {l}', { l: LEAGUES[r.tier - 1] }) : t('Sestupuješ do: {l}', { l: LEAGUES[Math.max(1, r.tier - 1) - 1] }), 22, r.win ? PAL.mint : PAL.fog);
     const close = () => {
       objs.forEach((o) => o.destroy());
       this.awayObjs = [];
@@ -1497,7 +1501,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const meT = add(this.add.text(W - 30, y0 + 186, '', txt(40, PAL.mint)).setOrigin(1, 0).setDepth(D + 2));
     const bar = add(this.add.graphics().setDepth(D + 2));
     const msg = add(this.add.text(W / 2, y0 + 296, '', txt(20, PAL.mint)).setOrigin(0.5, 0).setDepth(D + 2));
-    add(this.add.text(W / 2, y0 + 326, t('Soupeř zrychluje každý den – a když vedeš, zabere víc. Síla soupeře podle tvého minulého týdne.'), txt(15, PAL.fog)).setOrigin(0.5, 0).setWordWrapWidth(W - 60).setAlign('center').setDepth(D + 2));
+    // vysvětlení o soupeři je v nápovědě (Nastavení → Jak to funguje); tady jen běžící pohár za minulou výhru
+    if (L.cup) {
+      const ct = add(this.add.text(W / 2, y0 + 330, t('Ligový pohár: výdělek +{p} % do konce týdne', { p: Math.round((cupMult(L) - 1) * 100) }), txt(18, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 2));
+      ct.setScale(Math.min(1, (W - 50) / ct.width));
+    }
     this.leagueLive = () => {
       const rival = rivalTick(L), lead = L.me >= rival;
       rivalT.setText(big(rival)).setScale(Math.min(1, 180 / rivalT.setScale(1).width));
@@ -1515,16 +1523,19 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     };
     this.leagueLive();
     // odměny
-    g.fillStyle(col('pine'), 0.8).fillRoundedRect(10, y0 + 376, W / 2 - 15, 76, 12);
-    g.fillStyle(col('blood'), 0.8).fillRoundedRect(W / 2 + 5, y0 + 376, W / 2 - 15, 76, 12);
-    add(this.add.text(W / 4 + 2, y0 + 384, t('VÝHRA'), txt(18, PAL.mint)).setOrigin(0.5, 0).setDepth(D + 2));
-    add(this.add.text(W / 4 + 2, y0 + 408, t('+{k} krígel, +{g} 💎,\ntalisman a postup', { k: big(winReward(L.tier)), g: GEMS_FREE.league * L.tier }), txt(16, PAL.bone)).setOrigin(0.5, 0).setAlign('center').setDepth(D + 2));
-    add(this.add.text((W * 3) / 4 - 2, y0 + 384, t('PROHRA'), txt(18, PAL.scarlet)).setOrigin(0.5, 0).setDepth(D + 2));
-    add(this.add.text((W * 3) / 4 - 2, y0 + 408, L.tier > 1 ? t('sestup do ligy {n}', { n: L.tier - 1 }) : t('zůstaneš v 1. lize'), txt(16, PAL.bone)).setOrigin(0.5, 0).setDepth(D + 2));
+    // karta výhry širší (víc odměn), prohra užší
+    const WW = 330, LX = 10 + WW + 10, LW = W - 10 - LX;
+    g.fillStyle(col('pine'), 0.8).fillRoundedRect(10, y0 + 376, WW, 76, 12);
+    g.fillStyle(col('blood'), 0.8).fillRoundedRect(LX, y0 + 376, LW, 76, 12);
+    add(this.add.text(10 + WW / 2, y0 + 382, t('VÝHRA'), txt(18, PAL.mint)).setOrigin(0.5, 0).setDepth(D + 2));
+    const wt = add(this.add.text(10 + WW / 2, y0 + 404, t('+{g} 💎 · +{k} krígel\ntalisman · výdělek +{p} % na týden', { k: big(winReward(L.tier, this.d.krigle)), g: winGems(L.tier), p: Math.round(LG_CUP * L.tier * 100) }), txt(19, PAL.bone)).setOrigin(0.5, 0).setAlign('center').setDepth(D + 2));
+    wt.setScale(Math.min(1, (WW - 14) / wt.width));
+    add(this.add.text(LX + LW / 2, y0 + 382, t('PROHRA'), txt(18, PAL.scarlet)).setOrigin(0.5, 0).setDepth(D + 2));
+    const lt = add(this.add.text(LX + LW / 2, y0 + 410, L.tier > 1 ? t('sestup do ligy {n}', { n: L.tier - 1 }) : t('zůstaneš v 1. lize'), txt(17, PAL.bone)).setOrigin(0.5, 0).setDepth(D + 2));
+    lt.setScale(Math.min(1, (LW - 12) / lt.width));
     // historie posledních týdnů
     const hist = this.d.leagueHist ?? [];
-    add(this.add.text(20, y0 + 468, t('Minulé týdny:'), txt(16, PAL.fog)).setDepth(D + 2));
-    if (!hist.length) add(this.add.text(140, y0 + 468, t('zatím žádné'), txt(16, PAL.slate)).setDepth(D + 2));
+    if (hist.length) add(this.add.text(20, y0 + 468, t('Minulé týdny:'), txt(16, PAL.fog)).setDepth(D + 2));
     hist.forEach(([tier, win], i) => {
       const cx = 140 + i * 46;
       g.fillStyle(col(win ? 'green' : 'red')).fillRoundedRect(cx, y0 + 460, 40, 32, 8);
@@ -3689,11 +3700,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     { head: t('ŤUKNI NA PÍPU'), text: t('hostinský natočí pivo a vyděláš coins'), done: 'tap' },
     { head: t('KUP ÚROVEŇ PÍPY'), text: t('vyšší úroveň = víc coins za každé pivo'), done: 'buy:tap' },
     { head: t('ŤUKNI NA BUBLINU'), text: t('host si objednal – dá ti spropitné'), done: 'tip' },
-    { head: t('NAJMI ČÍŠNÍKY'), text: t('pípa pak točí sama a číšníci roznášejí pivo, i když nehraješ'), done: 'hire' },
+    { head: t('NAJMI ČÍŠNÍKY'), text: t('pak hospoda vydělává sama'), done: 'hire' },
     { head: t('OTEVŘI KUCHYNI'), text: t('další zdroj coins'), done: 'buy:kitchen' },
     { head: t('ŤUKNI NA MENU'), text: t('najdeš v něm další části hry'), done: 'menu' },
     { head: t('ŤUKNI NA OBCHOD'), text: t('tady kupuješ vylepšení výdělku'), done: 'tile:shop' },
-    { head: t('HOTOVO!'), text: t('další části menu se odemknou během hry. Hodně štěstí, hostinský!'), done: 'close' },
+    { head: t('HOTOVO!'), text: t('další věci se odemknou časem'), done: 'close' },
   ];
 
   /** událost hráče posune návod */
@@ -4368,7 +4379,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act) * ((p.adx?.[def.id] ?? 0) > Date.now() ? 2 : 1);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * cupMult(this.d.league) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act) * ((p.adx?.[def.id] ?? 0) > Date.now() ? 2 : 1);
   }
 
   // ---------- obchod s krígly ----------
@@ -4573,6 +4584,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   ossLast?: string;
+  /** Kostnice: ukázat všechny vlastnosti (jinak jen zesílené) */
+  ossAll = false;
   ossBusy = false;
 
   /** Kostnice: zaplatíš kostňákovi, ten hodí kostkou a náhodný stat se trochu zvedne */
@@ -4585,17 +4598,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     g.fillStyle(col('navy'), 0.8).fillRoundedRect(10, y0, W - 20, 150, 12);
     add(this.add.sprite(70, y0 + 132, 'skeleton', 12).setOrigin(0.5, 1).setScale(5).setDepth(D + 2));
     add(this.add.text(130, y0 + 10, t('Kostňák'), txt(26, PAL.ice)).setDepth(D + 2));
-    // citát max. 2 řádky; delší překlady se zmenší, ať nezakryjí počet kostí
-    const qt = add(this.add.text(130, y0 + 42, t('„Zaplať kostmi a já hodím. Co padne, to zesílí.“'), txt(16, PAL.bone)).setDepth(D + 2).setWordWrapWidth(250));
-    qt.setScale(Math.min(1, 34 / qt.height));
-    add(this.add.text(130, y0 + 78, t('máš {n} kostí', { n: big(bones) }), txt(20, PAL.gold)).setDepth(D + 2));
+    // méně textu (přání uživatele, hospoda 72): citát i počet kostí pryč (kosti jsou v horní liště), tlačítka větší
     // Den a noc (dřív samostatná dlaždice v Menu, teď tu)
-    const dnb = this.btn(130, y0 + 104, 136, 38, () => this.openShop('daynight', false), D + 3);
+    const dnb = this.btn(130, y0 + 82, 136, 60, () => this.openShop('daynight', false), D + 3);
     this.drawBtn(dnb, t('Den a noc'), !this.tileLock('daynight'), 'blue');
     dnb.label.setScale(Math.min(1, 126 / dnb.label.width));
     // Talismany (dřív samostatná dlaždice v Menu – méně dlaždic, přání uživatele)
     const tlk = this.tileLock('talis');
-    const tb = this.btn(272, y0 + 104, 136, 38, () => {
+    const tb = this.btn(272, y0 + 82, 136, 60, () => {
       if (tlk) return this.banner(this.views[0].cam, t('{s}: otevře se {c}', { s: t('Talismany'), c: tlk }));
       this.qVisit('talis');
       this.guideEv('tile:talis');
@@ -4659,14 +4669,25 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.drawBtn(b10, t('10 hodů\n{n} kostí', { n: big(c10) }), bones >= c10, 'plum');
     this.shopObjs.push(b1.bg, b1.label, b1.zone, b10.bg, b10.label, b10.zone);
     // přehled statů z Kostnice
-    add(this.add.text(20, y0 + 236, t('Zesíleno kostňákem ({n} hodů):', { n: rolls }), txt(18, PAL.gold)).setDepth(D + 2));
+    const head = add(this.add.text(20, y0 + 250, t('Zesíleno kostňákem ({n} hodů):', { n: rolls }), txt(20, PAL.gold)).setDepth(D + 2));
+    head.setScale(Math.min(1, 330 / head.width));
+    // jen to, co už kostka zlepšila (dřív všech 29 řádků, většina „+0 %“ – přání uživatele); zbytek pod tlačítkem Vše
+    const allB = this.btn(W - 170, y0 + 236, 160, 56, () => {
+      this.ossAll = !this.ossAll;
+      this.openShop('shop', false);
+    }, D + 2);
+    this.drawBtn(allB, this.ossAll ? t('Jen zesílené') : t('Vše ({n})', { n: OSSUARY.length }), true, 'plum');
+    allB.label.setScale(Math.min(1, 148 / allB.label.width));
+    this.shopObjs.push(allB.bg, allB.label, allB.zone);
+    const list = OSSUARY.filter((o) => this.ossAll || (this.d.oss?.[o.stat] ?? 0) > 0);
+    const top = y0 + 304;
+    if (!list.length) add(this.add.text(W / 2, top + 30, t('Zatím nic – hoď kostkou.'), txt(24, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2));
     // výška řádku tak, aby se celý přehled vešel nad spodní lištu (hlášení: poslední řádek nebyl vidět)
-    // písmo B: větší a světlejší (výběr uživatele)
-    const top = y0 + 262, rh = Math.min(30, (MB - 8 - top) / Math.ceil(OSSUARY.length / 2));
-    OSSUARY.forEach((o, i) => {
+    const rh = Math.min(36, (MB - 8 - top) / Math.max(1, Math.ceil(list.length / 2)));
+    list.forEach((o, i) => {
       const lvl = this.d.oss?.[o.stat] ?? 0;
       const capped = o.cap !== undefined && (lvl + 1) * o.per > o.cap + 1e-9;
-      const tx = add(this.add.text(20 + (i % 2) * 262, top + Math.floor(i / 2) * rh, STAT_NAMES[o.stat](lvl * o.per) + (capped ? ' (max)' : ''), txt(19, o.stat === this.ossLast ? PAL.gold : lvl ? PAL.mint : PAL.fog)).setDepth(D + 2));
+      const tx = add(this.add.text(20 + (i % 2) * 262, top + Math.floor(i / 2) * rh, STAT_NAMES[o.stat](lvl * o.per) + (capped ? ' (max)' : ''), txt(24, o.stat === this.ossLast ? PAL.gold : lvl ? PAL.mint : PAL.fog)).setDepth(D + 2));
       tx.setScale(Math.min(1, 250 / tx.width, rh / tx.height));
     });
   }
@@ -5536,14 +5557,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         { head: t('NOVÁ HOSPODA!'), text: t('ťukni nahoře na „{n}“', { n: name }), done: 'pub:' + (n - 1), at: tab },
         { head: t('OTEVŘI PÍPU'), text: t('i tady začínáš pípou – kup ji', { n: name }), done: 'buy:tap', at: here(card('tap', 'buy', n - 1)) },
         { head: t('NAJMI ČÍŠNÍKY'), text: t('pak tahle hospoda vydělává sama'), done: 'hire', at: here(card('tap', 'staff', n - 1)) },
-        { head: t('HOSPODY BĚŽÍ NARÁZ'), text: t('všechny vydělávají pořád. Přepínej záložkami nahoře nebo táhni prstem do strany.'), done: 'ok' },
+        { head: t('HOSPODY BĚŽÍ NARÁZ'), text: t('přepínej nahoře nebo tažením do strany'), done: 'ok' },
       ];
     }
     if (id === 'night')
       return [
-        { head: t('PADLA NOC!'), text: t('v noci chodí příšery a platí KOSTMI – coins se vrátí ráno'), done: 'ok' },
+        { head: t('PADLA NOC!'), text: t('příšery platí kostmi, ráno zase coins'), done: 'ok' },
         { head: t('ŤUKNI NA BUBLINU'), text: t('příšera si objednala – dá ti kost'), done: 'tip', at: () => { const p = this.views[this.views.length > 1 ? this.sel : 0]?.tipTarget(); return p ? [p.x - 30, p.y - 10, 60, 60] : null; } },
-        { head: t('KOSTI SBÍREJ'), text: t('utratíš je v Menu: Kostnice, Sběrač a talismany. Ráno se zase vydělávají coins.'), done: 'ok' },
+        { head: t('KOSTI SBÍREJ'), text: t('utratíš je v Menu → Kostnice'), done: 'ok' },
       ];
     const key = id.slice(5);
     const row = PubScene.TILES.find(([tb, sub]) => (sub && tb === 'shop' ? sub : tb) === key);
@@ -5552,11 +5573,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       decor: t('drahé ozdoby hospody – každá dává trvalý bonus, zůstane i po hygieně'),
       darts: t('házej šipky na terč – body dávají odměny, šipky přibývají samy'),
       daynight: t('nastavení dne a noci'),
-      keeper: t('body za úrovně, mistrovství, hvězdy a věrné hosty – dej je do stromu'),
+      keeper: t('za body kupuj dovednosti'),
       talis: t('talismany z chrámu – nasaď je a vylepšuj kostmi'),
       krigl: t('za krígly z hygieny tu kupuješ trvalá vylepšení'),
       temple: t('bojuj v chrámu – získáš talismany, krígly a truhly'),
-      league: t('týdenní soutěž s ostatními hospodskými – kdo víc vydělá, postoupí'),
+      league: t('vydělej za týden víc než soupeř'),
       bones: t('za kosti hoď kostkou – náhodně zlepší jednu vlastnost natrvalo'),
       coll: t('sběrač ťuká na bubliny hostů za tebe – kup ho za kosti'),
       special: t('každý den truhla zdarma'),

@@ -1319,5 +1319,18 @@
  "Statistiky": "統計",
  "anonymní – pomáhají hru vylepšovat": "匿名 – ゲームの改善に役立ちます",
  "hygiena {n} %": "衛生検査 {n} %",
- "ťukej na Pípu nahoře, pak kup tlačítkem dole": "上のサーバーをタップして、下のボタンで買う"
+ "ťukej na Pípu nahoře, pak kup tlačítkem dole": "上のサーバーをタップして、下のボタンで買う",
+ "pak hospoda vydělává sama": "すると酒場は自動で稼ぐ",
+ "další věci se odemknou časem": "他の機能は少しずつ解放される",
+ "příšery platí kostmi, ráno zase coins": "モンスターは骨で払う。朝にはまたコイン",
+ "utratíš je v Menu → Kostnice": "メニュー → 納骨堂で使う",
+ "přepínej nahoře nebo tažením do strany": "上のタブか横スワイプで切り替え",
+ "za body kupuj dovednosti": "ポイントでスキルを買おう",
+ "vydělej za týden víc než soupeř": "1週間でライバルより多く稼ごう",
+ "Zatím nic – hoď kostkou.": "まだなし – サイコロを振ろう。",
+ "Vše ({n})": "すべて({n})",
+ "Jen zesílené": "強化済みのみ",
+ "+{g} 💎 · +{k} krígel\ntalisman · výdělek +{p} % na týden": "+{g} 💎 · +{k} ジョッキ\nお守り · 1週間 収入 +{p} %",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nPostupuješ do: {l}": "報酬：+{g} 💎、+{k} ジョッキ、お守り。\nリーグカップ：1週間ずっと収入 +{p} %。\n昇格先：{l}",
+ "Ligový pohár: výdělek +{p} % do konce týdne": "リーグカップ：週末まで収入 +{p} %"
 }

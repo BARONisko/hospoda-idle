@@ -174,16 +174,21 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('týdenní výzva: vyzvednuta', await S(p, (s) => s.weekly().claimed));
   // 5i) liga: výhra → postup a krígly, prohra → sestup
   const lg = await S(p, (s) => {
+    s.d.krigle = 5000; s.d.gems = 0;
     const k0 = s.d.krigle;
     let L = s.league(); L.tier = 2; L.start -= 7 * 86400000; L.me = 1e30; s.leagueCheck();
-    const won = s.d.league.tier === 3 && s.d.krigle >= k0 + 10;
+    // odměny za výhru ve 2. lize: 60 💎, 2 % krígel (≥ 20), pohár +20 % výdělku na další týden
+    const def = s.d.pubs[0], r0 = s.totalRate();
+    const won = s.d.league.tier === 3 && s.d.krigle === k0 + 100 && s.d.gems === 60 && s.d.league.cup === 2;
+    s.d.league.cup = 0; const r1 = s.totalRate(); s.d.league.cup = 2;
+    const cupOk = !def || r1 <= 0 || Math.abs(r0 / r1 - 1.2) < 0.01;
     s.awayObjs.forEach((o) => o.destroy()); s.awayObjs = [];
     L = s.league(); L.start -= 7 * 86400000; L.me = 0; L.rate = 100; s.leagueCheck();
-    const lost = s.d.league.tier === 2;
+    const lost = s.d.league.tier === 2 && !s.d.league.cup && s.d.gems === 60 && cupOk;
     s.awayObjs.forEach((o) => o.destroy()); s.awayObjs = [];
     return won && lost;
   });
-  ok('liga: výhra = postup, prohra = sestup', lg);
+  ok('liga: výhra = postup, 💎, krígly a pohár; prohra = sestup bez poháru', lg);
   // 5i2) liga: soupeř má jméno a hospodu (stejné celý týden) a sílu podle minulého týdne
   const lg2 = await S(p, (s) => {
     const L = s.league();
