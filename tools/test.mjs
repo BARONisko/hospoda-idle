@@ -62,6 +62,13 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     await p.keyboard.press('Escape');
     await p.keyboard.press('Escape');
     ok('Escape: Kostnice → Menu → zavřeno', await S(p, (s) => { const r = s.shopObjs.length === 0; s.shopSub = 'up'; return r; }));
+    // nápověda „Jak to funguje“ (Nastavení): ťuk na téma → Escape zpět na seznam → Escape do Nastavení
+    await S(p, (s) => { s.openShop('opts', false); s.openHelp(); const z = s.shopObjs.find((o) => o.type === 'Zone' && o.width === 540); z.emit('pointerdown', { y: z.y + 20 }); z.emit('pointerup', { y: z.y + 20 }); });
+    ok('Nápověda: ťuk na 1. téma otevře vysvětlení', await S(p, (s) => s.tab === 'help' && s.shopObjs.some((o) => o.type === 'Text' && /^1 \/ \d+$/.test(o.text))));
+    await p.keyboard.press('Escape');
+    ok('Nápověda: Escape → zpět na seznam témat', await S(p, (s) => s.tab === 'help' && s.shopObjs.some((o) => o.type === 'Container')));
+    await p.keyboard.press('Escape');
+    ok('Nápověda: Escape → zpět do Nastavení', await S(p, (s) => { const r = s.tab === 'opts' && s.shopObjs.length > 0; s.closeShop(); return r; }));
     await S(p, (s) => { s.d.coins = 1e9; s.visit(s.visitList()[0]); });
     await p.keyboard.press('Escape');
     ok('Escape zavře okno návštěvníka', await S(p, (s) => s.awayObjs.length === 0 && !s.visitLive));
