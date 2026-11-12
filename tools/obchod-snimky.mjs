@@ -1,7 +1,7 @@
 // Snímky pro obchod (810×1440, en): pozdní hra se 3 hospodami. node store.mjs <out-dir>
 import { chromium } from 'playwright-core';
 const out = process.argv[2];
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
+const b = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
 const mk = async (q) => {
   const p = await b.newPage({ viewport: { width: 405, height: 720 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'en-US' });
   p.on('pageerror', (e) => console.log('ERR', e.message));

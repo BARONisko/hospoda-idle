@@ -1317,5 +1317,7 @@
  "Dát vědět, až bude kasa plná?": "Notify you when the till is full?",
  "Pošleme upozornění, když hospoda vydělá maximum, a na denní truhlu.": "We'll send a notification when the pub has earned its maximum, and for the daily chest.",
  "Statistiky": "Statistics",
- "anonymní – pomáhají hru vylepšovat": "anonymous – they help improve the game"
+ "anonymní – pomáhají hru vylepšovat": "anonymous – they help improve the game",
+ "hygiena {n} %": "inspection {n} %",
+ "ťukej na Pípu nahoře, pak kup tlačítkem dole": "tap the Tap at the top, then buy with the button below"
 }

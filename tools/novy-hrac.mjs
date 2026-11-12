@@ -2,7 +2,7 @@
 import { chromium } from 'playwright-core';
 const [out, minsS = '12', lang = 'en'] = process.argv.slice(2);
 const mins = Number(minsS);
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
+const b = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
 const p = await b.newPage({ viewport: { width: 405, height: 720 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, locale: 'en-US' });
 const errs = new Set();
 p.on('pageerror', (e) => errs.add(e.message));

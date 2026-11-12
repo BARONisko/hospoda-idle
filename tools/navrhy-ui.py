@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Makety nového UI (hospoda 70, přání uživatele: 5 návrhů). Skládá HTML z výřezu hospody a spritů hry;
-obrázky z něj udělá tools/navrhy-ui.mjs. Použití: python3 tools/navrhy-ui.py <složka s podklady> <out.html>
+obrázky z něj udělá tools/navrhy-ui.mjs. Použití: python3 tools/navrhy-ui.py <složka s podklady> <out.html> [sada]
+Sada 1 (výchozí): A–E + M1–M3 → prehled.png. Sada 2: F–K + M4–M9 (uživatel vybral B, chce další návrhy) → prehled-2.png.
 Podklady: pub.png (čistý výřez hospody 810×606) a složka spr/ (sprity vyvezené ze hry)."""
-import base64, sys
+import base64, io, math, sys
 from PIL import Image
 
 SRC, OUT = sys.argv[1], sys.argv[2]
+SADA = sys.argv[3] if len(sys.argv) > 3 else '1'
 b64 = lambda p: base64.b64encode(open(p, 'rb').read()).decode()
 FONT = b64('node_modules/@fontsource/jersey-10/files/jersey-10-latin-400-normal.woff2')
 FONT2 = b64('node_modules/@fontsource/jersey-10/files/jersey-10-latin-ext-400-normal.woff2')
@@ -195,8 +197,435 @@ em{position:absolute;right:8px;top:8px;width:13px;height:13px;border-radius:50%%
 .wood .pub{border-color:#3f2616}
 ''' % (FONT, FONT2, PUB)
 
-html = '<html><head><meta charset="utf-8"><style>' + CSS + '</style></head><body>'
-for part in (SCREENS[:5], SCREENS[5:]):
+# =====================================================================================================
+# Sada 2 (hospoda 71): uživatel vybral B „Velká hospoda“ a chce další návrhy hlavní obrazovky a menu.
+# Vždy vidět: coins + příjem, 💎, hospoda, úkol, hygiena, 4 stanice s +1 a cenou, ×1/×10/MAX, obsluha, spodní lišta.
+# Ovládání jednou rukou (důležité dole), dotyková místa ≥ 44 CSS px.
+# =====================================================================================================
+
+
+def clean_pub():
+    """výřez hospody bez kroužků číšníků (v návrzích je obsluha samostatné tlačítko): podlaha z vedlejšího místa"""
+    im = Image.open(SRC + '/pub.png').convert('RGB')
+    c = im.copy()
+    c.paste(im.crop((312, 474, 568, 606)), (4, 474))
+    c.paste(im.crop((312, 474, 364, 606)), (260, 474))
+    buf = io.BytesIO()
+    c.save(buf, 'PNG')
+    return 'data:image/png;base64,' + base64.b64encode(buf.getvalue()).decode()
+
+
+def fit(name, box, extra=''):
+    """sprite co největší do čtverce box (měřítko po 0,5 – na 2× displeji celé pixely)"""
+    w, h = Image.open(f'{SRC}/spr/{name}.png').size
+    return spr(name, max(0.5, math.floor(box / max(w, h) * 2) / 2), extra)
+
+
+ST10 = ['25K', '1.56M', '2.14M', '1.75M']  # ceny při ×10
+
+
+def hud2(cls=''):
+    return f'<div class="hd {cls}"><div class="coins">{spr("icons_coin", 2)}<div><b>3.48M coins</b><small>+2.04K / s</small></div></div><div class="gem2">💎 120<span>+</span></div></div>'
+
+
+def qpill(cls='', txt='Kuchyně na úr. 60', bar=True):
+    b = '<i><u style="width:90%"></u></i>' if bar else ''
+    return f'<div class="qp {cls}">{spr("icons_clipboard", 2)}<div class="qt"><b>{txt}</b>{b}</div><span class="rw">54/60<br>+68K</span></div>'
+
+
+def hpill(cls=''):
+    return f'<div class="hp {cls}">{spr("icons_mug", 2)}<div><small>hygiena</small><b>62 %</b></div></div>'
+
+
+def hcard(cls=''):
+    """hygiena jako karta v pravém horním rohu hospody (zakryje i ceduli hospody, která by jinak napůl prosvítala)"""
+    return f'<div class="hc {cls}"><div class="hr">{spr("icons_mug", 2)}<div><small>hygiena</small><b>62 %</b></div></div><i><u style="width:62%"></u></i></div>'
+
+
+def obs(cls='', label=True):
+    f = ''.join(spr(w, 2) for w in ('waiter_0', 'waiterB_0', 'waiterC_0'))
+    lb = '<div class="ol"><b>Obsluha</b><small>3 číšníci</small></div>' if label else ''
+    return f'<div class="obs {cls}"><div class="fc">{f}</div>{lb}<span class="up">↑</span></div>'
+
+
+def seg(cur='×1', cls=''):
+    return f'<div class="seg {cls}">' + ''.join(f'<span{" class=on" if m == cur else ""}>{m}</span>' for m in ('×1', '×10', 'MAX')) + '</div>'
+
+
+def pubc(h, zoom, pos='left bottom', inner='', cls=''):
+    return f'<div class="pub c {cls}" style="height:{h}px;background-size:{round(405 * zoom)}px auto;background-position:{pos}">{inner}</div>'
+
+
+# ---------- F: B úsporná ----------
+fts = ''.join(f'<div class="ft"><div class="fth">{fit(ic, 40)}<div><b>{n}</b><small>úroveň {l}</small></div></div><i><u style="width:{int(pr * 100)}%"></u></i>'
+              f'<div class="fbuy"><span>+1</span>{spr("icons_coin", 1)}<b>{p}</b></div></div>' for n, l, p, pr, ic in ST)
+F = hud2() + pubc(372, 1.25, 'left bottom', qpill('tl') + hcard() + '<div class="pbar">' + obs() + seg() + '</div>') + f'<div class="fgrid">{fts}</div>' + nav()
+
+# ---------- G: B s pásem stanic ----------
+gcs = ''.join(f'<div class="gc"><div class="gi">{fit(ic, 40)}</div><b>{n}</b><small>úr. {l}</small><i><u style="width:{int(pr * 100)}%"></u></i><div class="gb">+1<br>{p}</div></div>' for n, l, p, pr, ic in ST)
+gcs += f'<div class="gc lk"><div class="gi">{spr("icons_lock", 2)}</div><b>Nová stanice</b><small>2.5M</small></div>'
+G = hud2() + pubc(398, 1.33, 'left bottom', qpill('tl') + hcard() + '<div class="pbar">' + obs() + seg() + '</div>') + \
+    f'<div class="gband"><div class="gtrack">{gcs}</div><div class="dots"><s class="on"></s><s></s></div></div>' + nav()
+
+# ---------- H: B přes celou obrazovku ----------
+hts = ''.join(f'<div class="tile glass"><div class="th">{fit(ic, 40)}<div><b>{n}</b><small>úroveň {l}</small></div></div><i><u style="width:{int(pr * 100)}%"></u></i><div class="btn green hb">+10 · {p10}</div></div>'
+              for (n, l, p, pr, ic), p10 in zip(ST, ST10))
+H = pubc(0, 1.62, 'left top', '', 'full') + '<div class="hshade"></div>' + hud2('over') + qpill('tl hq') + hpill('tr hq') + \
+    f'<div class="hctl">{obs()}{seg("×10")}</div><div class="hgrid">{hts}</div>' + nav()
+
+# ---------- I: Tabule ----------
+crs = ''.join(f'<div class="cr"><div class="ci2">{fit(ic, 40)}</div><div class="cn"><b>{n}</b><small>úroveň {l}</small><i><u style="width:{int(pr * 100)}%"></u></i></div><span class="dl"></span>'
+              f'<div class="cbuy"><span>+1</span><b>{p}</b></div></div>' for n, l, p, pr, ic in ST)
+note = '<div class="note"><s class="pin"></s><b>Úkol: Kuchyně na úr. 60</b><span>54/60 · odměna +68K</span></div>'
+I = hud2() + pubc(266, 1.0, 'center 20%', note + hpill('br') + obs('bl'), 'tab') + \
+    f'<div class="board"><div class="bh"><b>CENÍK</b>{seg("×1", "chalk")}</div>{crs}</div>' + nav()
+
+
+# ---------- J: Akční kruhy ----------
+def kring(cx, cy, side, n, l, p, pr, ic):
+    C = 2 * math.pi * 35
+    svg = f'<svg width="80" height="80"><circle cx="40" cy="40" r="35" fill="none" stroke="#231a25" stroke-width="7"/><circle cx="40" cy="40" r="35" fill="none" stroke="#f9c22b" stroke-width="7" stroke-dasharray="{C * pr:.0f} 999" transform="rotate(-90 40 40)"/></svg>'
+    return f'<div class="kc" style="left:{cx - 40:.0f}px;top:{cy - 40:.0f}px">{svg}<div class="kin">{fit(ic, 28)}<b><s>+1</s> {p}</b></div><span class="klv">{l}</span><span class="kn {side}">{n}</span></div>'
+
+
+PIV = (418, 612)  # střed oblouku ≈ kloub pravého palce; jmenovky směrem od palce
+kcs = ''.join(kring(PIV[0] + 230 * math.cos(math.radians(a)), PIV[1] - 230 * math.sin(math.radians(a)), side, *s)
+              for a, side, s in zip((106, 128, 150, 172), ('up', 'up', 'left', 'down'), ST))
+J = pubc(0, 2.0, 'left top', '', 'full') + '<div class="jg"></div>' + hud2('over') + qpill('tl jq') + \
+    '<div class="ring2"><svg width="56" height="56"><circle cx="28" cy="28" r="23" fill="#231a25" stroke="#4a3f55" stroke-width="6"/><circle cx="28" cy="28" r="23" fill="none" stroke="#f9c22b" stroke-width="6" stroke-dasharray="90 145" transform="rotate(-90 28 28)"/></svg><span>62 %</span><small>hygiena</small></div>' + \
+    kcs + f'<div class="jo">{spr("waiter_0", 3)}<span>3</span><small>Obsluha</small></div>' + seg('×1', 'v jseg') + nav()
+
+# ---------- K: Všechno dole ----------
+krs = ''.join(f'<div class="kr"><div class="ci2">{fit(ic, 40)}</div><div class="cn"><b>{n}</b><small>úroveň {l}</small><i><u style="width:{int(pr * 100)}%"></u></i></div>'
+              f'<div class="btn green kb">+1 · {p}</div></div>' for n, l, p, pr, ic in ST)
+K = pubc(296, 1.0, 'center top', hpill('tl') + qpill('kq', 'Kuchyně na úroveň 60'), 'top') + \
+    '<div class="dock"><div class="hd in"><div class="coins">' + spr('icons_coin', 2) + '<div><b>3.48M coins</b><small>+2.04K / s</small></div></div><div class="gem2">💎 120<span>+</span></div></div>' + \
+    krs + f'<div class="kctl">{obs()}{seg()}</div></div>' + nav()
+
+# ---------- menu: stav hráče po 4. hygieně a první noci (hostinský úr. 6, 320 kostí) ----------
+# klíč: (název, sprite, stav, zamčeno → krátká podmínka, tečka)
+MI = {
+    'keeper': ('Hostinský', 'obj_apronIcon', 'úroveň 6 · 4 volné body', None, 1),
+    'krigl': ('Krígly', 'obj_krigl0', '1 240 krígel · +124 %', None, 0),
+    'brew': ('Pivovar', 'obj_fermenter', 'várka je hotová', None, 1),
+    'bones': ('Kostnice', 'obj_dSkulls', '320 kostí', None, 0),
+    'special': ('Nabídka', 'obj_chest', 'truhla je připravená', None, 1),
+    'book': ('Sbírka', 'icons_book', '23 / 60 hostů', None, 0),
+    'gems': ('Diamanty', None, 'balíčky a Štamgast', None, 0),
+    'opts': ('Nastavení', 'icons_gear', 'zvuk, jazyk, záloha', None, 0),
+    'coll': ('Sběrač', 'icons_tray', '', '500 kostí', 0),
+    'temple': ('Chrám', 'obj_dIdol1', '', '6. hygiena', 0),
+    'decor': ('Výzdoba', 'obj_plant', '', '10. hygiena', 0),
+    'darts': ('Šipky', 'obj_darts', '', '15. hygiena', 0),
+    'league': ('Liga', 'obj_trophy', '', '20. hygiena', 0),
+}
+
+
+def mico(key, box, dark=False):
+    """ikona položky menu; zamčená = silueta (světlá na tmavém pozadí, tmavá na polici)"""
+    n, s, st, lk, dot = MI[key]
+    if s is None:
+        return f'<span class="emo" style="font-size:{int(box * .78)}px;height:{box}px">💎</span>'
+    return fit(s, box, ('filter:brightness(0);opacity:.6' if dark else 'filter:brightness(0) invert(.75);opacity:.4') if lk else '')
+
+
+def mtitle(right=''):
+    return f'<div class="mt2"><b>Menu</b>{right}</div>'
+
+
+# ---------- M4: Skupiny ----------
+def t4(key):
+    n, s, st, lk, dot = MI[key]
+    if lk:
+        return f'<div class="t4 lk"><div class="tic">{mico(key, 34)}{spr("icons_lock", 1.5, "position:absolute;right:-14px;bottom:-2px")}</div><span>{n}</span><small>{lk.replace("hygiena", "hyg.")}</small></div>'
+    return f'<div class="t4">{"<em></em>" if dot else ""}<div class="tic">{mico(key, 38)}</div><span>{n}</span></div>'
+
+
+def sec(title, keys, hint=''):
+    return f'<div class="sec"><div class="sh"><small>{title}</small><small>{hint}</small></div><div class="g4">' + ''.join(t4(k) for k in keys) + '</div></div>'
+
+
+NX4 = '<div class="nx4">' + fit('obj_dIdol1', 28, 'filter:brightness(0) invert(.75);opacity:.5') + '<div><b>Další odemkneš: Chrám</b><i><u style="width:67%"></u></i></div><span>po 6. hygieně<br>4 / 6</span></div>'
+chips = ''.join(f'<div class="chip2">{mico(k, 26)}<span>{MI[k][0]}</span></div>' for k in ('book', 'gems', 'opts'))
+M4 = hud2() + mtitle('<small>nejčastější dole ↓</small>') + f'<div class="chips">{chips}</div>' + NX4 + '<div class="mw">' + \
+    sec('V noci', ('bones', 'coll'), 'v noci se platí kostmi') + sec('Trvalé bonusy', ('krigl', 'keeper', 'brew', 'decor')) + \
+    sec('Každý den', ('special', 'temple', 'darts', 'league')) + '</div>' + nav('menu')
+
+# ---------- M5: Cesta odemykání ----------
+NODES = [('Krígly', 'krigl', 1), ('Pivovar', 'brew', 3), ('Chrám', 'temple', 6), ('Výzdoba', 'decor', 10), ('Šipky', 'darts', 15), ('Liga', 'league', 20)]
+XN = [24 + i * 63.4 for i in range(6)]
+nodes = ''.join(f'<div class="nd{" ok" if h <= 4 else ""}" style="left:{x - 23:.0f}px">' + (f'<div class="nc">{fit(MI[k][1], 30)}</div>' if h <= 4 else f'<div class="nc">{fit(MI[k][1], 28, "filter:brightness(0) invert(.75);opacity:.4")}</div>') +
+                f'<b>{n}</b><small>{h}. hyg.</small>{"<s>✓</s>" if h <= 4 else ""}</div>' for (n, k, h), x in zip(NODES, XN))
+here = (XN[1] + XN[2]) / 2  # 4. hygiena: mezi pivovarem (3.) a chrámem (6.)
+road = f'<div class="road"><div class="rh"><b>Cesta hospodského</b><small>hygien: 4</small></div><div class="track"><div class="tl0"></div><div class="tl1" style="width:{here - XN[0]:.0f}px"></div>{nodes}' + \
+    f'<div class="hdot" style="left:{here - 8:.0f}px"></div><div class="here" style="left:{here - 24:.0f}px">JSI TU</div></div><div class="rnext"><span>Chrám otevře 6. hygiena – ještě 2</span><i><u style="width:67%"></u></i></div></div>'
+night = '<div class="night">' + fit('obj_dSkulls', 28) + '<div><b>Noc: Kostnice ✓ · další Sběrač</b><i><u style="width:64%"></u></i></div><span>320 / 500<br>kostí</span></div>'
+g8 = ''.join(t4(k) for k in ('bones', 'book', 'gems', 'opts', 'krigl', 'keeper', 'brew', 'special'))
+M5 = hud2() + mtitle() + road + night + f'<div class="mw"><div class="g4 bot">{g8}</div></div>' + nav('menu')
+
+
+# ---------- M6: Zamčené nahoře malé, odemčené dole velké ----------
+def lchip(key, bar=None):
+    n, s, st, lk, dot = MI[key]
+    b = f'<i><u style="width:{bar}%"></u></i>' if bar else ''
+    return f'<div class="lc{" wide" if bar else ""}">{mico(key, 24)}<div><b>{n}</b><small>{"od " + lk if bar else "po " + lk.replace("hygiena", "hygieně")}</small>{b}</div>{spr("icons_lock", 1)}</div>'
+
+
+def t6(key):
+    n, s, st, lk, dot = MI[key]
+    st = {'keeper': '4 volné body', 'krigl': '+124 % výdělek'}.get(key, st)
+    return f'<div class="t6">{"<em></em>" if dot else ""}<div class="tic">{mico(key, 36)}</div><div><b>{n}</b><small>{st}</small></div></div>'
+
+
+M6 = hud2() + mtitle() + '<div class="soon"><small>BRZY ODEMKNEŠ</small><div class="lcs">' + lchip('temple') + lchip('decor') + lchip('darts') + lchip('league') + lchip('coll', 64) + '</div></div>' + \
+    '<div class="mw"><div class="g6">' + ''.join(t6(k) for k in ('opts', 'book', 'gems', 'bones', 'krigl', 'keeper', 'brew', 'special')) + '</div></div>' + nav('menu')
+
+
+# ---------- M7: Seznam s rychlou akcí ----------
+def r7(key, act=None, cls='green'):
+    n, s, st, lk, dot = MI[key]
+    a = f'<div class="btn {cls} act">{act}</div>' if act else '<s>›</s>'
+    return f'<div class="r7"><div class="tic">{mico(key, 34)}</div><div class="rt"><b>{n}</b><small>{st}</small></div>{a}</div>'
+
+
+def soon7(key, txt, pct):
+    n = MI[key][0]
+    return f'<div class="r7 lk"><div class="tic">{mico(key, 30)}</div><div class="rt"><b>{n}</b><small>{txt}</small><i><u style="width:{pct}%"></u></i></div>{spr("icons_lock", 2)}</div>'
+
+
+M7 = hud2() + mtitle('<small>💎 kupuješ přes + nahoře</small>') + '<div class="l7">' + r7('opts') + r7('book') + r7('bones') + r7('krigl') + \
+    r7('keeper', '4 BODY', 'plum') + r7('brew', 'VYBRAT') + r7('special', 'OTEVŘÍT', 'amber') + \
+    '<div class="sh7"><small>BRZY</small></div>' + soon7('coll', '320 / 500 kostí', 64) + soon7('temple', 'hygien 4 / 6', 67) + \
+    '<div class="r7 more"><small>a dál: Výzdoba (10.), Šipky (15.), Liga (20. hygiena)</small></div></div>' + nav('menu')
+
+# ---------- M8: Police ----------
+SHELF = [('book', 'gems', 'opts'), ('bones', 'coll', 'temple'), ('krigl', 'keeper', 'decor'), ('special', 'brew', 'darts', 'league')]
+
+
+def it8(key):
+    n, s, st, lk, dot = MI[key]
+    return f'<div class="ob">{mico(key, 46, True)}{"<em></em>" if dot else ""}</div>'
+
+
+def pl8(key):
+    n, s, st, lk, dot = MI[key]
+    if lk:
+        return f'<span class="pl lk"><span style="display:flex;gap:3px;align-items:center">{spr("icons_lock", 1)}{n}</span><small>{lk.replace("hygiena", "hyg.")}</small></span>'
+    return f'<span class="pl">{n}</span>'
+
+
+M8 = hud2() + mtitle('<small>police hostinského</small>') + '<div class="cab">' + \
+    ''.join(f'<div class="shelf"><div class="its" style="grid-template-columns:repeat({len(row)},1fr)">' + ''.join(it8(k) for k in row) + '</div><div class="board8"></div>'
+            f'<div class="its pls" style="grid-template-columns:repeat({len(row)},1fr)">' + ''.join(pl8(k) for k in row) + '</div></div>' for row in SHELF) + '</div>' + nav('menu')
+
+# ---------- M9: Vějíř pro palec ----------
+# kloub palce nad tlačítkem Menu; vnitřní oblouk = nejčastější, vnější = zamčené
+FAN = [(125, (100, 140, 180), ('special', 'brew', 'keeper')),
+       (220, (95, 116, 137, 158, 179), ('krigl', 'bones', 'book', 'gems', 'opts')),
+       (315, (97, 114, 131, 148, 165), ('coll', 'temple', 'decor', 'darts', 'league'))]
+PF = (380, 600)
+
+
+def f9(key, x, y):
+    n, s, st, lk, dot = MI[key]
+    inner = mico(key, 30) + (spr('icons_lock', 1, 'position:absolute;right:4px;bottom:4px') if lk else '')
+    lab = n if not lk else f'{n}<small>{lk.replace("hygiena", "hyg.")}</small>'
+    return f'<div class="f9{" lk" if lk else ""}" style="left:{x - 27:.0f}px;top:{y - 27:.0f}px"><div class="fb">{inner}{"<em></em>" if dot else ""}</div><span>{lab}</span></div>'
+
+
+fan = ''.join(f9(k, PF[0] + r * math.cos(math.radians(a)), PF[1] - r * math.sin(math.radians(a))) for r, angs, keys in FAN for a, k in zip(angs, keys))
+M9 = hud2() + pubc(330, 1.22, 'left bottom', hcard()) + '<div class="tdim">' + ''.join(f'<div class="tile"></div>' for _ in range(4)) + '</div><div class="fanbg"></div>' + \
+    '<div class="nx9">' + fit('obj_dIdol1', 30) + '<div><b>Další: Chrám</b><small>po 6. hygieně · 4/6</small><i><u style="width:67%"></u></i></div></div>' + fan + nav('menu')
+
+SCREENS2 = [('F', 'B úsporná', 'B s menším písmem; celá dlaždice je tlačítko (46 px), obsluha a ×1/×10/MAX na spodní hraně hospody', F),
+            ('G', 'B s pásem stanic', 'hospoda vyšší, stanice jako sloupce v posuvném pásu nad lištou – všechna +1 v jedné řadě pro palec', G),
+            ('H', 'B přes celou obrazovku', 'hospoda je pod vším; dlaždice, úkol a ovládání plavou přes ni (ukázáno s ×10)', H),
+            ('I', 'Tabule', 'nový směr: stanice jako ceník na křídové tabuli, úkol jako papírek připíchnutý v hospodě', I),
+            ('J', 'Akční kruhy', 'nový směr: hospoda celá, stanice jako 4 kulatá tlačítka v oblouku pod pravým palcem', J),
+            ('K', 'Všechno dole', 'nový směr: nahoře jen hospoda, peníze, stanice i ovládání v jednom panelu u palce', K),
+            ('M4', 'Menu: skupiny', 'dlaždice podle druhu, nejčastější (každý den) úplně dole; vedlejší věci jako malé čipy nahoře', M4),
+            ('M5', 'Menu: cesta odemykání', 'nahoře cesta 1.→20. hygiena s „jsi tu“, dole jen odemčené dlaždice', M5),
+            ('M6', 'Menu: stav na dlaždici', 'zamčené malé nahoře, odemčené velké dole s jednou větou, co tam čeká', M6),
+            ('M7', 'Menu: rychlé akce', 'seznam, kde se to hlavní (truhla, várka, body) udělá rovnou tlačítkem', M7),
+            ('M8', 'Menu: police', 'věci hospody stojí na polici se štítky, zamčené jsou jen stíny', M8),
+            ('M9', 'Menu: vějíř pro palec', 'vyjede z rohu nad hospodu, nejčastější nejblíž palci, zamčené na kraji', M9)]
+
+CSS2 = '''
+.pub.c{background-image:url(@CLEAN@);image-rendering:pixelated}
+.pub.full{position:absolute;left:0;right:0;top:0;bottom:62px;height:auto!important;border:0;background-color:#2a1f2b}
+.hd{height:52px;display:flex;align-items:center;padding:0 8px 0 12px;gap:10px;flex:none;position:relative;z-index:3}
+.hd .coins{display:flex;align-items:center;gap:9px;flex:1}
+.hd .coins b{font-size:29px;color:#f9c22b;font-weight:400;line-height:.9;display:block}
+.hd .coins small{color:#1ebc73;font-size:16px}
+.hd.over{position:absolute;left:0;right:0;top:0;height:70px;align-items:flex-start;padding-top:4px;background:linear-gradient(rgba(30,20,32,.96) 55%%,rgba(30,20,32,0))}
+.gem2{height:44px;background:#231a25;border-radius:10px;padding:0 6px 0 10px;font-size:20px;color:#8fd3ff;display:flex;align-items:center;gap:8px;flex:none}
+.gem2 span{width:30px;height:30px;border-radius:7px;background:#1e9e68;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:inset 0 5px 0 rgba(255,255,255,.18)}
+.qp{position:absolute;display:flex;align-items:center;gap:7px;background:rgba(30,20,32,.93);border:2px solid #f9c22b;border-radius:12px;padding:0 9px 0 7px;height:46px;z-index:2}
+.qp .qt{flex:1}.qp b{font-size:18px;color:#f9c22b;font-weight:400;display:block;line-height:1;margin-bottom:4px;white-space:nowrap}
+.qp i{height:5px;width:100%%}.qp i u{background:#f9c22b}.qp .rw{font-size:14px;color:#f2e6d8;line-height:1;text-align:right}
+.hp{position:absolute;height:46px;display:flex;align-items:center;gap:6px;background:rgba(30,20,32,.93);border-radius:12px;padding:0 10px 0 6px;z-index:2}
+.hp small{font-size:14px;color:#cfc4d0}.hp b{font-size:21px;color:#f9c22b;font-weight:400;line-height:1;display:block}
+.tl{left:8px;top:8px}.tr{right:8px;top:8px}.bl{left:8px;bottom:8px}.br{right:8px;bottom:8px}
+.hc{position:absolute;right:0;top:0;width:110px;height:78px;background:#1e1420;border-radius:0 0 0 14px;padding:7px 9px 0 8px;z-index:2}
+.hc .hr{display:flex;align-items:center;gap:6px}.hc small{font-size:14px;color:#cfc4d0}.hc b{font-size:22px;color:#f9c22b;font-weight:400;line-height:1;display:block}
+.hc i{height:7px;margin-top:7px}.hc i u{background:#f9c22b}
+.obs{height:50px;display:flex;align-items:center;gap:8px;background:#6b3e75;border-radius:12px;padding:0 12px 0 6px;position:relative;box-shadow:inset 0 9px 0 rgba(255,255,255,.12),0 3px 0 rgba(0,0,0,.35);flex:none;z-index:2}
+.obs .fc{display:flex}.obs .fc img{margin-right:-11px;background:#2e222f;border-radius:50%%;border:2px solid #a884f3;width:34px!important;height:34px!important;padding:1px}
+.obs .fc img:last-child{margin-right:0}
+.obs b{font-size:20px;font-weight:400;display:block;line-height:1}.obs .ol small{font-size:14px;color:#e4d2ea}
+.obs .up{position:absolute;right:-6px;top:-7px;width:22px;height:22px;border-radius:50%%;background:#1ebc73;color:#fff;font:bold 14px Arial;display:flex;align-items:center;justify-content:center;border:2px solid #2e222f}
+.seg{display:flex;background:#231a25;border-radius:12px;padding:3px;gap:3px;flex:none;z-index:2;box-shadow:0 3px 0 rgba(0,0,0,.35)}
+.seg span{width:48px;height:44px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#9babb2;border-radius:9px}
+.seg span.on{background:#f79617;color:#2e222f;box-shadow:inset 0 8px 0 rgba(255,255,255,.2)}
+.seg.v{flex-direction:column}
+.pbar{position:absolute;left:0;right:0;bottom:0;height:74px;padding:0 8px 8px;display:flex;align-items:flex-end;justify-content:space-between;background:linear-gradient(rgba(30,20,32,0),rgba(30,20,32,.88) 50%%)}
+/* F */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:7px;padding:7px 8px;flex:1;min-height:0}
+.ft{background:#3a2f3d;border-radius:11px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.fth{display:flex;gap:8px;align-items:center;height:46px;padding:4px 8px 0}.fth .px{flex:none}
+.ft b{font-size:21px;font-weight:400;line-height:1;display:block}.ft small{font-size:15px}
+.ft i{margin:4px 8px 0;height:6px}
+.fbuy{margin-top:auto;height:46px;background:#1e9e68;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:inset 0 8px 0 rgba(255,255,255,.16)}
+.fbuy span{background:rgba(0,0,0,.22);border-radius:6px;padding:1px 6px;font-size:18px}.fbuy b{font-size:23px}
+/* G */
+.gband{flex:1;padding:7px 0 0 8px;overflow:hidden;position:relative}
+.gtrack{display:flex;gap:6px;width:max-content}
+.gc{width:88px;height:170px;background:#3a2f3d;border-radius:11px;padding:5px;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.gi{height:42px;display:flex;align-items:flex-end;justify-content:center;flex:none}
+.gc b{font-size:18px;font-weight:400;line-height:.9;height:34px;display:flex;align-items:center;justify-content:center}
+.gc small{font-size:14px;margin:0 0 4px}.gc i{width:100%%;height:6px;flex:none}
+.gb{margin-top:auto;width:100%%;height:50px;border-radius:9px;background:#1e9e68;display:flex;align-items:center;justify-content:center;font-size:19px;line-height:1;box-shadow:inset 0 8px 0 rgba(255,255,255,.16),0 3px 0 rgba(0,0,0,.35)}
+.gc.lk{background:#231a25;border:2px dashed #5a4e63;box-shadow:none;color:#8d8194}
+.dots{position:absolute;bottom:5px;left:0;right:0;display:flex;justify-content:center;gap:6px}.dots s{width:7px;height:7px;border-radius:50%%;background:#5a4e63}.dots s.on{background:#f9c22b}
+/* H */
+.hshade{position:absolute;left:0;right:0;bottom:62px;height:360px;background:linear-gradient(rgba(30,20,32,0),rgba(30,20,32,.75) 45%%,rgba(30,20,32,.95))}
+.qp.hq,.hp.hq{top:64px}
+.hctl{position:absolute;left:8px;right:8px;bottom:342px;display:flex;justify-content:space-between;align-items:flex-end}
+.hgrid{position:absolute;left:8px;right:8px;bottom:70px;display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.tile.glass{background:rgba(46,34,47,.84);border:1px solid rgba(249,194,43,.35);height:128px;backdrop-filter:blur(3px)}
+.btn.green.hb{width:100%%;height:46px;margin-top:7px}
+/* I */
+.pub.tab{border-bottom:0}
+.note{position:absolute;left:10px;top:12px;background:#f3e3b5;color:#3a2318;padding:7px 11px 6px;border-radius:2px;transform:rotate(-2deg);box-shadow:0 4px 0 rgba(0,0,0,.35);z-index:2}
+.note b{font-size:20px;font-weight:400;display:block;line-height:1}.note span{font-size:16px;color:#7a5a3c}
+.pin{position:absolute;top:-6px;left:48%%;width:12px;height:12px;border-radius:50%%;background:#e83b3b;border:2px solid #7a1a20}
+.board{margin:0 6px 8px;flex:1;border:8px solid #7a4524;border-top-width:10px;border-radius:6px;background:#1d2a24;background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1.5px),radial-gradient(ellipse at 30%% 20%%,rgba(255,255,255,.07),transparent 60%%);background-size:7px 7px,100%% 100%%;box-shadow:inset 0 0 0 2px #4a2914,0 4px 0 #3b2110;padding:2px 10px 6px;display:flex;flex-direction:column;justify-content:space-between;color:#eef2ea}
+.bh{display:flex;justify-content:space-between;align-items:center;height:52px}.bh b{font-size:32px;color:#f4e27a;font-weight:400;letter-spacing:3px}
+.seg.chalk{background:transparent;box-shadow:none;gap:5px}.seg.chalk span{border:2px solid rgba(238,242,234,.3);color:#cfd8cc}.seg.chalk span.on{border-color:#f4e27a;color:#f4e27a;background:rgba(244,226,122,.12);box-shadow:none}
+.cr{display:flex;align-items:center;gap:9px;height:60px;border-top:2px dashed rgba(238,242,234,.14)}
+.ci2{width:40px;display:flex;justify-content:center;flex:none}
+.cn b{font-size:23px;font-weight:400;line-height:1;display:block;white-space:nowrap}.cr small{color:#b9c4b7;font-size:15px}
+.cr i{height:5px;width:96px;margin-top:4px;background:rgba(255,255,255,.12)}.cr i u{background:#e8eee4}
+.dl{flex:1;align-self:center;border-bottom:3px dotted rgba(238,242,234,.3);margin-top:8px;min-width:8px}
+.cbuy{width:116px;height:48px;border-radius:10px;background:#1e9e68;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:inset 0 8px 0 rgba(255,255,255,.16),0 3px 0 rgba(0,0,0,.4);flex:none}
+.cbuy span{background:rgba(0,0,0,.22);border-radius:6px;padding:1px 5px;font-size:17px}.cbuy b{font-size:22px;font-weight:400}
+.obs.bl{position:absolute}
+/* J */
+.jg{position:absolute;left:0;right:0;bottom:62px;height:330px;background:linear-gradient(rgba(20,12,22,0),rgba(20,12,22,.55) 35%%,rgba(20,12,22,.9))}
+.qp.jq{top:64px;right:76px}
+.ring2{position:absolute;right:10px;top:60px;width:56px;height:70px;z-index:2}.ring2 span{position:absolute;left:0;right:0;top:17px;text-align:center;font-size:17px;color:#f9c22b}
+.ring2 small{position:absolute;left:-12px;right:-12px;top:57px;text-align:center;font-size:14px;color:#f2e6d8;text-shadow:0 1px 0 #000}
+.kc{position:absolute;width:80px;height:80px;z-index:2}.kc svg{position:absolute;inset:0}
+.kin{position:absolute;inset:8px;border-radius:50%%;background:#1e9e68;box-shadow:inset 0 10px 0 rgba(255,255,255,.16),0 3px 0 rgba(0,0,0,.45);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.kin b{font-size:17px;font-weight:400;line-height:1}.kin s{text-decoration:none;font-size:13px;opacity:.85}
+.klv{position:absolute;right:-6px;top:-5px;background:#f9c22b;color:#2e222f;border-radius:10px;padding:0 6px;font-size:15px;line-height:20px;border:2px solid #2e222f}
+.kn{position:absolute;font-size:17px;white-space:nowrap;background:rgba(30,20,32,.9);padding:1px 7px;border-radius:7px;color:#f2e6d8}
+.kn.up{left:50%%;bottom:calc(100%% + 3px);transform:translateX(-50%%)}.kn.left{right:calc(100%% + 3px);top:50%%;transform:translateY(-50%%)}.kn.down{left:50%%;top:calc(100%% + 3px);transform:translateX(-50%%)}
+.jo{position:absolute;left:10px;bottom:268px;width:64px;height:64px;border-radius:50%%;background:#6b3e75;border:3px solid #a884f3;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 rgba(0,0,0,.4);z-index:2}
+.jo span{position:absolute;right:-6px;top:-6px;background:#f9c22b;color:#2e222f;border-radius:50%%;width:22px;height:22px;font-size:16px;display:flex;align-items:center;justify-content:center;border:2px solid #2e222f}
+.jo small{position:absolute;top:66px;left:-10px;right:-10px;text-align:center;font-size:15px;color:#f2e6d8;text-shadow:0 1px 0 #000}
+.jseg{position:absolute;left:10px;bottom:76px}.jseg span{width:58px}
+/* K */
+.pub.top{border-top:0}
+.qp.kq{left:8px;right:8px;bottom:8px}.qp.kq .qt{flex:1}
+.dock{flex:1;display:flex;flex-direction:column;background:#2e222f;padding-bottom:4px}
+.hd.in{height:54px;border-bottom:1px solid #3e3546;margin-bottom:5px}
+.kr{display:flex;align-items:center;gap:8px;height:54px;background:#3a2f3d;border-radius:11px;margin:0 8px 5px;padding:0 4px 0 6px;flex:none}
+.kr .cn{flex:1}.kr b{font-size:22px}.kr small{font-size:15px}.kr i{height:5px;width:100%%;margin-top:3px}
+.btn.kb{width:124px;height:46px;font-size:21px}
+.kctl{display:flex;justify-content:space-between;align-items:center;padding:1px 8px 0;margin-top:auto}
+/* menu */
+.mt2{display:flex;justify-content:space-between;align-items:center;padding:4px 12px;border-top:2px solid #f9c22b;flex:none;height:44px}
+.mt2 b{font-size:29px;color:#f9c22b;font-weight:400}.mt2 small{font-size:16px}
+.emo{display:flex;align-items:center;justify-content:center;line-height:1;font-family:'Segoe UI Emoji',sans-serif}
+.tic{position:relative;display:flex;align-items:center;justify-content:center;height:40px;flex:none}
+.chips{display:flex;gap:6px;padding:4px 8px 0;flex:none}
+.chip2{flex:1;height:44px;border-radius:10px;background:#3a2f3d;display:flex;align-items:center;justify-content:center;gap:7px;font-size:19px}
+.sec{padding:0 8px;flex:none}
+.nav{position:relative;z-index:4}
+.sh{display:flex;justify-content:space-between;padding:9px 4px 5px}.sh small{font-size:16px;color:#f9c22b}.sh small+small{color:#8d8194}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.t4{height:96px;border-radius:12px;background:#5a4e63;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:18px;position:relative;box-shadow:inset 0 12px 0 rgba(255,255,255,.08),0 4px 0 rgba(0,0,0,.3)}
+.t4.lk{background:#231a25;box-shadow:none;border:2px dashed #4a3f55;color:#8d8194;gap:2px}.t4.lk small{color:#f9c22b;font-size:15px}
+.t4 em{right:6px;top:6px}.mw .t4{height:104px}
+.nx4{display:flex;align-items:center;gap:10px;margin:8px 8px 0;background:#231a25;border:1px dashed #6a5f70;border-radius:12px;padding:8px 12px;flex:none}.nx4 div{flex:1}.nx4 b{font-size:18px;font-weight:400;display:block;line-height:1;margin-bottom:5px;color:#cfc4d0}.nx4 i u{background:#f9c22b}.nx4 span{font-size:14px;line-height:1.05;text-align:right;color:#f9c22b}
+.mw{flex:1;display:flex;flex-direction:column;justify-content:flex-end;min-height:0;padding-bottom:8px}
+/* M5 */
+.road{margin:6px 8px 0;background:#231a25;border-radius:14px;padding:8px 10px 10px;flex:none}
+.rh{display:flex;justify-content:space-between;align-items:baseline}.rh b{font-size:22px;color:#f9c22b;font-weight:400}.rh small{font-size:16px}
+.track{position:relative;height:104px;margin-top:8px}
+.tl0,.tl1{position:absolute;top:22px;left:24px;height:6px;border-radius:3px}.tl0{right:24px;background:#4a3f55}.tl1{background:#f9c22b}
+.nd{position:absolute;top:0;width:46px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.nc{width:46px;height:46px;border-radius:50%%;background:#3a2f3d;border:3px solid #4a3f55;display:flex;align-items:center;justify-content:center}
+.nd.ok .nc{background:#5a4e63;border-color:#f9c22b}
+.nd b{font-size:16px;font-weight:400;margin-top:4px;line-height:1;white-space:nowrap}.nd small{font-size:14px;color:#8d8194}.nd.ok small{color:#1ebc73}
+.nd s{position:absolute;top:-4px;right:-6px;width:20px;height:20px;border-radius:50%%;background:#1ebc73;color:#fff;font:bold 12px Arial;display:flex;align-items:center;justify-content:center;text-decoration:none;border:2px solid #231a25}
+.here{position:absolute;top:84px;width:48px;text-align:center;font-size:14px;color:#2e222f;background:#f9c22b;border-radius:6px;line-height:18px}
+.hdot{position:absolute;top:17px;width:16px;height:16px;border-radius:50%%;background:#fff;border:3px solid #f9c22b;box-shadow:0 0 0 3px #231a25}
+.rnext{display:flex;align-items:center;gap:10px;margin-top:4px}.rnext span{font-size:17px;white-space:nowrap}.rnext i{flex:1;height:8px}.rnext i u{background:#f9c22b}
+.night{display:flex;align-items:center;gap:10px;margin:7px 8px 0;background:#231a25;border-radius:12px;padding:8px 12px;flex:none}
+.night div{flex:1}.night b{font-size:18px;font-weight:400;display:block;line-height:1;margin-bottom:5px;color:#8fd3ff}.night i u{background:#8fd3ff}.night span{font-size:15px;line-height:1;text-align:right;color:#cfc4d0}
+.g4.bot{padding:0 8px}
+/* M6 */
+.soon{margin:4px 8px 0;flex:none}.soon>small{font-size:15px;color:#8d8194;margin:2px 4px 6px}
+.lcs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.lc{height:46px;border-radius:10px;background:#231a25;border:2px dashed #4a3f55;display:flex;align-items:center;gap:8px;padding:0 8px;color:#8d8194}
+.lc div{flex:1}.lc b{font-size:18px;font-weight:400;display:block;line-height:1}.lc small{font-size:14px;color:#f9c22b}
+.lc.wide{grid-column:span 2}.lc.wide i{height:5px;margin-top:3px;width:100%%}.lc.wide i u{background:#f9c22b}
+.g6{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:0 8px 8px;margin-top:auto}
+.t6{height:80px;border-radius:12px;background:#5a4e63;display:flex;align-items:center;gap:9px;padding:0 8px;position:relative;box-shadow:inset 0 12px 0 rgba(255,255,255,.08),0 4px 0 rgba(0,0,0,.3)}
+.t6 .tic{width:48px;height:48px;border-radius:10px;background:#3a2f3d}
+.t6 b{font-size:22px;font-weight:400;display:block;line-height:1}.t6 small{font-size:15px;color:#e0d4e4;margin-top:3px;line-height:1}
+.t6 em{right:6px;top:6px}
+/* M7 */
+.l7{flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:0 8px 6px}
+.r7{display:flex;align-items:center;gap:10px;height:50px;background:#3a2f3d;border-radius:11px;margin-top:4px;padding:0 6px 0 6px;flex:none}
+.r7 .tic{width:42px;height:42px;border-radius:9px;background:#231a25}
+.r7 .rt{flex:1}.r7 b{font-size:21px;font-weight:400;display:block;line-height:1}.r7 small{font-size:15px;color:#cfc4d0;margin-top:2px}
+.r7 s{text-decoration:none;font:24px Arial;color:#9babb2;width:44px;text-align:center}
+.btn.act{width:104px;height:44px;font-size:19px}
+.r7.lk{background:#231a25;border:2px dashed #4a3f55;height:48px}.r7.lk b{color:#9babb2}.r7.lk i{height:5px;margin-top:3px;width:150px}.r7.lk i u{background:#f9c22b}.r7.lk>img{margin-right:12px;opacity:.7}
+.sh7 small{font-size:15px;color:#8d8194;margin:8px 4px 0}
+.r7.more{height:28px;background:none;justify-content:center}.r7.more small{font-size:15px;color:#8d8194}
+/* M8 */
+.cab{flex:1;margin:4px 8px 8px;border-radius:10px;background:#4a2c1c;background-image:repeating-linear-gradient(90deg,rgba(0,0,0,.12) 0 2px,transparent 2px 64px);border:6px solid #2f1a10;box-shadow:inset 0 0 0 2px #6b4226;display:flex;flex-direction:column;justify-content:space-evenly;padding:0 4px}
+.shelf{display:flex;flex-direction:column}
+.its{display:grid;justify-items:center;align-items:end;padding:0 4px}
+.its:not(.pls){height:64px}.ob{position:relative;display:inline-flex}.ob em{right:-12px;top:-8px}
+.board8{height:10px;background:#9a6a3c;box-shadow:inset 0 3px 0 #b8834f,0 6px 0 #2f1a10;margin:0 -4px}
+.pls{margin-top:12px;align-items:center}
+.pl{background:#d9b25a;color:#3a2318;font-size:16px;line-height:22px;padding:0 6px;border-radius:3px;box-shadow:inset 0 -2px 0 #9a7428,0 2px 0 rgba(0,0,0,.4);white-space:nowrap;display:flex;align-items:center;gap:3px}
+.pl.lk{background:#2e222f;color:#cfc4d0;box-shadow:inset 0 -2px 0 #1a121c;flex-direction:column;line-height:1;padding:3px 7px 4px;gap:1px}.pl.lk small{font-size:13px;color:#f9c22b}.pls{min-height:38px;align-items:start}
+/* M9 */
+.tdim{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:7px 8px;flex:1}
+.fanbg{position:absolute;inset:0;background:radial-gradient(circle at 380px 600px,rgba(46,34,47,.97) 0,rgba(46,34,47,.95) 352px,rgba(20,12,22,.6) 353px)}
+.f9{position:absolute;width:54px;display:flex;flex-direction:column;align-items:center;z-index:2}
+.fb{width:54px;height:54px;border-radius:50%%;background:#5a4e63;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:inset 0 9px 0 rgba(255,255,255,.1),0 3px 0 rgba(0,0,0,.4)}
+.f9 span{font-size:16px;margin-top:3px;white-space:nowrap;line-height:1}
+.f9.lk .fb{background:#231a25;border:2px dashed #4a3f55;box-shadow:none}.f9.lk span{color:#cfc4d0;font-size:15px;text-align:center}.f9.lk span small{color:#f9c22b;font-size:13px}
+.f9 em{right:-2px;top:-2px}
+.nx9{position:absolute;left:10px;top:64px;width:250px;display:flex;align-items:center;gap:10px;background:#231a25;border:2px solid #f9c22b;border-radius:12px;padding:8px 10px;z-index:2}
+.nx9 div{flex:1}.nx9 b{font-size:19px;font-weight:400;color:#f9c22b;display:block;line-height:1}.nx9 small{font-size:14px;margin:2px 0 5px}.nx9 i u{background:#f9c22b}
+'''
+
+if SADA == '2':
+    SCREENS, CSS, PREHLED = SCREENS2, CSS + (CSS2 % ()).replace('@CLEAN@', clean_pub()), 'prehled-2'
+    ROWS = (SCREENS[:6], SCREENS[6:])
+else:
+    PREHLED, ROWS = 'prehled', (SCREENS[:5], SCREENS[5:])
+
+html = f'<html><head><meta charset="utf-8"><style>{CSS}</style></head><body data-prehled="{PREHLED}">'
+for part in ROWS:
     html += '<div class="row">' + ''.join(f'<div class="col"><div class="cap"><h2>{k} – {t}</h2><p>{d}</p></div><div class="scr" id="{k}">{body}</div></div>' for k, t, d, body in part) + '</div>'
 html += '</body></html>'
 open(OUT, 'w', encoding='utf-8').write(html)

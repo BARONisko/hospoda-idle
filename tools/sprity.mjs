@@ -1,7 +1,7 @@
 import { chromium } from 'playwright-core';
 import fs from 'fs';
 const out = process.argv[2], list = process.argv.slice(3);
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
+const b = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
 const p = await b.newPage();
 await p.goto('http://localhost:5177/'); await p.waitForTimeout(3000);
 const r = await p.evaluate((list) => list.map((kf) => {

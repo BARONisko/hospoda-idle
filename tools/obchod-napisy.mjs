@@ -18,7 +18,7 @@ const css = {
   B: { bg: 'radial-gradient(circle at 50% 34%, #ffc440 0 22%, #f0a23a 22% 40%, #d97a30 40% 58%, #b4532a 58% 76%, #8a3524 76% 100%)', head: '#fff0c8', sh: '#2e222f', border: '#2e222f' },
   C: { bg: '#1c1420', head: '#f9c22b', sh: '#120c14', border: 'transparent' },
 }[style];
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
+const b = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
 const p = await b.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
 let i = 0;
 for (const [name, text] of SET) {

@@ -416,11 +416,16 @@ export class PubView {
 
   /** kam na obrazovce ukázat návodem „ťukni na bublinu“: bublina s objednávkou (host bez bubliny spropitné nedá) */
   tipTarget(): { x: number; y: number } | null {
-    const g = this.guests.find((q) => q.order && !q.leaving);
-    if (!g || !this.cam.visible) return null;
-    const b = g.order![0].getBounds();
+    if (!this.cam.visible) return null;
     const v = this.cam.worldView;
-    return { x: this.cam.x + (b.centerX - v.x) * this.cam.zoom, y: this.cam.y + (b.top - v.y) * this.cam.zoom };
+    // jen bublina, která je ve výřezu vidět (přiblížená hospoda ořízne kraje)
+    for (const g of this.guests) {
+      if (!g.order || g.leaving) continue;
+      const b = g.order[0].getBounds();
+      if (b.centerX < v.x + 4 || b.centerX > v.right - 4 || b.top < v.y || b.bottom > v.bottom) continue;
+      return { x: this.cam.x + (b.centerX - v.x) * this.cam.zoom, y: this.cam.y + (b.top - v.y) * this.cam.zoom };
+    }
+    return null;
   }
 
   /** runda pro všechny: každý sedící host dá spropitné (vrací počet) */

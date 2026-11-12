@@ -2,7 +2,7 @@
 // Spuštění: vite na 5177, pak node tools/tutwalk.mjs ["?night=1"] [tools/_tmp/tw/n] (končí „ZASEKNUTO“, když se návod nedá dohrát)
 import { chromium } from 'playwright-core';
 const [q = '', out = 'tools/_tmp/tw'] = process.argv.slice(2);
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
+const b = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
 const p = await b.newPage({ viewport: { width: 405, height: 720 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, locale: 'cs-CZ' });
 const errs = [];
 p.on('pageerror', (e) => errs.push(e.message));

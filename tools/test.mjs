@@ -93,7 +93,7 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   // 5b) obchod s krígly
   await S(p, (s) => { s.d.krigle = 400; s.openShop('krigl', false); s.shopObjs.filter((o) => o.type === 'Zone').at(-1); });
   await S(p, (s) => { s.d.kup = { start: 1, keepMgr: 1, speed: 2 }; s.applyKup(); });
-  ok('krígly: rychlejší cyklus', await S(p, (s) => Math.abs(s.cyc(s.cards[0].def) - 1.5 * 0.991 ** 2) < 1e-9));
+  ok('krígly: rychlejší cyklus', await S(p, (s) => (s.tsCache = undefined, Math.abs(s.cyc(s.cards[0].def) - 1.5 * 0.991 ** 2) < 1e-9)));
   // 5c) návštěvník s rozhodnutím
   for (let k = 0; k < 5; k++) {
     const r = await S(p, (s, k) => {
@@ -150,7 +150,8 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('strom: hvězda Dobrá pověst', await S(p, (s) => s.star('keep5') && !s.star('tray') && s.skillPoints() > 0));
   // 5g3) mistrovství: roste s časem obsluhy, zvedá výdělek a rychlost; štít na kartě
   ok('mistrovství, hvězdy a hosté dávají jen body do stromu', await S(p, (s) => {
-    s.d.mast = {}; s.d.stars = {}; s.d.loy = {}; const pub = s.d.pubs[0], def = s.cards[0].def; pub.st.tap.auto = true;
+    // statistiky se kešují na snímek – test mění uložení mezi snímky, takže keš zahodit (jinak výsledek závisí na načasování)
+    s.tsCache = undefined; s.d.mast = {}; s.d.stars = {}; s.d.loy = {}; const pub = s.d.pubs[0], def = s.cards[0].def; pub.st.tap.auto = true;
     const p0 = s.pay(pub, def), c0 = s.cyc(def), b0 = s.skillPoints();
     s.mastAdd(2e6); s.d.stars = { '1_tap': 2 }; s.d.loy = { guest0: 1750 }; s.tsCache = undefined;
     return s.mast('tap') >= 10 && s.pay(pub, def) === p0 && s.cyc(def) === c0 && s.skillPoints() === b0 + s.mast('tap') + 2 + 2;

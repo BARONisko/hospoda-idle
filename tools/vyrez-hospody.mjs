@@ -1,7 +1,7 @@
 // Čistý výřez hospody (bez lišty úkolu) pro makety UI: node pubview.mjs <out.png>
 import { chromium } from 'playwright-core';
 const out = process.argv[2];
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
+const b = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
 const p = await b.newPage({ viewport: { width: 405, height: 720 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'cs-CZ' });
 const U = 'http://localhost:5177/?night=0';
 await p.goto(U); await p.evaluate(() => { localStorage.clear(); localStorage.setItem('pubidle_lang', 'cs'); }); await p.goto(U); await p.waitForTimeout(2500);
