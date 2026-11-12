@@ -1,7 +1,7 @@
 // Jména lidí podle jazyka (přání uživatele: v cizích jazycích žádní „Jirka Jelínek“, ale místní jména).
 // Soupeři v lize: 12 mužských + 11 ženských + 1 mužské jméno (pořadí jako dřív v league.ts), příjmení, hospody.
 // Číšníci: muž, žena, muž, žena (postavy waiter, waiterB, waiterC, waiterD).
-import { lang, type Lang } from './index';
+import { lang, type Lang } from '../i18n';
 
 interface Names {
   first: string[];

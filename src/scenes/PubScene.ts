@@ -580,7 +580,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // liga: o kolik soupeř mezitím přidal (jen když je to pořád stejný týden)
     const L = this.league();
     let rival: { add: number; lead: number } | undefined;
-    if (L.start <= leftAt) {
+    // liga ještě zamčená (odemyká se po 20. hygieně) → o soupeři v okně nepsat, nový hráč by nevěděl, o co jde
+    if (L.start <= leftAt && !this.tileLock('league')) {
       const before = rivalTick(L, leftAt);
       const after = rivalTick(L);
       rival = { add: after - before, lead: 0 };

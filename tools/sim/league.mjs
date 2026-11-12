@@ -8,6 +8,6 @@ await build({
   format: 'esm',
   outfile: out,
   logLevel: 'error',
-  plugins: [{ name: 'i18n', setup(b) { b.onResolve({ filter: /\/i18n$/ }, () => ({ path: 'i18n', namespace: 'stub' })); b.onLoad({ filter: /.*/, namespace: 'stub' }, () => ({ contents: 'export const t = (s) => s;' })); } }],
+  plugins: [{ name: 'i18n', setup(b) { b.onResolve({ filter: /\/i18n$/ }, () => ({ path: 'i18n', namespace: 'stub' })); b.onLoad({ filter: /.*/, namespace: 'stub' }, () => ({ contents: 'export const t = (s) => s; export const lang = "cs";' })); } }],
 });
 await import('../../' + out);
