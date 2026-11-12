@@ -442,3 +442,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Snímky do obchodu přefocené s novým vzhledem (docs/play/snimek-1…8, zip).
 - Hospoda 72: nápověda „Jak to funguje“ v Nastavení (src/ui/help.ts, 22 témat, zamčená témata jen větou o odemčení, prahy MENU_HYG
   společné s tileLock, Zpět: téma → seznam → Nastavení). Otevření ze skriptu: s.openHelp().
+- Hospoda 72: build Actions č. 12 (993205c) nahrán do uzavřeného testu, 17 změn odesláno Googlu ke kontrole (12. 11.). Předávka:
+  handoff-2026-11-12b.md. Čeká: rozhodnutí o kríglech (bonus i z utracených?), bankovní účet, ověření na telefonu.
