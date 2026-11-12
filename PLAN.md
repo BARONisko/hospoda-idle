@@ -427,3 +427,4 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   https://claude.ai/artifact/4ii5JVT8KbNuAvdoK5nh42 ; balík grafiky docs/play/obchod-grafika.zip.
   Uživatel: nový build NEDÁVAT na testování, dokud není vše hotové (čeká: UI zjednodušení?, ID měření GA4, propagace).
   Cloudová session se na prohlížeč uživatele nedostane (žádné Claude in Chrome ani složka z počítače) – jen hotové prompty.
+- Hospoda 70: 5 návrhů nového UI + 3 návrhy menu (makety) v docs/navrhy-ui/nove-ui/ – čeká na výběr uživatele. Předávka: handoff-2026-11-12.md.

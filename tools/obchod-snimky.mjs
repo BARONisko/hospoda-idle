@@ -1,0 +1,43 @@
+// Snímky pro obchod (810×1440, en): pozdní hra se 3 hospodami. node store.mjs <out-dir>
+import { chromium } from 'playwright-core';
+const out = process.argv[2];
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome' });
+const mk = async (q) => {
+  const p = await b.newPage({ viewport: { width: 405, height: 720 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'en-US' });
+  p.on('pageerror', (e) => console.log('ERR', e.message));
+  const U = 'http://localhost:5177/' + q;
+  await p.goto(U);
+  await p.evaluate(() => { localStorage.clear(); localStorage.setItem('pubidle_lang', 'en'); });
+  await p.goto(U); await p.waitForTimeout(3000);
+  // rozehraná hra se 3 hospodami, bez průvodců a nápověd
+  await p.evaluate(() => { const s = game.scene.getScene('Pub'), d = s.d; d.tut = -1; d.nightInfo = true; d.guideQ = []; d.guides = ['night', 'pub2', 'pub3']; d.brewTut = -1; d.ntfAsk = true; d.pubIntro = undefined;
+    d.tabTut = ['home','brew','keeper','league','krigl','book','coll','bones','decor','special','opts','mast','quests','shop','up','gems','talis','darts','temple'];
+    d.coins = 3.48e9; d.earned = 9e10; d.run = 2e9; d.krigle = 140; d.gems = 120; d.klvl = 24; d.bones = 5300; d.stats = { ...d.stats, prestiges: 21 }; d.menuOpen = undefined;
+    while (d.pubs.length < 3) d.pubs.push({ act: d.pubs.length + 1, st: {} });
+    d.pubs.forEach((p, i) => { p.st = { tap: { lvl: 120 - i * 20, auto: true, prog: 0.3 }, kitchen: { lvl: 80 - i * 15, auto: true, prog: 0.6 }, cellar: { lvl: 60 - i * 12, auto: true, prog: 0.1 }, dice: { lvl: 35 - i * 8, auto: true, prog: 0.5 } }; p.mgr = true; p.w = [{ s: 3, t: 2, m: 2, xp: 9e5 }, { s: 3, t: 2, m: 1, xp: 9e5 }, { s: 2, t: 1, m: 1, xp: 9e5 }]; });
+    d.decor = ['portrait', 'boar', 'cuckoo', 'piano', 'aquarium', 'fireplace']; d.at = Date.now();
+    localStorage.setItem('pubidle_save_v1', JSON.stringify(d)); });
+  await p.goto(U); await p.waitForTimeout(3500);
+  return p;
+};
+const shot = async (p, name, js, wait = 2500) => { if (js) await p.evaluate(`(()=>{const s=game.scene.getScene('Pub'),d=s.d;${js}})()`); await p.waitForTimeout(wait); await p.screenshot({ path: `${out}/${name}.png` }); };
+let p = await mk('?night=0&talis=1&temple=1');
+await shot(p, 'pub1', "s.openShop('home',false);s.closeShop?.();s.selectPub(0)", 6000);
+await shot(p, 'pub2', 's.selectPub(1)', 6000);
+await shot(p, 'pub3', 's.selectPub(2)', 6000);
+await shot(p, 'brew', "s.selectPub(0);s.openShop('brew',false)");
+await shot(p, 'league', "s.openShop('league',false)");
+await shot(p, 'menu', "s.openShop('home',false)");
+await shot(p, 'book', "s.bookGrp=1;s.openShop('book',false)");
+await shot(p, 'keeper', "s.ktab=0;s.openShop('keeper',false)");
+await shot(p, 'temple', 's.openTemple()', 3500);
+await p.close();
+p = await mk('?night=0&talis=1');
+await shot(p, 'darts', 's.openDarts()', 3500);
+await p.close();
+p = await mk('?night=1&talis=1');
+await shot(p, 'night', "s.closeShop?.();s.selectPub(1)", 7000);
+await p.close();
+p = await mk('?night=0&talis=1&away=30000');
+await shot(p, 'away', '', 1500);
+await b.close();
