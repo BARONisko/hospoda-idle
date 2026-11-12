@@ -2991,9 +2991,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   private vipShow() {
     const v = this.views[0];
-    // ulička vpravo mezi stoly (viditelná část hospody)
+    // volné místo u pravé stěny (viditelná část hospody). Dřív 0,86 šířky = od vzhledu B (celá šířka místnosti) židle pravého stolu:
+    // VIP stál na sedícím hostovi a nad hlavou měl hvězdu i jeho bublinu s pivem (hlášení uživatele) – smí být jen jedna ikona
     const wv = v.cam.worldView;
-    const p = { x: Math.round(wv.x + wv.width * 0.86), y: Math.round(wv.y + wv.height * 0.6) };
+    const p = { x: Math.round(wv.x + wv.width * 0.955), y: Math.round(wv.y + wv.height * 0.6) };
     const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.vipObjs.push(o), this.events.emit('pubObj', o), o);
     const top = v.cam.worldView.y;
     const cone = add(this.add.graphics().setDepth(p.y - 1));
