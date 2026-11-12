@@ -6,6 +6,7 @@ import { Capacitor } from '@capacitor/core';
 import { InAppReview } from '@capacitor-community/in-app-review';
 import { stats as meter } from '../core/stats';
 import { fitPads, type R } from '../ui/touch';
+import { helpPanel, helpState, MENU_HYG } from '../ui/help';
 import { confetti, rays, bigText, coinFountain, popText, punch, flashRect } from '../ui/juice';
 import { big, dur } from '../core/num';
 import { WAITERS, WAITER_MAX, BAR_CAP, crew, tripTime, smileBonus, hireCost as wHireCost, UP_MAX as W_UP_MAX, freePoints, xpProgress, xpFor, spent as wSpent, earned as wEarned, MAX_POINTS, upName as wUpName, waiterLvl, waiterRate, tray, SMILE_STEP, START_CREW, beersPerCycle, type WaiterUp } from '../core/waiters';
@@ -741,14 +742,16 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // pořadí (přání uživatele): nejvýš jedna novinka za kolo, vždy se šipkou a krátkým návodem
     // 1. hygiena krígly · 2. Hostinský · první noc kosti (Kostnice, Sběrač) · 3. pivovar · 6. Chrám · 10. výzdoba · 15. šipky · 20. Liga
     // (pomaleji – přání uživatele, dřív 1–6 a vše odemčené za ~1 h)
+    // prahy hygien v MENU_HYG (ui/help.ts) – stejná čísla ukazuje nápověda „Jak to funguje“
     const hyg = d.stats.prestiges, after = (n: number) => (hyg >= n ? null : t('po {n}. hygieně', { n: String(n) }));
     switch (name) {
-      case 'krigl': return after(1);
-      case 'brew': return after(3);
-      case 'temple': return after(6);
-      case 'decor': return after(10);
-      case 'darts': return after(15);
-      case 'league': return after(20);
+      case 'krigl':
+      case 'brew':
+      case 'temple':
+      case 'decor':
+      case 'darts':
+      case 'league':
+        return after(MENU_HYG[name]);
       case 'daynight': return d.nightInfo ? null : t('po první noci');
       // přání uživatele (hospoda 72): strom až po 2. hygieně (dřív od 5. úrovně = v prvních minutách hry); kdo už ve stromu utrácel, tomu zůstane
       case 'keeper': return treeSpent(d.skills) > 0 ? null : after(2);
@@ -909,7 +912,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return [...mgrs, ...ups].sort((a, b) => a.cost - b.cost).slice(0, 5);
   }
 
-  tab: 'home' | 'shop' | 'tasks' | 'book' | 'krigl' | 'temple' | 'brew' | 'talis' | 'keeper' | 'league' | 'daynight' | 'darts' | 'coll' | 'opts' | 'special' | 'chest' = 'home';
+  tab: 'home' | 'shop' | 'tasks' | 'book' | 'krigl' | 'temple' | 'brew' | 'talis' | 'keeper' | 'league' | 'daynight' | 'darts' | 'coll' | 'opts' | 'special' | 'chest' | 'help' = 'home';
 
   /** má záložka něco nového (červená tečka)? Stejná pravidla rozsvěcují tečku na tlačítku Menu. */
   // ---------- šipky ----------
@@ -1266,10 +1269,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (tab !== 'home') {
       // Den a noc je teď v Kostnici → zpět do Kostnice
       const dn = tab === 'daynight' || tab === 'talis';
-      const back = this.btn(10, y0 + 10, 130, 42, () => (dn ? ((this.shopSub = 'bones'), this.openShop('shop', false)) : this.openShop('home', false)), D + 5);
-      this.drawBtn(back, dn ? t('← Kostnice') : t('← Menu'), true, 'plum');
+      // nápověda: zpět z tématu do seznamu, ze seznamu do Nastavení
+      const help = tab === 'help';
+      const back = this.btn(10, y0 + 10, 130, 42, () => (help ? this.helpBack() : dn ? ((this.shopSub = 'bones'), this.openShop('shop', false)) : this.openShop('home', false)), D + 5);
+      this.drawBtn(back, help ? (helpState.sel >= 0 ? t('← Témata') : t('← Nastavení')) : dn ? t('← Kostnice') : t('← Menu'), true, 'plum');
       const tile = PubScene.TILES.find(([tb, sub]) => tb === tab && (tab !== 'shop' || sub === this.shopSub));
-      const title = this.add.text(W / 2 + 30, y0 + 31, tab === 'talis' ? t('Talismany') : dn ? t('Den a noc') : tab === 'chest' ? t('Denní truhla') : tile?.[2] ?? '', txt(28, PAL.gold)).setOrigin(0.5).setDepth(D + 5);
+      const title = this.add.text(W / 2 + 30, y0 + 31, help ? t('Jak to funguje') : tab === 'talis' ? t('Talismany') : dn ? t('Den a noc') : tab === 'chest' ? t('Denní truhla') : tile?.[2] ?? '', txt(28, PAL.gold)).setOrigin(0.5).setDepth(D + 5);
       title.setScale(Math.min(1, 260 / title.width));
       this.shopObjs.push(back.bg, back.label, back.zone, title);
     }
@@ -1293,6 +1298,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     else if (tab === 'league') this.leagueTab(cy0, D);
     else if (tab === 'special') this.specialTab(y0, D);
     else if (tab === 'chest') this.chestTab(y0, D);
+    else if (tab === 'help') this.helpTab(y0 + 64, D);
     else this.optsTab(cy0, D);
     this.tabTut(tab === 'shop' ? this.shopSub : tab === 'keeper' && this.ktab === 3 ? 'mast' : tab, y0 + 60, D);
     sfx.click();
@@ -2255,10 +2261,22 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   // ---------- nastavení ----------
   private optsTab(y0: number, D: number) {
-    // výška řádku tak, aby se vešly všechny (zvuky, hudba, záloha, jazyk, složka, upozornění, začít znovu)
-    const n = 6 + (location.protocol.startsWith('http') ? 1 : 0) + (notify.available ? 1 : 0) + (meter.available ? 1 : 0);
+    // řádky o kus výš (nad nimi je jen číslo verze): s řádkem „Jak to funguje“ jich je na webu až 10
+    // a výška řádku musí zůstat ≥ 59 log. px = dotykové místo ≥ 44 CSS px
+    y0 -= 16;
+    // výška řádku tak, aby se vešly všechny (nápověda, zvuky, hudba, záloha, jazyk, složka, upozornění, začít znovu)
+    const n = 7 + (location.protocol.startsWith('http') ? 1 : 0) + (notify.available ? 1 : 0) + (meter.available ? 1 : 0);
     const RH = Math.min(96, Math.floor((MB - y0 - 6) / n));
     this.shopObjs.push(this.add.text(W - 12, y0 - 4, t('verze {v}', { v: __APP_VERSION__ }), txt(16, PAL.fog)).setOrigin(1, 1).setDepth(D + 2));
+    // nápověda „Jak to funguje“ nahoře (přání uživatele: informace o různých věcech ve hře)
+    {
+      this.row(y0, RH, D, t('Jak to funguje'), t('stručně o všem, co ve hře je'), 'ink', PAL.bone, Math.min(RH < 70 ? 240 : 300, W - 232 - 34));
+      const bs = Math.min(60, RH - 14);
+      const b = this.btn(W - 232, y0 + (RH - 8 - bs) / 2, 210, bs, () => this.openHelp(), D + 2);
+      this.drawBtn(b, t('Ukázat'), true, 'blue');
+      this.shopObjs.push(b.bg, b.label, b.zone);
+      y0 += RH;
+    }
     // hlasitost: − / hodnota / + po 10 % (0 % = vypnuto)
     const vols: [string, () => number, (v: number) => void][] = [
       [t('Zvuky'), () => sfx.sfxVol, (v) => sfx.setSfxVol(v)],
@@ -2362,6 +2380,43 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     });
     const fy = y0 + (vols.length + 1 + rows.length) * RH + 30;
     if (fy < MB - 10) this.shopObjs.push(this.add.text(W / 2, fy, lang === 'cs' ? 'P.U.B. Idle – Pajzl Tycoon' : 'P.U.B. Idle: Pub Tycoon', txt(18, PAL.slate)).setOrigin(0.5).setDepth(D + 1));
+  }
+
+  // ---------- nápověda „Jak to funguje“ (src/ui/help.ts) ----------
+  /** otevře nápovědu z Nastavení (seznam témat od začátku) */
+  private openHelp() {
+    helpState.sel = -1;
+    helpState.scroll = 0;
+    helpState.last = -1;
+    this.openShop('help', false);
+  }
+
+  /** Zpět v nápovědě (tlačítko i Android Zpět / Escape): z tématu do seznamu, ze seznamu do Nastavení */
+  private helpBack() {
+    if (helpState.sel >= 0) {
+      helpState.sel = -1;
+      this.openShop('help', false);
+    } else this.openShop('opts', false);
+  }
+
+  private helpTab(y0: number, D: number) {
+    helpPanel(
+      {
+        scene: this,
+        add: (o) => (this.shopObjs.push(o), o),
+        button: (x, y, w, h, label, c, on, fn) => {
+          const b = this.btn(x, y, w, h, fn, D + 2);
+          this.drawBtn(b, label, on, c);
+          this.shopObjs.push(b.bg, b.label, b.zone);
+        },
+        locked: (k) => this.tileLock(k) !== null,
+        show: (sel) => ((helpState.sel = sel), this.openShop('help', false)),
+      },
+      y0,
+      MB - 8,
+      W,
+      D,
+    );
   }
 
   // ---------- speciální nabídka: denní truhla, reklamní kampaň, VIP host ----------
@@ -3156,7 +3211,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (this.shopObjs.length) {
       // podsekce otevřená z mřížky Menu → zpět do mřížky (jako „← Menu“); Obchod, Úkoly a mřížka se zavřou (jako ✕)
       const inGrid = PubScene.TILES.some(([tb, sub]) => tb === this.tab && (tb !== 'shop' || sub === this.shopSub));
-      if (!tut && (this.tab === 'daynight' || this.tab === 'talis')) (this.shopSub = 'bones'), this.openShop('shop', false);
+      if (!tut && this.tab === 'help') this.helpBack();
+      else if (!tut && (this.tab === 'daynight' || this.tab === 'talis')) (this.shopSub = 'bones'), this.openShop('shop', false);
       else if (!tut && inGrid) this.openShop('home', false);
       else {
         this.closeShop();
