@@ -448,3 +448,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   z úrovní obchodu a reklamy). Nákup v obchodě už není krok zpět; rada „Za krígly si můžeš koupit“ bez omezení. Hygiena (7 %),
   truhla a liga se dál počítají z držených. Simulace obchod za krígly nemodeluje (počítá, jako by hráč neutrácel) – dopad neměřen.
   Ověřeno na snímcích ve vzhledu B: VIP host + pruh, rvačka, návštěvník, zlatý sud. Návrhy pozdních cílů: docs/navrhy-ui/krigly-cile/.
+- Hospoda 73: kontrola Googlu buildu 12 prošla (publikováno 12. 11.); build 13 (Actions č. 13, 7882606) v uzavřeném testu Alpha,
+  odeslán ke kontrole. Pozdní cíl pro krígly odložen (uživatel), odměny ligy beze změny.
