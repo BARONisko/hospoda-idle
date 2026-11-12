@@ -527,7 +527,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         this.offline();
         this.leagueCheck();
       } else {
-        store(this.d);
+        store(this.d, true);
         if (notesOn) void notify.schedule(this.notes());
       }
     };

@@ -239,15 +239,26 @@ export function load(): Save {
 }
 
 
-export function store(d: Save) {
+/** klíč uložené hry a značka „hráč začal znovu“ (pro core/backup.ts) */
+export const SAVE_KEY = KEY;
+export const WIPED_KEY = 'pubidle_wiped';
+/** zrcadlo uložení (mobilní aplikace: úložiště, které Android zálohuje) – nastaví core/backup.ts; now = hned (odchod ze hry) */
+let mirror: ((raw: string, now: boolean) => void) | undefined;
+export function setMirror(fn: (raw: string, now: boolean) => void) {
+  mirror = fn;
+}
+
+export function store(d: Save, flush = false) {
   if (locked) return;
   // hodiny vrácené dozadu nesmí posunout čas odchodu (přetáčení hodin = opakovaný offline výdělek); víc než den = oprava hodin
   const now = Date.now();
   d.at = d.at > now && d.at - now < 86_400_000 ? d.at : now;
   try {
-    localStorage.setItem(KEY, JSON.stringify(d));
+    const raw = JSON.stringify(d);
+    localStorage.setItem(KEY, raw);
     if (localStorage.getItem(OWNER) !== TAB) localStorage.setItem(OWNER, TAB);
     fullWarned = false;
+    mirror?.(raw, flush);
   } catch {
     // plné nebo zakázané úložiště – hráči to říct (jednou, dokud se zas nepovede uložit)
     if (!fullWarned) issue('full');
@@ -259,6 +270,7 @@ export function wipe() {
   locked = true; // po smazání už nic neukládat (pagehide při znovunačtení)
   try {
     localStorage.removeItem(KEY);
+    localStorage.setItem(WIPED_KEY, '1'); // záloha v telefonu se smaže při dalším startu (backup.ts)
   } catch {
     /* nic */
   }

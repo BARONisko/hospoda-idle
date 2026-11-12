@@ -420,3 +420,10 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   500 kostí; název mimo češtinu „P.U.B. Idle: Pub Tycoon“; statistiky připravené (core/stats.ts, GA4, zapne se VITE_GA_ID,
   vypínač v Nastavení); texty obchodu ve 12 jazycích docs/play/listing/; snímky s nápisy docs/play/snimek-1…8.
   Čeká: měřicí ID GA4 od uživatele, rozhodnutí o záloze do cloudu, propagace. Android běh č. 11.
+- Hospoda 70: záloha do cloudu „ta jednoduchá“ (přání uživatele): core/backup.ts zrcadlí uložení do @capacitor/preferences
+  (SharedPreferences → Android Auto Backup do Google účtu hráče), obnova při startu, když v telefonu žádná hra není
+  (main.ts await initBackup); „Začít znovu“ zálohu smaže (WIPED_KEY). Na telefonu neověřeno – ověřit přeinstalací.
+  Zásady soukromí doplněny. Návod pro nahrání do Play (pro přítelkyni uživatele): dokument
+  https://claude.ai/artifact/4ii5JVT8KbNuAvdoK5nh42 ; balík grafiky docs/play/obchod-grafika.zip.
+  Uživatel: nový build NEDÁVAT na testování, dokud není vše hotové (čeká: UI zjednodušení?, ID měření GA4, propagace).
+  Cloudová session se na prohlížeč uživatele nedostane (žádné Claude in Chrome ani složka z počítače) – jen hotové prompty.

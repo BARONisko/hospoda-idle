@@ -2,6 +2,7 @@ import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { initAdMob } from './core/admob';
 import { initBilling } from './core/billing';
+import { initBackup } from './core/backup';
 import Phaser from 'phaser';
 import '@fontsource/jersey-10/latin-ext-400.css';
 import '@fontsource/jersey-10/latin-400.css';
@@ -110,6 +111,8 @@ guard(Phaser.Game.prototype, 'step');
 }
 
 // Mobil na výšku: logické rozlišení 540×960 (9:16), roztažení na displej se zachováním poměru.
+// mobilní aplikace: po přeinstalaci / na novém telefonu obnovit hru ze zálohy Androidu – dřív, než se hra načte
+await initBackup();
 const game = new Phaser.Game({
   type: Phaser.WEBGL,
   parent: 'game',
