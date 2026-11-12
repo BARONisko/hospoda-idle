@@ -444,3 +444,7 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   společné s tileLock, Zpět: téma → seznam → Nastavení). Otevření ze skriptu: s.openHelp().
 - Hospoda 72: build Actions č. 12 (993205c) nahrán do uzavřeného testu, 17 změn odesláno Googlu ke kontrole (12. 11.). Předávka:
   handoff-2026-11-12b.md. Čeká: rozhodnutí o kríglech (bonus i z utracených?), bankovní účet, ověření na telefonu.
+- Hospoda 72: KRÍGLY – bonus výdělku (+0,9 %) dávají i utracené krígly (d.kSpent, PubScene.kAll(); převod uložení dopočítá útratu
+  z úrovní obchodu a reklamy). Nákup v obchodě už není krok zpět; rada „Za krígly si můžeš koupit“ bez omezení. Hygiena (7 %),
+  truhla a liga se dál počítají z držených. Simulace obchod za krígly nemodeluje (počítá, jako by hráč neutrácel) – dopad neměřen.
+  Ověřeno na snímcích ve vzhledu B: VIP host + pruh, rvačka, návštěvník, zlatý sud. Návrhy pozdních cílů: docs/navrhy-ui/krigly-cile/.

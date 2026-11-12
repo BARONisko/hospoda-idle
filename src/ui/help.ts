@@ -66,7 +66,7 @@ export const HELP: HelpTopic[] = [
   {
     title: t('Hygiena a krígly'),
     icon: ['obj', 'krigl0'],
-    text: t('Hygienu zavoláš v Obchodě. Zavře hospodu – coins, úrovně stanic a vylepšení začnou od nuly – a dá ti krígly: každý trvale zvýší výdělek. Čím víc v kole vyděláš, tím víc krígel dostaneš, a časem přibudou nové hospody. Krígly jde utratit v menu Krígly za trvalá vylepšení, utracené už ale bonus nedávají. Číšníci, kosti a výzdoba zůstávají.'),
+    text: t('Hygienu zavoláš v Obchodě. Zavře hospodu – coins, úrovně stanic a vylepšení začnou od nuly – a dá ti krígly: každý trvale zvýší výdělek. Čím víc v kole vyděláš, tím víc krígel dostaneš, a časem přibudou nové hospody. Krígly jde utratit v menu Krígly za trvalá vylepšení – bonus dávají dál i utracené. Číšníci, kosti a výzdoba zůstávají.'),
   },
   {
     title: t('Návštěvníci a VIP host'),

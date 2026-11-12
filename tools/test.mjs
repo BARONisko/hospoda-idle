@@ -196,6 +196,16 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     return won && lost;
   });
   ok('liga: výhra = postup, 💎, krígly a pohár; prohra = sestup bez poháru', lg);
+  // 5i0) krígly: utracené dál dávají bonus výdělku (hospoda 72)
+  ok('krígly: utracené dál dávají bonus', await S(p, (s) => {
+    s.d.krigle = 1000; s.d.kSpent = 0;
+    const all = s.kAll();
+    s.openShop('krigl', false);
+    for (const z of s.shopObjs.filter((o) => o.type === 'Zone').slice(2)) { if (s.d.krigle < 1000) break; z.emit('pointerdown'); z.emit('pointerup'); }
+    const spent = 1000 - s.d.krigle;
+    s.closeSheet?.();
+    return spent > 0 && s.d.kSpent === spent && s.kAll() === all;
+  }));
   // 5i2) liga: soupeř má jméno a hospodu (stejné celý týden) a sílu podle minulého týdne
   const lg2 = await S(p, (s) => {
     const L = s.league();

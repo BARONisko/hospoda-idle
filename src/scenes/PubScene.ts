@@ -286,6 +286,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         this.time.delayedCall(1500, () => this.views[0] && this.banner(this.views[0].cam, t('Číšníci prodáni – vráceno {n} coins. Najmi je znovu na Pípě.', { n: big(back) })));
       }
     }
+    // krígly (hospoda 72, přání uživatele): bonus výdělku dávají i utracené krígly → dopočítat, kolik hráč už utratil
+    // (obchod za krígly + Lepší reklama; vrácení bodů stromu se zpětně zjistit nedá)
+    if (this.d.kSpent === undefined) {
+      let sp = 0;
+      for (const it of KRIGL_SHOP) for (let l = 0; l < (this.d.kup?.[it.id] ?? 0); l++) sp += it.cost(l);
+      for (let l = 0; l < (this.d.adv?.lvl ?? 0); l++) sp += adLvlCost(l);
+      this.d.kSpent = Number.isFinite(sp) ? sp : 0;
+    }
     // skilly na rok (hospoda 63): starý strom 3×5 → nový velký strom; úroveň podle celkového XP na nové křivce, body se vrátí
     if (!this.d.sk2) {
       let tot = this.d.xp ?? 0;
@@ -1588,6 +1596,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     });
   }
 
+  /** krígly pro bonus výdělku: držené + utracené (utracené bonus neztrácí – nákup v obchodě už není krok zpět) */
+  kAll() {
+    return this.d.krigle + (this.d.kSpent ?? 0);
+  }
+
   // ---------- hostinský: úroveň a strom dovedností ----------
   private xp(n: number) {
     this.d.xp = (this.d.xp ?? 0) + n * (1 + this.ts().xp);
@@ -1794,6 +1807,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         ask(() => {
           if (this.d.krigle < rc) return sfx.error();
           this.d.krigle -= rc;
+          this.d.kSpent = (this.d.kSpent ?? 0) + rc;
           this.d.skR = (this.d.skR ?? 0) + 1;
           reset();
         });
@@ -2147,7 +2161,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (this.shopSub === 'bones') return this.bonesTab(y0, D);
     const offer = this.shopOffer().slice(0, 4);
     const k = this.kriglyNow();
-    const kv = { k: big(this.d.krigle), b: big(Math.round(this.d.krigle * KRIGL_BONUS * 100)), g: GEMS_FREE.prestige };
+    const kv = { k: big(this.d.krigle), b: big(Math.round(this.kAll() * KRIGL_BONUS * 100)), g: GEMS_FREE.prestige };
     this.row(y0, RH, D, t('Zavolat hygienu'), this.hygGemsLeft() > 0 ? t('krígly: {k} (+{b} % výdělek) · hygiena +{g} 💎', kv) : t('krígly: {k} (+{b} % výdělek) · 💎 zase zítra', kv), 'blood', PAL.sand);
     const pb = this.btn(W - 212, y0 + 12, 190, 62, () => this.askPrestige(), D + 2);
     this.hygBtn = pb;
@@ -2818,6 +2832,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const up = this.btn(118, y + 190, W - 146, 40, () => {
       if (this.d.krigle < cost) return;
       this.d.krigle -= cost;
+      this.d.kSpent = (this.d.kSpent ?? 0) + cost;
       a.lvl++;
       store(this.d);
       sfx.levelUp();
@@ -3350,9 +3365,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const off = this.shopOffer().find((o) => o.cost <= d.coins);
     if (off) return { text: t('V Obchodě si můžeš koupit: {s}.', { s: off.title }), go: open('shop', 'up') };
     if (!this.tileLock('krigl')) {
-      // QA (hospoda 67): rada vedla do pasti – každý utracený krígl bere trvalý bonus výdělku. Radit až od 50 krígel,
-      // jen věci za nejvýš 5 % vlastněných krígel a nikdy Delší spánek.
-      const it = d.krigle < 50 ? undefined : KRIGL_SHOP.find((x) => x.id !== 'offline' && !kMaxed(x, this.kl(x.id)) && x.cost(this.kl(x.id)) <= d.krigle * 0.05);
+      // hospoda 72: utracené krígly bonus výdělku neztrácejí → rada už není past (dřív jen od 50 krígel a do 5 % vlastněných)
+      const it = KRIGL_SHOP.find((x) => !kMaxed(x, this.kl(x.id)) && x.cost(this.kl(x.id)) <= d.krigle);
       if (it) return { text: t('Za krígly si můžeš koupit: {s}.', { s: it.name }), go: open('krigl') };
     }
     if (!this.tileLock('keeper') && this.skillPoints() > 0) return { text: t('Hostinský má volný bod – vyber dovednost.'), go: open('keeper') };
@@ -3658,7 +3672,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // návrh 2B (vybráno): před / po – krígly teď → po hygieně a kolikrát víc se bude vydělávat navždy
     tx(by + 20, t('Hygiena!'), 40, PAL.scarlet);
     tx(by + 70, t('zavře hospodu: coins, úrovně a vylepšení začnou od nuly'), 18, PAL.fog);
-    const cur = this.d.krigle * KRIGL_BONUS, nw = (this.d.krigle + k) * KRIGL_BONUS;
+    const cur = this.kAll() * KRIGL_BONUS, nw = (this.kAll() + k) * KRIGL_BONUS;
     const cy = by + 128;
     const side = (x: number, head: string, val: string, c: string) => {
       const h = this.add.text(x, cy, head, txt(22, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2);
@@ -4435,7 +4449,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.d.krigle) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * cupMult(this.d.league) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act) * ((p.adx?.[def.id] ?? 0) > Date.now() ? 2 : 1);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.kAll()) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * cupMult(this.d.league) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act) * ((p.adx?.[def.id] ?? 0) > Date.now() ? 2 : 1);
   }
 
   // ---------- obchod s krígly ----------
@@ -4790,8 +4804,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private kriglTab(y0: number, D: number) {
     const RH = 86;
     this.shopObjs.push(
-      this.add.text(20, y0 - 2, t('Máš {k} krígel (+{b} % výdělek)', { k: big(this.d.krigle), b: big(Math.round(this.d.krigle * KRIGL_BONUS * 100)) }), txt(22, PAL.gold)).setDepth(D + 1),
-      this.add.text(20, y0 + 24, t('Utracené krígly už bonus nedávají.'), txt(16, PAL.fog)).setDepth(D + 1),
+      this.add.text(20, y0 - 2, t('Máš {k} krígel (+{b} % výdělek)', { k: big(this.d.krigle), b: big(Math.round(this.kAll() * KRIGL_BONUS * 100)) }), txt(22, PAL.gold)).setDepth(D + 1),
+      this.add.text(20, y0 + 24, t('Bonus dávají i utracené krígly.'), txt(16, PAL.fog)).setDepth(D + 1),
     );
     const RH2 = 63;
     KRIGL_SHOP.forEach((it, i) => {
@@ -4804,6 +4818,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const b = this.btn(W - 172, y + 5, 150, 46, () => {
         if (max || this.d.krigle < price) return sfx.error();
         this.d.krigle -= price;
+        this.d.kSpent = (this.d.kSpent ?? 0) + price;
         (this.d.kup ??= {})[it.id] = lvl + 1;
         this.applyKup();
         sfx.fanfare();

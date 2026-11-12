@@ -54,6 +54,8 @@ export interface Save {
   ach: string[];
   /** obchod s krígly: úrovně koupených položek */
   kup?: Record<string, number>;
+  /** krígly utracené (obchod, reklama, vrácení bodů) – dál dávají bonus výdělku (hospoda 72) */
+  kSpent?: number;
   /** věrnost hostů: počet příchodů hostů (XP) */
   gxp?: number;
   /** obchod s krígly v2: vrácené krígly za starý Delší spánek a Štědré hosty */
