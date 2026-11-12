@@ -428,3 +428,17 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Uživatel: nový build NEDÁVAT na testování, dokud není vše hotové (čeká: UI zjednodušení?, ID měření GA4, propagace).
   Cloudová session se na prohlížeč uživatele nedostane (žádné Claude in Chrome ani složka z počítače) – jen hotové prompty.
 - Hospoda 70: 5 návrhů nového UI + 3 návrhy menu (makety) v docs/navrhy-ui/nove-ui/ – čeká na výběr uživatele. Předávka: handoff-2026-11-12.md.
+- Hospoda 72 (místní session na počítači uživatele, složka pub1 – Claude v Chromu funguje): Google Analytics založené, ID měření
+  G-R6F2PV2LM2 v obou workflow (VITE_GA_ID), zásady soukromí doplněny. Play Console: názvy a popisy ve 12 jazycích uložené (koncept),
+  Data safety + „Interakce s aplikací“ (analytika, volitelné), produkty/licence/IARC už hotové.
+- Hospoda 72: VZHLED B „Velká hospoda“ na hlavní obrazovce (výběr uživatele; musí být vidět celá šířka hospody = všechny 3 stoly):
+  horní lišta coins + příjem + 💎, hospoda výška 444, pilulky úkolu (ťuk = UKAŽ / VYBER) a hygieny, kolečka obsluhy v hospodě,
+  ×1/×10/MAX vpravo dole v hospodě, stanice 2×2 dlaždice (TILE_*), Den/kosti až od první noci. Menu beze změny (výběr uživatele).
+  Další návrhy F–K a M4–M9 jen uložené: docs/navrhy-ui/nove-ui/prehled-2.png.
+- Hospoda 72 (drobnosti, schváleno): Hostinský až po 2. hygieně (kdo už utrácel ve stromu, tomu zůstane); kratší texty průvodce;
+  Kostnice bez citátu, jen zesílené vlastnosti + tlačítko Vše (ossAll); Liga bez vysvětlující věty, karta výhry širší.
+  LIGA ODMĚNY (přání: kdo platí 💎, musí dostat víc): 30 💎 × liga (dřív 2 ×), krígly max(10 × liga, 1 % × liga z vlastněných),
+  Ligový pohár = výdělek +10 % × vyhraná liga po celý další týden (LeagueState.cup, cupMult v payout). Test 5i.
+  Snímky do obchodu přefocené s novým vzhledem (docs/play/snimek-1…8, zip).
+- Hospoda 72: nápověda „Jak to funguje“ v Nastavení (src/ui/help.ts, 22 témat, zamčená témata jen větou o odemčení, prahy MENU_HYG
+  společné s tileLock, Zpět: téma → seznam → Nastavení). Otevření ze skriptu: s.openHelp().
