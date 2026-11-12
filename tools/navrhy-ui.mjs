@@ -22,6 +22,8 @@ const ids = await p.$$eval('.scr[id]', (els) => els.map((e) => e.id));
 for (const id of ids) await p.locator('#' + id).screenshot({ path: `${out}/${id}.png` });
 const name = await p.evaluate(() => document.body.dataset.prehled || 'prehled');
 const p1 = await open(1);
-await p1.screenshot({ path: `${out}/${name}.png`, fullPage: true });
+// <body data-crop>: přehled oříznutý na obsah (sada 3), jinak celá stránka
+const crop = await p1.evaluate(() => (document.body.dataset.crop ? { x: 0, y: 0, width: Math.ceil(document.body.getBoundingClientRect().width), height: Math.ceil([...document.querySelectorAll('.row')].pop().getBoundingClientRect().bottom) + 24 } : null));
+await p1.screenshot({ path: `${out}/${name}.png`, ...(crop ? { clip: crop } : { fullPage: true }) });
 console.log('ok', ids.join(' '), name);
 await b.close();

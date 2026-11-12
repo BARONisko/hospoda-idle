@@ -2,6 +2,7 @@
 """Makety nového UI (hospoda 70, přání uživatele: 5 návrhů). Skládá HTML z výřezu hospody a spritů hry;
 obrázky z něj udělá tools/navrhy-ui.mjs. Použití: python3 tools/navrhy-ui.py <složka s podklady> <out.html> [sada]
 Sada 1 (výchozí): A–E + M1–M3 → prehled.png. Sada 2: F–K + M4–M9 (uživatel vybral B, chce další návrhy) → prehled-2.png.
+Sada 3: KA–KD pozdní cíle pro krígly → docs/navrhy-ui/krigly-cile/ (prehled-krigly.png).
 Podklady: pub.png (čistý výřez hospody 810×606) a složka spr/ (sprity vyvezené ze hry)."""
 import base64, io, math, sys
 from PIL import Image
@@ -618,15 +619,217 @@ CSS2 = '''
 .nx9 div{flex:1}.nx9 b{font-size:19px;font-weight:400;color:#f9c22b;display:block;line-height:1}.nx9 small{font-size:14px;margin:2px 0 5px}.nx9 i u{background:#f9c22b}
 '''
 
-if SADA == '2':
+# =====================================================================================================
+# Sada 3 (hospoda 72): pozdní cíle pro krígly – 4 návrhy (KA hospody za krígly, KB cechovní erby = 2. prestiž,
+# KC milníky krígel + Sláva hospody, KD slavnosti). Výstup: docs/navrhy-ui/krigly-cile/ (KA–KD.png, prehled-krigly.png).
+# Stav hráče na maketách: 3 hospody, 2,48M krígel. Pozor na pojmy: „pečeť“ už je v Chrámu (SEAL_BONUS) → měna KB jsou „erby“.
+# =====================================================================================================
+KR = '2.48M'
+
+
+def hud3():
+    return f'<div class="hd"><div class="coins">{spr("icons_coin", 2)}<div><b>8.42T coins</b><small>+1.93B / s</small></div></div><div class="gem2">💎 120<span>+</span></div></div>'
+
+
+def head3(title, right=None):
+    r = right if right is not None else f'<div class="kch">{fit("obj_krigl0", 26)}<b>{KR}</b></div>'
+    return f'<div class="h3"><div class="btn plum bk">← Menu</div><b>{title}</b>{r}</div>'
+
+
+def info3(how, gives):
+    return '<div class="inf"><div class="ih">JAK TO FUNGUJE</div><ul>' + ''.join(f'<li>{h}</li>' for h in how) + f'</ul><div class="ih g">CO TO HRÁČI DÁ</div><p>{gives}</p></div>'
+
+
+def kcost(v, cls=''):
+    return f'<span class="kc3 {cls}">{fit("obj_krigl0", 18)}{v}</span>'
+
+
+def erb(k=1.0):
+    return f'<span class="erb" style="width:{26 * k:.0f}px;height:{30 * k:.0f}px"><span>{fit("icons_mug", 16 * k)}</span></span>'
+
+
+# ---------- KA: další hospody za krígly ----------
+def prow(no, name, guests, filt, pos, state, price, sub):
+    g = ''.join(spr(x, 2) for x in guests)
+    th = f'<div class="th3" style="filter:{filt};background-position:{pos}"></div>'
+    if state == 'buy':
+        btn = f'<div class="btn green b3">KOUPIT{kcost(price)}</div>'
+    else:
+        btn = f'<div class="btn off b3">{spr("icons_lock", 1)}{kcost(price, "dim")}</div>'
+    bar = f'<i><u style="width:{sub}%"></u></i>' if state == 'lock' and sub else ''
+    return f'<div class="p3 {state}">{th}<div class="pt"><b>{no}. {name}</b><div class="gs">{g}<small>×10 výdělek<br>+20 % krígel</small></div>{bar}</div>{btn}</div>'
+
+
+owned = ''.join(f'<span>✓ {n}</span>' for n in ('Pajzl u Berana', 'Sklepní krčma', 'Žabákův podnik'))
+KA = hud3() + head3('Další hospody') + f'<div class="own"><small>MÁŠ 3 HOSPODY</small><div>{owned}</div></div>' + '<div class="pl3">' + \
+    prow(4, 'Hřbitovní hospoda', ('digger_0', 'ghost_0', 'skeleton_0'), 'grayscale(.75) hue-rotate(190deg) brightness(.75)', '-150px -120px', 'buy', '25K', 0) + \
+    prow(5, 'Ledová nálevna', ('frostbrewer_0', 'werewolf_0', 'monk_0'), 'hue-rotate(175deg) saturate(.8) brightness(1.15)', '-10px -40px', 'buy', '1M', 0) + \
+    prow(6, 'Cantina La Catrina', ('mariachi_0', 'catrinaSinger_0', 'muertos0_0'), 'hue-rotate(-28deg) saturate(1.7)', '-240px -130px', 'lock', '40M', 0) + \
+    prow(7, 'Přístavní krčma', ('captain_0', 'vodnik_0', 'deep0_0'), 'hue-rotate(125deg) saturate(.75) brightness(.8)', '-90px -180px', 'lock', '1.6B', 0) + \
+    '</div>' + \
+    info3(['Hospodu koupíš za krígly a zůstane ti i po hygieně.',
+           'Každá další je 40× dražší (25K, 1M, 40M, 1,6B, 64B …).',
+           'Utracené krígly se dál počítají do bonusu výdělku.'],
+          'Hospoda vydělává 10× víc než ta předchozí, přidá +20 % krígel z hygieny, nové prostředí, 6 nových hostů do Sbírky a vlastní názvy stanic.') + nav('menu')
+
+# ---------- KB: druhá prestiž – cechovní erby ----------
+TREE = [('obj_kegGold', 'Rychlý rozjezd', 'začínáš se všemi 3 hospodami', '1/1', None),
+        ('obj_krigl3', 'Plnější krígly', 'krígly z hygieny ×2', '1/5', 9),
+        ('obj_krigl0', 'Silnější krígl', '+1,0 % místo +0,9 % za krígl', '0/5', 8),
+        ('icons_clock', 'Hygiena sama', 'spustí se, jakmile se vyplatí', '0/1', 20),
+        ('icons_bag', 'Levný obchod', 'obchod za krígly −10 %', '0/5', 4),
+        ('obj_trophy', 'Mistr cechu', 'výdělek ×2, bez stropu', '2', 40)]
+
+
+def node3(ic, n, d, lv, c):
+    have = 7
+    if c is None:
+        b = '<div class="nb done">HOTOVO</div>'
+    else:
+        b = f'<div class="nb{" ok" if c <= have else ""}">{erb(.55)}{c}</div>'
+    return f'<div class="n3"><div class="nh">{fit(ic, 28)}<b>{n}</b></div><small>{d}</small><div class="nf"><span>úr. {lv}</span>{b}</div></div>'
+
+
+minis = ''.join(f'<div class="th3 mini" style="filter:{f};background-position:{p}"></div>' for f, p in (('none', '-150px -120px'), ('hue-rotate(215deg) saturate(.6) brightness(.7)', '-10px -40px'), ('hue-rotate(75deg) saturate(.8) brightness(.85)', '-240px -130px')))
+KB = hud3() + head3('Cech hostinských', f'<div class="kch">{erb(.75)}<b>7</b></div>') + \
+    f'<div class="sell"><div class="sr">{minis}<span class="ar">→</span>{erb(1.35)}<div class="sg"><b>+15 erbů</b><small>za {KR} krígel</small></div></div>' \
+    '<div class="btn amber sb">PRODAT ŘETĚZEC HOSPOD</div>' \
+    '<div class="kl"><span class="bad">Ztratíš: coins, stanice, krígly, obchod za krígly, 2. a 3. hospodu</span><span class="good">Zůstane: 💎, talismany, Hostinský, Kostnice, Pivovar, Chrám, Liga</span></div></div>' + \
+    '<div class="sh3"><small>CECHOVNÍ SÍŇ – TRVALÉ BONUSY</small><small>máš 7 erbů</small></div><div class="g3">' + ''.join(node3(*t) for t in TREE) + '</div>' + \
+    info3(['Od 1M krígel můžeš prodat celý řetězec. Erby = √(krígly ÷ 10K): za 1M je 10 erbů, za 100M 100 erbů.',
+           'Začneš znovu v Pajzlu, ale s bonusy z Cechovní síně.',
+           'Za erby kupuješ 6 trvalých bonusů v Cechovní síni.'],
+          'Nový dlouhý cíl nad hygienou: každé další kolo je rychlejší a krígly mají znovu cenu.') + nav('menu')
+
+# ---------- KC: milníky krígel + Sláva hospody ----------
+MS = [('1K', 'done', 'icons_star', 'Titul „Výčepní“', 'a dřevěný rámeček'),
+      ('10K', 'done', 'count_0', 'Vzácný host Hrabě', 'nechává 5× spropitné'),
+      ('100K', 'done', 'obj_tap_gold', 'Zlatá pípa', 'nový vzhled všech hospod'),
+      ('1M', 'done', 'obj_cCrown', 'Titul „Pan hostinský“', 'a zlatý rámeček'),
+      ('10M', 'next', 'yellowKing_0', 'Vzácný host Žlutý král', '2.48M / 10M krígel'),
+      ('100M', 'lock', 'obj_tap_crystal', 'Křišťálová pípa a stoly', ''),
+      ('1B', 'lock', 'obj_kegGold', 'Titul „Pivní baron“', '')]
+
+
+def ms3(v, st, ic, n, d):
+    lk = st == 'lock'
+    icon = fit(ic, 30, 'filter:brightness(0) invert(.75);opacity:.4' if lk else '')
+    end = {'done': '<span class="ck">✓</span>', 'next': '<span class="nx">DALŠÍ</span>', 'lock': spr('icons_lock', 1.5, 'opacity:.7')}[st]
+    bar = '<i><u style="width:25%"></u></i>' if st == 'next' else ''
+    return f'<div class="m3 {st}"><span class="mv">{v}</span><div class="mi">{icon}</div><div class="mt3"><b>{n}</b>{f"<small>{d}</small>" if d else ""}{bar}</div>{end}</div>'
+
+
+KC = hud3() + head3('Sláva hospody') + \
+    f'<div class="fame"><div class="por">{spr("player_0", 4)}</div><div class="fi"><small>Pan hostinský Beran</small><b>Sláva hospody 11</b><div class="stars">★★★★★★★★★★★</div>' \
+    '<i><u style="width:21%"></u></i><small class="fs">spropitné +11 % · další sláva při 4.1M krígel</small></div></div>' + \
+    '<div class="sh3"><small>MILNÍKY – CELKEM ZÍSKANÉ KRÍGLY</small><small>4 / 7</small></div><div class="ml3">' + ''.join(ms3(*m) for m in MS) + '</div>' + \
+    info3(['Počítají se všechny získané krígly, nic se neutrácí.',
+           'Každý 10× násobek odemkne titul, vzhled nebo hosta.',
+           'Sláva: +1 za každé zdvojnásobení krígel, bez stropu.'],
+          'Stále viditelný další cíl a čím se pochlubit – titul a rámeček uvidí i soupeři v Lize.') + nav('menu')
+
+# ---------- KD: slavnosti (opakovaná útrata krígel) ----------
+FE = [('obj_dVepro', 'Zabijačka', '2 %', '49.6K', 'výdělek ×2 na 8 h', 'green'),
+      ('obj_guitar', 'Koncert', '5 %', '124K', 'spropitné ×5 na 8 h<br>+ vzácný host', 'green'),
+      ('obj_kegGold', 'Korunovace sudu', '10 %', '248K', 'výdělek ×3 na 24 h<br>+10 💎 a talisman', 'amber')]
+fes = ''.join(f'<div class="f3"><div class="fic">{fit(ic, 40)}</div><div class="ft3"><b>{n}</b><small>{e}</small></div><div class="btn {c} fb3">{p} krígel{kcost(k)}</div></div>' for ic, n, p, k, e, c in FE)
+pips = ''.join(f'<s{" class=on" if i < 7 else ""}></s>' for i in range(10))
+KD = hud3() + head3('Slavnosti') + \
+    f'<div class="run3">{fit("obj_dFlag", 34)}<div><b>Dnes můžeš uspořádat 1 slavnost</b><small>hospoda bude vyzdobená a přijde víc hostů</small></div></div>' + \
+    f'<div class="fl3">{fes}</div>' + \
+    f'<div class="chr"><div class="ch1">{fit("icons_book", 30)}<div><b>Kronika slavností</b><small>uspořádáno 27 · trvale výdělek +10 %</small></div></div><div class="pp">{pips}<span>7 / 10 → dalších +5 %</span></div></div>' + \
+    info3(['Jednou denně uspořádáš slavnost. Stojí podíl tvých krígel (2, 5 nebo 10 %), takže má váhu s tisícem i s miliardou.',
+           'Po dobu slavnosti je hospoda vyzdobená, chodí víc hostů a platí její bonus.',
+           'Každá 10. slavnost zapíše do Kroniky trvalých +5 % výdělku.'],
+          'Krígly mají kam téct každý den a je důvod se vracet; drahá slavnost dá i 💎 a talisman.') + nav('menu')
+
+SCREENS3 = [('KA', 'Další hospody', '4., 5., 6. … hospoda se kupuje za krígly; každá má nové prostředí a hosty a vydělává 10× víc', KA),
+            ('KB', 'Cechovní erby', 'druhá prestiž: prodáš celý řetězec za erby a za ně kupuješ trvalé bonusy v Cechovní síni', KB),
+            ('KC', 'Milníky a Sláva', 'nic se neutrácí: za 1K, 10K … 1B získaných krígel jsou tituly, vzhledy a hosté, k tomu nekonečná Sláva', KC),
+            ('KD', 'Slavnosti', 'denní útrata: slavnost za podíl krígel dá na pár hodin velký bonus a plní Kroniku', KD)]
+
+CSS3 = '''
+.h3{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 8px;border-top:2px solid #f9c22b;flex:none}
+.h3>b{font-size:26px;color:#f9c22b;font-weight:400}
+.btn.bk{width:88px;height:36px;font-size:19px}
+.kch{min-width:88px;height:36px;border-radius:9px;background:#231a25;border:1px solid #f9c22b;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 8px}
+.kch b{font-size:21px;color:#f9c22b;font-weight:400}
+.kc3{display:inline-flex;align-items:center;gap:4px;justify-content:center}.kc3.dim{color:#cfc4d0}
+.inf{margin:0 8px 7px;background:#231a25;border:2px solid #f9c22b;border-radius:10px;padding:6px 10px 7px;flex:none}
+.ih{font-size:16px;color:#f9c22b;letter-spacing:1px;line-height:1.1}.ih.g{color:#1ebc73;margin-top:4px}
+.inf ul{list-style:none}.inf li{font-size:16.5px;line-height:1.02;padding-left:11px;position:relative;margin-top:3px;color:#f2e6d8}
+.inf li:before{content:"";position:absolute;left:0;top:6px;width:5px;height:5px;background:#f9c22b}
+.inf p{font-size:16.5px;line-height:1.02;color:#bff0d6;margin-top:2px}
+.sh3{display:flex;justify-content:space-between;padding:6px 12px 3px;flex:none}.sh3 small{font-size:15px;color:#9babb2}.sh3 small:last-child{color:#f9c22b}
+.th3{width:84px;height:56px;border-radius:7px;background-image:url(@PUB@);background-size:405px auto;image-rendering:pixelated;border:2px solid #f9c22b;flex:none}
+.th3.mini{width:44px;height:36px;border-width:1px;margin-right:-10px;box-shadow:2px 0 0 #231a25}
+.btn.off{background:#4a3f55;color:#cfc4d0;box-shadow:none;gap:5px}
+/* KA */
+.own{margin:0 8px;padding:5px 9px 7px;background:#3a2f3d;border-radius:10px;flex:none}.own small{font-size:14px;margin-bottom:4px}
+.own div{display:flex;justify-content:space-between}.own span{font-size:16px;color:#1ebc73;white-space:nowrap}
+.pl3{flex:1;display:flex;flex-direction:column;justify-content:space-evenly;padding:2px 8px;min-height:0}
+.p3{display:flex;align-items:center;gap:9px;background:#3a2f3d;border-radius:11px;padding:5px 6px 5px 6px;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.p3 .pt{flex:1;min-width:0}.p3 b{font-size:21px;font-weight:400;line-height:1;display:block;white-space:nowrap}
+.gs{display:flex;align-items:center;margin-top:3px}.gs img{margin-right:-4px}.gs small{font-size:14px;color:#f9c22b;margin-left:9px;line-height:.95;white-space:nowrap}
+.p3 i{height:5px;margin-top:3px}.p3 i u{background:#f9c22b}
+.btn.b3{width:86px;height:52px;font-size:18px;flex-direction:column;gap:2px}
+.p3.lock{background:#231a25;border:2px dashed #4a3f55;box-shadow:none}.p3.lock b{color:#cfc4d0}.p3.lock .th3{border-color:#4a3f55;opacity:.75}
+.more3{font-size:15px;color:#8d8194;text-align:center}
+/* KB */
+.erb{display:inline-flex;flex:none;background:#8a5a12;clip-path:polygon(0 0,100% 0,100% 62%,50% 100%,0 62%);padding:2px;position:relative}
+.erb>span{flex:1;display:flex;align-items:center;justify-content:center;background:linear-gradient(90deg,#f9c22b 50%,#f79617 50%);clip-path:polygon(0 0,100% 0,100% 61%,50% 100%,0 61%);padding-bottom:12%}
+.sell{margin:0 8px;background:#3a2f3d;border-radius:11px;padding:8px 9px;flex:none;border:2px solid #f79617}
+.sr{display:flex;align-items:center;justify-content:center}.sr .ar{font:26px Arial;color:#f9c22b;margin:0 16px 0 22px}
+.sg{margin-left:10px}.sg b{font-size:27px;color:#f9c22b;font-weight:400;line-height:.9;display:block}.sg small{font-size:15px;color:#cfc4d0}
+.btn.sb{height:44px;margin:7px 0 6px;font-size:22px;width:100%}
+.kl span{display:block;font-size:15px;line-height:1.05;white-space:nowrap}.kl .bad{color:#ff8f8f}.kl .good{color:#8fe8b8;margin-top:2px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;padding:0 8px;flex:1;min-height:0;margin-bottom:6px}
+.n3{background:#3a2f3d;border-radius:10px;padding:5px 6px;display:flex;flex-direction:column;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.nh{display:flex;align-items:center;gap:5px;height:30px}.nh b{font-size:17px;font-weight:400;line-height:.9}
+.n3>small{font-size:14px;color:#cfc4d0;line-height:.98;margin-top:2px}
+.nf{margin-top:auto;display:flex;align-items:center;justify-content:space-between}.nf span{font-size:14px;color:#9babb2}
+.nb{height:26px;min-width:50px;border-radius:7px;background:#4a3f55;color:#cfc4d0;font-size:17px;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 6px}
+.nb.ok{background:#1e9e68;color:#fff;box-shadow:inset 0 5px 0 rgba(255,255,255,.16)}.nb.done{background:none;color:#1ebc73;font-size:15px;padding:0}
+/* KC */
+.fame{margin:0 8px;background:#3a2f3d;border-radius:11px;padding:6px 10px;display:flex;gap:11px;align-items:center;flex:none}
+.por{width:76px;height:76px;flex:none;background:#231a25;border:4px solid #f9c22b;box-shadow:0 0 0 2px #8a5a12,inset 0 0 0 2px #8a5a12;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.fi{flex:1}.fi small{font-size:15px;color:#cfc4d0}.fi b{font-size:26px;color:#f9c22b;font-weight:400;line-height:1;display:block}
+.stars{font:11px Arial;color:#f9c22b;letter-spacing:1px;margin:1px 0 4px}.fi i{height:7px}.fi i u{background:#f9c22b}.fi .fs{margin-top:4px;font-size:14px}
+.ml3{flex:1;display:flex;flex-direction:column;justify-content:space-evenly;padding:0 8px 4px;min-height:0;position:relative}
+.ml3:before{content:"";position:absolute;left:33px;top:14px;bottom:18px;width:3px;background:#4a3f55}
+.m3{display:flex;align-items:center;gap:8px;height:34px;position:relative}
+.mv{width:52px;height:24px;border-radius:12px;background:#4a3f55;color:#cfc4d0;font-size:17px;display:flex;align-items:center;justify-content:center;flex:none;z-index:1}
+.m3.done .mv{background:#1e9e68;color:#fff}.m3.next .mv{background:#f79617;color:#2e222f}
+.mi{width:32px;height:32px;border-radius:8px;background:#231a25;display:flex;align-items:center;justify-content:center;flex:none}
+.mt3{flex:1;min-width:0}.mt3 b{font-size:19px;font-weight:400;line-height:1;display:block;white-space:nowrap}.mt3 small{font-size:14px;color:#cfc4d0;line-height:1}
+.m3.lock b{color:#9babb2}.m3.next{background:#3a2f3d;border:2px solid #f9c22b;border-radius:10px;height:46px;margin:0 -4px;padding:0 6px 0 2px}.m3.next b{color:#f9c22b}
+.m3 i{height:4px;margin-top:2px;width:150px}.m3 i u{background:#f9c22b}
+.ck{color:#1ebc73;font:bold 17px Arial;width:26px;text-align:center}.nx{background:#f79617;color:#2e222f;font-size:15px;border-radius:7px;padding:1px 6px}
+/* KD */
+.run3{margin:0 8px;background:#3a2f3d;border-radius:11px;padding:7px 10px;display:flex;gap:10px;align-items:center;flex:none}
+.run3 b{font-size:20px;color:#f9c22b;font-weight:400;line-height:1;display:block}.run3 small{font-size:14px;color:#cfc4d0;margin-top:2px}
+.fl3{flex:1;display:flex;flex-direction:column;justify-content:space-evenly;padding:3px 8px;min-height:0}
+.f3{display:flex;align-items:center;gap:9px;background:#3a2f3d;border-radius:11px;padding:6px;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.fic{width:50px;height:50px;border-radius:9px;background:#231a25;display:flex;align-items:center;justify-content:center;flex:none}
+.ft3{flex:1;min-width:0}.ft3 b{font-size:22px;font-weight:400;line-height:1;display:block}.ft3 small{font-size:15px;color:#f9c22b;line-height:1;margin-top:3px}
+.btn.fb3{width:104px;height:52px;font-size:17px;flex-direction:column;gap:1px}
+.chr{margin:0 8px 6px;background:#231a25;border:2px dashed #6a5f70;border-radius:11px;padding:6px 9px;flex:none}
+.ch1{display:flex;gap:9px;align-items:center}.ch1 b{font-size:19px;font-weight:400;line-height:1;display:block}.ch1 small{font-size:14px;color:#1ebc73;margin-top:1px}
+.pp{display:flex;align-items:center;gap:4px;margin-top:5px}.pp s{width:17px;height:9px;border-radius:3px;background:#4a3f55}.pp s.on{background:#f9c22b}.pp span{font-size:14px;color:#cfc4d0;margin-left:6px}
+'''
+
+if SADA == '3':
+    SCREENS, CSS, PREHLED = SCREENS3, CSS + (CSS2 % ()).replace('@CLEAN@', clean_pub()) + CSS3.replace('@PUB@', PUB), 'prehled-krigly'
+    ROWS = (SCREENS,)
+elif SADA == '2':
     SCREENS, CSS, PREHLED = SCREENS2, CSS + (CSS2 % ()).replace('@CLEAN@', clean_pub()), 'prehled-2'
     ROWS = (SCREENS[:6], SCREENS[6:])
 else:
     PREHLED, ROWS = 'prehled', (SCREENS[:5], SCREENS[5:])
 
-html = f'<html><head><meta charset="utf-8"><style>{CSS}</style></head><body data-prehled="{PREHLED}">'
+html = f'<html><head><meta charset="utf-8"><style>{CSS}</style></head><body data-prehled="{PREHLED}"{' data-crop="1"' if SADA == '3' else ''}>'
 for part in ROWS:
-    html += '<div class="row">' + ''.join(f'<div class="col"><div class="cap"><h2>{k} – {t}</h2><p>{d}</p></div><div class="scr" id="{k}">{body}</div></div>' for k, t, d, body in part) + '</div>'
+    html += '<div class="row">' + ''.join(f'<div class="col"><div class="cap"><h2>{k[-1] if SADA == '3' else k} – {t}</h2><p>{d}</p></div><div class="scr" id="{k}">{body}</div></div>' for k, t, d, body in part) + '</div>'
 html += '</body></html>'
 open(OUT, 'w', encoding='utf-8').write(html)
 print('ok', len(html) // 1024, 'kB')
