@@ -25,6 +25,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          VITE_GA_ID: ${{ vars.GA_ID || 'G-R6F2PV2LM2' }}
       - run: npm run build:offline
       # hratelná složka HRA/ přímo v repu (stažené repo → HRA/index.html dvojklikem); commit tokenem Actions nespouští další běh
       - name: Aktualizovat složku HRA v repu

@@ -24,6 +24,7 @@ jobs:
       - run: npm run build
         env:
           VITE_ADMOB_REWARDED: ${{ vars.ADMOB_REWARDED || 'ca-app-pub-8006969045918894/9741456666' }}
+          VITE_GA_ID: ${{ vars.GA_ID || 'G-R6F2PV2LM2' }}
       - run: npx cap sync android
       - name: Klíč pro podpis
         env:
