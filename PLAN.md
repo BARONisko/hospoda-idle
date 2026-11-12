@@ -410,3 +410,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   (cs beze změny); štamgasti a postavy v překladech: en Rusty, Fred, Granny Mabel, Doctor Smith, Jake, Uncle Bob,
   Casey, Mr. Waters, Landlord Barney („Barney's Dive“), Vic; ostatní jazyky obdobně (pl Nowak, Wacek, Baran; ru
   Петров, Вадик; ja 山田, クマ; …). Snímky pro Play znovu nafocené. Android běh č. 10.
+- Hospoda 70 (kontrola oblíbenosti, robot-hráč 14 min + všechny obrazovky): nálezy a návrhy v QA-NALEZY.md (konec) – upozornění na
+  Androidu nefungují (chybí plugin), návštěvník trestá nového hráče, past „číšníci nestíhají“, chybí hodnocení v obchodě, název a
+  snímky v obchodě. Čeká na rozhodnutí uživatele, co z toho udělat.

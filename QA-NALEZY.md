@@ -53,3 +53,22 @@ Seřazeno podle důležitosti; [R] = rozhodnutí uživatele / návrh na snímcí
 - [R] 💎 za hygienu (+2) bez limitu (zapálený ~12 💎/h). Zlatá truhla 10 % krígel = složený úrok ~×1800/rok.
 - [HOTOVO h69] big(): big(999999999999999) → „0.99aa“, big(9.99) → „10.0“, big(NaN) → „∞“ (num.ts:11).
 - Po 1. dni žádná nová hospoda (MAX_PUBS = 3) – dlouhodobé cíle jen strom, liga, mistrovství.
+
+# Kontrola „bude to oblíbené?“ (hospoda 70, 2026-11-12) – robot-hráč 14 min anglicky, všechny obrazovky, simulace
+Seřazeno podle dopadu na udržení hráčů. [R] = čeká na rozhodnutí uživatele.
+- [R] **Upozornění na Androidu nefungují**: v balíčku chybí @capacitor/local-notifications (android/app/capacitor.build.gradle má jen
+  admob, app, native-purchases) → notify.available = false, řádek v Nastavení se v aplikaci vůbec neukáže. Přidat plugin + povolení.
+- [R] **Návštěvník trestá nového hráče**: první návštěvník přijde vždy 120 s po startu (visitT = 120), náhodně z 5. Hygienik: úplatek
+  = výdělek za 120 s (aktivní hráč ho nikdy nemá, „chybí 5,46K“), Riskovat = 50 % ztráta min(coins, výdělek za 300 s) = všech coins.
+  Muž v kabátě: „chybí 128K“. Návrh: do 1. hygieny jen návštěvníci bez ztráty; cena nejvýš polovina coins; pokuta nejvýš 30 % coins.
+- [R] **Past „bar plný – číšníci nestíhají“**: od 3. do 10. minuty robot kupoval úrovně pípy/kuchyně a výdělek stál (706 → 772 /s),
+  protože 3. číšník (400 coins) a body číšníků jsou schované v malých kolečkách bez popisu a žádný úkol na ně nevede.
+  Návrh: úkol „Najmi 3. číšníka“ + šipka, při plném baru tlačítko na kartě pípy „Číšníci“ místo zbytečného +1.
+- [R] Chybí výzva k hodnocení v obchodě (Play In-App Review) – po 3. hygieně / 2. den.
+- [R] Název v obchodě „Pajzl Tycoon“ anglicky nikdo nehledá → „P.U.B. Idle: Pub Tycoon“; popis obchodu přeložit do všech 11 jazyků hry.
+- [R] Snímky v obchodě bez titulků (tmavé, hodně textu) – přidat velký nápis nad každý snímek.
+- [R] Žádné měření (analytika) – po vydání nepůjde poznat, kde hráči odcházejí. Žádná záloha do cloudu (jen ruční Uložit/Nahrát).
+- [HOTOVO h70] Okno po návratu psalo o soupeři v lize, i když je liga zamčená (do 20. hygieny). npm run sim po jménech podle jazyka.
+- V pořádku: návod 45–70 s bez zaseknutí, 14 min hry bez chyby v konzoli, 26 obrazovek anglicky bez přetečení, okno po návratu (×2 za
+  reklamu), potvrzení hygieny, první noc, nová hospoda; skript 6–7 % jádra, 20 MB paměti; první hygiena ~9 min (sim).
+- Neověřeno (jen na telefonu): reklamy, nákupy, tlačítko Zpět, zvuk, výkon na slabém telefonu.
