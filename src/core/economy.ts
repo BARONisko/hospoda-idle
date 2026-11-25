@@ -213,7 +213,14 @@ export const MENU_HYG: Record<string, number> = { krigl: 1, brew: 4, temple: 11,
  *  laťka = potřebná tržba, která s každou hygienou roste o ~31 % (1,07^4). Dřív 7 % držených krígel (≈ stejné tempo bez utrácení). */
 export const PRESTIGE_GROW = 1.07;
 export const PRESTIGE_AT = 14;
-export const prestigeMin = (prestiges: number) => (prestiges > 0 ? Math.max(PRESTIGE_MIN, Math.ceil(PRESTIGE_MIN * PRESTIGE_GROW ** (prestiges - PRESTIGE_AT))) : PRESTIGE_FIRST);
+/** od 70. hygieny laťka roste jen o 2 % (25. 11. 2026, plán „hra na rok“: se 7 % měl běžný hráč 60h kolo už 86. den,
+ *  s 2 % až kolem 365. dne – tools/sim/days.mjs REKO=1) */
+export const PRESTIGE_LATE = 70;
+export const PRESTIGE_GROW_LATE = 1.02;
+export const prestigeMin = (prestiges: number) =>
+  prestiges > 0
+    ? Math.max(PRESTIGE_MIN, Math.ceil(PRESTIGE_MIN * PRESTIGE_GROW ** (Math.min(prestiges, PRESTIGE_LATE) - PRESTIGE_AT) * PRESTIGE_GROW_LATE ** Math.max(0, prestiges - PRESTIGE_LATE)))
+    : PRESTIGE_FIRST;
 /** k hygieně ještě celoživotní výdělek (coins) – přání uživatele 25. 11.: „odemykat hygienou a k tomu výdělkem“ */
 // prahy ≈ celoživotní výdělek kousek za danou hygienou (tools/sim/days.mjs: brew 4. hyg. 1,7e9, Chrám 11. 7,4e9, výzdoba 20. 2,3e10,
 // šipky 30. 2,4e11, liga 40. 3,2e12) → kdo jde na hygienu co nejdřív, dostane novinku až uprostřed dalšího kola
