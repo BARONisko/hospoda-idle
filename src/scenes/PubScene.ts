@@ -38,11 +38,13 @@ import { mastStage, mastRank, mastProg, RANKS, RANK_COLORS, MAST_MAX } from '../
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave, wipe } from '../core/save';
 import { PubView, LOOK, REKO, livery } from '../game/PubView';
-import { RekoState, REKO_HYG, REKO_OFFLINE_H, REKO_STARS, newReko, rekoCount, rekoMax, nextTask, rekoReady, chapter, taskProg, taskDone, rekoStar, RekoTask } from '../core/reko';
+import { RekoState, REKO_HYG, REKO_OFFLINE_H, REKO_STARS, REKO_GOLD, newReko, rekoCount, rekoMax, nextTask, rekoReady, chapter, taskProg, taskDone, rekoStar, RekoTask } from '../core/reko';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
 import { GUESTS } from '../game/PubView';
 import { QUESTS, QCtx, QuestDef, currentQuest, questDone } from '../core/quests';
 import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today, WeekKind, newWeekly, weekId, weekNum, weekText, GOLD_WEEK_X, GOLD_WEEK_GEMS } from '../core/goals';
+/** hvězdičky podniku: do ★5 pět políček, pak deset */
+const rkStars = (n: number) => '★'.repeat(n) + '☆'.repeat((n >= 5 ? 10 : 5) - n);
 
 const W = 540;
 /** kolik talířů z kuchyně může čekat na číšníky */
@@ -2603,8 +2605,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const R = this.rk();
     if (R) {
       const ks = chapter(R.star + 1), nd = ks.filter((k) => R.done.includes(k.id)).length, rd = ks.some((k) => !R.done.includes(k.id) && taskDone(k, this.d, R));
-      const stars = '★'.repeat(R.star) + '☆'.repeat(REKO_STARS - R.star);
-      this.row(y1, RH, D, t('Kniha hostinského {s}', { s: stars }), R.star >= REKO_STARS ? t('pětihvězdičkový podnik') : rekoReady(R) ? t('kapitola hotová: Rekonstrukce ★{n}', { n: R.star + 1 }) : t('kapitola ★{n}: {a} / {b} úkolů', { n: R.star + 1, a: nd, b: ks.length }), 'maroon', PAL.gold);
+      const stars = rkStars(R.star);
+      this.row(y1, RH, D, t('Kniha hostinského {s}', { s: stars }), R.star >= REKO_STARS ? t('legendární podnik') : rekoReady(R) ? t('kapitola hotová: Rekonstrukce ★{n}', { n: R.star + 1 }) : t('kapitola ★{n}: {a} / {b} úkolů', { n: R.star + 1, a: nd, b: ks.length }), 'maroon', PAL.gold);
       const b = this.btn(W - 172, y1 + 10, 150, 54, () => this.rekoBook(), D + 2);
       this.drawBtn(b, t('Otevřít'), true, rd || rekoReady(R) ? 'green' : 'amber');
       this.shopObjs.push(b.bg, b.label, b.zone);
@@ -4895,7 +4897,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     });
     this.pubTabs.forEach((b, j) => {
       // ★5 Rekonstrukce: zlatý štít podniku (zlatý rám záložky a hvězda u jména)
-      const gold = (this.d.reko?.star ?? 0) >= REKO_STARS;
+      const gold = (this.d.reko?.star ?? 0) >= REKO_GOLD;
       this.drawBtn(b, PUB_NAMES[this.d.pubs[j].act] + (gold ? ' ★' : ''), true, j === i ? 'amber' : 'slate');
       if (gold) b.bg.lineStyle(3, col('gold')).strokeRoundedRect(b.x + 1, b.y + 1, b.w - 2, b.h - 2, 10);
       b.label.setY(b.y + 16).setFontSize(18).setScale(Math.min(1, (b.w - 10) / b.label.width));
@@ -6261,13 +6263,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     R.done.push(k.id);
     const n = this.qReward();
     this.d.coins += n;
-    this.d.gems = (this.d.gems ?? 0) + GEMS_FREE.quest;
+    this.d.gems = (this.d.gems ?? 0) + GEMS_FREE.quest + (k.gift?.gems ?? 0);
+    if (k.gift?.bones) this.d.bones = (this.d.bones ?? 0) + k.gift.bones;
     meter.track('reko_task', { id: k.id, star: R.star });
     this.views.forEach((v) => v.rekoRefresh(true));
     sfx.fanfare();
     this.banner(this.views[0].cam, t('Kniha hostinského: {w}!', { w: k.what() }) + '\n' + t('+{n} coins a +{g} 💎', { n: big(n), g: GEMS_FREE.quest }));
     // kousek je v Pajzlu / Sklepní krčmě → ukázat tu hospodu
-    const pi = this.d.pubs.findIndex((p) => p.act === k.item.act);
+    const pi = k.item ? this.d.pubs.findIndex((p) => p.act === k.item!.act) : -1;
     if (pi >= 0 && this.views.length > 1 && pi !== this.sel && !this.shopObjs.length) this.selectPub?.(pi);
     if (rekoReady(R)) this.time.delayedCall(1800, () => this.banner(this.views[0].cam, t('Kapitola hotová: můžeš zavolat Rekonstrukci ★{n}!', { n: R.star + 1 })));
     store(this.d);
@@ -6275,7 +6278,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** co přinese hvězdička */
   private rekoGift(star: number) {
-    return [t('nový vzhled Pajzlu'), t('pátá stanice v každé hospodě'), t('další kapitola Knihy'), t('kasa offline o {h} h déle', { h: REKO_OFFLINE_H }), t('zlatý štít podniku')][star - 1] ?? '';
+    return [t('nový vzhled Pajzlu'), t('pátá stanice v každé hospodě'), t('další kapitola Knihy'), t('kasa offline o {h} h déle', { h: REKO_OFFLINE_H }), t('zlatý štít podniku'), t('svatba v hospodě (nová událost)'), t('zlaté stanice od hodnosti Mistr'), t('relikvie z Chrámu'), t('vzácní hosté do Sbírky'), t('trůn hostinského')][star - 1] ?? '';
   }
 
   /** Kniha hostinského: úkoly kapitoly (okno přes obrazovku) */
@@ -6297,11 +6300,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     g.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
     g.lineStyle(4, col('gold')).strokeRoundedRect(bx, by, bw, bh, 16);
     objs.push(g);
-    const stars = '★'.repeat(R.star) + '☆'.repeat(REKO_STARS - R.star);
+    const stars = rkStars(R.star);
     objs.push(this.add.text(W / 2, by + 16, t('Kniha hostinského'), txt(34, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 2));
     objs.push(this.add.text(W / 2, by + 58, t('Podnik: {s}', { s: stars }), txt(22, PAL.sand)).setOrigin(0.5, 0).setDepth(D + 2));
     if (R.star >= REKO_STARS) {
-      objs.push(this.add.text(W / 2, by + 110, t('Všech {n} hvězdiček! Pětihvězdičkový podnik.', { n: REKO_STARS }), txt(24, PAL.mint)).setOrigin(0.5, 0).setDepth(D + 2).setWordWrapWidth(bw - 40).setAlign('center'));
+      objs.push(this.add.text(W / 2, by + 110, t('Všech {n} hvězdiček! Legendární podnik.', { n: REKO_STARS }), txt(24, PAL.mint)).setOrigin(0.5, 0).setDepth(D + 2).setWordWrapWidth(bw - 40).setAlign('center'));
     } else {
       objs.push(this.add.text(W / 2, by + 88, t('Kapitola ★{n} · za Rekonstrukci: {g}', { n: star, g: this.rekoGift(star) }), txt(18, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2).setWordWrapWidth(bw - 40).setAlign('center'));
       ks.forEach((k, i) => {

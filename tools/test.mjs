@@ -357,6 +357,15 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     const r0 = s.rate(s.d.pubs[0]); s.d.pubs[0].st.pool.auto = true; const earns = s.rate(s.d.pubs[0]) > r0;
     return (c && c.narrow && c.y + c.h <= 960 - 84 && opened && earns && s.views[0].cam.height < 444) || JSON.stringify({ c: !!c, opened, earns });
   }).then((r) => (r !== true && console.log(r), r)) === true);
+  ok('★6: úkol bez kousku dá kosti a 💎, kapitola ★6 v Knize', await S(p, async (s) => {
+    const RK = await import('/src/core/reko.ts'); const R = s.d.reko;
+    R.star = 5; R.done = RK.REKO_TASKS.filter((k) => k.star <= 5).map((k) => k.id); R.c = {};
+    const b0 = s.d.bones ?? 0, g0 = s.d.gems ?? 0;
+    s.task('tips', 1500); const k = RK.REKO_TASKS.find((x) => x.id === 't26'); s.rekoClaim(k);
+    const got = R.done.includes('t26') && (s.d.bones ?? 0) === b0 + 2000 && (s.d.gems ?? 0) > g0;
+    s.rekoBook(); const book = s.awayObjs.length > 20; s.awayClose();
+    return (got && book && RK.chapter(10).length === 6) || JSON.stringify({ got, book });
+  }).then((r) => (r !== true && console.log(r), r)) === true);
   ok('bez chyb v konzoli (Rekonstrukce)', p.errors.length === 0);
   if (p.errors.length) console.log(p.errors);
   await p.close();

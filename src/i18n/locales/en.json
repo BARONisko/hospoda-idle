@@ -1610,5 +1610,16 @@
  "cloud: uloženo před {n} min": "cloud: saved {n} min ago",
  "Uloženo v cloudu Google Play": "Saved to Google Play cloud",
  "Přihlásit": "Sign in",
- "Žebříček Chrámu": "Temple leaderboard"
+ "Žebříček Chrámu": "Temple leaderboard",
+ "Hodnost {r} na {n} stanicích": "Rank {r} at {n} stations",
+ "Zavolej {n} hygien": "Call {n} inspections",
+ "Vylepši talismany o {n} úrovní": "Upgrade talismans by {n} levels",
+ "Splň {n} týdenní výzev": "Complete {n} weekly challenges",
+ "legendární podnik": "legendary establishment",
+ "svatba v hospodě (nová událost)": "a wedding in the pub (new event)",
+ "zlaté stanice od hodnosti Mistr": "golden stations from rank Master",
+ "relikvie z Chrámu": "relics from the Temple",
+ "vzácní hosté do Sbírky": "rare guests for the Collection",
+ "trůn hostinského": "the innkeeper's throne",
+ "Všech {n} hvězdiček! Legendární podnik.": "All {n} stars! A legendary establishment."
 }

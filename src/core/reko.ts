@@ -2,6 +2,8 @@
 // Od Ligy (40. hygiena) pokračují úkoly hostinského po kapitolách. Každý splněný úkol přidá do hospody kousek
 // nábytku nebo výzdoby; po všech úkolech kapitoly se dá zavolat Rekonstrukce = hygiena, která přidá hvězdičku podniku.
 // Hvězdy: ★1 nový vzhled Pajzlu, ★2 pátá stanice, ★3 jen výzdoba, ★4 kasa offline +2 h, ★5 zlatý štít podniku.
+// ★6–★10 (plán „hra na rok“, 25. 11. 2026): úkoly dávají kosti/💎 místo nábytku; hvězdy přinesou svatbu, zlaté stanice,
+// relikvie z Chrámu, vzácné hosty a trůn hostinského (zavádí se postupně, běžný hráč ★6 až kolem 135. dne).
 // Krígly ani obchod s krígly Rekonstrukce nesmaže (bez simulace by tvrdý reset hráče v pozdní hře zastavil na dny).
 import { t } from '../i18n';
 import { mastStage, mastRank } from './mastery';
@@ -27,7 +29,9 @@ export interface RekoState {
 
 /** od kolikáté hygieny se Kniha otevře (stejně jako Liga) */
 export const REKO_HYG = 40;
-export const REKO_STARS = 5;
+export const REKO_STARS = 10;
+/** ★5 = zlatý štít podniku (původní konec Knihy) */
+export const REKO_GOLD = 5;
 /** ★4: kasa offline o 2 h déle */
 export const REKO_OFFLINE_H = 2;
 
@@ -35,6 +39,8 @@ const talSum = (d: Save) => Object.values(d.talis ?? {}).reduce((a, b) => a + b,
 const lvl = (d: Save, id: string) => Math.max(0, ...d.pubs.map((p) => p.st[id]?.lvl ?? 0));
 const maxD = (d: Save) => d.temple?.maxD ?? 1;
 const rank = (d: Save, id: string) => mastRank(mastStage(d.mast?.[id] ?? 0)).rank;
+const STN = ['tap', 'kitchen', 'cellar', 'dice'];
+const big = (n: number) => n.toLocaleString('cs-CZ').replace(/\s/g, ' ');
 
 export function newReko(d: Save): RekoState {
   return { star: 0, done: [], c: {}, s0: { gxp: d.gxp ?? 0, tal: talSum(d) } };
@@ -59,9 +65,12 @@ export interface RekoTask {
   text: () => string;
   goal: number;
   prog: (d: Save, R: RekoState) => number;
-  /** co se v hospodě změní */
+  /** co se v hospodě změní (nebo co hráč dostane) */
   what: () => string;
-  item: RekoItem;
+  /** kousek v hospodě (★1–★5); ★6–★10 místo něj dárek */
+  item?: RekoItem;
+  /** ★6–★10: dárek za úkol navíc k coins a 💎 */
+  gift?: { bones?: number; gems?: number };
 }
 
 const T = 16;
@@ -116,6 +125,41 @@ export const REKO_TASKS: RekoTask[] = [
   { id: 't25', star: 5, text: () => t('Hodnost {r} na všech 4 stanicích', { r: t('Mistr') }), goal: 4, prog: (d) => ['tap', 'kitchen', 'cellar', 'dice'].filter((s) => rank(d, s) >= 2).length, what: () => t('Zlaté dveře do sklepa'), item: wall('gateDoorOpen', 12) },
   { id: 't25b', star: 5, text: () => t('Poraz Cthulhu na obtížnost {d}', { d: 'VI' }), goal: 1, prog: (d) => (maxD(d) > 6 ? 1 : 0), what: () => t('Cthulhuova koruna nad barem'), item: wall('cCrown', 5.5) },
   { id: 't25c', star: 5, text: () => t('{n} talismanů na úrovni {l}', { n: 8, l: 5 }), goal: 8, prog: (d) => Object.values(d.talis ?? {}).filter((v) => v >= 5).length, what: () => t('Vitrína s talismany se zlatým světlem'), item: floor('necroCaseLit', 16, 8) },
+  // ★6 Svatba v hospodě
+  { id: 't26', star: 6, text: () => t('Obslouž {n} bublin', { n: 1500 }), goal: 1500, prog: c('tips'), what: () => t('+{n} kostí', { n: big(2000) }), gift: { bones: 2000 } },
+  { id: 't27', star: 6, text: () => t('Zvládni {n} událostí', { n: 120 }), goal: 120, prog: c('events'), what: () => t('+{n} 💎', { n: 20 }), gift: { gems: 20 } },
+  { id: 't28', star: 6, text: () => t('Uvař a prodej {n} piv', { n: 200 }), goal: 200, prog: c('beer'), what: () => t('+{n} kostí', { n: big(2000) }), gift: { bones: 2000 } },
+  { id: 't29', star: 6, text: () => t('Vyhraj ligu {n}×', { n: 3 }), goal: 3, prog: c('lg'), what: () => t('+{n} 💎', { n: 20 }), gift: { gems: 20 } },
+  { id: 't30', star: 6, text: () => t('Rozežeň {n} rvaček', { n: 30 }), goal: 30, prog: c('brawls'), what: () => t('+{n} kostí', { n: big(3000) }), gift: { bones: 3000 } },
+  { id: 't31', star: 6, text: () => t('Obslouž {n} bublin za jeden den', { n: 300 }), goal: 300, prog: day('tips'), what: () => t('+{n} 💎', { n: 30 }), gift: { gems: 30 } },
+  // ★7 Zlaté stanice
+  { id: 't32', star: 7, text: () => t('Nasbírej {n} kostí', { n: '20 000' }), goal: 20000, prog: c('bones'), what: () => t('+{n} 💎', { n: 25 }), gift: { gems: 25 } },
+  { id: 't33', star: 7, text: () => t('Vyber v noci {n} spropitných za jeden den', { n: 80 }), goal: 80, prog: day('night'), what: () => t('+{n} kostí', { n: big(4000) }), gift: { bones: 4000 } },
+  { id: 't34', star: 7, text: () => t('Dohraj {n} her šipek', { n: 50 }), goal: 50, prog: c('darts'), what: () => t('+{n} 💎', { n: 25 }), gift: { gems: 25 } },
+  { id: 't35', star: 7, text: () => t('Hodnost {r} na {n} stanicích', { r: t('Velmistr'), n: 2 }), goal: 2, prog: (d) => STN.filter((s) => rank(d, s) >= 3).length, what: () => t('+{n} kostí', { n: big(5000) }), gift: { bones: 5000 } },
+  { id: 't36', star: 7, text: () => t('Vyřeš {n} návštěvníků', { n: 25 }), goal: 25, prog: c('visitors'), what: () => t('+{n} 💎', { n: 25 }), gift: { gems: 25 } },
+  { id: 't37', star: 7, text: () => t('Obslouž {n} VIP hostů', { n: 15 }), goal: 15, prog: c('vip'), what: () => t('+{n} kostí', { n: big(5000) }), gift: { bones: 5000 } },
+  // ★8 Relikvie z Chrámu
+  { id: 't38', star: 8, text: () => t('Poraz Cthulhu na obtížnost {d}', { d: 'VII' }), goal: 1, prog: (d) => (maxD(d) > 7 ? 1 : 0), what: () => t('+{n} 💎', { n: 30 }), gift: { gems: 30 } },
+  { id: 't39', star: 8, text: () => t('Získej {n} krígel jednou hygienou', { n: 250 }), goal: 250, prog: c('kmax'), what: () => t('+{n} kostí', { n: big(6000) }), gift: { bones: 6000 } },
+  { id: 't40', star: 8, text: () => t('Splň {n} týdenní výzvy', { n: 6 }), goal: 6, prog: c('weekly'), what: () => t('+{n} 💎', { n: 30 }), gift: { gems: 30 } },
+  { id: 't41', star: 8, text: () => t('Zavolej {n} hygien', { n: 10 }), goal: 10, prog: c('hyg'), what: () => t('+{n} kostí', { n: big(6000) }), gift: { bones: 6000 } },
+  { id: 't42', star: 8, text: () => t('Vylepši talismany o {n} úrovní', { n: 15 }), goal: 15, prog: (d, R) => talSum(d) - (R.s0?.tal ?? 0), what: () => t('+{n} 💎', { n: 30 }), gift: { gems: 30 } },
+  { id: 't43', star: 8, text: () => t('Vyhraj ligu: {l}', { l: t('Národní liga') }) + ' 2×', goal: 2, prog: c('lg3'), what: () => t('+{n} kostí', { n: big(8000) }), gift: { bones: 8000 } },
+  // ★9 Vzácní hosté
+  { id: 't44', star: 9, text: () => t('{n} příchodů hostů', { n: '200 000' }), goal: 200000, prog: (d, R) => (d.gxp ?? 0) - (R.s0?.gxp ?? 0), what: () => t('+{n} 💎', { n: 35 }), gift: { gems: 35 } },
+  { id: 't45', star: 9, text: () => t('Obslouž {n} bublin', { n: 3000 }), goal: 3000, prog: c('tips'), what: () => t('+{n} kostí', { n: big(8000) }), gift: { bones: 8000 } },
+  { id: 't46', star: 9, text: () => t('Rozežeň {n} rvaček', { n: 60 }), goal: 60, prog: c('brawls'), what: () => t('+{n} 💎', { n: 35 }), gift: { gems: 35 } },
+  { id: 't47', star: 9, text: () => t('Hodnost {r} na kterékoli stanici', { r: t('Legenda') }), goal: 1, prog: (d) => (STN.some((s) => rank(d, s) >= 4) ? 1 : 0), what: () => t('+{n} kostí', { n: big(10000) }), gift: { bones: 10000 } },
+  { id: 't48', star: 9, text: () => t('Zvládni {n} událostí', { n: 250 }), goal: 250, prog: c('events'), what: () => t('+{n} 💎', { n: 35 }), gift: { gems: 35 } },
+  { id: 't49', star: 9, text: () => t('Nasbírej {n} kostí', { n: '40 000' }), goal: 40000, prog: c('bones'), what: () => t('+{n} 💎', { n: 35 }), gift: { gems: 35 } },
+  // ★10 Trůn hostinského
+  { id: 't50', star: 10, text: () => t('Poraz Cthulhu na obtížnost {d}', { d: 'X' }), goal: 1, prog: (d) => (maxD(d) > 10 ? 1 : 0), what: () => t('+{n} 💎', { n: 50 }), gift: { gems: 50 } },
+  { id: 't51', star: 10, text: () => t('Vyhraj ligu: {l}', { l: t('Národní liga') }) + ' 3×', goal: 3, prog: c('lg3'), what: () => t('+{n} kostí', { n: big(12000) }), gift: { bones: 12000 } },
+  { id: 't52', star: 10, text: () => t('Hodnost {r} na {n} stanicích', { r: t('Legenda'), n: 2 }), goal: 2, prog: (d) => STN.filter((s) => rank(d, s) >= 4).length, what: () => t('+{n} 💎', { n: 50 }), gift: { gems: 50 } },
+  { id: 't53', star: 10, text: () => t('Splň {n} týdenní výzev', { n: 8 }), goal: 8, prog: c('weekly'), what: () => t('+{n} kostí', { n: big(12000) }), gift: { bones: 12000 } },
+  { id: 't54', star: 10, text: () => t('{n} talismanů na úrovni {l}', { n: 12, l: 5 }), goal: 12, prog: (d) => Object.values(d.talis ?? {}).filter((v) => v >= 5).length, what: () => t('+{n} 💎', { n: 50 }), gift: { gems: 50 } },
+  { id: 't55', star: 10, text: () => t('Obslouž {n} bublin za jeden den', { n: 600 }), goal: 600, prog: day('tips'), what: () => t('+{n} kostí', { n: big(15000) }), gift: { bones: 15000 } },
 ];
 
 function yesterday() {
@@ -160,5 +204,5 @@ export function rekoStar(R: RekoState, d: Save) {
 }
 
 /** kousky v hospodě podle vyzvednutých úkolů */
-export const rekoItems = (R: RekoState | undefined) => (R ? REKO_TASKS.filter((k) => R.done.includes(k.id)) : []);
+export const rekoItems = (R: RekoState | undefined) => (R ? (REKO_TASKS.filter((k) => k.item && R.done.includes(k.id)) as (RekoTask & { item: RekoItem })[]) : []);
 export const rekoFrame = (f: string, R: RekoState | undefined) => f.replace('{l}', R?.look ?? 'a');

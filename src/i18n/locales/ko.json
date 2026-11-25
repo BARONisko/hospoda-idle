@@ -1610,5 +1610,16 @@
  "cloud: uloženo před {n} min": "클라우드: {n}분 전 저장",
  "Uloženo v cloudu Google Play": "Google Play 클라우드에 저장됨",
  "Přihlásit": "로그인",
- "Žebříček Chrámu": "신전 리더보드"
+ "Žebříček Chrámu": "신전 리더보드",
+ "Hodnost {r} na {n} stanicích": "{n}개 작업대에서 {r} 등급",
+ "Zavolej {n} hygien": "위생 점검 {n}회 부르기",
+ "Vylepši talismany o {n} úrovní": "부적을 {n}레벨 강화",
+ "Splň {n} týdenní výzev": "주간 도전 {n}개 완료",
+ "legendární podnik": "전설의 가게",
+ "svatba v hospodě (nová událost)": "술집 결혼식 (새 이벤트)",
+ "zlaté stanice od hodnosti Mistr": "마스터 등급부터 황금 작업대",
+ "relikvie z Chrámu": "신전의 성유물",
+ "vzácní hosté do Sbírky": "컬렉션에 희귀 손님",
+ "trůn hostinského": "주인장의 왕좌",
+ "Všech {n} hvězdiček! Legendární podnik.": "별 {n}개 모두! 전설의 가게."
 }
