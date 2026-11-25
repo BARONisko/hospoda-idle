@@ -36,7 +36,8 @@ import { loyLvl, loyProg, loyNext, LOY_MAX } from '../core/loyalty';
 import { mastStage, mastRank, mastProg, RANKS, RANK_COLORS, MAST_MAX } from '../core/mastery';
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave, wipe } from '../core/save';
-import { PubView, LOOK } from '../game/PubView';
+import { PubView, LOOK, REKO, livery } from '../game/PubView';
+import { RekoState, REKO_HYG, REKO_OFFLINE_H, REKO_STARS, newReko, rekoCount, rekoMax, nextTask, rekoReady, chapter, taskProg, taskDone, rekoStar, RekoTask } from '../core/reko';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
 import { GUESTS } from '../game/PubView';
 import { QUESTS, QCtx, QuestDef, currentQuest, questDone } from '../core/quests';
@@ -424,6 +425,17 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const n = this.starMsg;
       this.starMsg = 0;
       this.time.delayedCall(2500, () => this.views[0] && this.banner(this.views[0].cam, t('★ Nové hvězdy stanic: {n} – +{n} b. do stromu hostinského', { n }), true));
+    }
+    // po Rekonstrukci: oslava nové hvězdičky podniku
+    if (this.d.rekoMsg) {
+      const n = this.d.rekoMsg;
+      this.d.rekoMsg = undefined;
+      this.time.delayedCall(1200, () => {
+        if (!this.views[0]) return;
+        sfx.fanfare();
+        this.cameras.main.flash(600, 255, 220, 120);
+        this.banner(this.views[0].cam, t('Rekonstrukce hotová! Podnik {s}', { s: '★'.repeat(n) }) + '\n' + this.rekoGift(n), true);
+      });
     }
     this.events.off('guestArrive');
     this.events.on('guestArrive', () => (this.d.gxp = (this.d.gxp ?? 0) + 1 + this.ts().gxp));
@@ -1616,6 +1628,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         this.leagueResult = { win, me: L.me, rival, tier, name: rivalInfo(L).name, wild: !win && move < 0 && !!L.wild && tier > 1, stay: move === 0, k, g: gm };
         this.d.leagueHist = [...(this.d.leagueHist ?? []), [tier, win] as [number, boolean]].slice(-8);
         if (win) {
+          const R = this.rk();
+          if (R) (rekoCount(R, 'lg'), tier >= 3 && rekoCount(R, 'lg3'));
           this.d.krigle += k;
           this.d.gems = (this.d.gems ?? 0) + gm;
           // liga → šipky: +3 body
@@ -2434,6 +2448,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   private task(kind: TaskKind, n: number) {
+    const R = this.rk();
+    if (R && kind !== 'levels' && kind !== 'earn' && kind !== 'temple') rekoCount(R, kind, n);
     for (const tk of this.daily().tasks) if (tk.kind === kind && !tk.claimed) tk.prog = Math.min(tk.goal, tk.prog + n);
   }
 
@@ -2459,6 +2475,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   private week(kind: WeekKind, n = 1) {
+    const R = this.rk();
+    if (R && (kind === 'brawls' || kind === 'visitors')) rekoCount(R, kind, n);
     const w = this.weekly();
     if (w.kind !== kind) return;
     if (!w.claimed) w.prog = Math.min(w.goal, w.prog + n);
@@ -2478,6 +2496,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         if (w.claimed || w.prog < w.goal) return sfx.error();
         w.claimed = true;
         this.d.krigle += 5;
+        const R = this.rk();
+        if (R) rekoCount(R, 'weekly');
         this.tryDrop(1);
         store(this.d);
         this.openShop('tasks', false);
@@ -2522,7 +2542,17 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     });
     // úspěchy jsou ve Sbírce (přání uživatele 25. 11.: úkoly jen ve 3 řadách – denní, týdenní, Kniha hostinského v liště)
     const y1 = y0 + 34 + 3 * RH + 12;
-    if (this.achClaimable()) head(y1, t('Splněný úspěch čeká ve Sbírce → Úspěchy'));
+    // Kniha hostinského (3. řada úkolů): kapitola, postup a tlačítko do Knihy
+    const R = this.rk();
+    if (R) {
+      const ks = chapter(R.star + 1), nd = ks.filter((k) => R.done.includes(k.id)).length, rd = ks.some((k) => !R.done.includes(k.id) && taskDone(k, this.d, R));
+      const stars = '★'.repeat(R.star) + '☆'.repeat(REKO_STARS - R.star);
+      this.row(y1, RH, D, t('Kniha hostinského {s}', { s: stars }), R.star >= REKO_STARS ? t('pětihvězdičkový podnik') : rekoReady(R) ? t('kapitola hotová: Rekonstrukce ★{n}', { n: R.star + 1 }) : t('kapitola ★{n}: {a} / {b} úkolů', { n: R.star + 1, a: nd, b: ks.length }), 'maroon', PAL.gold);
+      const b = this.btn(W - 172, y1 + 10, 150, 54, () => this.rekoBook(), D + 2);
+      this.drawBtn(b, t('Otevřít'), true, rd || rekoReady(R) ? 'green' : 'amber');
+      this.shopObjs.push(b.bg, b.label, b.zone);
+    }
+    if (this.achClaimable()) head(y1 + (R ? RH : 0), t('Splněný úspěch čeká ve Sbírce → Úspěchy'));
   }
 
   // ---------- nastavení ----------
@@ -2927,6 +2957,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** koupený vzhled hospody → PubView (jen vzhled) */
   private lookSync() {
+    REKO.R = this.d.reko;
     LOOK.tap = this.owns('lookTap');
     LOOK.tables = this.owns('lookTables');
     LOOK.livery = this.owns('lookLivery');
@@ -4386,6 +4417,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       dn.shift = switchPhase(false);
     }
     this.d.stats.prestiges++;
+    const R = this.rk();
+    if (R) (rekoCount(R, 'hyg'), rekoMax(R, 'kmax', k));
     meter.track('hygiene', { n: this.d.stats.prestiges, pubs: n });
     this.d.run = 0;
     this.d.coins = 0;
@@ -4783,7 +4816,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (j === i) v.frame(0, TOP + TABH, W, VIEW_H - TABH, 124);
     });
     this.pubTabs.forEach((b, j) => {
-      this.drawBtn(b, PUB_NAMES[this.d.pubs[j].act], true, j === i ? 'amber' : 'slate');
+      // ★5 Rekonstrukce: zlatý štít podniku (zlatý rám záložky a hvězda u jména)
+      const gold = (this.d.reko?.star ?? 0) >= REKO_STARS;
+      this.drawBtn(b, PUB_NAMES[this.d.pubs[j].act] + (gold ? ' ★' : ''), true, j === i ? 'amber' : 'slate');
+      if (gold) b.bg.lineStyle(3, col('gold')).strokeRoundedRect(b.x + 1, b.y + 1, b.w - 2, b.h - 2, 10);
       b.label.setY(b.y + 16).setFontSize(18).setScale(Math.min(1, (b.w - 10) / b.label.width));
     });
     this.skillBtns.forEach((_, j) => this.drawSkill(j));
@@ -5171,7 +5207,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private offCap() {
     // delší offline za diamanty: +2 h za každý stupeň (nad běžný strop)
     const gemH = 2 * ['off1', 'off2', 'off3'].filter((id) => this.owns(id)).length;
-    return gemH * 3600 + Math.min(OFFLINE_MAX_H * 3600, OFFLINE_CAP + (kOffline(this.kl('offline')) + (this.has('cuckoo') ? 4 : 0)) * 3600 + this.ts().offline * 3600) + (hasStyle(this.d.pubs, 'cellar') ? 3600 : 0);
+    return gemH * 3600 + Math.min(OFFLINE_MAX_H * 3600, OFFLINE_CAP + (kOffline(this.kl('offline')) + (this.has('cuckoo') ? 4 : 0)) * 3600 + this.ts().offline * 3600) + (hasStyle(this.d.pubs, 'cellar') ? 3600 : 0) + ((this.d.reko?.star ?? 0) >= 4 ? REKO_OFFLINE_H * 3600 : 0);
   }
 
   /** úroveň vylepšení za kosti */
@@ -5604,7 +5640,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     for (let k = 0; k < WAITER_MAX; k++) {
       const { x, y } = chipXY(k);
       const bg = this.add.graphics().setDepth(50);
-      const face = this.add.image(x, y + 4, WAITERS[k].key + (LOOK.livery ? '_lux' : ''), 0).setScale(2.3).setDepth(51);
+      const face = this.add.image(x, y + 4, WAITERS[k].key + (livery() ? '_lux' : ''), 0).setScale(2.3).setDepth(51);
       const name = this.add.text(x, y + CHIP_R + 12, '', txt(17, PAL.bone)).setOrigin(0.5).setDepth(52);
       const lvl = this.add.text(x + 24, y - 24, '', txt(17, PAL.ink)).setOrigin(0.5).setDepth(53);
       const zone = this.add.zone(x - CHIP_R - 4, y - CHIP_R - 4, CHIP_R * 2 + 8, CHIP_R * 2 + 26).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(54);
@@ -5696,7 +5732,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     g.fillStyle(col('dusk')).fillRoundedRect(4, y0, W - 8, yb - y0 - 4, 14);
     g.lineStyle(3, col('gold')).strokeRoundedRect(4, y0, W - 8, yb - y0 - 4, 14);
     objs.push(g);
-    objs.push(this.add.image(42, y0 + 44, WAITERS[k].key + (LOOK.livery ? '_lux' : ''), 0).setScale(2.5).setDepth(D + 1));
+    objs.push(this.add.image(42, y0 + 44, WAITERS[k].key + (livery() ? '_lux' : ''), 0).setScale(2.5).setDepth(D + 1));
     objs.push(this.add.text(74, y0 + 12, t('{n} · úroveň {l}', { n: WAITERS[k].name, l: waiterLvl(w) }), txt(28, PAL.gold)).setDepth(D + 1));
     const r = waiterRate(w);
     const free = freePoints(w);
@@ -5815,6 +5851,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (this.brewTutAt && Date.now() > this.brewTutAt) this.brewTutNext();
     if (this.ntfQ.length) this.ntfNext();
     const dt = Math.min(dms / 1000, 0.25);
+    this.rekoTick();
     this.comboT -= dt;
     this.punchT -= dt;
     this.tutFollow?.();
@@ -6106,7 +6143,159 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   private qCur(): QuestDef | null {
-    return (this.d.tut ?? -1) < 0 ? currentQuest(this.d, this.qctx()) : null;
+    if ((this.d.tut ?? -1) >= 0) return null;
+    return currentQuest(this.d, this.qctx()) ?? this.rkQuest();
+  }
+
+  // ---------- Rekonstrukce ★ a Kniha hostinského (posudek pozdní hry C + D) ----------
+  /** stav Knihy; undefined = ještě zamčená (otevře se s Ligou: 40. hygiena a výdělek) */
+  rk(): RekoState | undefined {
+    if (this.d.reko) return this.d.reko;
+    if (this.d.stats.prestiges < REKO_HYG || this.tileLock('league')) return undefined;
+    this.d.reko = newReko(this.d);
+    REKO.R = this.d.reko;
+    return this.d.reko;
+  }
+
+  /** úkol Knihy v liště úkolu (po úkolech hostinského pokračuje Kniha); po všech úkolech kapitoly výzva k Rekonstrukci */
+  private rkQuest(): QuestDef | null {
+    const R = this.rk();
+    if (!R) return null;
+    const at = { k: 'tile', key: 'tasks' } as const;
+    if (rekoReady(R)) return { id: 'rk:reko', text: () => t('Zavolej Rekonstrukci ★{n}', { n: R.star + 1 }), prog: () => [1, 1], at };
+    const k = nextTask(this.d, R);
+    if (!k) return null;
+    return { id: 'rk:' + k.id, text: k.text, prog: () => [taskProg(k, this.d, R), k.goal], at };
+  }
+
+  /** vyzvednutí úkolu Knihy: odměna jako úkol hostinského a v hospodě přibude kousek */
+  private rekoClaim(k: RekoTask) {
+    const R = this.rk();
+    if (!R || R.done.includes(k.id) || !taskDone(k, this.d, R)) return sfx.error();
+    R.done.push(k.id);
+    const n = this.qReward();
+    this.d.coins += n;
+    this.d.gems = (this.d.gems ?? 0) + GEMS_FREE.quest;
+    meter.track('reko_task', { id: k.id, star: R.star });
+    this.views.forEach((v) => v.rekoRefresh(true));
+    sfx.fanfare();
+    this.banner(this.views[0].cam, t('Kniha hostinského: {w}!', { w: k.what() }) + '\n' + t('+{n} coins a +{g} 💎', { n: big(n), g: GEMS_FREE.quest }));
+    // kousek je v Pajzlu / Sklepní krčmě → ukázat tu hospodu
+    const pi = this.d.pubs.findIndex((p) => p.act === k.item.act);
+    if (pi >= 0 && this.views.length > 1 && pi !== this.sel && !this.shopObjs.length) this.selectPub?.(pi);
+    if (rekoReady(R)) this.time.delayedCall(1800, () => this.banner(this.views[0].cam, t('Kapitola hotová: můžeš zavolat Rekonstrukci ★{n}!', { n: R.star + 1 })));
+    store(this.d);
+  }
+
+  /** co přinese hvězdička */
+  private rekoGift(star: number) {
+    return [t('nový vzhled Pajzlu'), t('pátá stanice v každé hospodě'), t('další kapitola Knihy'), t('kasa offline o {h} h déle', { h: REKO_OFFLINE_H }), t('zlatý štít podniku')][star - 1] ?? '';
+  }
+
+  /** Kniha hostinského: úkoly kapitoly (okno přes obrazovku) */
+  rekoBook() {
+    const R = this.rk();
+    if (!R) return;
+    this.closeShop();
+    const D = 520;
+    const objs: Phaser.GameObjects.GameObject[] = [];
+    const close = () => {
+      objs.forEach((o) => o.destroy());
+      this.awayObjs = [];
+    };
+    objs.push(this.add.rectangle(0, 0, W, H, 0x000000, 0.75).setOrigin(0).setDepth(D).setInteractive().on('pointerdown', () => 0));
+    const star = R.star + 1, ks = chapter(star), RH = 74;
+    const bx = 14, bw = W - 28, bh = Math.min(H - 120, 190 + ks.length * RH + (R.star >= REKO_STARS ? 0 : 80)), by = Math.max(60, (H - bh) / 2);
+    const g = this.add.graphics().setDepth(D + 1);
+    g.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
+    g.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
+    g.lineStyle(4, col('gold')).strokeRoundedRect(bx, by, bw, bh, 16);
+    objs.push(g);
+    const stars = '★'.repeat(R.star) + '☆'.repeat(REKO_STARS - R.star);
+    objs.push(this.add.text(W / 2, by + 16, t('Kniha hostinského'), txt(34, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 2));
+    objs.push(this.add.text(W / 2, by + 58, t('Podnik: {s}', { s: stars }), txt(22, PAL.sand)).setOrigin(0.5, 0).setDepth(D + 2));
+    if (R.star >= REKO_STARS) {
+      objs.push(this.add.text(W / 2, by + 110, t('Všech {n} hvězdiček! Pětihvězdičkový podnik.', { n: REKO_STARS }), txt(24, PAL.mint)).setOrigin(0.5, 0).setDepth(D + 2).setWordWrapWidth(bw - 40).setAlign('center'));
+    } else {
+      objs.push(this.add.text(W / 2, by + 88, t('Kapitola ★{n} · za Rekonstrukci: {g}', { n: star, g: this.rekoGift(star) }), txt(18, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2).setWordWrapWidth(bw - 40).setAlign('center'));
+      ks.forEach((k, i) => {
+        const y = by + 124 + i * RH, claimed = R.done.includes(k.id), done = claimed || taskDone(k, this.d, R);
+        const box = this.add.graphics().setDepth(D + 1);
+        box.fillStyle(col(claimed ? 'pine' : 'ink'), 0.7).fillRoundedRect(bx + 10, y, bw - 20, RH - 8, 10);
+        const name = this.add.text(bx + 24, y + 6, k.text(), txt(20, claimed ? PAL.mint : PAL.bone)).setDepth(D + 2);
+        name.setScale(Math.min(1, (bw - 210) / name.width));
+        const p = taskProg(k, this.d, R);
+        const sub = this.add.text(bx + 24, y + 36, (claimed ? '✓ ' : k.goal > 1 ? `${big(p)} / ${big(k.goal)} · ` : '') + k.what(), txt(16, PAL.fog)).setDepth(D + 2);
+        sub.setScale(Math.min(1, (bw - 210) / sub.width));
+        objs.push(box, name, sub);
+        const b = this.btn(W - 172, y + 7, 140, 52, () => {
+          if (claimed || !done) return sfx.error();
+          close();
+          this.rekoClaim(k);
+          this.rekoBook();
+        }, D + 3);
+        this.drawBtn(b, claimed ? '✓' : done ? t('Vybrat') : `${Math.floor((p / k.goal) * 100)} %`, done && !claimed, 'green');
+        objs.push(b.bg, b.label, b.zone);
+      });
+      const ready = rekoReady(R);
+      const rb = this.btn(bx + 24, by + bh - 150, bw - 48, 64, () => (ready ? (close(), this.askReko()) : sfx.error()), D + 3);
+      this.drawBtn(rb, ready ? t('Rekonstrukce ★{n}', { n: star }) : t('Rekonstrukce: splň všechny úkoly'), ready, 'red');
+      objs.push(rb.bg, rb.label, rb.zone);
+    }
+    const cb = this.btn(W / 2 - 90, by + bh - 78, 180, 60, () => close(), D + 3);
+    this.drawBtn(cb, t('Zavřít'), true, 'slate');
+    objs.push(cb.bg, cb.label, cb.zone);
+    this.awayObjs = objs;
+    this.awayClose = close;
+    sfx.click();
+  }
+
+  /** potvrzení Rekonstrukce (= hygiena navíc s hvězdičkou) */
+  private askReko() {
+    const R = this.rk();
+    if (!R || !rekoReady(R)) return sfx.error();
+    const D = 520, star = R.star + 1;
+    const objs: Phaser.GameObjects.GameObject[] = [];
+    const close = () => {
+      objs.forEach((o) => o.destroy());
+      this.awayObjs = [];
+    };
+    objs.push(this.add.rectangle(0, 0, W, H, 0x000000, 0.75).setOrigin(0).setDepth(D).setInteractive());
+    const bx = 30, by = 230, bw = W - 60, bh = 460;
+    const g = this.add.graphics().setDepth(D + 1);
+    g.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
+    g.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
+    g.lineStyle(4, col('gold')).strokeRoundedRect(bx, by, bw, bh, 16);
+    objs.push(g);
+    const tx = (y: number, s: string, size: number, c: string) => objs.push(this.add.text(W / 2, y, s, txt(size, c)).setOrigin(0.5, 0).setAlign('center').setDepth(D + 2).setWordWrapWidth(bw - 40));
+    tx(by + 20, t('Rekonstrukce ★{n}', { n: star }), 40, PAL.gold);
+    tx(by + 80, t('Hospody se zavřou jako při hygieně (coins, úrovně a vylepšení od nuly). Krígly, obchod s krígly, číšníci, strom, šipky, talismany, kosti a výzdoba zůstanou.'), 19, PAL.fog);
+    tx(by + 210, '★'.repeat(star), 52, PAL.gold);
+    tx(by + 280, t('Dostaneš: {g}', { g: this.rekoGift(star) }), 24, PAL.mint);
+    const no = this.btn(bx + 24, by + bh - 88, 180, 64, () => close(), D + 3);
+    this.drawBtn(no, t('Ještě ne'), true, 'slate');
+    const yes = this.btn(bx + bw - 204, by + bh - 88, 180, 64, () => {
+      rekoStar(R, this.d);
+      this.d.rekoMsg = star;
+      meter.track('reko', { star });
+      this.prestige();
+    }, D + 3);
+    this.drawBtn(yes, t('Rekonstruovat'), true, 'red');
+    yes.label.setScale(Math.min(1, 160 / yes.label.width));
+    objs.push(no.bg, no.label, no.zone, yes.bg, yes.label, yes.zone);
+    this.awayObjs = objs;
+    this.awayClose = close;
+    sfx.click();
+  }
+
+  /** kosti přibyly (jakkoli: noc, šipky, truhla…) → čítač úkolu „Nasbírej kosti“ */
+  private rkBones = -1;
+  private rekoTick() {
+    const R = this.d.reko;
+    if (!R) return;
+    const b = this.d.bones ?? 0;
+    if (this.rkBones >= 0 && b > this.rkBones) rekoCount(R, 'bones', b - this.rkBones);
+    this.rkBones = b;
   }
 
   /** o kolik se posunou věci nahoře v hospodě (schopnost manažera, truhla, cedule stylu) kvůli pilulkám úkolu
@@ -6181,6 +6370,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private qClaim() {
     const q = this.qCur();
     if (!q || !questDone(q, this.d, this.qctx())) return;
+    // Kniha hostinského: vyzvednout úkol / otevřít Rekonstrukci
+    if (q.id === 'rk:reko') return this.rekoBook();
+    if (q.id.startsWith('rk:')) {
+      const k = chapter(this.rk()!.star + 1).find((x) => 'rk:' + x.id === q.id);
+      if (k) this.rekoClaim(k);
+      this.qPoint = null;
+      return;
+    }
     const n = this.qReward();
     this.d.coins += n;
     this.d.gems = (this.d.gems ?? 0) + GEMS_FREE.quest;
@@ -6197,6 +6394,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private qShow() {
     const q = this.qCur();
     if (!q) return;
+    if (q.id.startsWith('rk:')) return this.rekoBook();
     this.qPoint = this.qPoint === q.id ? null : q.id;
     // cíl je na kartě, ale menu je otevřené → zavřít menu
     if (this.qPoint && (q.at.k === 'buy' || q.at.k === 'staff' || q.at.k === 'tip' || q.at.k === 'style') && this.shopObjs.length) this.closeShop();

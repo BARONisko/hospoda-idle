@@ -11,11 +11,13 @@ import { buildIcons } from './icons';
 import { buildWeaponIcons } from './weaponArt';
 import { buildLootArt } from './lootArt';
 import { buildDecorArt } from './decorArt';
+import { buildRekoArt } from './rekoArt';
 import { buildActDecorArt } from './actDecorArt';
 import { buildWellArt } from './wellArt';
 import { buildYellowArt } from './yellowArt';
 import { buildUI, buildLights } from './uiArt';
-import { drawPubBackground, drawCellarBackground } from './tiles';
+import { drawPubBackground, drawCellarBackground, drawRekoBackground } from './tiles';
+import type { RekoLook } from './rekoTiles';
 import { buildKitchenArt, drawKitchenBackground } from './kitchenArt';
 import { buildWitchArt, buildWitchProps } from './witchArt';
 import { buildPantryArt, buildGoblinSheets } from './goblinArt';
@@ -65,7 +67,7 @@ export function generateAll(scene: Phaser.Scene) {
   buildWitchArt(scene);
   buildSudokongArt(scene);
   buildDwarfArt(scene);
-  const objs = { ...buildObjects(), ...buildObjects2(), ...buildCellarArt(), ...buildCellarDecorArt(), ...buildDecorArt(), ...buildActDecorArt(), ...buildWellArt(), ...buildYellowArt(), ...buildKitchenArt(), ...buildPantryArt(), ...buildWitchProps(), ...buildGraveArt(), ...buildCoinArt(), ...buildAdmirerArt(), ...buildWallEyes(), ...buildNecroArt(), ...buildTourneyObjects(), ...buildGateProps(), ...buildEndProps(), ...buildSewerC(), ...buildFairObjects(), ...buildWeatherObjects(), ...buildKrcmaObjects(), ...buildYardArt() };
+  const objs = { ...buildObjects(), ...buildObjects2(), ...buildCellarArt(), ...buildCellarDecorArt(), ...buildDecorArt(), ...buildRekoArt(), ...buildActDecorArt(), ...buildWellArt(), ...buildYellowArt(), ...buildKitchenArt(), ...buildPantryArt(), ...buildWitchProps(), ...buildGraveArt(), ...buildCoinArt(), ...buildAdmirerArt(), ...buildWallEyes(), ...buildNecroArt(), ...buildTourneyObjects(), ...buildGateProps(), ...buildEndProps(), ...buildSewerC(), ...buildFairObjects(), ...buildWeatherObjects(), ...buildKrcmaObjects(), ...buildYardArt() };
   buildTourneyArt(scene);
   buildFairArt(scene);
   buildWeatherArt(scene);
@@ -84,6 +86,12 @@ export function generateAll(scene: Phaser.Scene) {
   buildPulciArt(scene);
   for (const [k, a, n, r] of [['cthulhu_walk', 0, 4, 5], ['cthulhu_idle', 4, 4, 3], ['cthulhu_thirst', 8, 2, 4], ['cthulhu_happy', 10, 4, 3], ['cthulhu_regular', 14, 2, 2]] as const)
     if (!scene.anims.exists(k)) scene.anims.create({ key: k, frames: Array.from({ length: n }, (_, i) => ({ key: 'cthulhu', frame: a + i })), frameRate: r, repeat: -1 });
+}
+
+export function renderRekoBackground(scene: Phaser.Scene, tablesLevel: number, look: RekoLook) {
+  const key = `pubBgReko${tablesLevel}${look}`;
+  if (!scene.textures.exists(key)) addImage(scene, key, drawRekoBackground(tablesLevel, look));
+  return key;
 }
 
 export function renderPubBackground(scene: Phaser.Scene, tablesLevel: number, act = 1) {

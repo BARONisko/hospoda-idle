@@ -331,6 +331,27 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   }));
   await p.close();
 }
+// 6a3) Rekonstrukce ★ a Kniha hostinského: úkol → kousek v hospodě, kapitola hotová → Rekonstrukce = hvězda a nový vzhled
+{
+  const p = await page();
+  ok('Kniha hostinského: čítač úkolu, vyzvednutí přidá kousek, Rekonstrukce dá ★1 a nový vzhled Pajzlu', await S(p, async (s) => {
+    const RK = await import('/src/core/reko.ts'), QS = await import('/src/core/quests.ts');
+    s.d.tut = -1; s.d.stats.prestiges = 45; s.d.earned = 1e16; s.d.q = QS.QUESTS.map((q) => q.id);
+    const R = s.rk(), pill = s.qCur()?.id === 'rk:t01';
+    s.task('tips', 200); const counted = R.c.tips === 200 && RK.taskDone(RK.REKO_TASKS[0], s.d, R);
+    s.qClaim(); const claimed = R.done.includes('t01') && s.views[0].tables.every((o) => o.frame.name === 'rka_table');
+    R.done.push(...RK.chapter(1).map((k) => k.id).filter((id) => id !== 't01'));
+    s.views[0].rekoRefresh(); const items = Object.keys(s.views[0].rk).length >= 5;
+    s.rekoBook(); const book = s.awayObjs.length > 20; s.awayClose();
+    s.askReko(); s.awayObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown');
+    return (pill && counted && claimed && items && book) || JSON.stringify({ pill, counted, claimed, items, book });
+  }).then((r) => (r !== true && console.log(r), r)) === true);
+  await p.waitForTimeout(1500);
+  ok('Rekonstrukce: ★1, hygiena proběhla, Pajzl má nový vzhled a další kapitola běží', await S(p, (s) => s.d.reko.star === 1 && s.d.stats.prestiges === 46 && s.views[0].bg.texture.key.startsWith('pubBgReko') && s.qCur()?.id.startsWith('rk:t0')));
+  ok('bez chyb v konzoli (Rekonstrukce)', p.errors.length === 0);
+  if (p.errors.length) console.log(p.errors);
+  await p.close();
+}
 // 6b) hygiena jako skutečný hráč (lišta úkolu, VIP, styl): „Ještě ne“ hru neblokuje, po hygieně hra běží dál,
 //     coins na rozjezd a průvodce novou hospodou jde dokončit (dřív zamrznutí / zaseknutí)
 {

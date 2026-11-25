@@ -3,11 +3,12 @@ import { PUB_MAP, PUB } from '../data/maps';
 import { PalKey } from '../data/palette';
 import { DecorGrid, cellarLook, decorateCellar, lookBrickColors, lookFloorColors } from './cellarDecor';
 import { drawStairs, stairsMat } from './stairsArt';
+import { RekoLook, rekoFloor, rekoWall, rekoBar } from './rekoTiles';
 
 const T = 16;
 
 // ============================================================ HOSPODA
-function woodFloor(p: PixelCanvas, tx: number, ty: number) {
+function woodFloor0(p: PixelCanvas, tx: number, ty: number) {
   const ox = tx * T;
   const oy = ty * T;
   for (let row = 0; row < 4; row++) {
@@ -43,7 +44,7 @@ function woodFloor(p: PixelCanvas, tx: number, ty: number) {
   }
 }
 
-function barTiles(p: PixelCanvas, tx: number, ty: number) {
+function barTiles0(p: PixelCanvas, tx: number, ty: number) {
   const ox = tx * T;
   const oy = ty * T;
   for (let y = 0; y < T; y++)
@@ -65,7 +66,7 @@ function wallTop(p: PixelCanvas, tx: number, ty: number) {
   for (let x = 0; x < T; x++) if (hash(ox + x, oy, 4) < 0.25) p.set(ox + x, oy + 3 + Math.floor(hash(ox + x, oy, 5) * 10), 'dusk');
 }
 
-function wallFace(p: PixelCanvas, tx: number, ty: number, upper: boolean) {
+function wallFace0(p: PixelCanvas, tx: number, ty: number, upper: boolean) {
   const ox = tx * T;
   const oy = ty * T;
   if (upper) {
@@ -250,6 +251,11 @@ const CTHULHU_COLORS: Partial<Record<PalKey, PalKey>> = {
   blood: 'navy', red: 'pine', bone: 'ice', sand: 'mint', olive: 'grave', dusk: 'navy',
 };
 
+/** Pajzl po Rekonstrukci (★1 Nový lak): 3 návrhy vzhledu – a dub a mosaz, b prvorepubliková pivnice, c roubenka */
+export function drawRekoBackground(tablesLevel: number, look: RekoLook): PixelCanvas {
+  return drawPubBackground1(tablesLevel, look);
+}
+
 export function drawPubBackground(tablesLevel: number, act = 1): PixelCanvas {
   if (act === 4) {
     const c = drawCellarPubBackground(tablesLevel);
@@ -298,8 +304,11 @@ function drawCellarPubBackground(tablesLevel: number): PixelCanvas {
   return p;
 }
 
-function drawPubBackground1(tablesLevel: number): PixelCanvas {
+function drawPubBackground1(tablesLevel: number, look?: RekoLook): PixelCanvas {
   const p = new PixelCanvas(PUB.w * T, PUB.h * T);
+  const woodFloor = look ? (q: PixelCanvas, x: number, y: number) => rekoFloor(q, x, y, look) : woodFloor0;
+  const wallFace = look ? (q: PixelCanvas, x: number, y: number, up: boolean) => rekoWall(q, x, y, up, look) : wallFace0;
+  const barTiles = look ? (q: PixelCanvas, x: number, y: number) => rekoBar(q, x, y, look) : barTiles0;
   const open = tablesLevel >= 1;
   for (let y = 0; y < PUB.h; y++)
     for (let x = 0; x < PUB.w; x++) {

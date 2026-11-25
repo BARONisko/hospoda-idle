@@ -136,6 +136,10 @@ export interface Save {
   mast?: Record<string, number>;
   /** týdenní výzva */
   weekly?: Weekly;
+  /** Rekonstrukce ★ a Kniha hostinského (od Ligy) */
+  reko?: import('./reko').RekoState;
+  /** po Rekonstrukci ukázat oslavu nové hvězdy */
+  rekoMsg?: number;
   /** týdenní liga */
   league?: LeagueState;
   /** historie lig: [liga, výhra] posledních týdnů */

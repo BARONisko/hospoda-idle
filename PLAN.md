@@ -501,3 +501,10 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Kostka zdarma (d.frDay), vrcholy Druhý manažer (p.dbl), Pivní dynastie, Pán noci (midU). Off4 a Hluboký sklep vypadly (offline je za 💎).
   Převod (d.sk4): body zpět, staty starého stromu v d.skOld = „Stará pověst“ – platí vždy to větší (treeStats). Tempo: tools/sim/strom-navrhy.mjs,
   days.mjs teď počítá strom A (TREE=0 = staré +10 %).
+
+### Vlna 2 (25. 11. 2026) – Rekonstrukce ★ a Kniha hostinského (část 1)
+- Kniha hostinského od Ligy (40. hygiena): 34 úkolů v 5 kapitolách (src/core/reko.ts), lišta úkolu pokračuje Knihou,
+  řádek v Úkolech → okno Knihy. Splněný úkol = kousek v hospodě (★1 nové kresby rk*, ★2–★5 zatím stávající kresby).
+- Rekonstrukce = hygiena navíc po celé kapitole, dá hvězdu: ★1 nový vzhled Pajzlu (návrhy A/B/C, snímek
+  /mnt/project-files/navrhy-vyber/rekonstrukce-vzhled-ABC.png, zatím A), ★4 kasa +2 h, ★5 zlatý štít. Krígly nemaže.
+- Čeká: Petrův výběr vzhledu, ★2 pátá stanice (varianta A), vlastní kresby pro ★2–★5.

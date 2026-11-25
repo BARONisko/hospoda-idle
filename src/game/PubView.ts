@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import { renderPubBackground } from '../gfx';
+import { renderPubBackground, renderRekoBackground } from '../gfx';
+import { RekoState, rekoItems, rekoFrame } from '../core/reko';
 import { PUB } from '../data/maps';
 import { PAL } from '../data/palette';
 import { txt } from '../ui/font';
@@ -14,6 +15,11 @@ import { WAITERS } from '../core/waiters';
 const T = 16;
 /** vzhled hospody za diamanty (jen vzhled; nastavuje scéna podle koupených položek) */
 export const LOOK = { tap: false, tables: false, livery: false };
+/** Rekonstrukce ★ (Kniha hostinského): hvězdy a vyzvednuté úkoly – nastavuje scéna */
+export const REKO: { R?: RekoState } = {};
+const rkSwap = (k: string) => rekoItems(REKO.R).some((x) => x.item.swap === k);
+/** livreje: za diamanty nebo za úkol Rekonstrukce */
+export const livery = () => LOOK.livery || rkSwap('livery');
 /** střed interiéru na šířku: sloupce 1–17 (sloupec 0 je vnější zeď – byl vidět jako černý pruh vlevo) */
 const CX_ROOM = 9.5 * T;
 const DOOR = { x: PUB.door.x * T + 8, y: PUB.door.y * T + 14 };
@@ -125,13 +131,44 @@ export class PubView {
   private waiters: Phaser.GameObjects.Sprite[] = [];
   private taps: Phaser.GameObjects.Image[] = [];
   private tables: Phaser.GameObjects.Image[] = [];
+  private chairs: Phaser.GameObjects.Image[] = [];
+  private bg!: Phaser.GameObjects.Image;
+  private rk: Record<string, Phaser.GameObjects.Image[]> = {};
+
+  /** Rekonstrukce: nový vzhled Pajzlu (★1) a kousky za splněné úkoly Knihy hostinského */
+  rekoRefresh(pop = false) {
+    const R = REKO.R;
+    if (this.pub.act === 1) this.bg.setTexture(R && R.star >= 1 ? renderRekoBackground(this.s, 1, R.look ?? 'a') : renderPubBackground(this.s, 1, 1));
+    const want = new Set<string>();
+    for (const k of rekoItems(R)) {
+      const it = k.item;
+      if (it.act !== this.pub.act || it.swap) continue;
+      const frame = rekoFrame(it.frame, R);
+      const key = k.id + ':' + frame;
+      want.add(key);
+      if (this.rk[key]) continue;
+      const put = (x: number, y: number, depth: number) => {
+        const o = this.s.add.image(this.ox + x, y, 'obj', frame).setOrigin(0.5, 1).setDepth(depth);
+        this.objs.push(o);
+        this.s.events.emit('pubObj', o);
+        if (pop) this.s.tweens.add({ targets: o, scale: { from: 2, to: 1 }, duration: 600, ease: 'Back.out' });
+        return o;
+      };
+      this.rk[key] = it.lamps ? [2.5, 5, 7.5].map((x) => put(x * T, 3 * T + 4, 6 * T)) : [put(it.x, it.y, it.wall ? -800 : it.y)];
+    }
+    // jiný vzhled (A/B/C) → staré kousky pryč
+    for (const k of Object.keys(this.rk)) if (!want.has(k)) (this.rk[k].forEach((o) => o.destroy()), delete this.rk[k]);
+    this.applyLook();
+  }
 
   /** použije koupený vzhled (pípa, stoly, livreje) – volá se po startu a po koupi */
   applyLook() {
-    this.taps.forEach((o, i) => o.setFrame(LOOK.tap ? 'luxTap' : i ? 'tap2' : 'tap'));
-    this.tables.forEach((o) => o.setFrame(LOOK.tables ? 'luxTable' : 'table'));
+    const R = REKO.R, a1 = this.pub.act === 1, gold = rkSwap('goldTap'), rkTab = a1 && rkSwap('tables'), rkTap = a1 && rkSwap('tap');
+    this.taps.forEach((o, i) => o.setFrame(gold ? (i ? 'tap2_gold' : 'tap_gold') : rkTap && !i ? rekoFrame('rk{l}_tap', R) : LOOK.tap ? 'luxTap' : i ? 'tap2' : 'tap'));
+    this.tables.forEach((o) => o.setFrame(rkTab ? rekoFrame('rk{l}_table', R) : LOOK.tables ? 'luxTable' : 'table'));
+    this.chairs.forEach((o, i) => o.setFrame(rkTab ? rekoFrame(i % 2 ? 'rk{l}_chairR' : 'rk{l}_chairL', R) : i % 2 ? 'chairR' : 'chairL'));
     this.waiters.forEach((o, i) => {
-      const key = LOOK.livery ? `${WAITERS[i].key}_lux` : WAITERS[i].key;
+      const key = livery() ? `${WAITERS[i].key}_lux` : WAITERS[i].key;
       if (o.texture.key !== key) o.setTexture(key, o.frame.name);
     });
   }
@@ -148,7 +185,7 @@ export class PubView {
     const add = <G extends Phaser.GameObjects.GameObject>(g: G) => (this.objs.push(g), g);
     const img = (x: number, y: number, frame: string, depth = 0) =>
       add(s.add.image(ox + x, y, 'obj', frame).setOrigin(0.5, 1).setDepth(depth));
-    add(s.add.image(ox, 0, renderPubBackground(s, 1, pub.act)).setOrigin(0).setDepth(-1000));
+    this.bg = add(s.add.image(ox, 0, renderPubBackground(s, 1, pub.act)).setOrigin(0).setDepth(-1000));
     for (const w of PUB.wallDecor) if (w.x < 17 && !w.kind.endsWith('_skip') && w.kind !== 'window') img(w.x * T + 8, 2 * T + 14, w.kind, -900);
     img(PUB.cellarDoor.x * T + 8, 2 * T + 16, 'cellarDoor', -900);
     this.taps = [img(3 * T + 8, 5 * T + 6, 'tap', 5 * T + 6), img(6 * T + 8, 5 * T + 6, 'tap2', 5 * T + 6)];
@@ -158,8 +195,7 @@ export class PubView {
     this.props.cellar = [img(1 * T + 8, 3 * T + 15, 'kegRack', 3 * T + 15)];
     for (const tb of TABLES) {
       this.tables.push(img(tb.x * T + 16, tb.y * T + 14, 'table', tb.y * T + 14));
-      img(tb.x * T - 8, tb.y * T + 15, 'chairL', tb.y * T + 2);
-      img(tb.x * T + 40, tb.y * T + 15, 'chairR', tb.y * T + 2);
+      this.chairs.push(img(tb.x * T - 8, tb.y * T + 15, 'chairL', tb.y * T + 2), img(tb.x * T + 40, tb.y * T + 15, 'chairR', tb.y * T + 2));
       const aisle = tb.y * T + 30;
       this.seats.push({ x: tb.x * T - 8, y: tb.y * T + 12, flip: false, aisle, taken: false });
       this.seats.push({ x: tb.x * T + 40, y: tb.y * T + 12, flip: true, aisle, taken: false });
@@ -167,7 +203,7 @@ export class PubView {
     // kostky: místo u stolu s kostkami je zabrané (nesedá tam host)
     this.seats.find((st) => st.x === SPOT.dice.x && st.y === SPOT.dice.y)!.taken = true;
     this.keeper = add(s.add.sprite(ox + SPOT.tap.x, SPOT.tap.y, pub.act === 3 ? 'zabak' : pub.act === 4 ? 'cultist4' : 'player', 0).setOrigin(0.5, 1).setDepth(SPOT.tap.y));
-    this.applyLook();
+    this.rekoRefresh();
     // hospoda je už rozjetá: pár hostů sedí hned od začátku
     for (let i = 0; i < 4; i++) {
       this.spawn();
@@ -324,7 +360,7 @@ export class PubView {
     const nw = this.pub.w?.length ?? 0;
     for (let i = this.waiters.length; i < Math.min(nw, WAITERS.length); i++) {
       const h = WAIT_HOME[i];
-      const spr = this.s.add.sprite(this.ox + h.x, h.y, LOOK.livery ? `${WAITERS[i].key}_lux` : WAITERS[i].key, 0).setOrigin(0.5, 1).setDepth(h.y + 1);
+      const spr = this.s.add.sprite(this.ox + h.x, h.y, livery() ? `${WAITERS[i].key}_lux` : WAITERS[i].key, 0).setOrigin(0.5, 1).setDepth(h.y + 1);
       this.objs.push(spr);
       this.waiters.push(spr);
       this.s.events.emit('pubObj', spr);
