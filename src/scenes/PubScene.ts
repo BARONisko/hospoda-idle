@@ -115,6 +115,16 @@ const hms = (ms: number) => {
 };
 /** upozornění na mobilu zapnutá (nastavení) */
 let notesOn = false;
+/** méně textu na hlavní obrazovce (posudek 25. 11.): a = bez „ťukni sem!“ a jmen číšníků, b = navíc kratší hygiena a cedule stylu,
+ *  c = navíc „úr. N“ a kratší úkol. Ladění ?ui=0|a|b|c */
+const UI_LEAN = ((): number => {
+  try {
+    const v = new URLSearchParams(location.search).get('ui') ?? '';
+    return v in { 0: 1, a: 1, b: 1, c: 1 } ? ({ 0: 0, a: 1, b: 2, c: 3 } as Record<string, number>)[v] : 2;
+  } catch {
+    return 2;
+  }
+})();
 /** hráč vypnul anonymní statistiky (Nastavení) */
 let statsOff = false;
 
@@ -678,7 +688,30 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       m.setDate(m.getDate() + 1);
       m.setHours(10, 0, 0, 0);
       out.push({ id: NOTE.chest, at: m.getTime(), title: t('Denní truhla je připravená'), body: t('Otevři ji a nepřeruš sérii – 7. den zlatá truhla!') });
+    } else if ((this.d.tut ?? -1) < 0) {
+      // truhla dnes čeká neotevřená: připomenout za 3 h, nejpozději ve 20:00 (ať se série nepřeruší); pozdě večer až ráno v 10
+      const eve = new Date(now);
+      eve.setHours(20, 0, 0, 0);
+      let at = Math.min(now + 3 * 3600_000, eve.getTime());
+      if (at < now + 30 * 60_000) {
+        const m = new Date(now);
+        m.setDate(m.getDate() + 1);
+        m.setHours(10, 0, 0, 0);
+        at = m.getTime();
+      }
+      out.push({ id: NOTE.chest, at, title: t('Denní truhla čeká neotevřená'), body: t('Otevři ji a nepřeruš sérii – 7. den zlatá truhla!') });
     }
+    // návrat po delší pauze: za 2 a za 5 dní v 18:00 (zruší se, jakmile hráč hru otevře)
+    if ((this.d.tut ?? -1) < 0)
+      for (const [id, days, title, body] of [
+        [NOTE.back2, 2, t('Štamgasti se ptají, kde jsi'), t('Hospoda mezitím vydělávala – kasa je plná a čekají nové úkoly.')],
+        [NOTE.back5, 5, t('Hospoda bez hostinského chátrá'), t('Vrať se pro výdělek a denní truhlu – číšníci to sami dlouho neutáhnou.')],
+      ] as const) {
+        const m = new Date(now);
+        m.setDate(m.getDate() + days);
+        m.setHours(18, 0, 0, 0);
+        out.push({ id, at: m.getTime(), title, body });
+      }
     if (!this.tileLock('temple') && !isWeekend(now)) {
       const sat = new Date(now);
       sat.setDate(sat.getDate() + ((6 - sat.getDay() + 7) % 7));
@@ -5687,7 +5720,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       else c.zone.disableInteractive();
       c.face.setVisible(show && has);
       c.lvl.setVisible(show && has);
-      c.name.setVisible(show);
+      c.name.setVisible(show && (!has || UI_LEAN < 1));
       if (!show) return;
       // kulaté ikony (návrh B: větší, jméno pod kruhem)
       c.bg.fillStyle(col('ink'), 0.8).fillCircle(x, y, R);
@@ -6060,7 +6093,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (key === this.goalKey) return;
     this.goalKey = key;
     parts.forEach((o) => o.setVisible(true));
-    u.num.setText(t('do hygieny {n} %', { n: pct })).setColor(full ? PAL.mint : PAL.gold).setScale(1);
+    u.num.setText(UI_LEAN >= 2 ? `${pct} %` : t('do hygieny {n} %', { n: pct })).setColor(full ? PAL.mint : PAL.gold).setScale(1);
     u.num.setScale(Math.min(1, 150 / u.num.width));
     // krígl, který se plní (dřív v horní liště, návrh C), vedle něj nápis
     const mw = 20, mh = 28, pw = Math.round(12 + mw + 7 + 10 + u.num.displayWidth + 14), x = W - 10 - pw;
@@ -6754,8 +6787,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // víc stylů v jedné hospodě (styl se při předběhnutí neztrácí): názvy za sebou, výhody pod sebou
     a.setText(all.map((id) => STYLES[id].name.toUpperCase()).join(' + ')).setY(y + 2);
     a.setScale(Math.min(1, (W - 40) / a.width));
-    b.setText(all.map((id) => STYLES[id].perk).join('\n') + (n > 1 ? '\n' + t('{n} styly: +{v} % všude', { n, v: Math.round(STYLE_MIX * (n - 1) * 100) }) : '')).setY(y + 30).setColor(PAL.bone).setAlign('center');
-    const w = Math.max(a.displayWidth, b.width) + 24, h = 30 + b.height + 6;
+    b.setText((UI_LEAN >= 2 ? '' : all.map((id) => STYLES[id].perk).join('\n') + (n > 1 ? '\n' : '')) + (n > 1 ? t('{n} styly: +{v} % všude', { n, v: Math.round(STYLE_MIX * (n - 1) * 100) }) : '')).setY(y + 30).setColor(PAL.bone).setAlign('center');
+    const w = Math.max(a.displayWidth, b.width) + 24, h = b.text ? 30 + b.height + 6 : 34;
     const cx = W - 8 - w / 2;
     a.setX(cx);
     b.setX(cx);
@@ -6816,7 +6849,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const { x, y, w } = c;
       c.icon.setAlpha(open ? 1 : 0.45);
       c.name.setText(STATION_NAMES[p.act][c.def.id]).setAlpha(open ? 1 : 0.55);
-      c.lvl.setText(open ? t('úroveň {n}', { n: s.lvl }) : t('zavřeno'));
+      c.lvl.setText(open ? (UI_LEAN >= 3 ? t('úr. {n}', { n: s.lvl }) : t('úroveň {n}', { n: s.lvl })) : t('zavřeno'));
       c.lvl.setScale(Math.min(1, (w - 74 - (c.narrow ? PubScene.NBTN + 20 : 0)) / Math.max(1, c.lvl.width)));
       c.info.setText('');
       const sl = STAFF_LABEL[c.def.id];
@@ -6889,7 +6922,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const bx = c.narrow ? x + 64 : x + 10, bw = c.narrow ? w - 64 - PubScene.NBTN - 30 : w - 20, by = y + L.bar;
       c.bar.fillStyle(col('ink')).fillRoundedRect(bx, by, bw, L.barH, 6);
       if (open && s.prog > 0) c.bar.fillStyle(col(s.auto ? 'mint' : 'amber')).fillRoundedRect(bx, by, Math.max(12, bw * Math.min(1, s.prog)), L.barH, 6);
-      if (open && !s.auto && s.prog === 0) {
+      if (open && !s.auto && s.prog === 0 && UI_LEAN >= 1 && (this.d.tut ?? -1) < 0) {
+        // místo nápisu „ťukni sem!“ pulzuje zlatý obrys pruhu
+        c.info.setText('');
+        c.bar.lineStyle(3, col('gold'), 0.45 + 0.4 * Math.sin(this.time.now / 260)).strokeRoundedRect(bx - 2, by - 2, bw + 4, L.barH + 4, 7);
+      } else if (open && !s.auto && s.prog === 0) {
         c.info.setText(t('ťukni sem!')).setColor(PAL.gold);
         fs(c.info, c.narrow ? 18 : 26);
       } else fs(c.info, 18);

@@ -510,3 +510,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - ★2 pátá stanice hotová (varianta A): Kulečník / Krvavý kulečník / Žabí kuželky / Kulečník hlubin (POOL v economy.ts,
   úzká karta pod mřížkou, hospoda o 80 px nižší, stůl v hospodě). Není ve stylech, hvězdách stanic ani mistrovství.
 - Čeká: Petrův výběr vzhledu, vlastní kresby pro ★2–★5.
+- Posudek před vydáním (25. 11.): upozornění na neotevřenou denní truhlu (týž den za 3 h, nejpozději 20:00) a návrat po 2 a 5 dnech
+  v 18:00 (NOTE.back2/back5). Méně textu na hlavní obrazovce: ?ui=0|a|b|c (návrhy /mnt/project-files/prvni-obrazovka/navrhy-ABC.png),
+  výchozí B = bez „ťukni sem!“ po návodu (pulzující zlatý obrys pruhu), bez jmen číšníků, hygiena jen „N %“, cedule stylu bez výhody.

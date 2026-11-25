@@ -600,6 +600,13 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('VIP: přišel a čeká', await S(p, (s) => !!s.vipSpr && s.d.vip.until > Date.now()));
   ok('VIP: ťuknutí ho obslouží a dá výdělek', await S(p, (s) => { const e = s.d.earned; s.vipServeNow(); return !s.vipSpr && s.d.earned > e && s.d.vip.until === 0; }));
   ok('upozornění: VIP a truhla naplánované', await S(p, (s) => { const n = s.notes().map((x) => x.id); return n.includes(5) && n.includes(3); }));
+  ok('upozornění: neotevřená truhla připomenuta týž den, návrat za 2 a 5 dní', await S(p, (s) => {
+    const c = s.d.chest; s.d.chest = undefined;
+    const now = new Date(); now.setHours(12, 0, 0, 0);
+    const ns = s.notes(now.getTime()); s.d.chest = c;
+    const ch = ns.find((x) => x.id === 3), b2 = ns.find((x) => x.id === 6), b5 = ns.find((x) => x.id === 7);
+    return ch && ch.at === now.getTime() + 3 * 3600_000 && b2 && b5 && new Date(b2.at).getHours() === 18 && b5.at - b2.at > 2.9 * 86400_000;
+  }));
   ok('bez chyb v konzoli (speciální nabídka)', p.errors.length === 0);
   await p.close();
 }

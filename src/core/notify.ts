@@ -24,7 +24,7 @@ export interface NotifyProvider {
 }
 
 /** druhy upozornění (id) */
-export const NOTE = { full: 1, darts: 2, chest: 3, temple: 4, vip: 5 } as const;
+export const NOTE = { full: 1, darts: 2, chest: 3, temple: 4, vip: 5, back2: 6, back5: 7 } as const;
 
 /** Capacitor LocalNotifications (mobilní aplikace) – plugin @capacitor/local-notifications (kontrola hospoda 70: dřív v balíčku
  *  chyběl, takže v aplikaci upozornění nešla vůbec). Bez přesných budíků (isExactNotification: false) – jinak by plugin na
