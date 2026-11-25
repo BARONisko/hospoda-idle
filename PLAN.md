@@ -493,3 +493,11 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Denní úkoly pestřejší (pivo, šipky, VIP, noc, chrám o víkendu), týdenní + zlatá výzva (3× cíl, 💎 + kosti),
   úspěchy přesunuty do Sbírky, žolík truhly (1 vynechaný den/týden), Pivní horečka v pivovaru, bonus událostí od 30. prestiže.
 - Další: vlna 2 = Rekonstrukce ★ (s1, s2 = 5. stanice var. A, s4, s5), úkoly hostinského po hvězdách, pravidla týdne, efekty, výzdoba.
+
+- HOTOVO 25. 11. 2026 – STROM „TŘI CECHY“ (výběr uživatele: návrh A, docs/navrh-strom-2.md, src/core/skilltree.ts):
+  3 cesty × 8 pater (řemeslo 5 úrovní pod 1 % / volba 1 ze 2 „ťukám“ nebo „samo“ / … / vrchol), brány pater 0/5/15/30/50/75/100/140 b.
+  v cestě, koruna Legenda okresu (obě volby v jednom patře každé cesty). Ceny: řemeslo 2/4/7/11 za úroveň, volby 8/14/22, vrchol 60, koruna 40.
+  Nové schopnosti: Zlatá ruka, Uvítací hodina, Rozjezd (d.rushU), Velký tank (brewCfg.tankMul), Sudová loterie, Zásobárna, Noční lov,
+  Kostka zdarma (d.frDay), vrcholy Druhý manažer (p.dbl), Pivní dynastie, Pán noci (midU). Off4 a Hluboký sklep vypadly (offline je za 💎).
+  Převod (d.sk4): body zpět, staty starého stromu v d.skOld = „Stará pověst“ – platí vždy to větší (treeStats). Tempo: tools/sim/strom-navrhy.mjs,
+  days.mjs teď počítá strom A (TREE=0 = staré +10 %).

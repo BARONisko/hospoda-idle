@@ -21,6 +21,8 @@ export interface PubState {
   boostUntil?: number;
   /** schopnost znovu připravena od (ms) */
   boostReady?: number;
+  /** Druhý manažer: poslední puštění bylo to „navíc“ (další má normální nabíjení) */
+  dbl?: boolean;
   /** ×2 za reklamu na stanici: id stanice → platí do (ms) */
   adx?: Record<string, number>;
   /** styly hospody získané v tomto kole (economy.pubStyles) */
@@ -118,6 +120,14 @@ export interface Save {
   sk2?: boolean;
   /** nové ceny uzlů (hospoda 63b) – body jednou vráceny */
   sk3?: boolean;
+  /** strom „Tři cechy“ (25. 11. 2026): převedeno; skOld = staty starého stromu („Stará pověst“, platí to větší) */
+  sk4?: boolean;
+  skOld?: Record<string, number>;
+  /** po převodu ještě neukázaný nápis „Nový strom“ */
+  skNew?: boolean;
+  /** Rozjezd: do kdy po hygieně běží výdělek ×5; Kostka zdarma: den (YYYY-MM-DD) posledního hodu zdarma */
+  rushU?: number;
+  frDay?: string;
   /** 25. 11. 2026 (pravidlo pod 1 %): Zlatý výčep a pečetě Chrámu po 0,9 % – úrovně výčepu za starých pravidel (zůstávají); pečetě v temple.old */
   cthOld?: number;
   bon9?: boolean;

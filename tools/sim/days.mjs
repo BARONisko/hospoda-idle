@@ -8,8 +8,8 @@ const { run, MENU_HYG, PRESTIGE_GROW, PRESTIGE_MIN, PRESTIGE_FIRST, prestigeMin,
 
 const STARE = !!process.env.STARE;
 // TREE=D|A|B|C: strom hostinského podle tools/sim/strom-navrhy.mjs (D = dnešní strom spočítaný po uzlech) místo hrubých +10 %
-const TREE = process.env.TREE;
-const { treeMult } = TREE ? await import('./strom-navrhy.mjs') : {};
+const TREE = process.env.TREE ?? 'A'; // od 25. 11. 2026 je ve hře strom A (Tři cechy); TREE=0 = staré hrubé +10 %
+const { treeMult } = TREE !== '0' ? await import('./strom-navrhy.mjs') : {};
 const kf = (r, p) => Math.floor(2 * (r / (1e5 * 10 ** (p - 1))) ** 0.25);
 const goalOf = (n) => prestigeMin(n);
 // body stromu hostinského (tools/sim/skills.mjs, dny 1/7/30/100/365) → podíl stromu; celý strom ≈ +10 % výdělku (cesta Výčep)
@@ -52,7 +52,7 @@ for (const pl of P) {
     const bosses = templeDay === null ? 0 : Math.floor((day - templeDay) / 7 / pl.boss);
     const seal = 1 + (STARE ? 0.1 : SEAL) * bosses;
     const brew = n >= MENU_HYG.brew ? 1 + 0.009 * pl.brew * day : 1;
-    const tree = n >= 2 ? (TREE ? treeMult(TREE, pl.who, day) : 1 + (0.1 * pts(pl.who, day)) / 654) : 1;
+    const tree = n >= 2 ? (TREE !== '0' ? treeMult(TREE, pl.who, day) : 1 + (0.1 * pts(pl.who, day)) / 654) : 1;
     const cup = leagueDay === null ? 1 : 1 + pl.cup;
     const vy = STARE ? (cth ? 1.25 + 0.25 * cth : 1) : 1 + VYCEP * cth;
     const decor = decorDay === null ? 1 : (1.1 * (day - decorDay >= 7 ? 1.25 : 1));

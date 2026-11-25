@@ -1,4 +1,4 @@
-# Nový strom dovedností – 3 návrhy (25. 11. 2026, čeká na výběr)
+# Nový strom dovedností – 3 návrhy (25. 11. 2026) – vybráno A „Tři cechy“, HOTOVO (viz PLAN.md)
 
 Snímky: `docs/navrhy-skilly/strom-2/` (prehled.png, A1–C2, P). Tempo: `node tools/sim/strom-navrhy.mjs`,
 délka hry: `TREE=A|B|C|D DAYS=100 node tools/sim/days.mjs` (D = dnešní strom spočítaný po uzlech).

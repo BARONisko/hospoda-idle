@@ -149,12 +149,23 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   // 5g) hostinský: XP → úroveň → dovednost
   await S(p, (s) => { s.d.klvl = 1; s.d.xp = 0; s.d.skills = []; s.ktab = 0; s.ktSel = ''; s.d.stars = {}; s.d.mast = {}; s.d.loy = {}; s.xp(15); s.openShop('keeper', false); });
   ok('hostinský: úroveň 3 a 2 body', await S(p, (s) => s.d.klvl === 3 && s.skillPoints() === 2));
-  await S(p, (s) => s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown'));
-  ok('strom: koupen 1. uzel Výčepu (KOUPIT)', await S(p, (s) => s.d.skills.join() === 'v0' && s.skillPoints() === 0 && s.ts().income >= 0.006));
+  await S(p, (s) => { s.d.klvl = 3; s.openShop('keeper', false); s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown'); });
+  ok('strom: koupena 1. úroveň řemesla Výčepu (KOUPIT)', await S(p, (s) => s.d.skills.join() === 'vr0_1' && s.skillPoints() === 0 && s.ts().income >= 0.005));
   ok('strom: další uzel bez bodů nejde', await S(p, (s) => { s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown'); return s.d.skills.length === 1; }));
   // 5g2) hvězdný uzel a hygiena: Dobrá pověst nechá 5 % úrovní
-  await S(p, (s) => { s.d.klvl = 300; s.d.skills = []; for (let i = 0; i <= 20; i++) s.d.skills.push('s' + i); });
-  ok('strom: hvězda Dobrá pověst', await S(p, (s) => s.star('keep5') && !s.star('tray') && s.skillPoints() > 0));
+  await S(p, (s) => { s.d.klvl = 300; s.d.skills = ['sr0_1', 'sc0b']; });
+  ok('strom: volba Dobrá pověst', await S(p, (s) => s.star('keep5') && !s.star('rush') && !s.star('tray') && s.skillPoints() > 0));
+  ok('strom Tři cechy: volby, brány a koruna', await S(p, (s) => {
+    const own = ['sr0_1', 'sc0b'];
+    const can = (id) => s.treeOk(id, own);
+    const a = !can('sc0a') && !can('sr1_1') && can('sr0_2');
+    own.push('sr0_2', 'sr0_3', 'sr0_4');
+    const b = can('sr1_1');
+    // koruna: se všemi třemi vrcholy jde v jednom patře mít obě volby (jen jednou v cestě)
+    const all = ['vcap', 'scap', 'ncap', 'crown', 'sc0b', 'sc1a', 'sr0_1', 'sr1_1', 'sr2_1', 'sr3_1'];
+    const c = s.treeOk('sc0a', all) && !s.treeOk('sc1b', [...all, 'sc0a']);
+    return a && b && c;
+  }));
   // 5g3) mistrovství: roste s časem obsluhy, zvedá výdělek a rychlost; štít na kartě
   ok('mistrovství, hvězdy a hosté dávají jen body do stromu', await S(p, (s) => {
     // statistiky se kešují na snímek – test mění uložení mezi snímky, takže keš zahodit (jinak výsledek závisí na načasování)
@@ -404,6 +415,24 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   await p.waitForFunction(() => window.game?.scene?.getScene('Pub')?.d, null, { timeout: 15000 });
   await p.waitForTimeout(300);
   ok('převod skillů: nový strom, body vrácené', await S(p, (s) => s.d.sk2 && s.d.skills.length === 0 && s.d.klvl >= 10 && s.skillPoints() === s.d.klvl - 1));
+  // strom Tři cechy (25. 11. 2026): starý velký strom → body zpět, staty jako Stará pověst
+  await S(p, (s) => { delete s.d.sk4; s.d.skills = ['v0', 'v1', 'v2', 'v3', 'v4']; });
+  await p.reload();
+  await p.waitForFunction(() => window.game?.scene?.getScene('Pub')?.d, null, { timeout: 15000 });
+  await p.waitForTimeout(300);
+  ok('převod na Tři cechy: body zpět, Stará pověst drží výdělek', await S(p, (s) => s.d.sk4 && s.d.skills.length === 0 && Math.abs(s.d.skOld.income - 0.006) < 1e-9 && Math.abs(s.d.skOld.tips - 0.039) < 1e-9 && s.ts().tips >= 0.039 && s.skillPoints() === s.d.klvl - 1 + s.bonusPoints()));
+  ok('Stará pověst: platí to větší, ne součet', await S(p, (s) => { s.d.skills = ['vr0_1']; s.tsCache = undefined; const v = s.ts().income; s.d.skills = []; s.tsCache = undefined; return v === s.ts().income; }));
+  ok('Druhý manažer: 2× za sebou, pak nabíjení', await S(p, (s) => {
+    const p0 = s.d.pubs[0]; p0.mgr = true; p0.boostReady = 0; p0.boostUntil = 0; delete p0.dbl; s.d.skills = ['vcap'];
+    s.useSkill(0, true); const a = p0.boostReady === p0.boostUntil;
+    p0.boostUntil = 0; p0.boostReady = 0; s.useSkill(0, true); const b = p0.boostReady > p0.boostUntil;
+    p0.boostUntil = 0; p0.boostReady = 0; return a && b;
+  }));
+  ok('Pivní dynastie, Rozjezd a Sudová loterie po hygieně', await S(p, (s) => {
+    s.d.skills = ['scap', 'sc0a', 'sc2a']; s.d.tut = -1; const k0 = s.d.krigle, kn = s.kriglyNow(); s.prestige(); return true;
+  }));
+  await p.waitForTimeout(800);
+  ok('… stanice na 25., výdělek ×5, krígly +1–3', await S(p, (s) => s.d.pubs.every((x) => (x.st.kitchen?.lvl ?? 0) >= 25 && x.mgr) && s.d.rushU > Date.now()));
   // mistrovství i offline: hodina pryč s obsluhou na pípě
   await S(p, (s) => { s.d.coins = 1e6; s.hire(0, s.cards[0].def); s.d.mast = {}; s.d.at = Date.now() - 3600_000; s.offline(); });
   ok('mistrovství roste i offline', await S(p, (s) => (s.d.mast.tap ?? 0) >= 3500));

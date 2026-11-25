@@ -54,7 +54,7 @@ function designA() {
     [['krigly', 0.008], ['cycle', 0.004], ['brew', 0.009], ['staff', 0.009]],
     [['bones', 0.009], ['nighttips', 0.009], ['events', 0.009], ['xp', 0.009]],
   ];
-  const RC = [3, 4, 7, 11], CC = [8, 14, 22], CAP = 60;
+  const RC = [2, 4, 7, 11], CC = [8, 14, 22], CAP = 60;
   // patro f (0–7) se otevře, až máš v cestě utraceno aspoň G[f] bodů (jako u talentů: nejde jen proběhnout k vrcholu)
   const G = [0, 5, 15, 30, 50, 75, 100, 140];
   const N = [];
