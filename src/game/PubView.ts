@@ -97,6 +97,11 @@ const MGR_SPRITE: Record<number, string> = { 1: 'tapster', 2: 'count', 3: 'deep0
 export class PubView {
   /** hostů navíc (stat z Kostnice) */
   static extraGuests = 0;
+  /** Pivní horečka (pivovar): do kdy chodí 2× víc hostů a objednávají 2× častěji */
+  static rushUntil = 0;
+  static rush() {
+    return PubView.rushUntil > Date.now();
+  }
   /** probuzený Cthulhu (vylepšení z krígel) – kouká do hospody */
   cthulhu = false;
   private cth?: Phaser.GameObjects.Sprite;
@@ -384,7 +389,7 @@ export class PubView {
     if (g.order) {
       const o = g.order;
       g.order = undefined;
-      g.next = (g.sat ?? 0) + this.rnd.realInRange(8, 14);
+      g.next = (g.sat ?? 0) + this.rnd.realInRange(8, 14) / (PubView.rush() ? 2 : 1);
       this.s.tweens.killTweensOf(o);
       this.s.tweens.add({ targets: o, scale: 0, alpha: 0, duration: 120, onComplete: () => o.forEach((x) => x.destroy()) });
     }
@@ -411,7 +416,7 @@ export class PubView {
   private serve(g: Guest) {
     g.order?.forEach((o) => o.destroy());
     g.order = undefined;
-    g.next = (g.sat ?? 0) + this.rnd.realInRange(8, 14);
+    g.next = (g.sat ?? 0) + this.rnd.realInRange(8, 14) / (PubView.rush() ? 2 : 1);
   }
 
   /** kam na obrazovce ukázat návodem „ťukni na bublinu“: bublina s objednávkou (host bez bubliny spropitné nedá) */
@@ -608,9 +613,10 @@ export class PubView {
   update(dt: number, busy: number) {
     // hosté: čím víc otevřených stanic, tím víc lidí
     this.spawnT -= dt;
-    const want = Math.min(this.seats.length - 1, 3 + busy * 2 + PubView.extraGuests);
+    const rush = PubView.rush();
+    const want = Math.min(this.seats.length - 1, 3 + busy * 2 + PubView.extraGuests + (rush ? 4 : 0));
     if (this.spawnT <= 0) {
-      this.spawnT = this.rnd.realInRange(1.2, 3.5);
+      this.spawnT = this.rnd.realInRange(1.2, 3.5) / (rush ? 2 : 1);
       if (this.guests.length < want) {
         const n = this.guests.length;
         this.spawn();

@@ -1443,5 +1443,21 @@
  "Celkem ×{m}": "Total ×{m}",
  "po {n}. hygieně a {c} coins výdělku": "after inspection {n} and {c} coins earned",
  "ještě {c} coins výdělku": "{c} more coins to earn",
- "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "Unlocks after inspection {n} and {c} coins of total earnings."
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "Unlocks after inspection {n} and {c} coins of total earnings.",
+ "Zlatá výzva: {s}": "Golden challenge: {s}",
+ "odměna: {g} 💎 + kosti": "reward: {g} 💎 + bones",
+ "Splněný úspěch čeká ve Sbírce → Úspěchy": "A completed achievement is waiting in Collection → Achievements",
+ "Úspěchy": "Achievements",
+ "Uvař a prodej nebo vlož {n} piva": "Brew and sell or invest {n} beers",
+ "Dohraj {n} hru šipek": "Finish {n} darts game",
+ "Obsluž VIP hosta": "Serve a VIP guest",
+ "V noci obsluž {n} bublin": "Serve {n} bubbles at night",
+ "Odehraj kolo v Chrámu": "Play a round in the Temple",
+ "žolík ✓": "joker ✓",
+ "Pivní horečka\n{m} min: 2× víc hostů": "Beer fever\n{m} min: 2× more guests",
+ "Pivní horečka! 2× víc hostů na {m} min": "Beer fever! 2× more guests for {m} min",
+ "Událost navíc: +{n} kostí": "Event bonus: +{n} bones",
+ "Událost navíc: číšníci +15 min zkušeností": "Event bonus: waiters +15 min of experience",
+ "V Úkolech najdeš denní úkoly (odměna v coins) a týdenní výzvu (talisman a krígly); po ní přijde zlatá výzva s 💎. Úkol od hostinského v liště nad hospodou tě postupně provede celou hrou – tlačítko UKAŽ ukáže, kam ťuknout. Úspěchy (krígl za každý) jsou ve Sbírce. Ve Speciální nabídce na tebe každý den čeká truhla zdarma; sedmý den série je zlatá truhla s 💎 a jeden vynechaný den za týden ti odpustí žolík.": "In Tasks you'll find daily tasks (coin rewards) and a weekly challenge (a talisman and tankards); after it comes a golden challenge with 💎. The landlord's task in the bar above the pub guides you through the whole game – the SHOW button points to where to tap. Achievements (a tankard each) are in the Collection. In the Special offer a free chest waits for you every day; day seven of a streak is a golden chest with 💎, and a joker forgives one missed day per week.",
+ "Pivovar vaří pivo sám, i když nehraješ. Hotová piva prodáš za coins, vložíš do vylepšení pivovaru, nebo je utratíš za pivní akce – třeba Pivní horečku, kdy chodí dvakrát víc hostů. Vyšší úroveň vaří rychleji, má větší tank a dává trvalý bonus k výdělku, který zůstane i po hygieně. Když je tank plný, vaření stojí.": "The brewery brews beer by itself, even when you're not playing. Sell finished beers for coins, put them into brewery upgrades, or spend them on beer actions – like Beer fever, when twice as many guests come. A higher level brews faster, has a bigger tank and gives a permanent earnings bonus that stays after inspections. When the tank is full, brewing stops."
 }

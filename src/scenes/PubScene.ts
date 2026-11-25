@@ -27,7 +27,7 @@ import { isNight, nightForced, phaseLeft, DAY_MS, bonesFor, nightCfg, retune, ni
 import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
 import { notify, NOTE, Note } from '../core/notify';
-import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, GEM_PERM, GEM_LOOK, CHRONICLE_BONUS, VIP_GEMS, GOLD_GEMS, GEMS_FREE, PRESTIGE_GEMS_DAY, RESPEC_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
+import { chestReady, chestDay, openChest, jokerFree, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, GEM_PERM, GEM_LOOK, CHRONICLE_BONUS, VIP_GEMS, GOLD_GEMS, GEMS_FREE, PRESTIGE_GEMS_DAY, RESPEC_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
 import { templeState, isWeekend, ROUNDS_PER_DAY, sealBonus, TempleState, weekendKey, ALTAR_PER, weekendLeft } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { TREE, TREE_BY_ID, TREE_BRANCHES, TREE_COLORS, STAR_TEXT, treeSpent, treeCan, hasStar, treeStats, xpNeed, oldXpNeed, lvlFromTotal, respecCost, pathX, type StarId, type TreeNode } from '../core/skilltree';
@@ -40,7 +40,7 @@ import { PubView, LOOK } from '../game/PubView';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
 import { GUESTS } from '../game/PubView';
 import { QUESTS, QCtx, QuestDef, currentQuest, questDone } from '../core/quests';
-import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today, WeekKind, newWeekly, weekId, weekNum, weekText } from '../core/goals';
+import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today, WeekKind, newWeekly, weekId, weekNum, weekText, GOLD_WEEK_X, GOLD_WEEK_GEMS } from '../core/goals';
 
 const W = 540;
 /** kolik talířů z kuchyně může čekat na číšníky */
@@ -548,6 +548,17 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         this.week(k === 'brawl' ? 'brawls' : 'events');
         this.xp(20);
         this.task('events', 1);
+        // návrh J6: v pozdní hře (od 30. hygieny) dá událost navíc i věc, kterou hygiena nesmaže – kosti, nebo zkušenosti číšníkům
+        if (this.d.stats.prestiges >= 30) {
+          if (Math.random() < 0.5) {
+            const b = Math.max(20, Math.round(this.bonesPerSec() * 900));
+            this.d.bones = (this.d.bones ?? 0) + b;
+            this.banner(this.views[0].cam, t('Událost navíc: +{n} kostí', { n: big(b) }));
+          } else {
+            for (const p of this.d.pubs) for (const w of p.w ?? []) w.xp = (w.xp ?? 0) + 900;
+            this.banner(this.views[0].cam, t('Událost navíc: číšníci +15 min zkušeností'));
+          }
+        }
       },
     });
     const evq = new URLSearchParams(location.search).get('ev') as EventKind | null;
@@ -1000,6 +1011,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** šipky → kosti a hostinský: každá dohraná hra +3 kosti a +5 XP */
   dartsLeg(n: number) {
+    this.task('darts', n);
     this.d.bones = (this.d.bones ?? 0) + 3 * n;
     this.xp(5 * n);
   }
@@ -1066,6 +1078,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   templeData(): TempleState {
     return (this.d.temple = templeState(this.d.temple));
+  }
+
+  /** denní úkol „Odehraj kolo v Chrámu“ */
+  templeRound() {
+    this.task('temple', 1);
   }
 
   templeIncome() {
@@ -1159,7 +1176,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** co přesně upozornění hlásí (když se změní – víc bodů, další úkol – tečka se rozsvítí znovu) */
   private alertSig(id: string) {
     if (id === 'keeper') return String(this.skillPoints());
-    if (id === 'tasks') return String(this.daily().tasks.filter((k) => !k.claimed && k.prog >= k.goal).length + this.d.ach.length * 100 + (this.weekly().claimed ? 0 : this.weekly().prog >= this.weekly().goal ? 1e4 : 0));
+    if (id === 'tasks') return String(this.daily().tasks.filter((k) => !k.claimed && k.prog >= k.goal).length + (this.weekly().claimed ? (this.weekly().gc ? 0 : (this.weekly().gp ?? 0) >= this.weekly().goal * GOLD_WEEK_X ? 1e5 : 0) : this.weekly().prog >= this.weekly().goal ? 1e4 : 0));
+    if (id === 'book') return String(this.d.ach.length);
     if (id === 'special') return dayKey();
     if (id === 'darts') return String(Math.floor(this.d.darts?.pts ?? 0));
     if (id === 'shop') return String(this.shopOffer().filter((u) => u.cost <= this.d.coins).length);
@@ -1174,6 +1192,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private alertRaw(id: string) {
     if (id === 'shop') return this.shopOffer().some((u) => u.cost <= this.d.coins);
     if (id === 'tasks') return this.claimable();
+    if (id === 'book') return this.achClaimable();
     if (id === 'brew') return this.brewFull();
     if (id === 'keeper') return this.skillPoints() > 0;
     if (id === 'special') return (chestReady(this.d.chest) && (this.d.tut ?? -1) < 0) || (passOn(this.d.pass) && (this.d.pass!.claim ?? '') < dayKey());
@@ -2160,6 +2179,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       b.stock--;
       this.xp(15);
       this.week('beers');
+      this.task('beer', 1);
       this.gain(price);
       sfx.coin(1.2);
       store(this.d);
@@ -2172,6 +2192,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       b.stock--;
       b.inv++;
       this.week('beers');
+      this.task('beer', 1);
       if (b.inv >= lvlCost(b)) {
         b.inv = 0;
         b.lvl++;
@@ -2190,9 +2211,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const happyLeft = Math.max(0, (fx.happy ?? 0) - now), slowLeft = Math.max(0, (L.slowUntil ?? 0) - now);
     const mmss = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.floor((ms % 60000) / 1000)).padStart(2, '0')}`;
     const acts: { cost: number; label: string; on?: string; ok: boolean; run: () => void }[] = [
-      { cost: 2, label: t('Happy hour\n{m} min ×2', { m: this.happyMin() }), on: happyLeft ? t('běží {t}', { t: mmss(happyLeft) }) : undefined, ok: !happyLeft, run: () => {
+      // návrh J4 (výběr uživatele): místo Happy hour ×2 (sčítala se se Šťastnou hodinou ×3) Pivní horečka – 2× víc hostů a objednávek
+      { cost: 2, label: t('Pivní horečka\n{m} min: 2× víc hostů', { m: this.happyMin() }), on: happyLeft ? t('běží {t}', { t: mmss(happyLeft) }) : undefined, ok: !happyLeft, run: () => {
         fx.happy = Date.now() + this.happyMin() * 60_000;
-        this.banner(this.views[0].cam, t('Happy hour! Výdělek ×2 na {m} min', { m: this.happyMin() }));
+        PubView.rushUntil = fx.happy;
+        this.banner(this.views[0].cam, t('Pivní horečka! 2× víc hostů na {m} min', { m: this.happyMin() }));
       } },
       { cost: 1, label: t('Runda pro všechny\nspropitné od všech'), ok: true, run: () => {
         const per = Math.max(1, Math.round(this.visitCtx().income(sellSecs(b) * (1 + this.ts().beer)) * 0.08));
@@ -2345,7 +2368,16 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   // ---------- úkoly a úspěchy ----------
   private daily() {
-    if (this.d.daily.day < today()) this.d.daily = newDaily(this.totalRate());
+    if (this.d.daily.day < today()) {
+      // pestřejší denní úkoly (návrh J2): druhy z částí hry, které už hráč má
+      const ex: TaskKind[] = [];
+      if (!this.tileLock('brew')) ex.push('beer');
+      if (!this.tileLock('darts') && this.d.darts && autoOn(this.d.darts)) ex.push('darts');
+      if (this.d.stats.prestiges >= 1) ex.push('vip');
+      if (this.d.nightInfo) ex.push('night');
+      if (!this.tileLock('temple') && isWeekend()) ex.push('temple');
+      this.d.daily = newDaily(this.totalRate(), ex);
+    }
     return this.d.daily;
   }
 
@@ -2359,7 +2391,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** je co vyzvednout (úkol nebo úspěch)? */
   private claimable() {
-    return (this.weekly().prog >= this.weekly().goal && !this.weekly().claimed) || this.daily().tasks.some((k) => !k.claimed && k.prog >= k.goal) || ACHIEVEMENTS.some((a) => !this.d.ach.includes(a.id) && a.done(this.d));
+    const w = this.weekly();
+    return (w.prog >= w.goal && !w.claimed) || (w.claimed && !w.gc && (w.gp ?? 0) >= w.goal * GOLD_WEEK_X) || this.daily().tasks.some((k) => !k.claimed && k.prog >= k.goal);
+  }
+
+  /** úspěch k vyzvednutí (úspěchy jsou ve Sbírce – úkoly sloučené do 3 řad, přání uživatele 25. 11.) */
+  private achClaimable() {
+    return ACHIEVEMENTS.some((a) => !this.d.ach.includes(a.id) && a.done(this.d));
   }
 
   private taskReward() {
@@ -2374,7 +2412,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   private week(kind: WeekKind, n = 1) {
     const w = this.weekly();
-    if (w.kind === kind && !w.claimed) w.prog = Math.min(w.goal, w.prog + n);
+    if (w.kind !== kind) return;
+    if (!w.claimed) w.prog = Math.min(w.goal, w.prog + n);
+    else if (!w.gc) w.gp = Math.min(w.goal * GOLD_WEEK_X, (w.gp ?? w.goal) + n);
   }
 
   private tasksTab(y0: number, D: number) {
@@ -2396,6 +2436,23 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       }, D + 2);
       this.drawBtn(b, w.claimed ? '✓' : done ? t('Vybrat') : `${Math.floor((w.prog / w.goal) * 100)} %`, done && !w.claimed, 'green');
       this.shopObjs.push(b.bg, b.label, b.zone);
+      // zlatá výzva (návrh J3): po vyzvednutí stejný úkol do 3× cíle, odměna 💎 + kosti
+      if (w.claimed) {
+        y0 += RH + 4;
+        const gg = w.goal * GOLD_WEEK_X, gp = w.gp ?? w.goal, gd = gp >= gg;
+        this.row(y0 - 4, RH, D, t('Zlatá výzva: {s}', { s: weekText(w.kind, gg) }), w.gc ? t('hotovo – další v pondělí') : `${gp} / ${gg} · ${t('odměna: {g} 💎 + kosti', { g: GOLD_WEEK_GEMS })}`, 'plum', PAL.gold);
+        const b2 = this.btn(W - 172, y0 + 6, 150, 54, () => {
+          if (w.gc || (w.gp ?? w.goal) < gg) return sfx.error();
+          w.gc = true;
+          this.d.gems = (this.d.gems ?? 0) + GOLD_WEEK_GEMS;
+          this.d.bones = (this.d.bones ?? 0) + Math.max(50, Math.round(this.bonesPerSec() * 3600 * 2));
+          sfx.fanfare();
+          store(this.d);
+          this.openShop('tasks', false);
+        }, D + 2);
+        this.drawBtn(b2, w.gc ? '✓' : gd ? t('Vybrat') : `${Math.floor((gp / gg) * 100)} %`, gd && !w.gc, 'green');
+        this.shopObjs.push(b2.bg, b2.label, b2.zone);
+      }
       y0 += RH + 4;
     }
     head(y0, t('Denní úkoly'));
@@ -2415,27 +2472,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.drawBtn(b, tk.claimed ? '✓' : done ? t('+{n}', { n: big(this.taskReward()) }) : t('{p} %', { p: Math.floor((tk.prog / tk.goal) * 100) }), done && !tk.claimed, 'green');
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
+    // úspěchy jsou ve Sbírce (přání uživatele 25. 11.: úkoly jen ve 3 řadách – denní, týdenní, Kniha hostinského v liště)
     const y1 = y0 + 34 + 3 * RH + 12;
-    const got = this.d.ach.length;
-    head(y1, t('Úspěchy {a} / {b}  (odměna 1 krígl)', { a: got, b: ACHIEVEMENTS.length }));
-    // nejdřív k vyzvednutí, pak nesplněné
-    const list = ACHIEVEMENTS.filter((a) => !this.d.ach.includes(a.id)).sort((a, b) => Number(b.done(this.d)) - Number(a.done(this.d))).slice(0, 2);
-    if (!list.length) head(y1 + 50, t('Všechny úspěchy splněny!'));
-    list.forEach((a, i) => {
-      const y = y1 + 34 + i * RH;
-      const done = a.done(this.d);
-      this.row(y, RH, D, a.text, done ? t('splněno!') : t('zatím ne'));
-      const b = this.btn(W - 172, y + 10, 150, 54, () => {
-        if (!a.done(this.d) || this.d.ach.includes(a.id)) return sfx.error();
-        this.d.ach.push(a.id);
-        this.d.krigle += 1;
-        sfx.fanfare();
-        store(this.d);
-        this.openShop('tasks', false);
-      }, D + 2);
-      this.drawBtn(b, done ? t('+1 krígl') : '—', done, 'green');
-      this.shopObjs.push(b.bg, b.label, b.zone);
-    });
+    if (this.achClaimable()) head(y1, t('Splněný úspěch čeká ve Sbírce → Úspěchy'));
   }
 
   // ---------- nastavení ----------
@@ -3335,7 +3374,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.card(y, 96, 'ink', D);
     add(this.add.image(58, y + 50, 'obj', 'chest').setScale(3).setDepth(D + 2));
     add(this.add.text(108, y + 14, t('Denní truhla'), txt(24, PAL.bone)).setDepth(D + 2));
-    const cs = add(this.add.text(108, y + 52, t('zdarma každý den · série {d}/7', { d: chestDay(this.d.chest) }), txt(16, PAL.fog)).setDepth(D + 2));
+    const cs = add(this.add.text(108, y + 52, t('zdarma každý den · série {d}/7', { d: chestDay(this.d.chest) }) + (jokerFree(this.d.chest) ? ' · ' + t('žolík ✓') : ''), txt(16, PAL.fog)).setDepth(D + 2));
     cs.setScale(Math.min(1, 250 / cs.width));
     const ch = this.btn(W - 150, y + 23, 128, 50, () => this.openShop('chest', false), D + 3);
     this.drawBtn(ch, chestReady(this.d.chest) ? t('Otevřít') : t('Ukázat'), true, chestReady(this.d.chest) ? 'green' : 'slate');
@@ -3582,6 +3621,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const v = this.d.vip;
     if (!v?.until || v.until <= Date.now()) return;
     vipServe(v);
+    this.task('vip', 1);
     const n = this.hoursIncome(VIP_H);
     this.gain(n);
     this.d.gems = (this.d.gems ?? 0) + VIP_GEMS;
@@ -3640,7 +3680,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
     const nameOf = (key: string, seen: boolean) => (seen ? this.guestName(key) : '???');
     const groups = [...[1, 2, 3].map((a) => [...new Set(GUESTS[a])]), Object.values(SEASONS).map((x) => x.guest)];
-    const gn = [...[1, 2, 3].map((a) => PUB_NAMES[a]), t('Sezóna'), t('Návštěvníci')];
+    const gn = [...[1, 2, 3].map((a) => PUB_NAMES[a]), t('Sezóna'), t('Návštěvníci'), t('Úspěchy')];
     const tw = (W - 20 - (gn.length - 1) * 4) / gn.length;
     gn.forEach((n, i) => {
       const b = this.btn(10 + i * (tw + 4), y0 - 50, tw, 40, () => ((this.bookGrp = i), (this.bookSel = ''), this.openShop('book', false)), D + 2);
@@ -3651,6 +3691,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
     if (this.bookGrp === 4) return this.bookVisitors(y0, D);
+    if (this.bookGrp === 5) return this.bookAch(y0, D);
     (groups[this.bookGrp] ?? []).forEach((key, i) => {
       const cw = (W - 20 - 3 * 8) / 4, x = 10 + (i % 4) * (cw + 8), y = y0 + Math.floor(i / 4) * 178, seen = this.d.seen.includes(key);
       const L = this.loyText(key);
@@ -3682,6 +3723,30 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const bt = add(this.add.text(100, py + 90, L.bonus, txt(16, PAL.fog)).setDepth(D + 8));
       bt.setScale(Math.min(1, (W - 120) / bt.width));
     }
+  }
+
+  /** Sbírka → Úspěchy (dřív v Úkolech): k vyzvednutí nahoře, pak nesplněné; každý = 1 krígl */
+  private bookAch(y0: number, D: number) {
+    const RH = 62, got = this.d.ach.length;
+    this.shopObjs.push(this.add.text(20, y0 - 2, t('Úspěchy {a} / {b}  (odměna 1 krígl)', { a: got, b: ACHIEVEMENTS.length }), txt(22, PAL.gold)).setDepth(D + 1));
+    const list = ACHIEVEMENTS.filter((a) => !this.d.ach.includes(a.id)).sort((a, b) => Number(b.done(this.d)) - Number(a.done(this.d)));
+    const max = Math.max(1, Math.floor((MB - 12 - (y0 + 34)) / RH));
+    if (!list.length) this.shopObjs.push(this.add.text(20, y0 + 40, t('Všechny úspěchy splněny!'), txt(22, PAL.mint)).setDepth(D + 1));
+    list.slice(0, max).forEach((a, i) => {
+      const y = y0 + 34 + i * RH;
+      const done = a.done(this.d);
+      this.row(y, RH - 4, D, a.text, done ? t('splněno!') : t('zatím ne'));
+      const b = this.btn(W - 172, y + 6, 150, RH - 18, () => {
+        if (!a.done(this.d) || this.d.ach.includes(a.id)) return sfx.error();
+        this.d.ach.push(a.id);
+        this.d.krigle += 1;
+        sfx.fanfare();
+        store(this.d);
+        this.openShop('book', false);
+      }, D + 2);
+      this.drawBtn(b, done ? t('+1 krígl') : '—', done, 'green');
+      this.shopObjs.push(b.bg, b.label, b.zone);
+    });
   }
 
   /** Sbírka → Návštěvníci: kolikrát hráč přijal / zaplatil; po VIS_GOLD zlatý rámeček = 2 💎 místo 1 */
@@ -5059,7 +5124,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const gold = !this.night && Math.random() < Math.min(0.1, this.ts().golden);
     const tip = (gold ? 10 : 1) * Math.max(1, Math.round((this.rate(v.pub) * 2 + this.pay(v.pub, STATIONS[0])) * (this.has('boar') ? 3 : 1) * (isStyle(v.pub, 'tap') ? 2 : 1) * (1 + this.ts().tips + guestTips(this.d.gxp ?? 0)) * this.happyMult()));
     const bone = this.boneMult(v.pub) * (1 + this.ts().nighttips);
-    if (this.night) this.d.bones = (this.d.bones ?? 0) + bone;
+    if (this.night) (this.d.bones = (this.d.bones ?? 0) + bone), this.task('night', 1);
     else this.gain(tip);
     // hvězda „Kostěné spropitné“: i ve dne kousek kosti (1 kost za 5 bublin)
     if (!this.night && this.star('daybones')) this.d.bones = (this.d.bones ?? 0) + bone * 0.2;
@@ -5140,8 +5205,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return Math.round(10 * (1 + 0.2 * (this.brew().lvl - 1)));
   }
 
+  /** dřív Happy hour ×2 – teď Pivní horečka (víc hostů v PubView.rushUntil), výdělek se nenásobí */
   private happyMult() {
-    return (this.d.fx?.happy ?? 0) > Date.now() ? 2 : 1;
+    return 1;
   }
 
   private dayNightTab(y0: number, D: number) {
@@ -5408,6 +5474,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (this.d.dn) this.d.dn.shift = sh;
     }
     PubView.extraGuests = Math.floor(this.ts().guests);
+    PubView.rushUntil = this.d.fx?.happy ?? 0;
     vipCfg.every = VIP_EVERY / (this.star('vip2') ? 2 : 1);
   }
 

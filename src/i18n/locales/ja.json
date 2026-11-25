@@ -1443,5 +1443,21 @@
  "Celkem ×{m}": "合計 ×{m}",
  "po {n}. hygieně a {c} coins výdělku": "{n}回目の検査後、{c}コイン獲得で",
  "ještě {c} coins výdělku": "あと{c}コインの収入",
- "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "{n}回目の検査後、総収入{c}コインで解放。"
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "{n}回目の検査後、総収入{c}コインで解放。",
+ "Zlatá výzva: {s}": "ゴールドチャレンジ: {s}",
+ "odměna: {g} 💎 + kosti": "報酬: {g} 💎 + 骨",
+ "Splněný úspěch čeká ve Sbírce → Úspěchy": "達成済みの実績がコレクション → 実績で待っています",
+ "Úspěchy": "実績",
+ "Uvař a prodej nebo vlož {n} piva": "ビールを{n}杯醸造して売るか投資する",
+ "Dohraj {n} hru šipek": "ダーツを{n}ゲーム終える",
+ "Obsluž VIP hosta": "VIP客に応対する",
+ "V noci obsluž {n} bublin": "夜に{n}個の吹き出しに応対する",
+ "Odehraj kolo v Chrámu": "神殿で1ラウンド遊ぶ",
+ "žolík ✓": "ジョーカー ✓",
+ "Pivní horečka\n{m} min: 2× víc hostů": "ビール祭り\n{m}分: 客が2倍",
+ "Pivní horečka! 2× víc hostů na {m} min": "ビール祭り！{m}分間 客が2倍",
+ "Událost navíc: +{n} kostí": "イベントボーナス: 骨+{n}",
+ "Událost navíc: číšníci +15 min zkušeností": "イベントボーナス: 店員の経験+15分",
+ "V Úkolech najdeš denní úkoly (odměna v coins) a týdenní výzvu (talisman a krígly); po ní přijde zlatá výzva s 💎. Úkol od hostinského v liště nad hospodou tě postupně provede celou hrou – tlačítko UKAŽ ukáže, kam ťuknout. Úspěchy (krígl za každý) jsou ve Sbírce. Ve Speciální nabídce na tebe každý den čeká truhla zdarma; sedmý den série je zlatá truhla s 💎 a jeden vynechaný den za týden ti odpustí žolík.": "タスクには毎日のタスク（報酬はコイン）と週間チャレンジ（お守りとジョッキ）があり、その後に💎付きのゴールドチャレンジが続きます。酒場の上のバーにある店主のタスクがゲーム全体を案内します。「見せる」ボタンでタップする場所がわかります。実績（それぞれジョッキ1個）はコレクションにあります。特別オファーでは毎日無料の宝箱が待っています。連続7日目は💎入りの金の宝箱で、ジョーカーが週に1日の休みを許してくれます。",
+ "Pivovar vaří pivo sám, i když nehraješ. Hotová piva prodáš za coins, vložíš do vylepšení pivovaru, nebo je utratíš za pivní akce – třeba Pivní horečku, kdy chodí dvakrát víc hostů. Vyšší úroveň vaří rychleji, má větší tank a dává trvalý bonus k výdělku, který zůstane i po hygieně. Když je tank plný, vaření stojí.": "醸造所はプレイしていなくても自動でビールを造ります。完成したビールはコインで売るか、醸造所の強化に使うか、ビールイベントに使えます。たとえばビール祭りでは客が2倍来ます。レベルが上がると醸造が速くなり、タンクが大きくなり、検査後も残る永続的な収入ボーナスが得られます。タンクが満杯になると醸造は止まります。"
 }

@@ -1443,5 +1443,21 @@
  "Celkem ×{m}": "합계 ×{m}",
  "po {n}. hygieně a {c} coins výdělku": "{n}번째 점검 후 {c} 코인 수입 시",
  "ještě {c} coins výdělku": "수입 {c} 코인 남음",
- "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "{n}번째 점검 후 총수입 {c} 코인이면 해금됩니다."
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "{n}번째 점검 후 총수입 {c} 코인이면 해금됩니다.",
+ "Zlatá výzva: {s}": "골드 도전: {s}",
+ "odměna: {g} 💎 + kosti": "보상: {g} 💎 + 뼈",
+ "Splněný úspěch čeká ve Sbírce → Úspěchy": "완료한 업적이 컬렉션 → 업적에서 기다립니다",
+ "Úspěchy": "업적",
+ "Uvař a prodej nebo vlož {n} piva": "맥주 {n}잔을 양조해 팔거나 투자하기",
+ "Dohraj {n} hru šipek": "다트 게임 {n}판 끝내기",
+ "Obsluž VIP hosta": "VIP 손님 응대하기",
+ "V noci obsluž {n} bublin": "밤에 말풍선 {n}개 응대하기",
+ "Odehraj kolo v Chrámu": "신전에서 한 판 하기",
+ "žolík ✓": "조커 ✓",
+ "Pivní horečka\n{m} min: 2× víc hostů": "맥주 열풍\n{m}분: 손님 2배",
+ "Pivní horečka! 2× víc hostů na {m} min": "맥주 열풍! {m}분 동안 손님 2배",
+ "Událost navíc: +{n} kostí": "이벤트 보너스: 뼈 +{n}",
+ "Událost navíc: číšníci +15 min zkušeností": "이벤트 보너스: 종업원 경험 +15분",
+ "V Úkolech najdeš denní úkoly (odměna v coins) a týdenní výzvu (talisman a krígly); po ní přijde zlatá výzva s 💎. Úkol od hostinského v liště nad hospodou tě postupně provede celou hrou – tlačítko UKAŽ ukáže, kam ťuknout. Úspěchy (krígl za každý) jsou ve Sbírce. Ve Speciální nabídce na tebe každý den čeká truhla zdarma; sedmý den série je zlatá truhla s 💎 a jeden vynechaný den za týden ti odpustí žolík.": "과제에는 일일 과제(코인 보상)와 주간 도전(부적과 맥주잔)이 있고, 그 뒤에 💎를 주는 골드 도전이 이어집니다. 술집 위 막대에 있는 주인의 과제가 게임 전체를 안내하며, 보여 주기 버튼이 누를 곳을 알려 줍니다. 업적(각각 맥주잔 1개)은 컬렉션에 있습니다. 특별 제안에서는 매일 무료 상자가 기다립니다. 연속 7일째에는 💎가 든 황금 상자를 받고, 조커가 일주일에 하루 빠진 날을 봐줍니다.",
+ "Pivovar vaří pivo sám, i když nehraješ. Hotová piva prodáš za coins, vložíš do vylepšení pivovaru, nebo je utratíš za pivní akce – třeba Pivní horečku, kdy chodí dvakrát víc hostů. Vyšší úroveň vaří rychleji, má větší tank a dává trvalý bonus k výdělku, který zůstane i po hygieně. Když je tank plný, vaření stojí.": "양조장은 게임을 하지 않을 때도 스스로 맥주를 빚습니다. 완성된 맥주는 코인을 받고 팔거나, 양조장 강화에 쓰거나, 맥주 이벤트에 쓸 수 있습니다. 예를 들어 맥주 열풍 동안에는 손님이 두 배로 옵니다. 레벨이 오르면 더 빨리 빚고 탱크가 커지며, 점검 후에도 남는 영구 수입 보너스를 줍니다. 탱크가 가득 차면 양조가 멈춥니다."
 }

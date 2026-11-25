@@ -1443,5 +1443,21 @@
  "Celkem ×{m}": "Total ×{m}",
  "po {n}. hygieně a {c} coins výdělku": "après la {n}e inspection et {c} coins gagnés",
  "ještě {c} coins výdělku": "encore {c} coins à gagner",
- "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "Se débloque après la {n}e inspection et {c} coins de revenus au total."
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "Se débloque après la {n}e inspection et {c} coins de revenus au total.",
+ "Zlatá výzva: {s}": "Défi doré : {s}",
+ "odměna: {g} 💎 + kosti": "récompense : {g} 💎 + os",
+ "Splněný úspěch čeká ve Sbírce → Úspěchy": "Un succès accompli t'attend dans Collection → Succès",
+ "Úspěchy": "Succès",
+ "Uvař a prodej nebo vlož {n} piva": "Brasse et vends ou investis {n} bières",
+ "Dohraj {n} hru šipek": "Termine {n} partie de fléchettes",
+ "Obsluž VIP hosta": "Sers un client VIP",
+ "V noci obsluž {n} bublin": "Sers {n} bulles la nuit",
+ "Odehraj kolo v Chrámu": "Joue une manche au Temple",
+ "žolík ✓": "joker ✓",
+ "Pivní horečka\n{m} min: 2× víc hostů": "Fièvre de la bière\n{m} min : 2× plus de clients",
+ "Pivní horečka! 2× víc hostů na {m} min": "Fièvre de la bière ! 2× plus de clients pendant {m} min",
+ "Událost navíc: +{n} kostí": "Bonus d'événement : +{n} os",
+ "Událost navíc: číšníci +15 min zkušeností": "Bonus d'événement : serveurs +15 min d'expérience",
+ "V Úkolech najdeš denní úkoly (odměna v coins) a týdenní výzvu (talisman a krígly); po ní přijde zlatá výzva s 💎. Úkol od hostinského v liště nad hospodou tě postupně provede celou hrou – tlačítko UKAŽ ukáže, kam ťuknout. Úspěchy (krígl za každý) jsou ve Sbírce. Ve Speciální nabídce na tebe každý den čeká truhla zdarma; sedmý den série je zlatá truhla s 💎 a jeden vynechaný den za týden ti odpustí žolík.": "Dans Tâches, tu trouveras les tâches du jour (récompense en coins) et le défi de la semaine (talisman et chopes) ; ensuite vient un défi doré avec des 💎. La tâche du patron, dans la barre au-dessus de la taverne, te guide dans tout le jeu – le bouton MONTRER indique où toucher. Les succès (une chope chacun) sont dans la Collection. Dans l'Offre spéciale, un coffre gratuit t'attend chaque jour ; le septième jour de la série, c'est un coffre doré avec des 💎, et un joker te pardonne un jour manqué par semaine.",
+ "Pivovar vaří pivo sám, i když nehraješ. Hotová piva prodáš za coins, vložíš do vylepšení pivovaru, nebo je utratíš za pivní akce – třeba Pivní horečku, kdy chodí dvakrát víc hostů. Vyšší úroveň vaří rychleji, má větší tank a dává trvalý bonus k výdělku, který zůstane i po hygieně. Když je tank plný, vaření stojí.": "La brasserie brasse la bière toute seule, même quand tu ne joues pas. Vends les bières prêtes contre des coins, investis-les dans les améliorations de la brasserie ou dépense-les en actions bière – comme la Fièvre de la bière, quand deux fois plus de clients viennent. Un niveau plus élevé brasse plus vite, a une plus grande cuve et donne un bonus de revenus permanent qui reste après les inspections. Quand la cuve est pleine, le brassage s'arrête."
 }

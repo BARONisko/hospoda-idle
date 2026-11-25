@@ -1443,5 +1443,21 @@
  "Celkem ×{m}": "Total ×{m}",
  "po {n}. hygieně a {c} coins výdělku": "após a {n}ª inspeção e {c} coins ganhos",
  "ještě {c} coins výdělku": "faltam {c} coins de renda",
- "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "Desbloqueia após a {n}ª inspeção e {c} coins de renda total."
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "Desbloqueia após a {n}ª inspeção e {c} coins de renda total.",
+ "Zlatá výzva: {s}": "Desafio dourado: {s}",
+ "odměna: {g} 💎 + kosti": "prêmio: {g} 💎 + ossos",
+ "Splněný úspěch čeká ve Sbírce → Úspěchy": "Uma conquista cumprida espera em Coleção → Conquistas",
+ "Úspěchy": "Conquistas",
+ "Uvař a prodej nebo vlož {n} piva": "Prepare e venda ou invista {n} cervejas",
+ "Dohraj {n} hru šipek": "Termine {n} partida de dardos",
+ "Obsluž VIP hosta": "Atenda um cliente VIP",
+ "V noci obsluž {n} bublin": "Atenda {n} balões à noite",
+ "Odehraj kolo v Chrámu": "Jogue uma rodada no Templo",
+ "žolík ✓": "curinga ✓",
+ "Pivní horečka\n{m} min: 2× víc hostů": "Febre da cerveja\n{m} min: 2× mais clientes",
+ "Pivní horečka! 2× víc hostů na {m} min": "Febre da cerveja! 2× mais clientes por {m} min",
+ "Událost navíc: +{n} kostí": "Bônus do evento: +{n} ossos",
+ "Událost navíc: číšníci +15 min zkušeností": "Bônus do evento: garçons +15 min de experiência",
+ "V Úkolech najdeš denní úkoly (odměna v coins) a týdenní výzvu (talisman a krígly); po ní přijde zlatá výzva s 💎. Úkol od hostinského v liště nad hospodou tě postupně provede celou hrou – tlačítko UKAŽ ukáže, kam ťuknout. Úspěchy (krígl za každý) jsou ve Sbírce. Ve Speciální nabídce na tebe každý den čeká truhla zdarma; sedmý den série je zlatá truhla s 💎 a jeden vynechaný den za týden ti odpustí žolík.": "Em Tarefas você encontra tarefas diárias (prêmio em coins) e o desafio semanal (talismã e canecas); depois vem um desafio dourado com 💎. A tarefa do taberneiro na barra acima da taberna guia você pelo jogo todo – o botão MOSTRAR indica onde tocar. As conquistas (uma caneca cada) ficam na Coleção. Na Oferta especial um baú grátis espera por você todo dia; o sétimo dia da sequência é um baú dourado com 💎, e um curinga perdoa um dia perdido por semana.",
+ "Pivovar vaří pivo sám, i když nehraješ. Hotová piva prodáš za coins, vložíš do vylepšení pivovaru, nebo je utratíš za pivní akce – třeba Pivní horečku, kdy chodí dvakrát víc hostů. Vyšší úroveň vaří rychleji, má větší tank a dává trvalý bonus k výdělku, který zůstane i po hygieně. Když je tank plný, vaření stojí.": "A cervejaria produz cerveja sozinha, mesmo quando você não está jogando. Venda as cervejas prontas por coins, invista em melhorias da cervejaria ou gaste em ações de cerveja – como a Febre da cerveja, quando chegam o dobro de clientes. Um nível mais alto produz mais rápido, tem um tanque maior e dá um bônus permanente de renda que continua após as inspeções. Quando o tanque está cheio, a produção para."
 }

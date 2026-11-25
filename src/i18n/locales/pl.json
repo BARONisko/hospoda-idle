@@ -1443,5 +1443,21 @@
  "Celkem ×{m}": "Razem ×{m}",
  "po {n}. hygieně a {c} coins výdělku": "po {n}. sanepidzie i {c} coins zarobku",
  "ještě {c} coins výdělku": "jeszcze {c} coins zarobku",
- "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "Odblokuje się po {n}. sanepidzie i {c} coins łącznego zarobku."
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "Odblokuje się po {n}. sanepidzie i {c} coins łącznego zarobku.",
+ "Zlatá výzva: {s}": "Złote wyzwanie: {s}",
+ "odměna: {g} 💎 + kosti": "nagroda: {g} 💎 + kości",
+ "Splněný úspěch čeká ve Sbírce → Úspěchy": "Spełnione osiągnięcie czeka w Kolekcji → Osiągnięcia",
+ "Úspěchy": "Osiągnięcia",
+ "Uvař a prodej nebo vlož {n} piva": "Uwarz i sprzedaj lub zainwestuj {n} piwa",
+ "Dohraj {n} hru šipek": "Dokończ {n} grę w rzutki",
+ "Obsluž VIP hosta": "Obsłuż gościa VIP",
+ "V noci obsluž {n} bublin": "W nocy obsłuż {n} dymków",
+ "Odehraj kolo v Chrámu": "Zagraj rundę w Świątyni",
+ "žolík ✓": "joker ✓",
+ "Pivní horečka\n{m} min: 2× víc hostů": "Piwna gorączka\n{m} min: 2× więcej gości",
+ "Pivní horečka! 2× víc hostů na {m} min": "Piwna gorączka! 2× więcej gości przez {m} min",
+ "Událost navíc: +{n} kostí": "Bonus wydarzenia: +{n} kości",
+ "Událost navíc: číšníci +15 min zkušeností": "Bonus wydarzenia: kelnerzy +15 min doświadczenia",
+ "V Úkolech najdeš denní úkoly (odměna v coins) a týdenní výzvu (talisman a krígly); po ní přijde zlatá výzva s 💎. Úkol od hostinského v liště nad hospodou tě postupně provede celou hrou – tlačítko UKAŽ ukáže, kam ťuknout. Úspěchy (krígl za každý) jsou ve Sbírce. Ve Speciální nabídce na tebe každý den čeká truhla zdarma; sedmý den série je zlatá truhla s 💎 a jeden vynechaný den za týden ti odpustí žolík.": "W Zadaniach znajdziesz zadania dzienne (nagroda w coins) i wyzwanie tygodnia (talizman i kufle); po nim przychodzi złote wyzwanie z 💎. Zadanie od karczmarza na pasku nad karczmą prowadzi cię przez całą grę – przycisk POKAŻ wskaże, gdzie stuknąć. Osiągnięcia (kufel za każde) są w Kolekcji. W Ofercie specjalnej codziennie czeka darmowa skrzynia; siódmego dnia serii jest złota skrzynia z 💎, a joker wybacza jeden opuszczony dzień w tygodniu.",
+ "Pivovar vaří pivo sám, i když nehraješ. Hotová piva prodáš za coins, vložíš do vylepšení pivovaru, nebo je utratíš za pivní akce – třeba Pivní horečku, kdy chodí dvakrát víc hostů. Vyšší úroveň vaří rychleji, má větší tank a dává trvalý bonus k výdělku, který zůstane i po hygieně. Když je tank plný, vaření stojí.": "Browar warzy piwo sam, nawet gdy nie grasz. Gotowe piwa sprzedasz za coins, włożysz w ulepszenia browaru albo wydasz na piwne akcje – na przykład Piwną gorączkę, kiedy przychodzi dwa razy więcej gości. Wyższy poziom warzy szybciej, ma większy zbiornik i daje stały bonus do zarobku, który zostaje po sanepidzie. Gdy zbiornik jest pełny, warzenie staje."
 }

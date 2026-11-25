@@ -1443,5 +1443,21 @@
  "Celkem ×{m}": "合计 ×{m}",
  "po {n}. hygieně a {c} coins výdělku": "第{n}次检查后且收入{c}金币",
  "ještě {c} coins výdělku": "还差{c}金币收入",
- "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "第{n}次检查后且总收入达{c}金币时解锁。"
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "第{n}次检查后且总收入达{c}金币时解锁。",
+ "Zlatá výzva: {s}": "黄金挑战：{s}",
+ "odměna: {g} 💎 + kosti": "奖励：{g} 💎 + 骨头",
+ "Splněný úspěch čeká ve Sbírce → Úspěchy": "有已完成的成就在收藏 → 成就中等你",
+ "Úspěchy": "成就",
+ "Uvař a prodej nebo vlož {n} piva": "酿造并出售或投入{n}杯啤酒",
+ "Dohraj {n} hru šipek": "完成{n}局飞镖",
+ "Obsluž VIP hosta": "招待一位VIP客人",
+ "V noci obsluž {n} bublin": "在夜里招待{n}个气泡",
+ "Odehraj kolo v Chrámu": "在神殿里玩一轮",
+ "žolík ✓": "王牌 ✓",
+ "Pivní horečka\n{m} min: 2× víc hostů": "啤酒狂欢\n{m}分钟：客人×2",
+ "Pivní horečka! 2× víc hostů na {m} min": "啤酒狂欢！{m}分钟内客人×2",
+ "Událost navíc: +{n} kostí": "事件奖励：+{n}骨头",
+ "Událost navíc: číšníci +15 min zkušeností": "事件奖励：服务员经验+15分钟",
+ "V Úkolech najdeš denní úkoly (odměna v coins) a týdenní výzvu (talisman a krígly); po ní přijde zlatá výzva s 💎. Úkol od hostinského v liště nad hospodou tě postupně provede celou hrou – tlačítko UKAŽ ukáže, kam ťuknout. Úspěchy (krígl za každý) jsou ve Sbírce. Ve Speciální nabídce na tebe každý den čeká truhla zdarma; sedmý den série je zlatá truhla s 💎 a jeden vynechaný den za týden ti odpustí žolík.": "在任务中有每日任务（奖励金币）和每周挑战（护身符和酒杯）；之后还有带💎的黄金挑战。酒馆上方横条里的店主任务会带你走完整个游戏——“显示”按钮会指出该点哪里。成就（每个一只酒杯）在收藏里。特别优惠里每天都有一个免费宝箱；连续第七天是带💎的金宝箱，王牌每周可原谅一天未签到。",
+ "Pivovar vaří pivo sám, i když nehraješ. Hotová piva prodáš za coins, vložíš do vylepšení pivovaru, nebo je utratíš za pivní akce – třeba Pivní horečku, kdy chodí dvakrát víc hostů. Vyšší úroveň vaří rychleji, má větší tank a dává trvalý bonus k výdělku, který zůstane i po hygieně. Když je tank plný, vaření stojí.": "酿酒厂即使你不玩也会自己酿酒。酿好的啤酒可以卖成金币、投入酿酒厂升级，或用于啤酒活动——比如啤酒狂欢，期间客人多一倍。等级越高酿得越快、酒罐越大，并带来检查后仍保留的永久收入加成。酒罐满了就会停止酿造。"
 }

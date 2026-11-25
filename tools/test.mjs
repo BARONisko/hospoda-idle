@@ -263,6 +263,24 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     s.d.stats.prestiges = pr; s.d.menuOpen = mo; s.d.earned = ea;
     return r && keep && !s.constructor.TILES.some((x) => x[0] === 'talis');
   }));
+  // 25. 11. 2026: úkoly ve 3 řadách – zlatá týdenní výzva, žolík denní truhly, pestřejší denní úkoly, úspěchy ve Sbírce
+  ok('úkoly: zlatá výzva, žolík truhly, nové denní úkoly, úspěchy ve Sbírce', await S(p, async (s) => {
+    const SP = await import('/src/core/special.ts'), G = await import('/src/core/goals.ts');
+    const w = s.weekly(); w.prog = w.goal; w.claimed = true; w.gp = w.goal; w.gc = false;
+    s.week(w.kind, w.goal * 2); const gold = w.gp === w.goal * 3 && s.claimable();
+    const g0 = s.d.gems ?? 0; s.openShop('tasks', false);
+    const li = s.shopObjs.findIndex((o) => o.type === 'Text' && o.text.startsWith(`${w.goal * 3} / ${w.goal * 3}`)); s.shopObjs.slice(li).find((o) => o.type === 'Zone').emit('pointerdown');
+    const paid = w.gc === true && (s.d.gems ?? 0) === g0 + G.GOLD_WEEK_GEMS;
+    s.closeShop();
+    const day = 86400000, now = new Date(2026, 10, 26, 12).getTime();
+    const two = SP.dayKey(now - 2 * day), three = SP.dayKey(now - 3 * day);
+    const joker = SP.chestDay({ day: 3, last: two }, now) === 4 && SP.chestDay({ day: 3, last: two, jk: SP.mondayKey(now) }, now) === 1 && SP.chestDay({ day: 3, last: three }, now) === 1;
+    const used = SP.openChest({ day: 3, last: two }, now).st.jk === SP.mondayKey(now);
+    const kinds = new Set(); for (let i = 0; i < 60; i++) G.newDaily(100, ['beer', 'darts']).tasks.forEach((k) => kinds.add(k.kind));
+    const daily = kinds.has('beer') && kinds.has('darts') && kinds.size === 6;
+    s.bookGrp = 5; s.openShop('book', false); const book = s.shopObjs.length > 10; s.bookGrp = 0; s.closeShop();
+    return (gold && paid && joker && used && daily && book) || JSON.stringify({ gold, paid, joker, used, daily, book });
+  }).then((r) => (r !== true && console.log(r), r)) === true);
   // zavřená pípa: soupeř 2 h nepřibývá (čistá funkce přes stav)
   ok('liga 💎: soupeř se zavřenou pípou stojí, po 2 h zase přibývá', await S(p, (s) => {
     const L = s.league(), now = Date.now();

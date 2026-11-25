@@ -488,3 +488,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   výběr ukazuje 5 stupňů končících nejvyšším odemčeným; žebříček později). Zaklikávací pomůcka s návrhy (Rekonstrukce ★, 35 úkolů
   s nábytkem, týdenní pravidla, efekty, 2. řada výzdoby, drobnosti): https://claude.ai/artifact/AJrpra31oAsdYLfUx7SiRf.
   Pátá stanice: návrhy A/B/C v /mnt/project-files/pata-stanice (čeká na výběr).
+
+### Vlna 1 (25. 11. 2026) – úkoly ve 3 řadách + J
+- Denní úkoly pestřejší (pivo, šipky, VIP, noc, chrám o víkendu), týdenní + zlatá výzva (3× cíl, 💎 + kosti),
+  úspěchy přesunuty do Sbírky, žolík truhly (1 vynechaný den/týden), Pivní horečka v pivovaru, bonus událostí od 30. prestiže.
+- Další: vlna 2 = Rekonstrukce ★ (s1, s2 = 5. stanice var. A, s4, s5), úkoly hostinského po hvězdách, pravidla týdne, efekty, výzdoba.

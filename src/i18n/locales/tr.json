@@ -1443,5 +1443,21 @@
  "Celkem ×{m}": "Toplam ×{m}",
  "po {n}. hygieně a {c} coins výdělku": "{n}. denetimden ve {c} coins kazançtan sonra",
  "ještě {c} coins výdělku": "{c} coins kazanç kaldı",
- "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "{n}. denetimden ve toplam {c} coins kazançtan sonra açılır."
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "{n}. denetimden ve toplam {c} coins kazançtan sonra açılır.",
+ "Zlatá výzva: {s}": "Altın görev: {s}",
+ "odměna: {g} 💎 + kosti": "ödül: {g} 💎 + kemik",
+ "Splněný úspěch čeká ve Sbírce → Úspěchy": "Tamamlanan başarı Koleksiyon → Başarılar'da seni bekliyor",
+ "Úspěchy": "Başarılar",
+ "Uvař a prodej nebo vlož {n} piva": "{n} bira demle ve sat ya da yatır",
+ "Dohraj {n} hru šipek": "{n} dart oyunu bitir",
+ "Obsluž VIP hosta": "Bir VIP misafire hizmet et",
+ "V noci obsluž {n} bublin": "Gece {n} baloncuğa hizmet et",
+ "Odehraj kolo v Chrámu": "Tapınakta bir tur oyna",
+ "žolík ✓": "joker ✓",
+ "Pivní horečka\n{m} min: 2× víc hostů": "Bira çılgınlığı\n{m} dk: 2× daha çok misafir",
+ "Pivní horečka! 2× víc hostů na {m} min": "Bira çılgınlığı! {m} dk boyunca 2× daha çok misafir",
+ "Událost navíc: +{n} kostí": "Etkinlik bonusu: +{n} kemik",
+ "Událost navíc: číšníci +15 min zkušeností": "Etkinlik bonusu: garsonlara +15 dk deneyim",
+ "V Úkolech najdeš denní úkoly (odměna v coins) a týdenní výzvu (talisman a krígly); po ní přijde zlatá výzva s 💎. Úkol od hostinského v liště nad hospodou tě postupně provede celou hrou – tlačítko UKAŽ ukáže, kam ťuknout. Úspěchy (krígl za každý) jsou ve Sbírce. Ve Speciální nabídce na tebe každý den čeká truhla zdarma; sedmý den série je zlatá truhla s 💎 a jeden vynechaný den za týden ti odpustí žolík.": "Görevler'de günlük görevler (ödül coins) ve haftalık görev (tılsım ve kupalar) var; ardından 💎 veren altın görev gelir. Meyhanenin üstündeki çubukta yer alan meyhanecinin görevi seni tüm oyun boyunca yönlendirir – GÖSTER düğmesi nereye dokunacağını gösterir. Başarılar (her biri bir kupa) Koleksiyon'da. Özel teklif'te her gün ücretsiz bir sandık seni bekler; serinin yedinci günü 💎 dolu altın sandıktır ve joker haftada bir kaçırılan günü affeder.",
+ "Pivovar vaří pivo sám, i když nehraješ. Hotová piva prodáš za coins, vložíš do vylepšení pivovaru, nebo je utratíš za pivní akce – třeba Pivní horečku, kdy chodí dvakrát víc hostů. Vyšší úroveň vaří rychleji, má větší tank a dává trvalý bonus k výdělku, který zůstane i po hygieně. Když je tank plný, vaření stojí.": "Bira fabrikası sen oynamasan da kendi kendine bira yapar. Hazır biraları coins karşılığında satabilir, fabrika geliştirmelerine yatırabilir veya bira etkinliklerine harcayabilirsin – örneğin iki kat daha fazla misafirin geldiği Bira çılgınlığı. Daha yüksek seviye daha hızlı bira yapar, daha büyük tankı olur ve denetimden sonra da kalan kalıcı bir kazanç bonusu verir. Tank dolunca üretim durur."
 }

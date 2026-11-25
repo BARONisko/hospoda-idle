@@ -52,7 +52,7 @@ export const HELP: HelpTopic[] = [
   {
     title: t('Úkoly a denní truhla'),
     icon: ['icons', 'clipboard'],
-    text: t('V Úkolech najdeš denní úkoly (odměna v coins), týdenní výzvu (talisman a krígly) a úspěchy (krígl za každý). Úkol od hostinského tě postupně provede celou hrou – tlačítko UKAŽ ukáže, kam ťuknout. Ve Speciální nabídce na tebe každý den čeká truhla zdarma; když nevynecháš ani den, sedmý den je zlatá truhla s 💎.'),
+    text: t('V Úkolech najdeš denní úkoly (odměna v coins) a týdenní výzvu (talisman a krígly); po ní přijde zlatá výzva s 💎. Úkol od hostinského v liště nad hospodou tě postupně provede celou hrou – tlačítko UKAŽ ukáže, kam ťuknout. Úspěchy (krígl za každý) jsou ve Sbírce. Ve Speciální nabídce na tebe každý den čeká truhla zdarma; sedmý den série je zlatá truhla s 💎 a jeden vynechaný den za týden ti odpustí žolík.'),
   },
   {
     title: t('Šťastná hodina a manažeři'),
@@ -106,7 +106,7 @@ export const HELP: HelpTopic[] = [
     title: t('Pivovar'),
     icon: ['obj', 'fermenter'],
     lock: 'brew',
-    text: t('Pivovar vaří pivo sám, i když nehraješ. Hotová piva prodáš za coins, vložíš do vylepšení pivovaru, nebo je utratíš za pivní akce – třeba Happy hour s dvojnásobným výdělkem. Vyšší úroveň vaří rychleji, má větší tank a dává trvalý bonus k výdělku, který zůstane i po hygieně. Když je tank plný, vaření stojí.'),
+    text: t('Pivovar vaří pivo sám, i když nehraješ. Hotová piva prodáš za coins, vložíš do vylepšení pivovaru, nebo je utratíš za pivní akce – třeba Pivní horečku, kdy chodí dvakrát víc hostů. Vyšší úroveň vaří rychleji, má větší tank a dává trvalý bonus k výdělku, který zůstane i po hygieně. Když je tank plný, vaření stojí.'),
   },
   {
     title: t('Chrám'),

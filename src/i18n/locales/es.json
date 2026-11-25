@@ -1443,5 +1443,21 @@
  "Celkem ×{m}": "Total ×{m}",
  "po {n}. hygieně a {c} coins výdělku": "tras la {n}.ª inspección y {c} coins ganadas",
  "ještě {c} coins výdělku": "faltan {c} coins de ingresos",
- "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "Se desbloquea tras la {n}.ª inspección y {c} coins de ingresos totales."
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "Se desbloquea tras la {n}.ª inspección y {c} coins de ingresos totales.",
+ "Zlatá výzva: {s}": "Desafío dorado: {s}",
+ "odměna: {g} 💎 + kosti": "premio: {g} 💎 + huesos",
+ "Splněný úspěch čeká ve Sbírce → Úspěchy": "Un logro cumplido te espera en Colección → Logros",
+ "Úspěchy": "Logros",
+ "Uvař a prodej nebo vlož {n} piva": "Elabora y vende o invierte {n} cervezas",
+ "Dohraj {n} hru šipek": "Termina {n} partida de dardos",
+ "Obsluž VIP hosta": "Atiende a un cliente VIP",
+ "V noci obsluž {n} bublin": "Atiende {n} burbujas de noche",
+ "Odehraj kolo v Chrámu": "Juega una ronda en el Templo",
+ "žolík ✓": "comodín ✓",
+ "Pivní horečka\n{m} min: 2× víc hostů": "Fiebre cervecera\n{m} min: 2× más clientes",
+ "Pivní horečka! 2× víc hostů na {m} min": "¡Fiebre cervecera! 2× más clientes durante {m} min",
+ "Událost navíc: +{n} kostí": "Extra del evento: +{n} huesos",
+ "Událost navíc: číšníci +15 min zkušeností": "Extra del evento: camareros +15 min de experiencia",
+ "V Úkolech najdeš denní úkoly (odměna v coins) a týdenní výzvu (talisman a krígly); po ní přijde zlatá výzva s 💎. Úkol od hostinského v liště nad hospodou tě postupně provede celou hrou – tlačítko UKAŽ ukáže, kam ťuknout. Úspěchy (krígl za každý) jsou ve Sbírce. Ve Speciální nabídce na tebe každý den čeká truhla zdarma; sedmý den série je zlatá truhla s 💎 a jeden vynechaný den za týden ti odpustí žolík.": "En Tareas encontrarás tareas diarias (premio en coins) y el desafío semanal (talismán y jarras); después llega un desafío dorado con 💎. La tarea del tabernero en la barra sobre la taberna te guía por todo el juego: el botón MOSTRAR indica dónde tocar. Los logros (una jarra cada uno) están en la Colección. En la Oferta especial te espera cada día un cofre gratis; el séptimo día de la racha es un cofre dorado con 💎, y un comodín te perdona un día perdido por semana.",
+ "Pivovar vaří pivo sám, i když nehraješ. Hotová piva prodáš za coins, vložíš do vylepšení pivovaru, nebo je utratíš za pivní akce – třeba Pivní horečku, kdy chodí dvakrát víc hostů. Vyšší úroveň vaří rychleji, má větší tank a dává trvalý bonus k výdělku, který zůstane i po hygieně. Když je tank plný, vaření stojí.": "La cervecería elabora cerveza sola, incluso cuando no juegas. Vende las cervezas listas por coins, inviértelas en mejoras de la cervecería o gástalas en acciones cerveceras, como la Fiebre cervecera, cuando llegan el doble de clientes. Un nivel más alto elabora más rápido, tiene un tanque mayor y da una bonificación permanente a los ingresos que se mantiene tras las inspecciones. Cuando el tanque está lleno, la elaboración se detiene."
 }

@@ -1443,5 +1443,21 @@
  "Celkem ×{m}": "Итого ×{m}",
  "po {n}. hygieně a {c} coins výdělku": "после {n}-й санинспекции и {c} coins дохода",
  "ještě {c} coins výdělku": "ещё {c} coins дохода",
- "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "Откроется после {n}-й санинспекции и {c} coins общего дохода."
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "Откроется после {n}-й санинспекции и {c} coins общего дохода.",
+ "Zlatá výzva: {s}": "Золотое испытание: {s}",
+ "odměna: {g} 💎 + kosti": "награда: {g} 💎 + кости",
+ "Splněný úspěch čeká ve Sbírce → Úspěchy": "Выполненное достижение ждёт в Коллекции → Достижения",
+ "Úspěchy": "Достижения",
+ "Uvař a prodej nebo vlož {n} piva": "Свари и продай или вложи {n} пива",
+ "Dohraj {n} hru šipek": "Доиграй {n} партию в дартс",
+ "Obsluž VIP hosta": "Обслужи VIP-гостя",
+ "V noci obsluž {n} bublin": "Ночью обслужи {n} пузырей",
+ "Odehraj kolo v Chrámu": "Сыграй раунд в Храме",
+ "žolík ✓": "джокер ✓",
+ "Pivní horečka\n{m} min: 2× víc hostů": "Пивная лихорадка\n{m} мин: гостей ×2",
+ "Pivní horečka! 2× víc hostů na {m} min": "Пивная лихорадка! Гостей ×2 на {m} мин",
+ "Událost navíc: +{n} kostí": "Бонус события: +{n} костей",
+ "Událost navíc: číšníci +15 min zkušeností": "Бонус события: официантам +15 мин опыта",
+ "V Úkolech najdeš denní úkoly (odměna v coins) a týdenní výzvu (talisman a krígly); po ní přijde zlatá výzva s 💎. Úkol od hostinského v liště nad hospodou tě postupně provede celou hrou – tlačítko UKAŽ ukáže, kam ťuknout. Úspěchy (krígl za každý) jsou ve Sbírce. Ve Speciální nabídce na tebe každý den čeká truhla zdarma; sedmý den série je zlatá truhla s 💎 a jeden vynechaný den za týden ti odpustí žolík.": "В Заданиях есть ежедневные задания (награда в coins) и недельное испытание (талисман и кружки); после него идёт золотое испытание с 💎. Задание хозяина в полосе над трактиром проведёт тебя через всю игру – кнопка ПОКАЖИ укажет, куда нажать. Достижения (кружка за каждое) находятся в Коллекции. В Особом предложении каждый день ждёт бесплатный сундук; седьмой день серии – золотой сундук с 💎, а джокер прощает один пропущенный день в неделю.",
+ "Pivovar vaří pivo sám, i když nehraješ. Hotová piva prodáš za coins, vložíš do vylepšení pivovaru, nebo je utratíš za pivní akce – třeba Pivní horečku, kdy chodí dvakrát víc hostů. Vyšší úroveň vaří rychleji, má větší tank a dává trvalý bonus k výdělku, který zůstane i po hygieně. Když je tank plný, vaření stojí.": "Пивоварня варит пиво сама, даже когда ты не играешь. Готовое пиво можно продать за coins, вложить в улучшения пивоварни или потратить на пивные акции – например, Пивную лихорадку, когда гостей приходит вдвое больше. Более высокий уровень варит быстрее, имеет больший бак и даёт постоянный бонус к доходу, который остаётся после санинспекции. Когда бак полон, варка останавливается."
 }

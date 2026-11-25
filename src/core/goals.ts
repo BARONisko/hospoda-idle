@@ -10,7 +10,8 @@ export interface Stats {
   prestiges: number;
 }
 
-export type TaskKind = 'tips' | 'levels' | 'events' | 'earn';
+/** denní úkoly; beer/darts/vip/night/temple přibudou po odemčení (návrh J2) */
+export type TaskKind = 'tips' | 'levels' | 'events' | 'earn' | 'beer' | 'darts' | 'vip' | 'night' | 'temple';
 
 export interface DailyTask {
   kind: TaskKind;
@@ -30,16 +31,22 @@ export const today = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 
-/** nové denní úkoly (3 z nabídky); „vydělej“ podle aktuálního výdělku */
-export function newDaily(rate: number): Daily {
+/** nové denní úkoly (3 z nabídky); „vydělej“ podle aktuálního výdělku; extra = druhy z odemčených částí hry (pivovar, šipky…) */
+export function newDaily(rate: number, extra: TaskKind[] = []): Daily {
+  const X: Partial<Record<TaskKind, number>> = { beer: 2, darts: 1, vip: 1, night: 15, temple: 1 };
   const pool: DailyTask[] = [
     { kind: 'tips', goal: 15, prog: 0, claimed: false },
     { kind: 'levels', goal: 30, prog: 0, claimed: false },
     { kind: 'events', goal: 2, prog: 0, claimed: false },
     { kind: 'earn', goal: Math.max(500, Math.round(rate * 900)), prog: 0, claimed: false },
+    ...extra.filter((k) => X[k]).map((k) => ({ kind: k, goal: X[k]!, prog: 0, claimed: false })),
   ];
-  const drop = Math.floor(Math.random() * pool.length);
-  return { day: today(), tasks: pool.filter((_, i) => i !== drop) };
+  // 3 náhodné různé druhy
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return { day: today(), tasks: pool.slice(0, 3) };
 }
 
 export const taskText = (k: TaskKind, goal: string) =>
@@ -48,6 +55,11 @@ export const taskText = (k: TaskKind, goal: string) =>
     levels: t('Kup {n} úrovní stanic', { n: goal }),
     events: t('Zvládni {n} události', { n: goal }),
     earn: t('Vydělej {n} coins', { n: goal }),
+    beer: t('Uvař a prodej nebo vlož {n} piva', { n: goal }),
+    darts: t('Dohraj {n} hru šipek', { n: goal }),
+    vip: t('Obsluž VIP hosta'),
+    night: t('V noci obsluž {n} bublin', { n: goal }),
+    temple: t('Odehraj kolo v Chrámu'),
   })[k];
 
 export interface AchDef {
@@ -109,7 +121,13 @@ export interface Weekly {
   goal: number;
   prog: number;
   claimed: boolean;
+  /** zlatá výzva (návrh J3): po vyzvednutí běží dál do 3× cíle; gp = celkový postup, gc = zlatá vyzvednuta */
+  gp?: number;
+  gc?: boolean;
 }
+/** zlatá týdenní výzva: 3× cíl, odměna 💎 a kosti */
+export const GOLD_WEEK_X = 3;
+export const GOLD_WEEK_GEMS = 20;
 const WEEK_GOALS: Record<WeekKind, number> = { events: 15, brawls: 5, beers: 6, visitors: 8, tips: 300 };
 export const weekText = (k: WeekKind, n: number) =>
   ({

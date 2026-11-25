@@ -7,6 +7,8 @@ export interface ChestState {
   day: number;
   /** den posledního otevření (místní datum YYYY-MM-DD) */
   last: string;
+  /** žolík (návrh J1): pondělí týdne, ve kterém už jednou zachránil sérii po 1 vynechaném dni */
+  jk?: string;
 }
 
 /** místní datum YYYY-MM-DD */
@@ -26,7 +28,22 @@ export const chestReady = (c: ChestState | undefined, now = Date.now()) => !c ||
 export function chestDay(c: ChestState | undefined, now = Date.now()) {
   if (!c) return 1;
   if (c.last === dayKey(now)) return c.day;
-  return c.last === yesterday(now) && c.day < 7 ? c.day + 1 : 1;
+  return (c.last === yesterday(now) || jokerSaves(c, now)) && c.day < 7 ? c.day + 1 : 1;
+}
+/** pondělí týdne (místní datum) – žolík se obnoví každé pondělí */
+export function mondayKey(now = Date.now()) {
+  const d = new Date(now);
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return dayKey(d.getTime());
+}
+/** žolík tento týden ještě nepoužitý */
+export const jokerFree = (c: ChestState | undefined, now = Date.now()) => (c?.jk ?? '') !== mondayKey(now);
+/** vynechaný právě 1 den a žolík je volný → série pokračuje */
+export function jokerSaves(c: ChestState | undefined, now = Date.now()) {
+  if (!c?.last || !jokerFree(c, now)) return false;
+  const d = new Date(now);
+  d.setDate(d.getDate() - 2);
+  return c.last === dayKey(d.getTime());
 }
 
 export type ChestRew = { k: 'coins'; h: number } | { k: 'bones'; n: number; h?: number } | { k: 'darts'; n: number; q?: number } | { k: 'krigle'; n: number; f?: number } | { k: 'gold' };
@@ -49,7 +66,8 @@ export const GOLD_KRIGLE_F = 0.02;
 /** otevře truhlu: vrátí den (1–7) a uloží sérii */
 export function openChest(c: ChestState | undefined, now = Date.now()): { st: ChestState; day: number } {
   const day = chestDay(c, now);
-  return { st: { day, last: dayKey(now) }, day };
+  const jk = c && c.last !== dayKey(now) && jokerSaves(c, now) && c.day < 7 ? mondayKey(now) : c?.jk;
+  return { st: { day, last: dayKey(now), ...(jk ? { jk } : {}) }, day };
 }
 
 // ---------- reklamní kampaň ----------

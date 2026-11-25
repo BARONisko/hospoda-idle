@@ -30,6 +30,8 @@ export interface TempleHost {
   /** odměny do hlavní hry; vrací text pro hlášku */
   templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal' | 'stat' | 'darts' | 'gems', n: number): string;
   templeSave(): void;
+  /** začalo kolo (denní úkol) */
+  templeRound?(): void;
   /** přepočítat staty (po oltáři) */
   templeRefresh?(): void;
   /** kolik krígel dá obchod chrámu (roste s tvými krígly) */
@@ -683,6 +685,7 @@ export class TempleScene extends Phaser.Scene {
   private startRound() {
     if (!isWeekend() || this.T.used >= ROUNDS_PER_DAY) return;
     this.T.used++;
+    this.host.templeRound?.();
     this.host.templeSave();
     this.clearUi();
     this.mode = 'fight';
