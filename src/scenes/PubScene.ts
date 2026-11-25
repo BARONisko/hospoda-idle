@@ -1225,7 +1225,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   tileH = 118;
   /** návrhy zamčeného Menu (posudek nováčka: 10 z 12 dlaždic zamčených bez názvu = zeď):
    *  x = dosavadní, a = odemčené + jen nejbližší zamčená, b = všechny se jménem a siluetou, c = odemčené + pruh „Brzy“ */
-  menuMode = (new URLSearchParams(location.search).get('menu') ?? 'x') as 'x' | 'a' | 'b' | 'c';
+  menuMode = (new URLSearchParams(location.search).get('menu') ?? 'a') as 'x' | 'a' | 'b' | 'c'; // výběr uživatele: A
   /** pořadí odemykání dlaždic (pro „nejbližší zamčenou“) */
   private static TILE_RANK: Record<string, number> = { krigl: 1, bones: 1.2, daynight: 1.2, keeper: 2, coll: 2.5, brew: 3, talis: 4, temple: 6, decor: 10, darts: 15, league: 20 };
 

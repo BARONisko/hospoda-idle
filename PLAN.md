@@ -457,4 +457,4 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   den a noc až od 1. hygieny (dřív první noc v 8. minutě; kdo noc už zažil, tomu zůstane; ?night=1 dál funguje);
   návod končí „Ťukni na Obchod“ → „Kup vylepšení ×3“ (krok „Ťukni na Menu“ zrušen; bez peněz šetří přes bubliny hostů);
   pilulka „do hygieny N %“, horní nápisy mizí dolů (nevjíždějí do lišty úkolu), kolečko číšníka „najmi / cena“.
-  Návrhy zamčeného Menu: ?menu=a (jen nejbližší zamčená) | b (všechny se jménem) | c (pruh „Brzy“) – čeká na výběr.
+  Zamčené Menu: vybrána varianta A (odemčené + jen nejbližší zamčená se jménem); ladění ?menu=x|b|c.
