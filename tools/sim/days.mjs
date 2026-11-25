@@ -11,7 +11,9 @@ const STARE = !!process.env.STARE;
 const TREE = process.env.TREE ?? 'A'; // od 25. 11. 2026 je ve hře strom A (Tři cechy); TREE=0 = staré hrubé +10 %
 const { treeMult } = TREE !== '0' ? await import('./strom-navrhy.mjs') : {};
 const kf = (r, p) => Math.floor(2 * (r / (1e5 * 10 ** (p - 1))) ** 0.25);
-const goalOf = (n) => prestigeMin(n);
+// LATE=70:1.03 = od 70. hygieny laťka roste jen o 3 % (zkouška prodloužení pozdní hry)
+const [L0, LG] = (process.env.LATE ?? '').split(':').map(Number);
+const goalOf = (n) => (L0 && n > L0 ? Math.ceil(prestigeMin(L0) * LG ** (n - L0)) : prestigeMin(n));
 // body stromu hostinského (tools/sim/skills.mjs, dny 1/7/30/100/365) → podíl stromu; celý strom ≈ +10 % výdělku (cesta Výčep)
 const PTS = { slabší: [17, 43, 117, 209, 369], běžný: [37, 113, 212, 347, 610], zapálený: [86, 185, 315, 486, 749] };
 const PD = [1, 7, 30, 100, 365];
@@ -49,7 +51,7 @@ const roundT = (pubs, k, goal, m, five = false) => {
   return cache.get(key);
 };
 
-for (const pl of P) {
+for (const pl of P.filter((x) => !process.env.WHO || x.who === process.env.WHO)) {
   let n = 0, k = 0, held = 0, pubs = 1, cth = 0, prog = 0, T = 0, goal = 0;
   const unlock = {}, log = [];
   let templeDay = null, decorDay = null, leagueDay = null, star = 0, pend = 0;
