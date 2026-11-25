@@ -1640,5 +1640,7 @@
  "ZLATÁ ŘADA": "GOLD TRACK",
  "Sezónní pass: {r}": "Season pass: {r}",
  "{a}–{b} z {n}": "{a}–{b} of {n}",
- "Zlatá řada · {p}": "Gold track · {p}"
+ "Zlatá řada · {p}": "Gold track · {p}",
+ "ukládá se samo · naposledy před {n} min": "saves automatically · last {n} min ago",
+ "Uložit teď": "Save now"
 }

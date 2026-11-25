@@ -1640,5 +1640,7 @@
  "ZLATÁ ŘADA": "黄金线",
  "Sezónní pass: {r}": "赛季通行证：{r}",
  "{a}–{b} z {n}": "{a}–{b} / {n}",
- "Zlatá řada · {p}": "黄金线 · {p}"
+ "Zlatá řada · {p}": "黄金线 · {p}",
+ "ukládá se samo · naposledy před {n} min": "自动保存 · {n} 分钟前",
+ "Uložit teď": "立即保存"
 }

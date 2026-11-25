@@ -1640,5 +1640,7 @@
  "ZLATÁ ŘADA": "ALTIN SIRA",
  "Sezónní pass: {r}": "Sezon kartı: {r}",
  "{a}–{b} z {n}": "{a}–{b} / {n}",
- "Zlatá řada · {p}": "Altın sıra · {p}"
+ "Zlatá řada · {p}": "Altın sıra · {p}",
+ "ukládá se samo · naposledy před {n} min": "kendiliğinden kaydeder · {n} dk önce",
+ "Uložit teď": "Şimdi kaydet"
 }

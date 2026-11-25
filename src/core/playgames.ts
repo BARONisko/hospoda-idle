@@ -80,6 +80,8 @@ const earnedOf = (d: { earned?: number } | null) => (d && Number.isFinite(d.earn
 const withTimeout = <T>(p: Promise<T>, ms: number) => Promise.race([p, new Promise<null>((r) => setTimeout(() => r(null), ms))]);
 
 let lastUp = 0, upBusy = false, lastRaw = '';
+/** uložení při odchodu, které přišlo během nahrávání – nahraje se hned po něm */
+let queued = '';
 const sent: Partial<Record<Board, number>> = {};
 const MAXS: Record<Board, number> = { krigle: 10_000_000, level: 100_000, temple: 999_999_999_999 };
 
@@ -98,7 +100,13 @@ export async function initPlayGames(wiped = false): Promise<void> {
   addMirror((raw, now) => {
     lastRaw = raw;
     const tm = Date.now();
-    if (tm - lastUp < (now ? 30_000 : 180_000)) return;
+    // při hraní nejvýš 1× za 3 min; při odchodu ze hry (do pozadí, zavření) vždy – i po 5 s hraní (přání uživatele)
+    if (now) {
+      if (upBusy) queued = raw;
+      else void upload(raw);
+      return;
+    }
+    if (tm - lastUp < 180_000) return;
     void upload(raw);
   });
   // přihlášení proběhne samo při startu aplikace; počkat na výsledek nejvýš pár sekund, pak hra běží dál
@@ -168,6 +176,11 @@ async function upload(raw: string) {
     /* příště */
   } finally {
     upBusy = false;
+  }
+  if (queued) {
+    const q = queued;
+    queued = '';
+    await upload(q);
   }
 }
 

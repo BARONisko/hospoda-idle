@@ -1640,5 +1640,7 @@
  "ZLATÁ ŘADA": "GOLDENE REIHE",
  "Sezónní pass: {r}": "Saisonpass: {r}",
  "{a}–{b} z {n}": "{a}–{b} von {n}",
- "Zlatá řada · {p}": "Goldene Reihe · {p}"
+ "Zlatá řada · {p}": "Goldene Reihe · {p}",
+ "ukládá se samo · naposledy před {n} min": "speichert automatisch · zuletzt vor {n} Min.",
+ "Uložit teď": "Jetzt sichern"
 }

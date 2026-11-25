@@ -1640,5 +1640,7 @@
  "ZLATÁ ŘADA": "ゴールドライン",
  "Sezónní pass: {r}": "シーズンパス：{r}",
  "{a}–{b} z {n}": "{a}–{b} / {n}",
- "Zlatá řada · {p}": "ゴールドライン・{p}"
+ "Zlatá řada · {p}": "ゴールドライン・{p}",
+ "ukládá se samo · naposledy před {n} min": "自動保存 · {n}分前",
+ "Uložit teď": "今すぐ保存"
 }

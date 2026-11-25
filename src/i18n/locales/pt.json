@@ -1640,5 +1640,7 @@
  "ZLATÁ ŘADA": "TRILHA DOURADA",
  "Sezónní pass: {r}": "Passe de temporada: {r}",
  "{a}–{b} z {n}": "{a}–{b} de {n}",
- "Zlatá řada · {p}": "Trilha dourada · {p}"
+ "Zlatá řada · {p}": "Trilha dourada · {p}",
+ "ukládá se samo · naposledy před {n} min": "salva sozinho · há {n} min",
+ "Uložit teď": "Salvar já"
 }

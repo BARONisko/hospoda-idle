@@ -2696,7 +2696,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (pg.available) {
       const y = y0 + vols.length * RH;
       const mins = pg.savedAt ? Math.floor((Date.now() - pg.savedAt) / 60000) : -1;
-      this.row(y, RH, D, t('Google Play Hry'), !pg.signedIn ? t('nepřihlášeno – žebříčky a cloud') : mins < 0 ? t('cloud: ukládá se samo') : t('cloud: uloženo před {n} min', { n: mins }), 'ink', PAL.bone, Math.min(RH < 70 ? 240 : 300, W - 232 - 34));
+      this.row(y, RH, D, t('Google Play Hry'), !pg.signedIn ? t('nepřihlášeno – žebříčky a cloud') : mins < 0 ? t('cloud: ukládá se samo') : t('ukládá se samo · naposledy před {n} min', { n: mins }), 'ink', PAL.bone, Math.min(RH < 70 ? 240 : 300, W - 232 - 34));
       const bs = Math.min(60, RH - 14), by = y + (RH - 8 - bs) / 2;
       const lb = this.btn(W - 232, by, 102, bs, () => {
         sfx.click();
@@ -2712,7 +2712,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
           if (this.tab === 'opts') this.openShop('opts', false);
         });
       }, D + 2);
-      this.drawBtn(sv, pg.signedIn ? t('Uložit') : t('Přihlásit'), true, 'green');
+      this.drawBtn(sv, pg.signedIn ? t('Uložit teď') : t('Přihlásit'), true, 'green');
       this.shopObjs.push(lb.bg, lb.label, lb.zone, sv.bg, sv.label, sv.zone);
     } else {
       const y = y0 + vols.length * RH;

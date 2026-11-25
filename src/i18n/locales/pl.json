@@ -1640,5 +1640,7 @@
  "ZLATÁ ŘADA": "ZŁOTA ŚCIEŻKA",
  "Sezónní pass: {r}": "Przepustka sezonowa: {r}",
  "{a}–{b} z {n}": "{a}–{b} z {n}",
- "Zlatá řada · {p}": "Złota ścieżka · {p}"
+ "Zlatá řada · {p}": "Złota ścieżka · {p}",
+ "ukládá se samo · naposledy před {n} min": "zapisuje się sama · {n} min temu",
+ "Uložit teď": "Zapisz teraz"
 }

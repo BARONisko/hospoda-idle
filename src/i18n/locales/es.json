@@ -1640,5 +1640,7 @@
  "ZLATÁ ŘADA": "FILA DORADA",
  "Sezónní pass: {r}": "Pase de temporada: {r}",
  "{a}–{b} z {n}": "{a}–{b} de {n}",
- "Zlatá řada · {p}": "Fila dorada · {p}"
+ "Zlatá řada · {p}": "Fila dorada · {p}",
+ "ukládá se samo · naposledy před {n} min": "se guarda solo · última vez hace {n} min",
+ "Uložit teď": "Guardar ya"
 }

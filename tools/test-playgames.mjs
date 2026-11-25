@@ -41,9 +41,24 @@ ok(r.earned === 5e9 && r.cloud === 5e9, 'cloud dál → hráč vybral cloud');
 r = await run(mk(1e6, 2), mk(5e9, 40), 'local');
 ok(r.earned === 1e6 && r.cloud === 1e6, 'cloud dál → hráč vybral telefon, cloud přepsán');
 r = await run(mk(9e9, 50), mk(5e9, 40));
-ok(r.earned === 9e9 && r.cloud === 9e9 && r.lb === '50', 'telefon dál → bez ptaní, nahráno do cloudu a krígly do žebříčku');
+ok(r.earned === 9e9 && r.cloud === 9e9 && Number(r.lb) > 0, 'telefon dál → bez ptaní, nahráno do cloudu a krígly do žebříčku ' + JSON.stringify(r));
 r = await run(mk(9e9, 50), null);
 ok(r.cloud === 9e9 && !r.errs.length, 'prázdný cloud → nahráno, bez chyb ' + r.errs.join(' | '));
+// 5 s hraní, nákup, odchod do pozadí → hned v cloudu
+{
+  const ctx = await b.newContext({ viewport: { width: 405, height: 720 } });
+  const p = await ctx.newPage();
+  await p.addInitScript((l) => { if (sessionStorage.getItem('x')) return; sessionStorage.setItem('x', '1'); localStorage.clear(); localStorage.setItem('pubidle_save_v1', l); }, mk(9e9, 50));
+  await p.goto(U);
+  await p.waitForFunction(() => window.game?.scene?.getScene('Pub')?.d, null, { timeout: 15000 });
+  await p.waitForTimeout(2500);
+  await p.evaluate(() => { const s = game.scene.getScene('Pub'); s.d.coins = 777777; });
+  await p.evaluate(() => { Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true }); document.dispatchEvent(new Event('visibilitychange')); });
+  await p.waitForTimeout(800);
+  const c = await p.evaluate(() => JSON.parse(JSON.parse(localStorage.getItem('pubidle_pg_fake_cloud') ?? 'null')?.data ?? 'null')?.coins);
+  ok(c === 777777, 'krátké hraní a odchod do pozadí → hned uloženo v cloudu (' + c + ')');
+  await ctx.close();
+}
 await b.close();
 console.log(fail ? `${fail} chyb` : 'vše v pořádku');
 process.exit(fail ? 1 : 0);

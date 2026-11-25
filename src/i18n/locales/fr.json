@@ -1640,5 +1640,7 @@
  "ZLATÁ ŘADA": "LIGNE DORÉE",
  "Sezónní pass: {r}": "Pass saisonnier : {r}",
  "{a}–{b} z {n}": "{a}–{b} sur {n}",
- "Zlatá řada · {p}": "Ligne dorée · {p}"
+ "Zlatá řada · {p}": "Ligne dorée · {p}",
+ "ukládá se samo · naposledy před {n} min": "sauvegarde auto · il y a {n} min",
+ "Uložit teď": "Sauver"
 }
