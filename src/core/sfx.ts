@@ -32,6 +32,12 @@ class Sfx {
     this.sfxOut.connect(this.out);
     this.musOut.connect(this.out);
     this.applyVol();
+    // hra na pozadí (mobil: jiná aplikace, zhasnutý displej): zvuk uspat – jinak hudba hraje dál a bere baterii
+    const ctx = this.ctx;
+    const sleep = (off: boolean) => void (off ? ctx.suspend() : ctx.resume()).catch(() => undefined);
+    document.addEventListener('visibilitychange', () => sleep(document.visibilityState === 'hidden'));
+    document.addEventListener('pause', () => sleep(true)); // Capacitor (Android): aplikace odešla do pozadí
+    document.addEventListener('resume', () => sleep(document.visibilityState === 'hidden'));
     this.noise = this.ctx.createBuffer(1, this.ctx.sampleRate, this.ctx.sampleRate);
     const d = this.noise.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;

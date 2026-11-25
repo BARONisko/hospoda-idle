@@ -708,7 +708,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     objs.push(this.add.image(x0 + 16, by + 190, 'obj', 'coin').setScale(5).setDepth(D + 2), amt);
     tx(by + 236, bones >= 1 ? t('coins a {n} kostí', { n: big(bones) }) : 'coins', 22, PAL.mint);
     if (rival) {
-      tx(by + 284, t('{s} mezitím v lize přidal +{n} coins', { n: big(rival.add), s: rivalInfo(this.league()).name }), 20, PAL.scarlet);
+      const ri = rivalInfo(this.league());
+      // soupeřka: „přidala“ (dřív vždy „přidal“)
+      tx(by + 284, ri.woman ? t('{s} mezitím v lize přidala +{n} coins', { n: big(rival.add), s: ri.name }) : t('{s} mezitím v lize přidal +{n} coins', { n: big(rival.add), s: ri.name }), 20, PAL.scarlet);
       tx(by + 314, rival.lead >= 0 ? t('Pořád vedeš o {n} coins', { n: big(rival.lead) }) : t('{s} vede o {n} coins', { n: big(-rival.lead), s: rivalInfo(this.league()).name }), 20, rival.lead >= 0 ? PAL.mint : PAL.sand);
     }
     const done = () => {

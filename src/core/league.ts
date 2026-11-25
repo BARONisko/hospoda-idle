@@ -69,7 +69,7 @@ export function rivalInfo(L: Pick<LeagueState, 'week' | 'tier'>, guests = 16) {
   const h = hashStr(`${L.week}|${L.tier}`);
   const fi = h % FIRST.length, woman = fi >= 12 && fi < 23;
   const last = LAST[(h >>> 5) % LAST.length];
-  return { name: fullName(FIRST[fi], last, woman), pub: PUBS[(h >>> 10) % PUBS.length], look: (h >>> 15) % guests };
+  return { name: fullName(FIRST[fi], last, woman), woman, pub: PUBS[(h >>> 10) % PUBS.length], look: (h >>> 15) % guests };
 }
 
 /** obtížnost lig: kolik soupeř vydělá oproti tomu, co hráč zvládl minulý týden */
