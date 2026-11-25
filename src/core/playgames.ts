@@ -81,6 +81,7 @@ const withTimeout = <T>(p: Promise<T>, ms: number) => Promise.race([p, new Promi
 
 let lastUp = 0, upBusy = false, lastRaw = '';
 const sent: Partial<Record<Board, number>> = {};
+const MAXS: Record<Board, number> = { krigle: 10_000_000, level: 100_000, temple: 999_999_999_999 };
 
 /** Zavolat před startem hry (po initBackup). wiped = hráč dal „Začít znovu“ → cloud se přepíše bez ptaní. */
 export async function initPlayGames(wiped = false): Promise<void> {
@@ -180,7 +181,8 @@ function scores(d: any) {
 /** jedno číslo do žebříčku (Chrám po každém kole: Google Play si nechá nejlepší za den / týden / vše) */
 export function submit(board: Board, score: number) {
   if (!api || !pg.signedIn || !pg.boards.includes(board) || !(score > 0)) return;
-  const s = Math.min(Math.floor(score), Number.MAX_SAFE_INTEGER);
+  // strop skóre v Play Console (ochrana proti podvodům): krígly 10M, úroveň 100k, Chrám 999 999 999 999
+  const s = Math.min(Math.floor(score), MAXS[board]);
   if (board !== 'temple' && sent[board] === s) return;
   sent[board] = s;
   void api.submitScore({ board, score: s }).catch(() => undefined);
