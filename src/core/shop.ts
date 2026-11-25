@@ -19,7 +19,7 @@ export interface IapProvider {
   unclaimed?(): Promise<ProductId[]>;
 }
 
-export type ProductId = 'gems50' | 'gems100' | 'gems550' | 'gems1500' | 'gems3500' | 'pass' | 'noads' | 'starter' | 'xmas' | 'milestone' | 'passsub';
+export type ProductId = 'gems50' | 'gems100' | 'gems550' | 'gems1500' | 'gems3500' | 'pass' | 'noads' | 'starter' | 'xmas' | 'milestone' | 'passsub' | 'season';
 /** produkty: diamanty v balíčku a výchozí cena (startovní a vánoční balík: obsah v core/offers.ts) */
 export const PRODUCTS: Record<ProductId, { gems?: number; price: string }> = {
   gems50: { gems: 50, price: '25 Kč' },
@@ -34,6 +34,8 @@ export const PRODUCTS: Record<ProductId, { gems?: number; price: string }> = {
   milestone: { price: '79 Kč' },
   /** Štamgast jako předplatné (měsíční, v Play Console základní plán SUB_PLAN, nabídka 3 dny zdarma) */
   passsub: { price: '99 Kč' },
+  /** Zlatá řada sezónního pasu (spotřební, platí pro běžící sezónu) */
+  season: { price: '99 Kč' },
 };
 /** předplatná a základní plán v Play Console */
 export const SUBS: ProductId[] = ['passsub'];

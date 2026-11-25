@@ -379,6 +379,17 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     s.rekoBook(); const book = s.awayObjs.length > 20; s.awayClose();
     return (got && book && RK.chapter(10).length === 6) || JSON.stringify({ got, book });
   }).then((r) => (r !== true && console.log(r), r)) === true);
+  ok('sezónní pass: body za denní úkol, okno B, vyzvednutí zdarma, zlatá zamčená', await S(p, async (s) => {
+    const SP = await import('/src/core/spass.ts');
+    const before = SP.spassIdx() < 0;
+    SP.SP.start = Date.now() - 86400_000; s.d.spass = undefined;
+    s.spPts('daily'); const pts = s.d.spass?.pts === SP.SPASS_PTS.daily;
+    s.d.spass.pts = 250; const g0 = s.d.gems ?? 0;
+    s.spassWin(); const win = s.awayObjs.length > 30;
+    const r = SP.spassClaim(s.d.spass, 1, false), locked = SP.spassClaim(s.d.spass, 1, true) === null;
+    s.awayClose(); SP.SP.start = SP.SPASS_START;
+    return (before && pts && win && r && r.gems > 0 && locked && g0 >= 0) || JSON.stringify({ before, pts, win, r, locked });
+  }).then((r) => (r !== true && console.log(r), r)) === true);
   ok('bez chyb v konzoli (Rekonstrukce)', p.errors.length === 0);
   if (p.errors.length) console.log(p.errors);
   await p.close();

@@ -1,11 +1,11 @@
 // Google Play Billing v mobilní aplikaci (Capacitor, plugin @capgo/native-purchases). Na webu se nic nenačítá.
 // ID produktů v Play Console musí být stejná jako ProductId: gems50, gems100, gems550, gems1500, gems3500, pass, starter,
-// xmas (spotřební), noads (jednorázový, trvalý).
+// xmas, season (spotřební), noads (jednorázový, trvalý).
 import { Capacitor } from '@capacitor/core';
 import { setIapProvider, ProductId, PRODUCTS, SUBS, SUB_PLAN } from './shop';
 
 /** spotřební = jde koupit znovu (diamanty, Štamgast na 30 dní); noads je trvalý a obnoví se po přeinstalaci */
-const CONSUMABLE: ProductId[] = ['gems50', 'gems100', 'gems550', 'gems1500', 'gems3500', 'pass', 'starter', 'xmas', 'milestone'];
+const CONSUMABLE: ProductId[] = ['gems50', 'gems100', 'gems550', 'gems1500', 'gems3500', 'pass', 'starter', 'xmas', 'milestone', 'season'];
 
 export async function initBilling() {
   if (!Capacitor.isNativePlatform()) return;

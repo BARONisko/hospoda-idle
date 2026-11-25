@@ -38,7 +38,7 @@ import { mastStage, mastRank, mastProg, RANKS, RANK_COLORS, MAST_MAX } from '../
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave, wipe } from '../core/save';
 import { PubView, LOOK, REKO, livery } from '../game/PubView';
-import { spassAdd, SPassKind } from '../core/spass';
+import { spassAdd, SPassKind, spassSync, spassIdx, spassEnd, spassTier, spassRew, spassCan, spassClaim, SPassRew, SPASS_TIERS, SPASS_TIER_PTS, SPASS_PTS, spassName } from '../core/spass';
 import { RekoState, REKO_HYG, REKO_OFFLINE_H, REKO_STARS, REKO_GOLD, newReko, rekoCount, rekoMax, nextTask, rekoReady, chapter, taskProg, taskDone, rekoStar, RekoTask } from '../core/reko';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
 import { GUESTS } from '../game/PubView';
@@ -2616,7 +2616,19 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.drawBtn(b, t('Otevřít'), true, rd || rekoReady(R) ? 'green' : 'amber');
       this.shopObjs.push(b.bg, b.label, b.zone);
     }
-    if (this.achClaimable()) head(y1 + (R ? RH : 0), t('Splněný úspěch čeká ve Sbírce → Úspěchy'));
+    // sezónní pass (běží od SPASS_START): řádek pod Knihou
+    let y2 = y1 + (R ? RH : 0);
+    const sp = spassSync(this.d.spass);
+    if (sp) {
+      this.d.spass = sp;
+      const can = Array.from({ length: SPASS_TIERS }, (_, i) => i + 1).some((n) => spassCan(sp, n, false) || spassCan(sp, n, true));
+      this.row(y2, RH, D, t('Sezónní pass: {s}', { s: spassName(sp.s) }), t('stupeň {a} / {b}', { a: spassTier(sp), b: SPASS_TIERS }), 'plum', PAL.gold);
+      const b = this.btn(W - 172, y2 + 10, 150, 54, () => this.spassWin(), D + 2);
+      this.drawBtn(b, t('Otevřít'), true, can ? 'green' : 'amber');
+      this.shopObjs.push(b.bg, b.label, b.zone);
+      y2 += RH;
+    }
+    if (this.achClaimable()) head(y2, t('Splněný úspěch čeká ve Sbírce → Úspěchy'));
   }
 
   // ---------- nastavení ----------
@@ -3136,6 +3148,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.banner(this.views[0].cam, t('Odměny teď bez reklam'));
     } else if (id === 'starter' || id === 'xmas' || id === 'milestone') {
       this.bundleGrant(id);
+    } else if (id === 'season') {
+      this.d.spass = spassSync(this.d.spass);
+      if (this.d.spass) this.d.spass.gold = true;
+      this.banner(this.views[0].cam, t('Zlatá řada odemčena!'));
+      if (this.awayObjs.length) (this.awayClose?.(), this.spassWin());
     } else if (id === 'passsub') {
       this.subSync(true);
       this.banner(this.views[0].cam, t('Jsi štamgast! Předplatné běží'));
@@ -6337,6 +6354,125 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (pi >= 0 && this.views.length > 1 && pi !== this.sel && !this.shopObjs.length) this.selectPub?.(pi);
     if (rekoReady(R)) this.time.delayedCall(1800, () => this.banner(this.views[0].cam, t('Kapitola hotová: můžeš zavolat Rekonstrukci ★{n}!', { n: R.star + 1 })));
     store(this.d);
+  }
+
+  private spPage = -1;
+  /** sezónní pass (návrh B): stupně pod sebou, vlevo zdarma, uprostřed číslo, vpravo Zlatá řada; 5 stupňů na stránku */
+  spassWin() {
+    const sp = spassSync(this.d.spass);
+    if (!sp) return;
+    this.d.spass = sp;
+    this.closeShop();
+    const D = 520, PER = 5;
+    const objs: Phaser.GameObjects.GameObject[] = [];
+    const close = () => {
+      objs.forEach((o) => o.destroy());
+      this.awayObjs = [];
+    };
+    const tier = spassTier(sp), pages = Math.ceil(SPASS_TIERS / PER);
+    if (this.spPage < 0) this.spPage = Math.min(pages - 1, Math.floor(Math.max(0, tier - 1) / PER));
+    const pg = this.spPage;
+    objs.push(this.add.rectangle(0, 0, W, H, 0x000000, 0.75).setOrigin(0).setDepth(D).setInteractive().on('pointerdown', () => 0));
+    const bx = 10, bw = W - 20, by = 60, bh = H - 130;
+    const g = this.add.graphics().setDepth(D + 1);
+    g.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
+    g.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
+    g.lineStyle(4, col('gold')).strokeRoundedRect(bx, by, bw, bh, 16);
+    // hlavička: sezóna, zbývá, stupeň a body
+    g.fillStyle(col('maroon')).fillRoundedRect(bx + 10, by + 10, bw - 20, 118, 12);
+    const days = Math.max(0, Math.ceil((spassEnd() - Date.now()) / 86400_000));
+    const T = (x: number, y: number, s: string, size: number, c: string, ox = 0, oy = 0) => {
+      const o = this.add.text(x, y, s, txt(size, c)).setOrigin(ox, oy).setDepth(D + 2);
+      objs.push(o);
+      return o;
+    };
+    const head = T(bx + 24, by + 18, t('Sezóna: {s}', { s: spassName(sp.s) }), 26, PAL.gold);
+    head.setScale(Math.min(1, (bw - 190) / head.width));
+    T(bx + bw - 24, by + 22, t('ještě {d} dní', { d: days }), 18, PAL.fog, 1);
+    T(bx + 24, by + 56, t('Stupeň {a} / {b}', { a: tier, b: SPASS_TIERS }), 20, PAL.bone);
+    const inT = tier >= SPASS_TIERS ? SPASS_TIER_PTS : sp.pts - tier * SPASS_TIER_PTS;
+    g.fillStyle(col('ink')).fillRoundedRect(bx + 190, by + 58, bw - 214, 22, 8);
+    if (inT > 0) g.fillStyle(col('amber')).fillRoundedRect(bx + 190, by + 58, Math.max(16, ((bw - 214) * inT) / SPASS_TIER_PTS), 22, 8);
+    T(bx + 190 + (bw - 214) / 2, by + 69, tier >= SPASS_TIERS ? t('hotovo') : t('{a} / {b} bodů', { a: inT, b: SPASS_TIER_PTS }), 15, PAL.white, 0.5, 0.5);
+    const how = T(bx + 24, by + 92, t('Body: denní úkol +{a} · truhla +{b} · týdenní výzva +{c} · hygiena +{d}', { a: SPASS_PTS.daily, b: SPASS_PTS.chest, c: SPASS_PTS.weekly, d: SPASS_PTS.hyg }), 15, PAL.fog);
+    how.setScale(Math.min(1, (bw - 48) / how.width));
+    objs.push(g);
+    // sloupce
+    const y0 = by + 140, cw = 196, mid = W / 2;
+    T(bx + 14 + cw / 2, y0, t('ZDARMA'), 16, PAL.fog, 0.5);
+    T(bx + bw - 14 - cw / 2, y0, t('ZLATÁ ŘADA'), 16, PAL.gold, 0.5);
+    const RH = 92, top = y0 + 26;
+    const ln = this.add.graphics().setDepth(D + 1);
+    ln.fillStyle(col('ink')).fillRect(mid - 3, top, 6, PER * RH - 10);
+    objs.push(ln);
+    const rewTxt = (r: SPassRew) => (r.gems ? `💎 ${r.gems}` : r.bones ? `🦴 ${big(r.bones)}` : `🍺 ${t('+{k} krígel', { k: r.krigle ?? 0 })}`) + (r.gems && r.krigle ? `\n🍺 ${t('+{k} krígel', { k: r.krigle })}` : '');
+    for (let i = 0; i < PER; i++) {
+      const n = pg * PER + i + 1;
+      if (n > SPASS_TIERS) break;
+      const y = top + i * RH, reached = n <= tier;
+      if (reached) ln.fillStyle(col('mint')).fillRect(mid - 3, y, 6, RH);
+      for (const gold of [false, true]) {
+        const x = gold ? bx + bw - 14 - cw : bx + 14, got = (gold ? sp.gotG : sp.got).includes(n), can = spassCan(sp, n, gold);
+        const lock = gold && !sp.gold;
+        const box = this.add.graphics().setDepth(D + 1);
+        box.fillStyle(col(gold ? 'rust' : 'slate'), got ? 0.45 : 1).fillRoundedRect(x, y, cw, RH - 10, 10);
+        box.lineStyle(can ? 4 : 2, col(can ? 'mint' : gold ? 'gold' : 'fog'), can ? 1 : 0.6).strokeRoundedRect(x, y, cw, RH - 10, 10);
+        objs.push(box);
+        const rt = T(x + cw / 2, y + (RH - 10) / 2, rewTxt(spassRew(n, gold)), 20, PAL.bone, 0.5, 0.5).setAlign('center');
+        rt.setScale(Math.min(1, (cw - 20) / rt.width));
+        if (got) T(x + cw - 10, y + 6, '✓', 20, PAL.mint, 1, 0);
+        else if (lock) T(x + cw - 8, y + 4, '🔒', 16, PAL.white, 1, 0);
+        else if (can) T(x + cw - 10, y + 6, t('Vybrat'), 14, PAL.mint, 1, 0);
+        const z = this.add.zone(x, y, cw, RH - 10).setOrigin(0).setDepth(D + 3).setInteractive();
+        z.on('pointerdown', () => {
+          if (lock) return void this.iapBuy('season');
+          const r = spassClaim(sp, n, gold);
+          if (!r) return sfx.error();
+          this.d.gems = (this.d.gems ?? 0) + (r.gems ?? 0);
+          this.d.bones = (this.d.bones ?? 0) + (r.bones ?? 0);
+          this.d.krigle += r.krigle ?? 0;
+          meter.track('spass_claim', { n, gold });
+          store(this.d);
+          sfx.coin(1);
+          close();
+          this.spassWin();
+          this.banner(this.views[0].cam, t('Sezónní pass: {r}', { r: rewTxt(r).replace('\n', ' · ') }));
+        });
+        objs.push(z);
+      }
+      const cc = this.add.graphics().setDepth(D + 2);
+      cc.fillStyle(col(reached ? 'green' : 'slate')).fillCircle(mid, y + (RH - 10) / 2, 24);
+      cc.lineStyle(3, col(n === tier + 1 ? 'mint' : 'ink')).strokeCircle(mid, y + (RH - 10) / 2, 24);
+      objs.push(cc);
+      T(mid, y + (RH - 10) / 2, String(n), 20, PAL.white, 0.5, 0.5).setDepth(D + 3);
+    }
+    // stránky ▲ ▼, Zlatá řada, Zavřít
+    const yb = top + PER * RH;
+    const nav = (x: number, s: string, d: number) => {
+      const b = this.btn(x, yb, 110, 52, () => {
+        const np = pg + d;
+        if (np < 0 || np >= pages) return sfx.error();
+        this.spPage = np;
+        close();
+        this.spassWin();
+      }, D + 3);
+      this.drawBtn(b, s, pg + d >= 0 && pg + d < pages, 'slate');
+      objs.push(b.bg, b.label, b.zone);
+    };
+    nav(bx + 14, '▲', -1);
+    nav(bx + bw - 124, '▼', 1);
+    T(mid, yb + 26, t('{a}–{b} z {n}', { a: pg * PER + 1, b: Math.min(SPASS_TIERS, pg * PER + PER), n: SPASS_TIERS }), 18, PAL.fog, 0.5, 0.5);
+    if (!sp.gold) {
+      const gb = this.btn(bx + 20, yb + 62, bw - 40, 60, () => void this.iapBuy('season'), D + 3);
+      this.drawBtn(gb, t('Zlatá řada · {p}', { p: iap.price('season') }), true, 'amber');
+      objs.push(gb.bg, gb.label, gb.zone);
+    }
+    const cb = this.btn(W / 2 - 90, by + bh - 72, 180, 58, () => ((this.spPage = -1), close()), D + 3);
+    this.drawBtn(cb, t('Zavřít'), true, 'slate');
+    objs.push(cb.bg, cb.label, cb.zone);
+    this.awayObjs = objs;
+    this.awayClose = () => ((this.spPage = -1), close());
+    sfx.click();
   }
 
   /** sezónní pass: body (jen v běžící sezóně) */

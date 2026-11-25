@@ -1,9 +1,12 @@
 // Sezónní pass (plán „hra na rok“, schváleno 25. 11. 2026): každé 4 týdny nová sezóna, 30 stupňů,
 // řada zdarma a Zlatá řada (placená). Body za denní úkoly, denní truhlu, týdenní výzvu a hygienu.
-// Spouští se týden po vydání hry (SPASS_START). Vzhled okna podle výběru Petra (návrhy A/B/C).
+// Spouští se týden po vydání hry (SPASS_START). Okno = návrh B (svislý seznam), vybral Petr 25. 11. 2026.
+import { t } from '../i18n';
 
 /** začátek první sezóny (týden po vydání) a délka sezóny */
 export const SPASS_START = Date.UTC(2026, 11, 4);
+/** začátek pro výpočet (headless test ho posune do minulosti) */
+export const SP = { start: SPASS_START };
 export const SPASS_LEN = 28 * 86400_000;
 export const SPASS_TIERS = 30;
 /** body na jeden stupeň: běžný hráč ~140 bodů denně → všech 30 stupňů za ~3 týdny, slabší ~20 */
@@ -25,9 +28,11 @@ export interface SPassState {
 export type SPassRew = { gems?: number; bones?: number; krigle?: number };
 
 /** číslo sezóny podle data (−1 = ještě nezačala) */
-export const spassIdx = (now = Date.now()) => (now < SPASS_START ? -1 : Math.floor((now - SPASS_START) / SPASS_LEN));
+export const spassIdx = (now = Date.now()) => (now < SP.start ? -1 : Math.floor((now - SP.start) / SPASS_LEN));
 /** konec aktuální sezóny (ms) */
-export const spassEnd = (now = Date.now()) => SPASS_START + (spassIdx(now) + 1) * SPASS_LEN;
+export const spassEnd = (now = Date.now()) => SP.start + (spassIdx(now) + 1) * SPASS_LEN;
+/** název sezóny (střídají se podle čísla) */
+export const spassName = (s: number) => [t('Pivní podzim'), t('Zimní krčma'), t('Masopust'), t('Jarní pípa'), t('Májová zábava'), t('Letní zahrádka')][s % 6];
 
 /** stav pro aktuální sezónu (nová sezóna = body a odměny od nuly) */
 export function spassSync(st: SPassState | undefined, now = Date.now()): SPassState | undefined {
