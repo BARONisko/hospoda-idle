@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { PAL } from '../data/palette';
-import { t, lang, LANGS, AVAILABLE, setLang } from '../i18n';
+import { t, lang, LANGS, AVAILABLE, setLang, langChosen, keepLang, type Lang } from '../i18n';
 import { txt } from '../ui/font';
 import { Capacitor } from '@capacitor/core';
 import { InAppReview } from '@capacitor-community/in-app-review';
@@ -308,6 +308,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   static iapHooked = false;
   create() {
     this.d = load();
+    // první spuštění: výběr jazyka (předvybraný jazyk telefonu) – návrh A, mřížka 2×6
+    if (!langChosen() && (this.d.tut ?? (this.d.earned < 50 ? 0 : -1)) === 0) this.time.delayedCall(200, () => this.pickLang(true));
     setLayout((this.d.reko?.star ?? 0) >= 2);
     PubScene.cur = this;
     if (!PubScene.iapHooked) {
@@ -2675,7 +2677,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         saveOpts();
         for (let k = 0; k < 6; k++) this.time.delayedCall(k * 300, () => sfx.coin(1));
       }],
-      [t('Jazyk / Language'), LANGS[lang], () => setLang(AVAILABLE[(AVAILABLE.indexOf(lang) + 1) % AVAILABLE.length])],
+      [t('Jazyk / Language'), LANGS[lang], () => this.pickLang(false)],
     ];
     // offline verze do složky (zip s index.html) – nabízí se jen na webu, ne ve hře spuštěné z disku
     // záloha hry: dvě tlačítka v jednom řádku; v aplikaci s Google Play Hrami místo ní žebříčky a cloud
@@ -4035,6 +4037,62 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     store(this.d);
     meter.track('review_ask', { hyg });
     void InAppReview.requestReview().catch(() => undefined);
+  }
+
+  /** okno výběru jazyka (návrh A): mřížka 2×6, vybraný zlatě, dole Hrát / OK; first = první spuštění (nejde zavřít bez volby) */
+  pickLang(first: boolean) {
+    const D = 900, list = AVAILABLE, bw = W - 60, bx = 30, cw = (bw - 48 - 12) / 2, ch = 62, gap = 12;
+    const rows = Math.ceil(list.length / 2), gridH = rows * ch + (rows - 1) * gap;
+    const bh = 96 + (first ? 28 : 0) + gridH + 24 + 76 + 24, by = Math.round((H - bh) / 2);
+    let sel: Lang = lang;
+    const objs: Phaser.GameObjects.GameObject[] = [];
+    objs.push(this.add.rectangle(0, 0, W, H, 0x1e1420, 0.85).setOrigin(0).setDepth(D).setInteractive());
+    const g = this.add.graphics().setDepth(D + 1);
+    g.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
+    g.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
+    g.lineStyle(4, col('gold')).strokeRoundedRect(bx, by, bw, bh, 16);
+    objs.push(g);
+    // okno je vždy anglicky (přání Petra), názvy jazyků v originále
+    const tx = this.add.text(W / 2, by + 28, 'LANGUAGE', txt(34, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 2);
+    tx.setScale(Math.min(1, (bw - 40) / tx.width));
+    objs.push(tx);
+    let y = by + 84;
+    if (first) {
+      objs.push(this.add.text(W / 2, y, `Phone language: ${LANGS[lang]}`, txt(20, PAL.bone)).setOrigin(0.5, 0).setDepth(D + 2));
+      y += 32;
+    }
+    const btns: { b: Btn; l: Lang }[] = [];
+    const draw = () =>
+      btns.forEach(({ b, l }) => {
+        this.drawBtn(b, LANGS[l], true, l === sel ? 'gold' : 'slate');
+        b.label.setFontSize(26).setScale(1);
+        b.label.setScale(Math.min(1, (cw - 16) / Math.max(1, b.label.width)));
+      });
+    list.forEach((l, k) => {
+      const b = this.btn(bx + 24 + (k % 2) * (cw + 12), y + Math.floor(k / 2) * (ch + gap), cw, ch, () => {
+        sel = l;
+        sfx.click();
+        draw();
+      }, D + 3);
+      btns.push({ b, l });
+      objs.push(b.bg, b.label, b.zone);
+    });
+    draw();
+    const close = () => {
+      objs.forEach((o) => o.destroy());
+      this.awayObjs = [];
+    };
+    const ok = this.btn(bx + 24, y + gridH + 24, bw - 48, 76, () => {
+      if (sel !== lang) return setLang(sel);
+      keepLang();
+      close();
+      if (!first) this.openShop('opts', false);
+    }, D + 3);
+    this.drawBtn(ok, first ? 'Play' : 'OK', true, 'green');
+    ok.label.setFontSize(34);
+    objs.push(ok.bg, ok.label, ok.zone);
+    this.awayObjs = objs;
+    this.awayClose = first ? () => {} : close;
   }
 
   private askYesNo(q: string, yesFn: () => void, sub?: string, yesStyle: 'red' | 'green' = 'red') {

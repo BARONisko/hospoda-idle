@@ -17,12 +17,25 @@ const page = async (q = '') => {
   const p = await b.newPage({ viewport: { width: 405, height: 720 }, isMobile: true, hasTouch: true });
   p.errors = [];
   p.on('pageerror', (e) => p.errors.push(e.message));
+  // jazyk zvolený (jinak by nového hráče přivítal výběr jazyka); výběr jazyka testuje ?langask
+  if (!q.includes('langask')) await p.addInitScript(() => { if (!localStorage.getItem('pubidle_lang')) localStorage.setItem('pubidle_lang', 'cs'); });
   await p.goto(url + (q.includes('night') ? q : q ? q + '&night=0' : '?night=0'));
   await p.waitForFunction(() => window.game?.scene?.getScene('Pub')?.d, null, { timeout: 15000 });
   await p.waitForTimeout(300);
   return p;
 };
 const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON.stringify(arg ?? null)})`);
+
+// 0) první spuštění: výběr jazyka (mřížka, předvybraný jazyk telefonu, Hrát uloží volbu)
+{
+  const p = await page('?langask=1');
+  await p.waitForTimeout(600);
+  ok('jazyk: nový hráč vidí výběr jazyka', await S(p, (s) => s.awayObjs.length > 20 && !localStorage.getItem('pubidle_lang')));
+  await S(p, (s) => s.awayObjs.filter((o) => o.type === 'Zone').pop().emit('pointerdown'));
+  ok('jazyk: Hrát uloží jazyk a okno zavře', await S(p, (s) => s.awayObjs.length === 0 && !!localStorage.getItem('pubidle_lang')));
+  ok('bez chyb v konzoli (výběr jazyka)', p.errors.length === 0);
+  await p.close();
+}
 
 // 1) start, ruční cyklus, nákup úrovně
 {

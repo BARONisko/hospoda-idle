@@ -519,3 +519,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Tlačítka: Nastavení (řádek Google Play Hry místo Zálohy hry), konec kola v Chrámu, hlavička Menu (návrh C, ?lb=a|b|c).
   ID z Play Console přes GitHub Variables PG_APP_ID, PG_LB_KRIGLE, PG_LB_LEVEL, PG_LB_TEMPLE (bez nich se vše skryje).
   Ladění na webu ?pg=1 (předstíraný Google Play), test: node tools/test-playgames.mjs.
+- Výběr jazyka (návrh A, Petr 25. 11.): při prvním spuštění okno „LANGUAGE“ (vždy anglicky) s mřížkou 2×6 jazyků v originále,
+  předvybraný jazyk telefonu, „Play“ uloží volbu (pickLang). Stejné okno v Nastavení → Jazyk (dřív se jazyky jen přepínaly dokola).

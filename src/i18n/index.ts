@@ -45,6 +45,24 @@ const dict: Dict = lang === 'cs' ? {} : ((await files[`./locales/${lang}.json`]?
 export const locale = lang === 'pt' ? 'pt-BR' : lang === 'zh' ? 'zh-CN' : lang;
 const rules = new Intl.PluralRules(locale);
 
+/** hráč si jazyk už vybral (jinak se jazyk vzal z telefonu) */
+export function langChosen(): boolean {
+  try {
+    return !!localStorage.getItem(LANG_KEY);
+  } catch {
+    return true;
+  }
+}
+
+/** uloží jazyk bez nového načtení (potvrzení předvybraného jazyka) */
+export function keepLang() {
+  try {
+    localStorage.setItem(LANG_KEY, lang);
+  } catch {
+    /* nic */
+  }
+}
+
 /** Uloží jazyk a znovu načte hru (texty v datech se překládají při načtení). */
 export function setLang(l: Lang) {
   try {
