@@ -160,6 +160,8 @@ export interface PassState {
   until: number;
   /** den posledního vyzvednutí denních diamantů */
   claim?: string;
+  /** platí z předplatného (Google Play ho obnovuje; hra drží platnost 2 dny dopředu a při spuštění ověří) */
+  sub?: boolean;
 }
 export const PASS_DAYS = 30;
 export const PASS_MULT = 2;

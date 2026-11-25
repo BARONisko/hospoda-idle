@@ -553,6 +553,19 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('video za coins: ťuk na nákup bez coins nabídne video', await S(p, (s) => !!s.coinChip));
   await p.evaluate(() => game.scene.getScene('Pub').coinVid());
   ok('video za coins: +30 min výdělku, počítá se denní limit', await S(p, (s) => s.d.coins > 0 && s.d.offers.vid.n === 1 && !s.coinChip));
+  // lákadla 5–7: předplatné, denní video výzva, nabídka po milníku
+  await S(p, (s) => { s.d.offers.ms = undefined; s.msStart('pub2'); });
+  ok('milník: nová hospoda spustí nabídku na 24 h', await S(p, (s) => s.d.offers.ms?.id === 'pub2' && s.bundleTitle('milestone').length > 3));
+  await S(p, (s) => { window.g0 = s.d.gems; window.c0 = s.d.coins; });
+  await p.evaluate(() => game.scene.getScene('Pub').iapBuy('milestone'));
+  ok('milník: balík dá 500 💎 a výdělek, druhý stejný milník už ne', await S(p, (s) => { s.msStart('pub2'); return s.d.gems === window.g0 + 500 && s.d.coins > window.c0 && s.d.offers.bought.includes('ms:pub2') && s.d.offers.ms.id === 'pub2'; }));
+  await S(p, (s) => { s.d.offers.vc = undefined; window.g1 = s.d.gems; });
+  for (let i = 0; i < 5; i++) await p.evaluate(() => game.scene.getScene('Pub').rewarded());
+  ok('video výzva: 5 videí = vyzvednout 3 💎, jen jednou denně', await S(p, (s) => { s.vcClaim(); s.vcClaim(); return s.d.gems === window.g1 + 3 && s.d.offers.vc.got; }));
+  await p.evaluate(() => game.scene.getScene('Pub').iapBuy('passsub'));
+  ok('předplatné: Štamgast běží a jde spravovat', await S(p, (s) => s.d.pass.sub && s.d.pass.until > Date.now() + 86400e3));
+  await S(p, (s) => { s.spSub = 'pass'; s.openShop('special', false); });
+  ok('předplatné: záložka Štamgast bez chyb', await S(p, (s) => s.shopObjs.length > 10));
   ok('video za coins: bublina nejvýš 1× za 5 min', await S(p, (s) => { s.d.coins = 0; s.refresh(); s.cards[0].buy.zone.emit('pointerdown'); return !s.coinChip; }));
   ok('bez chyb v konzoli (diamanty)', p.errors.length === 0);
   await p.close();

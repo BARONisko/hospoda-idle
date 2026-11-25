@@ -466,3 +466,9 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   do ligy se nepočítá). Vyskakovací nabídka nejvýš 1 za spuštění, ne dřív než 3 min po startu, každá nejvýš 1× denně;
   jinak jen karta nahoře v Speciální nabídka → Nabídka. Vzhled okna: A „plakát“ (výběr uživatele z /mnt/project-files/vydelek/nabidka-ABC.png).
   Nové produkty v Play Console: gems50, gems1500, gems3500, starter, xmas (docs/play-console.md); nezaložený produkt se nenabízí.
+- Lákadla 5–7 (25. 11., schváleno uživatelem): Štamgast jako předplatné `passsub` (základní plán `monthly`, nabídka
+  3 dny zdarma; hra drží platnost 2 dny dopředu a při spuštění ověří aktivní předplatné, PubScene.subSync; „Spravovat
+  předplatné“ otevře Google Play), jednorázová karta na 30 dní zůstává; Bez reklam 149 Kč. Denní video výzva: 5 odměn
+  za video denně → +3 💎 a 2 h výdělku (řádek v kartě Reklamní kampaň). Nabídka po milníku: nová hospoda / první poražený
+  Cthulhu → „Oslavný balík“ `milestone` 79 Kč (500 💎, 8 h výdělku, Štamgast 3 dny) na 24 h, jednou za milník.
+  Snímky /mnt/project-files/vydelek/lakadla-5-7.png.

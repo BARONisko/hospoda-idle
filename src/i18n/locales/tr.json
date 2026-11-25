@@ -1416,5 +1416,21 @@
  "30 min výdělku · dnes ještě {k}×": "30 dk gelir · bugün {k}× kaldı",
  "🛒 Koupit": "🛒 Satın al",
  "první nákup ×2 (jinak {n})": "ilk alım ×2 (normalde {n})",
- "{s} mezitím v lize přidala +{n} coins": "{s} bu arada ligde +{n} coins ekledi"
+ "{s} mezitím v lize přidala +{n} coins": "{s} bu arada ligde +{n} coins ekledi",
+ "Jsi štamgast! Předplatné běží": "Artık müdavimsin! Abonelik aktif",
+ "Výzva dne splněna! Vyzvedni odměnu v Speciální nabídce": "Günün görevi tamam! Ödülünü Özel Teklif'ten al",
+ "+{g} 💎 a {n} coins": "+{g} 💎 ve {n} coins",
+ "{h} h výdělku hned": "Hemen {h} sa gelir",
+ "Oslava: {s}": "Kutlama: {s}",
+ "Oslava vítězství nad Cthulhu": "Cthulhu zaferi kutlaması",
+ "{n} 💎 · {h} h výdělku · Štamgast {d} dny": "{n} 💎 · {h} sa gelir · Müdavim {d} gün",
+ "Výzva dne splněna ✓ · zítra znovu": "Günün görevi tamam ✓ · yarın yine",
+ "Výzva dne: 📺 {n}/{g} → +{d} 💎 a {h} h výdělku": "Günün görevi: 📺 {n}/{g} → +{d} 💎 ve {h} sa gelir",
+ "Vyzvednout": "Al",
+ "předplatné běží – obnovuje se každý měsíc": "abonelik aktif – her ay yenilenir",
+ "Spravovat předplatné": "Aboneliği yönet",
+ "3 dny zdarma, pak {p} měsíčně": "3 gün ücretsiz, sonra ayda {p}",
+ "Předplatit · {p} měsíčně": "Abone ol · ayda {p}",
+ "Obnovuje se každý měsíc. Zrušíš kdykoli v Google Play.": "Her ay yenilenir. Google Play'den istediğin zaman iptal et.",
+ "nebo jednorázově: {s}": "ya da tek seferlik: {s}"
 }

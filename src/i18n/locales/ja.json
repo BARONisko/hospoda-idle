@@ -1416,5 +1416,21 @@
  "30 min výdělku · dnes ještě {k}×": "30分の収入・今日あと{k}回",
  "🛒 Koupit": "🛒 購入",
  "první nákup ×2 (jinak {n})": "初回購入×2(通常{n})",
- "{s} mezitím v lize přidala +{n} coins": "その間に{s}がリーグで +{n} coins 稼いだ"
+ "{s} mezitím v lize přidala +{n} coins": "その間に{s}がリーグで +{n} coins 稼いだ",
+ "Jsi štamgast! Předplatné běží": "常連になった!サブスク有効",
+ "Výzva dne splněna! Vyzvedni odměnu v Speciální nabídce": "今日のチャレンジ達成!特別オファーで報酬を受け取ろう",
+ "+{g} 💎 a {n} coins": "+{g} 💎 と {n} coins",
+ "{h} h výdělku hned": "すぐに{h}時間分の収入",
+ "Oslava: {s}": "お祝い:{s}",
+ "Oslava vítězství nad Cthulhu": "クトゥルフ撃破のお祝い",
+ "{n} 💎 · {h} h výdělku · Štamgast {d} dny": "{n} 💎・{h}時間分の収入・常連{d}日",
+ "Výzva dne splněna ✓ · zítra znovu": "今日のチャレンジ達成 ✓・また明日",
+ "Výzva dne: 📺 {n}/{g} → +{d} 💎 a {h} h výdělku": "今日のチャレンジ:📺 {n}/{g} → +{d} 💎 と{h}時間分の収入",
+ "Vyzvednout": "受け取る",
+ "předplatné běží – obnovuje se každý měsíc": "サブスク有効 – 毎月自動更新",
+ "Spravovat předplatné": "サブスクを管理",
+ "3 dny zdarma, pak {p} měsíčně": "3日間無料、その後月額{p}",
+ "Předplatit · {p} měsíčně": "登録・月額{p}",
+ "Obnovuje se každý měsíc. Zrušíš kdykoli v Google Play.": "毎月自動更新。Google Playでいつでも解約できます。",
+ "nebo jednorázově: {s}": "または1回払い:{s}"
 }

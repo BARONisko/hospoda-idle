@@ -1416,5 +1416,21 @@
  "30 min výdělku · dnes ještě {k}×": "30分钟收入 · 今天还剩{k}次",
  "🛒 Koupit": "🛒 购买",
  "první nákup ×2 (jinak {n})": "首次购买×2(平时{n})",
- "{s} mezitím v lize přidala +{n} coins": "这期间 {s} 在联赛中赚了 +{n} coins"
+ "{s} mezitím v lize přidala +{n} coins": "这期间 {s} 在联赛中赚了 +{n} coins",
+ "Jsi štamgast! Předplatné běží": "你成了常客!订阅生效中",
+ "Výzva dne splněna! Vyzvedni odměnu v Speciální nabídce": "今日挑战完成!去特别优惠领取奖励",
+ "+{g} 💎 a {n} coins": "+{g} 💎 和 {n} coins",
+ "{h} h výdělku hned": "立即获得{h}小时收入",
+ "Oslava: {s}": "庆祝:{s}",
+ "Oslava vítězství nad Cthulhu": "战胜克苏鲁庆祝",
+ "{n} 💎 · {h} h výdělku · Štamgast {d} dny": "{n} 💎 · {h}小时收入 · 常客{d}天",
+ "Výzva dne splněna ✓ · zítra znovu": "今日挑战完成 ✓ · 明天再来",
+ "Výzva dne: 📺 {n}/{g} → +{d} 💎 a {h} h výdělku": "今日挑战:📺 {n}/{g} → +{d} 💎 和{h}小时收入",
+ "Vyzvednout": "领取",
+ "předplatné běží – obnovuje se každý měsíc": "订阅生效中 – 每月自动续订",
+ "Spravovat předplatné": "管理订阅",
+ "3 dny zdarma, pak {p} měsíčně": "免费3天,之后每月{p}",
+ "Předplatit · {p} měsíčně": "订阅 · 每月{p}",
+ "Obnovuje se každý měsíc. Zrušíš kdykoli v Google Play.": "每月自动续订。可随时在Google Play取消。",
+ "nebo jednorázově: {s}": "或一次性:{s}"
 }

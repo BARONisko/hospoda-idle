@@ -1416,5 +1416,21 @@
  "30 min výdělku · dnes ještě {k}×": "30 min de ingresos · hoy quedan {k}×",
  "🛒 Koupit": "🛒 Comprar",
  "první nákup ×2 (jinak {n})": "primera compra ×2 (si no, {n})",
- "{s} mezitím v lize přidala +{n} coins": "{s} sumó +{n} coins en la liga mientras tanto"
+ "{s} mezitím v lize přidala +{n} coins": "{s} sumó +{n} coins en la liga mientras tanto",
+ "Jsi štamgast! Předplatné běží": "¡Eres Habitual! Suscripción activa",
+ "Výzva dne splněna! Vyzvedni odměnu v Speciální nabídce": "¡Reto diario hecho! Recoge el premio en Oferta especial",
+ "+{g} 💎 a {n} coins": "+{g} 💎 y {n} coins",
+ "{h} h výdělku hned": "{h} h de ingresos ya",
+ "Oslava: {s}": "Celebración: {s}",
+ "Oslava vítězství nad Cthulhu": "Celebración de la victoria sobre Cthulhu",
+ "{n} 💎 · {h} h výdělku · Štamgast {d} dny": "{n} 💎 · {h} h de ingresos · Habitual {d} días",
+ "Výzva dne splněna ✓ · zítra znovu": "Reto diario hecho ✓ · mañana otra vez",
+ "Výzva dne: 📺 {n}/{g} → +{d} 💎 a {h} h výdělku": "Reto diario: 📺 {n}/{g} → +{d} 💎 y {h} h de ingresos",
+ "Vyzvednout": "Recoger",
+ "předplatné běží – obnovuje se každý měsíc": "suscripción activa – se renueva cada mes",
+ "Spravovat předplatné": "Gestionar suscripción",
+ "3 dny zdarma, pak {p} měsíčně": "3 días gratis, luego {p} al mes",
+ "Předplatit · {p} měsíčně": "Suscribirse · {p} al mes",
+ "Obnovuje se každý měsíc. Zrušíš kdykoli v Google Play.": "Se renueva cada mes. Cancela cuando quieras en Google Play.",
+ "nebo jednorázově: {s}": "o una sola vez: {s}"
 }

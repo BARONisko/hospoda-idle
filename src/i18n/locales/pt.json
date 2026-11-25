@@ -1416,5 +1416,21 @@
  "30 min výdělku · dnes ještě {k}×": "30 min de ganhos · restam {k}× hoje",
  "🛒 Koupit": "🛒 Comprar",
  "první nákup ×2 (jinak {n})": "primeira compra ×2 (normal {n})",
- "{s} mezitím v lize přidala +{n} coins": "Enquanto isso, {s} somou +{n} coins na liga"
+ "{s} mezitím v lize přidala +{n} coins": "Enquanto isso, {s} somou +{n} coins na liga",
+ "Jsi štamgast! Předplatné běží": "Você é Freguês! Assinatura ativa",
+ "Výzva dne splněna! Vyzvedni odměnu v Speciální nabídce": "Desafio do dia feito! Pegue a recompensa em Oferta especial",
+ "+{g} 💎 a {n} coins": "+{g} 💎 e {n} coins",
+ "{h} h výdělku hned": "{h} h de ganhos agora",
+ "Oslava: {s}": "Comemoração: {s}",
+ "Oslava vítězství nad Cthulhu": "Comemoração da vitória sobre Cthulhu",
+ "{n} 💎 · {h} h výdělku · Štamgast {d} dny": "{n} 💎 · {h} h de ganhos · Freguês {d} dias",
+ "Výzva dne splněna ✓ · zítra znovu": "Desafio do dia feito ✓ · amanhã de novo",
+ "Výzva dne: 📺 {n}/{g} → +{d} 💎 a {h} h výdělku": "Desafio do dia: 📺 {n}/{g} → +{d} 💎 e {h} h de ganhos",
+ "Vyzvednout": "Pegar",
+ "předplatné běží – obnovuje se každý měsíc": "assinatura ativa – renova todo mês",
+ "Spravovat předplatné": "Gerenciar assinatura",
+ "3 dny zdarma, pak {p} měsíčně": "3 dias grátis, depois {p} por mês",
+ "Předplatit · {p} měsíčně": "Assinar · {p} por mês",
+ "Obnovuje se každý měsíc. Zrušíš kdykoli v Google Play.": "Renova todo mês. Cancele quando quiser no Google Play.",
+ "nebo jednorázově: {s}": "ou uma vez: {s}"
 }

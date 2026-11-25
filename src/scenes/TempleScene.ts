@@ -21,6 +21,8 @@ const ALTAR = { x: 270, y: 790 };
 
 /** co chrám potřebuje od hospody */
 export interface TempleHost {
+  /** milník: první poražený Cthulhu (nabídka na 24 h) */
+  msStart(id: string): void;
   templeData(): TempleState;
   /** výdělek coins/s (síla zásahu – jen logaritmicky) */
   templeIncome(): number;
@@ -275,6 +277,8 @@ export class TempleScene extends Phaser.Scene {
     const kr = this.host.templeReward('krigle', Math.round(this.kriglyGift() * DIFF_REW[d - 1]));
     const dp = this.host.templeReward('darts', 2 * d);
     const gm = this.host.templeReward('gems', GEMS_FREE.boss * d);
+    // první vítězství = milník (nabídka na 24 h, vyskočí až podle pravidla jedné nabídky)
+    if (this.T.boss === 1) this.host.msStart('boss1');
     let msg = t('CTHULHU PORAŽEN!') + '\n' + seal + '\n' + tal + '\n' + kr + '\n' + dp + '\n' + gm;
     if (d < DIFFS && (this.T.maxD ?? 1) <= d) {
       this.T.maxD = d + 1;

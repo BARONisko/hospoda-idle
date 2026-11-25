@@ -1416,5 +1416,21 @@
  "30 min výdělku · dnes ještě {k}×": "30분 수입 · 오늘 {k}회 남음",
  "🛒 Koupit": "🛒 구매",
  "první nákup ×2 (jinak {n})": "첫 구매 ×2 (평소 {n})",
- "{s} mezitím v lize přidala +{n} coins": "그사이 {s} 님이 리그에서 +{n} coins 벌었어요"
+ "{s} mezitím v lize přidala +{n} coins": "그사이 {s} 님이 리그에서 +{n} coins 벌었어요",
+ "Jsi štamgast! Předplatné běží": "단골이 됐어요! 구독 중",
+ "Výzva dne splněna! Vyzvedni odměnu v Speciální nabídce": "오늘의 도전 완료! 특별 할인에서 보상을 받으세요",
+ "+{g} 💎 a {n} coins": "+{g} 💎 와 {n} coins",
+ "{h} h výdělku hned": "즉시 {h}시간 수입",
+ "Oslava: {s}": "축하: {s}",
+ "Oslava vítězství nad Cthulhu": "크툴루 승리 축하",
+ "{n} 💎 · {h} h výdělku · Štamgast {d} dny": "{n} 💎 · {h}시간 수입 · 단골 {d}일",
+ "Výzva dne splněna ✓ · zítra znovu": "오늘의 도전 완료 ✓ · 내일 또",
+ "Výzva dne: 📺 {n}/{g} → +{d} 💎 a {h} h výdělku": "오늘의 도전: 📺 {n}/{g} → +{d} 💎 와 {h}시간 수입",
+ "Vyzvednout": "받기",
+ "předplatné běží – obnovuje se každý měsíc": "구독 중 – 매달 자동 갱신",
+ "Spravovat předplatné": "구독 관리",
+ "3 dny zdarma, pak {p} měsíčně": "3일 무료, 이후 월 {p}",
+ "Předplatit · {p} měsíčně": "구독 · 월 {p}",
+ "Obnovuje se každý měsíc. Zrušíš kdykoli v Google Play.": "매달 갱신돼요. Google Play에서 언제든 해지할 수 있어요.",
+ "nebo jednorázově: {s}": "또는 1회 구매: {s}"
 }

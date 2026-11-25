@@ -17,6 +17,10 @@ export interface OfferState {
   pop?: Record<string, string>;
   /** videa za coins dnes */
   vid?: { day: string; n: number };
+  /** denní video výzva: kolik videí dnes, vyzvednuto */
+  vc?: { day: string; n: number; got?: boolean };
+  /** nabídka po milníku (nová hospoda, první poražený Cthulhu): id a kdy začala */
+  ms?: { id: string; at: number };
 }
 
 // ---------- startovní balíček ----------
@@ -70,6 +74,36 @@ export function coinVidUse(o: OfferState, now = Date.now()) {
   o.vid = o.vid?.day === day ? { day, n: o.vid.n + 1 } : { day, n: 1 };
 }
 
+// ---------- denní video výzva ----------
+export const VC_GOAL = 5;
+export const VC_GEMS = 3;
+/** odměna navíc: tolik hodin výdělku */
+export const VC_H = 2;
+export const vcNow = (o: OfferState | undefined, now = Date.now()) => (o?.vc?.day === dayKey(now) ? o.vc : { day: dayKey(now), n: 0, got: false });
+/** zhlédnuté video (jakékoli za odměnu) */
+export function vcAdd(o: OfferState, now = Date.now()) {
+  const v = vcNow(o, now);
+  o.vc = { ...v, n: Math.min(VC_GOAL, v.n + 1) };
+}
+export const vcReady = (o: OfferState | undefined, now = Date.now()) => {
+  const v = vcNow(o, now);
+  return v.n >= VC_GOAL && !v.got;
+};
+
+// ---------- nabídka po milníku ----------
+export const MS_H = 24;
+export const MS_GEMS = 500;
+export const MS_SKIP_H = 8;
+export const MS_PASS_DAYS = 3;
+/** milník nastal: nabídka začne, jen když žádná jiná neběží a tenhle milník ještě nebyl */
+export function msStart(o: OfferState, id: string, now = Date.now()) {
+  if (msLive(o, now) || o.bought?.includes('ms:' + id) || o.ms?.id === id) return false;
+  o.ms = { id, at: now };
+  return true;
+}
+export const msUntil = (o: OfferState | undefined) => (o?.ms ? o.ms.at + MS_H * 3600_000 : 0);
+export const msLive = (o: OfferState | undefined, now = Date.now()) => !!o?.ms && now < msUntil(o) && !o.bought?.includes('ms:' + o.ms.id);
+
 // ---------- pravidlo jedné nabídky ----------
 /** vyskakovací nabídka nejdřív tolik minut po spuštění hry */
 export const POP_AFTER_MIN = 3;
@@ -77,12 +111,13 @@ export const POP_AFTER_MIN = 3;
 const BOOT = Date.now();
 let popped = false;
 
-export type PopId = 'starter' | 'xmas';
+export type PopId = 'starter' | 'xmas' | 'milestone';
 /** která nabídka smí teď vyskočit (null = žádná). hyg = počet hygien, from = od které hygieny startovní balíček. */
 export function popDue(o: OfferState | undefined, hyg: number, from: number, now = Date.now(), s = season): PopId | null {
   if (popped || now - BOOT < POP_AFTER_MIN * 60_000) return null;
   const today = dayKey(now);
   const seen = (id: PopId) => o?.pop?.[id] === today;
+  if (msLive(o, now) && o?.pop?.milestone !== o!.ms!.id) return 'milestone';
   // vánoční jen hráčům, kteří už hrají (po startovním prahu), ať nováčka nezahltí
   if (hyg >= from && xmasLive(o, now, s) && !seen('xmas')) return 'xmas';
   if (hyg >= from && !o?.bought?.includes('starter') && (!o?.starterAt || starterLive(o, now)) && !seen('starter')) return 'starter';
@@ -91,7 +126,8 @@ export function popDue(o: OfferState | undefined, hyg: number, from: number, now
 /** nabídka vyskočila: zapsat (do dalšího spuštění už žádná) */
 export function popShown(o: OfferState, id: PopId, now = Date.now()) {
   popped = true;
-  (o.pop ??= {})[id] = dayKey(now);
+  // milník: jednou za milník (ne za den)
+  (o.pop ??= {})[id] = id === 'milestone' ? (o.ms?.id ?? '') : dayKey(now);
   if (id === 'starter') o.starterAt ??= now;
 }
 /** jen pro testy */

@@ -75,9 +75,15 @@ první verze s Billingem (AAB z Actions) do kteréhokoli tracku.
    - `gems3500` – „3500 diamantů“, 999 Kč
    - `starter` – „Startovní balíček“ (300 diamantů, Štamgast na 3 dny, livreje číšníků), 49 Kč
    - `xmas` – „Vánoční balík“ (700 diamantů, Štamgast na 7 dní), 79 Kč
+   - `milestone` – „Oslavný balík“ (500 diamantů, 8 h výdělku, Štamgast na 3 dny; nabízí se 24 h po nové hospodě
+     nebo prvním poraženém Cthulhu), 79 Kč
    - `pass` – „Štamgast na 30 dní“ (denní diamanty, výdělek navíc, odměny bez reklam), 99 Kč
-   - `noads` – „Bez reklam“ (všechny odměny bez reklamy, navždy), 99 Kč
-   U každého: Aktivovat. Ceny v ostatních zemích nech přepočítat Googlem.
+   - `noads` – „Bez reklam“ (všechny odměny bez reklamy, navždy), 149 Kč
+   U každého: Aktivovat.
+   **Předplatné:** Zpeněžení → Produkty → **Předplatná** → Vytvořit: ID `passsub`, název „Štamgast“. Základní plán
+   s ID **`monthly`**, automatické obnovování, 1 měsíc, 99 Kč. K základnímu plánu přidej **nabídku**: zkušební doba
+   zdarma **3 dny**, způsobilost „Noví zákazníci“. Aktivovat plán i nabídku. Hra pozná zkušební dobu z obchodu
+   (bez ní ukáže jen „Předplatit · cena měsíčně“). Ceny v ostatních zemích nech přepočítat Googlem.
 3. **Testování nákupů zdarma:** Play Console (hlavní stránka účtu) → Nastavení → **Testování licencí** → přidej Gmaily
    testerů (stejné jako v Google skupině). Jejich nákupy jsou testovací („Testovací karta, vždy schválí“), nic neplatí.
 4. Hra ukáže ceny z obchodu (v měně hráče). Produkt, který v Play Console není, se ve hře nenabízí. „Bez reklam“ se po přeinstalaci obnoví samo; diamanty a Štamgast jsou
