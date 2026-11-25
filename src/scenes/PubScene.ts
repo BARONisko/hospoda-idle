@@ -2251,7 +2251,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const y = y0 + (i + 1) * RH;
       this.row(y, RH, D, o.title, o.sub);
       const b = this.btn(W - 212, y + 12, 190, 62, () => o.buy(), D + 2);
-      b.denied = () => this.coinVidChip(b);
+      b.denied = () => this.coinVidChip(b, o.cost);
       this.shopRows.push({ o, b });
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
@@ -3052,26 +3052,33 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     confetti(this, W / 2, 400, 60, 470, 0.9);
   }
 
-  /** ťuk na nákup, na který nejsou coins: na 5 s nabídne video za 30 min výdělku (jen kde si hráč ťukne) */
-  private coinVidChip(b: Btn) {
+  /** ťuk na nákup, na který nejsou coins: malá bublina „📺 +N“ nad pravým rohem tlačítka na 4 s (vzhled B, výběr
+   *  uživatele, /mnt/project-files/vydelek/video-ABC.png). Jen když chybí víc než minuta výdělku, nejvýš 1× za 5 min. */
+  private coinVidChip(b: Btn, cost: number) {
     if ((this.d.tut ?? -1) >= 0 || !this.canReward() || coinVidLeft(this.d.offers) <= 0) return;
-    this.coinChip?.forEach((o) => o.destroy());
+    if (cost - this.d.coins <= this.totalRate() * 60 || Date.now() - PubScene.coinChipAt < 5 * 60_000) return;
+    PubScene.coinChipAt = Date.now();
+    this.coinChip?.forEach((o) => o.active && o.destroy());
     const n = this.hoursIncome(COIN_VID_MIN / 60);
     const D = Math.max(470, (b.zone.depth ?? 0) + 5);
-    const w = Math.max(b.w, 230), h = 66;
-    const x = Math.min(W - 6 - w, Math.max(6, b.x + b.w / 2 - w / 2)), y = Math.max(TOP + 4, b.y - h - 8);
+    const w = 170, h = 44;
+    const x = Math.min(W - 6 - w, b.x + b.w - w), y = Math.max(TOP + 4, b.y - h - 6);
     const c = this.btn(x, y, w, h, () => void this.coinVid(), D);
-    c.label.setLineSpacing(-4);
-    this.drawBtn(c, `${t('📺 Video: +{n} coins', { n: big(n) })}\n${t('30 min výdělku · dnes ještě {k}×', { k: coinVidLeft(this.d.offers) })}`, true, 'amber');
-    const objs = [c.bg, c.label, c.zone];
+    this.drawBtn(c, `📺 +${big(n)}`, true, 'amber');
+    const tip = this.add.graphics().setDepth(D);
+    const tx = Math.min(x + w - 24, b.x + b.w - 24);
+    tip.fillStyle(col('amber')).fillTriangle(tx - 8, y + h - 1, tx + 8, y + h - 1, tx, y + h + 8);
+    const objs = [c.bg, c.label, c.zone, tip];
     this.coinChip = objs;
     this.tweens.add({ targets: objs, alpha: { from: 0, to: 1 }, duration: 150 });
-    this.time.delayedCall(5000, () => {
+    this.time.delayedCall(4000, () => {
       if (this.coinChip !== objs) return;
       objs.forEach((o) => o.active && o.destroy());
       this.coinChip = undefined;
     });
   }
+  /** kdy naposled vyskočila bublina videa (přes hygienu – scéna se restartuje) */
+  static coinChipAt = 0;
   coinChip?: Phaser.GameObjects.GameObject[];
 
   private async coinVid() {
@@ -4561,7 +4568,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       // po najmutí obsluhy se +1 roztáhne přes celou šíři (pozice tlačítka +1 se nastavuje v refresh)
       const bw = w - 20;
       const buy = this.btn(x + 10, y + L.btn, bw, L.btnH, () => this.buy(pubIdx, def), depth);
-      buy.denied = () => this.coinVidChip(buy);
+      buy.denied = () => this.coinVidChip(buy, this.offer(this.d.pubs[pubIdx], def).price);
       const staff = this.btn(x + 10, y + L.btn, (bw - 8) / 2, L.btnH, () => this.staffTap(pubIdx, def), depth);
       // dva řádky (obsluha + cena) hustěji, ať se vejdou do tlačítka bez zmenšení
       buy.label.setLineSpacing(-5);

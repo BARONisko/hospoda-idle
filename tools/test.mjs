@@ -549,10 +549,11 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   await S(p, (s) => { s.closeShop(); s.offerPop('xmas'); });
   ok('vánoční balík: okno nabídky', await S(p, (s) => s.awayObjs.length > 8));
   await S(p, (s) => s.awayClose());
-  await S(p, (s) => { s.d.tut = -1; s.d.coins = 0; s.d.offers.vid = undefined; s.closeShop(); s.refresh(); const c = s.cards[0]; c.buy.zone.emit('pointerdown'); });
+  await S(p, (s) => { s.d.tut = -1; s.d.coins = 0; s.d.offers.vid = undefined; s.constructor.coinChipAt = 0; s.totalRate = () => 0; s.closeShop(); s.refresh(); const c = s.cards[0]; c.buy.zone.emit('pointerdown'); });
   ok('video za coins: ťuk na nákup bez coins nabídne video', await S(p, (s) => !!s.coinChip));
   await p.evaluate(() => game.scene.getScene('Pub').coinVid());
   ok('video za coins: +30 min výdělku, počítá se denní limit', await S(p, (s) => s.d.coins > 0 && s.d.offers.vid.n === 1 && !s.coinChip));
+  ok('video za coins: bublina nejvýš 1× za 5 min', await S(p, (s) => { s.d.coins = 0; s.refresh(); s.cards[0].buy.zone.emit('pointerdown'); return !s.coinChip; }));
   ok('bez chyb v konzoli (diamanty)', p.errors.length === 0);
   await p.close();
 }
