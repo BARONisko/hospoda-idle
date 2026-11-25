@@ -16,6 +16,7 @@ import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payo
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { iap, ProductId, PRODUCTS, onIapReady } from '../core/shop';
+import { starterHyg, starterUntil, starterLive, STARTER_GEMS, STARTER_PASS_DAYS, STARTER_LOOK_GEMS, xmasLive, xmasUntil, xmasKey, XMAS_GEMS, XMAS_PASS_DAYS, GEM_PACKS, packGems, coinVidLeft, coinVidUse, COIN_VID_MIN, popDue, popShown } from '../core/offers';
 import { season, SEASONS, SEASON_BONUS } from '../core/season';
 /** kdy přijde sezónní host (karta ve Sbírce, dokud ho hráč neviděl; data podle core/season.ts) */
 const SEASON_WHEN: Record<string, string> = { monk: t('1. 12. – 6. 1.'), muertos0: t('20. 10. – 3. 11.'), brewer: t('15. 9. – 10. 10.') };
@@ -213,6 +214,8 @@ interface Btn {
   visible: boolean;
   /** poslední barva (kvůli překreslení při posunu) */
   c?: keyof typeof PAL;
+  /** ťuk na nepřístupné tlačítko (např. málo coins → nabídka videa) */
+  denied?: () => void;
 }
 
 interface Card {
@@ -362,6 +365,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // dotaz na upozornění (jednou, až hráč splní 3 úkoly) a výzva k hodnocení v obchodě (po 3. a 10. hygieně)
     this.time.delayedCall(5000, () => this.askNotify());
     this.time.addEvent({ delay: 6000, repeat: 12, callback: () => this.askReview() });
+    this.time.addEvent({ delay: 5000, loop: true, callback: () => this.offerTick() });
     // ladění: ?pubs=2|3 přidá hospody (než bude prestiž)
     const dbg = Number(new URLSearchParams(location.search).get('pubs'));
     while (dbg && this.d.pubs.length < Math.min(MAX_PUBS, dbg)) {
@@ -2245,6 +2249,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const y = y0 + (i + 1) * RH;
       this.row(y, RH, D, o.title, o.sub);
       const b = this.btn(W - 212, y + 12, 190, 62, () => o.buy(), D + 2);
+      b.denied = () => this.coinVidChip(b);
       this.shopRows.push({ o, b });
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
@@ -2837,9 +2842,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     } else if (id === 'noads') {
       this.d.noAds = true;
       this.banner(this.views[0].cam, t('Odměny teď bez reklam'));
+    } else if (id === 'starter' || id === 'xmas') {
+      this.bundleGrant(id);
     } else {
-      this.d.gems = (this.d.gems ?? 0) + (PRODUCTS[id].gems ?? 0);
-      this.banner(this.views[0].cam, t('+{n} 💎', { n: PRODUCTS[id].gems ?? 0 }));
+      // první nákup každého balíčku ×2
+      const o = (this.d.offers ??= {});
+      const n = packGems(o, id, PRODUCTS[id].gems ?? 0);
+      if (!o.first?.includes(id)) (o.first ??= []).push(id);
+      this.d.gems = (this.d.gems ?? 0) + n;
+      this.banner(this.views[0].cam, t('+{n} 💎', { n }));
     }
     store(this.d);
     sfx.levelUp();
@@ -2874,6 +2885,264 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (this.tab === 'special' && this.shopObjs.length) this.openShop('special', false);
   }
 
+  // ---------- lákadla (core/offers.ts): startovní a vánoční balík, video za coins ----------
+  /** od kolikáté hygieny se nabízí startovní balíček (první hygiena, ve které se nic neodemyká; strom = 2.) */
+  starterFrom() {
+    return starterHyg([...Object.values(MENU_HYG), 2]);
+  }
+
+  /** obsah balíčku pro okno a kartu: [ikona, text] */
+  private bundleItems(id: 'starter' | 'xmas'): { icon: [string, string | number, number] | string; s: string }[] {
+    if (id === 'xmas') {
+      return [
+        { icon: '💎', s: t('{n} diamantů', { n: XMAS_GEMS }) },
+        { icon: ['obj', 'apronIcon', 3], s: t('Štamgast na {d} dní (výdělek ×2)', { d: XMAS_PASS_DAYS }) },
+      ];
+    }
+    const look = this.owns('lookLivery')
+      ? { icon: '💎', s: t('+{n} 💎 místo livrejí (už je máš)', { n: STARTER_LOOK_GEMS }) }
+      : { icon: ['waiter_lux', 0, 3] as [string, number, number], s: t('Livreje číšníků (vzhled)') };
+    return [
+      { icon: '💎', s: t('{n} diamantů', { n: STARTER_GEMS }) },
+      { icon: ['obj', 'apronIcon', 3], s: t('Štamgast na {d} dny (výdělek ×2)', { d: STARTER_PASS_DAYS }) },
+      look,
+    ];
+  }
+  private bundleTitle(id: 'starter' | 'xmas') {
+    return id === 'xmas' ? t('Vánoční balík') : t('Startovní balíček');
+  }
+  /** do kdy balíček platí (skutečný odpočet) */
+  private bundleUntil(id: 'starter' | 'xmas') {
+    return id === 'xmas' ? xmasUntil() : starterUntil(this.d.offers);
+  }
+  /** odpočet balíčku: přes 2 dny ve dnech, jinak h:mm:ss */
+  private bundleLeft(until: number) {
+    const ms = Math.max(0, until - Date.now());
+    return ms > 2 * 86400_000 ? t('jen jednou · platí ještě {d} dní', { d: Math.floor(ms / 86400_000) }) : t('jen jednou · platí ještě {t}', { t: hms(ms) });
+  }
+  /** krátký souhrn obsahu (karta v Nabídce) */
+  private bundleSum(id: 'starter' | 'xmas') {
+    return id === 'xmas'
+      ? t('{n} 💎 · Štamgast {d} dní', { n: XMAS_GEMS, d: XMAS_PASS_DAYS })
+      : this.owns('lookLivery')
+        ? t('{n} 💎 · Štamgast {d} dny', { n: STARTER_GEMS + STARTER_LOOK_GEMS, d: STARTER_PASS_DAYS })
+        : t('{n} 💎 · Štamgast {d} dny · livreje', { n: STARTER_GEMS, d: STARTER_PASS_DAYS });
+  }
+  private bundleIcon(x: number, y: number, ic: [string, string | number, number] | string, D: number, k = 1) {
+    if (typeof ic === 'string') return this.add.text(x, y, ic, txt(Math.round(30 * k), PAL.white)).setOrigin(0.5).setDepth(D);
+    return this.add.image(x, y, ic[0], ic[1]).setScale(ic[2] * k).setDepth(D);
+  }
+
+  /** vyskakovací nabídka: nejvýš jedna za spuštění hry, ne v prvních minutách (pravidlo uživatele) */
+  private offerTick() {
+    if (!iap.available) return;
+    if (this.awayObjs.length || this.shopObjs.length || this.guideCur || this.ev.active || this.sheet >= 0 || (this.d.tut ?? -1) >= 0 || this.dartsOpen) return;
+    const id = popDue(this.d.offers, this.d.stats.prestiges, this.starterFrom());
+    if (!id || !iap.has(id)) return;
+    popShown((this.d.offers ??= {}), id);
+    store(this.d);
+    meter.track('offer_pop', { id });
+    this.offerPop(id);
+  }
+
+  /** vzhled okna nabídky: ?offer=a|b|c (návrhy pro uživatele) */
+  static OFFER_LOOK = (new URLSearchParams(location.search).get('offer') ?? 'a') as 'a' | 'b' | 'c';
+
+  /** okno s nabídkou balíčku */
+  offerPop(id: 'starter' | 'xmas') {
+    const D = 520;
+    const objs: Phaser.GameObjects.GameObject[] = [];
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (objs.push(o), o);
+    const look = PubScene.OFFER_LOOK;
+    add(this.add.rectangle(0, 0, W, H, 0x000000, look === 'c' ? 0.8 : 0.65).setOrigin(0).setDepth(D).setInteractive());
+    const close = () => {
+      this.awayObjs.forEach((o) => o.destroy());
+      this.awayObjs = [];
+      this.awayClose = undefined;
+    };
+    const items = this.bundleItems(id);
+    const until = this.bundleUntil(id);
+    const left = add(this.add.text(W / 2, 0, '', txt(20, PAL.sand)).setOrigin(0.5).setDepth(D + 3));
+    const tick = () => left.active && left.setText(this.bundleLeft(until));
+    tick();
+    const tm = this.time.addEvent({ delay: 1000, loop: true, callback: tick });
+    objs.push({ destroy: () => tm.remove() } as unknown as Phaser.GameObjects.GameObject);
+    const buy = () => {
+      close();
+      void this.iapBuy(id);
+    };
+    const panel = (bx: number, by: number, bw: number, bh: number, fill: keyof typeof PAL, edge: keyof typeof PAL) => {
+      const g = add(this.add.graphics().setDepth(D + 1));
+      g.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
+      g.fillStyle(col(fill)).fillRoundedRect(bx, by, bw, bh, 16);
+      g.lineStyle(4, col(edge)).strokeRoundedRect(bx, by, bw, bh, 16);
+      return g;
+    };
+    const fit = (o: Phaser.GameObjects.Text, w: number) => o.setScale(Math.min(1, w / o.width));
+    if (look === 'a') {
+      // A: plakát uprostřed – nadpis, seznam obsahu s ikonami, cena
+      const bh = 290 + items.length * 92, bx = 34, by = Math.round((TOP + MB - bh) / 2), bw = W - 68;
+      panel(bx, by, bw, bh, 'dusk', 'gold');
+      const rib = add(this.add.graphics().setDepth(D + 2));
+      rib.fillStyle(col(id === 'xmas' ? 'red' : 'green')).fillRoundedRect(bx + 30, by - 22, bw - 60, 64, 12);
+      fit(add(this.add.text(W / 2, by + 10, this.bundleTitle(id), txt(34, PAL.white)).setOrigin(0.5).setDepth(D + 3)), bw - 80);
+      left.setY(by + 70);
+      items.forEach((it, i) => {
+        const y = by + 130 + i * 92;
+        const g = add(this.add.graphics().setDepth(D + 2));
+        g.fillStyle(col('ink'), 0.6).fillRoundedRect(bx + 20, y - 38, bw - 40, 78, 12);
+        add(this.bundleIcon(bx + 66, y, it.icon, D + 3));
+        fit(add(this.add.text(bx + 112, y, it.s, txt(23, PAL.bone)).setOrigin(0, 0.5).setDepth(D + 3)), bw - 150);
+      });
+      const b = this.btn(bx + 30, by + bh - 150, bw - 60, 76, buy, D + 3);
+      this.drawBtn(b, t('Koupit · {p}', { p: iap.price(id) }), true, 'green');
+      const no = this.btn(W / 2 - 100, by + bh - 62, 200, 48, close, D + 3);
+      this.drawBtn(no, t('Ne, díky'), true, 'slate');
+      objs.push(b.bg, b.label, b.zone, no.bg, no.label, no.zone);
+    } else if (look === 'b') {
+      // B: karta zespodu – obsah ve třech dlaždicích vedle sebe, zavírací křížek
+      const bh = 470, by = MB - bh + 10, bx = 12, bw = W - 24;
+      panel(bx, by, bw, bh, 'plum', 'sand');
+      fit(add(this.add.text(bx + 24, by + 22, this.bundleTitle(id), txt(32, PAL.gold)).setDepth(D + 3)), bw - 110);
+      left.setOrigin(0, 0.5).setPosition(bx + 26, by + 82);
+      const x = this.btn(bx + bw - 70, by + 14, 56, 56, close, D + 3);
+      this.drawBtn(x, '✕', true, 'ink');
+      const n = items.length, gap = 12, tw = (bw - 40 - gap * (n - 1)) / n;
+      items.forEach((it, i) => {
+        const tx = bx + 20 + i * (tw + gap), ty = by + 112;
+        const g = add(this.add.graphics().setDepth(D + 2));
+        g.fillStyle(col('ink')).fillRoundedRect(tx, ty, tw, 190, 12);
+        add(this.bundleIcon(tx + tw / 2, ty + 62, it.icon, D + 3, 1.4));
+        const s = add(this.add.text(tx + tw / 2, ty + 140, it.s, txt(19, PAL.bone)).setOrigin(0.5).setAlign('center').setWordWrapWidth(tw - 14).setDepth(D + 3));
+        s.setScale(Math.min(1, 84 / s.height));
+      });
+      const b = this.btn(bx + 20, by + bh - 128, bw - 40, 80, buy, D + 3);
+      this.drawBtn(b, t('Koupit · {p}', { p: iap.price(id) }), true, 'amber');
+      objs.push(x.bg, x.label, x.zone, b.bg, b.label, b.zone);
+    } else {
+      // C: slavnostní – paprsky, velký nadpis, obsah jako štítky, cena pulzuje
+      const cx = W / 2;
+      const r = add(this.add.graphics().setDepth(D + 1).setPosition(cx, 330));
+      for (let i = 0; i < 16; i++) {
+        const a = (i / 16) * Math.PI * 2;
+        r.fillStyle(col(id === 'xmas' ? 'scarlet' : 'gold'), 0.12).fillTriangle(0, 0, Math.cos(a) * 480, Math.sin(a) * 480, Math.cos(a + 0.18) * 480, Math.sin(a + 0.18) * 480);
+      }
+      this.tweens.add({ targets: r, angle: 360, duration: 40000, repeat: -1 });
+      const title = add(this.add.text(cx, 150, this.bundleTitle(id).toUpperCase(), txt(44, PAL.gold)).setOrigin(0.5).setStroke(PAL.ink, 8).setDepth(D + 3));
+      fit(title, W - 40);
+      add(this.add.text(cx, 330, '💎', txt(120, PAL.white)).setOrigin(0.5).setDepth(D + 2));
+      left.setY(220);
+      items.forEach((it, i) => {
+        const y = 470 + i * 70;
+        const g = add(this.add.graphics().setDepth(D + 2));
+        g.fillStyle(col('dusk')).fillRoundedRect(60, y - 28, W - 120, 56, 28);
+        g.lineStyle(3, col('sand')).strokeRoundedRect(60, y - 28, W - 120, 56, 28);
+        add(this.bundleIcon(100, y, it.icon, D + 3, 0.8));
+        fit(add(this.add.text(136, y, it.s, txt(22, PAL.white)).setOrigin(0, 0.5).setDepth(D + 3)), W - 210);
+      });
+      const by = 470 + items.length * 70 + 10;
+      const b = this.btn(60, by, W - 120, 80, buy, D + 3);
+      this.drawBtn(b, t('Koupit · {p}', { p: iap.price(id) }), true, 'green');
+      this.tweens.add({ targets: b.label, scale: { from: b.label.scale, to: b.label.scale * 1.08 }, yoyo: true, repeat: -1, duration: 600 });
+      const no = this.btn(cx - 100, by + 100, 200, 48, close, D + 3);
+      this.drawBtn(no, t('Ne, díky'), true, 'slate');
+      objs.push(b.bg, b.label, b.zone, no.bg, no.label, no.zone);
+    }
+    this.awayObjs = objs;
+    this.awayClose = close;
+    sfx.fanfare();
+  }
+
+  /** karta balíčku v záložce Nabídka (vrací výšku, 0 = nic) */
+  private bundleCard(y: number, D: number): number {
+    const id = xmasLive(this.d.offers) ? 'xmas' : starterLive(this.d.offers) ? 'starter' : null;
+    if (!id || (iap.available && !iap.has(id))) return 0;
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
+    const h = 110;
+    this.card(y, h, id === 'xmas' ? 'red' : 'green', D);
+    add(this.add.text(24, y + 10, this.bundleTitle(id), txt(26, PAL.gold)).setDepth(D + 2));
+    const sum = add(this.add.text(24, y + 46, this.bundleSum(id), txt(20, PAL.white)).setDepth(D + 2));
+    sum.setScale(Math.min(1, (W - 200) / sum.width));
+    const until = this.bundleUntil(id);
+    const left = add(this.add.text(24, y + 78, '', txt(17, PAL.sand)).setDepth(D + 2));
+    const upd = () => left.setText(this.bundleLeft(until));
+    upd();
+    const prev = this.leagueLive;
+    this.leagueLive = () => (prev?.(), upd());
+    const b = this.btn(W - 160, y + 28, 138, 56, () => void this.iapBuy(id), D + 3);
+    this.drawBtn(b, iap.available ? iap.price(id) : t('jen v aplikaci'), iap.available, 'amber');
+    this.shopObjs.push(b.bg, b.label, b.zone);
+    return h + 10;
+  }
+
+  /** připsat balíček (startovní / vánoční) */
+  private bundleGrant(id: 'starter' | 'xmas') {
+    const o = (this.d.offers ??= {});
+    const now = Date.now();
+    const pass = (days: number) => (this.d.pass = { ...this.d.pass, until: Math.max(now, this.d.pass?.until ?? 0) + days * 86400_000 });
+    if (id === 'starter') {
+      let gems = STARTER_GEMS;
+      if (this.owns('lookLivery')) gems += STARTER_LOOK_GEMS;
+      else {
+        (this.d.own ??= []).push('lookLivery');
+        this.lookSync();
+        this.views.forEach((v) => v.applyLook());
+      }
+      this.d.gems = (this.d.gems ?? 0) + gems;
+      pass(STARTER_PASS_DAYS);
+      (o.bought ??= []).push('starter');
+    } else {
+      this.d.gems = (this.d.gems ?? 0) + XMAS_GEMS;
+      pass(XMAS_PASS_DAYS);
+      (o.bought ??= []).push(xmasKey(now));
+    }
+    this.tsCache = undefined;
+    this.applyKup();
+    this.banner(this.views[0].cam, t('{s} je tvůj!', { s: this.bundleTitle(id) }));
+    confetti(this, W / 2, 400, 60, 470, 0.9);
+  }
+
+  /** ťuk na nákup, na který nejsou coins: na 5 s nabídne video za 30 min výdělku (jen kde si hráč ťukne) */
+  private coinVidChip(b: Btn) {
+    if ((this.d.tut ?? -1) >= 0 || !this.canReward() || coinVidLeft(this.d.offers) <= 0) return;
+    this.coinChip?.forEach((o) => o.destroy());
+    const n = this.hoursIncome(COIN_VID_MIN / 60);
+    const D = Math.max(470, (b.zone.depth ?? 0) + 5);
+    const w = Math.max(b.w, 230), h = 66;
+    const x = Math.min(W - 6 - w, Math.max(6, b.x + b.w / 2 - w / 2)), y = Math.max(TOP + 4, b.y - h - 8);
+    const c = this.btn(x, y, w, h, () => void this.coinVid(), D);
+    c.label.setLineSpacing(-4);
+    this.drawBtn(c, `${t('📺 Video: +{n} coins', { n: big(n) })}\n${t('30 min výdělku · dnes ještě {k}×', { k: coinVidLeft(this.d.offers) })}`, true, 'amber');
+    const objs = [c.bg, c.label, c.zone];
+    this.coinChip = objs;
+    this.tweens.add({ targets: objs, alpha: { from: 0, to: 1 }, duration: 150 });
+    this.time.delayedCall(5000, () => {
+      if (this.coinChip !== objs) return;
+      objs.forEach((o) => o.active && o.destroy());
+      this.coinChip = undefined;
+    });
+  }
+  coinChip?: Phaser.GameObjects.GameObject[];
+
+  private async coinVid() {
+    const objs = this.coinChip;
+    objs?.forEach((o) => o.active && o.destroy());
+    this.coinChip = undefined;
+    if (coinVidLeft(this.d.offers) <= 0) return;
+    if (!(await this.rewarded())) return this.banner(this.views[0].cam, t('Reklama se nepřehrála'));
+    coinVidUse((this.d.offers ??= {}));
+    // jako časoskok: do ligy se nepočítá
+    const n = this.hoursIncome(COIN_VID_MIN / 60);
+    this.d.coins += n;
+    this.d.earned += n;
+    this.d.run += n;
+    store(this.d);
+    sfx.coin(1);
+    coinFountain(this, W / 2, 400, 12);
+    this.banner(this.views[0].cam, t('+{n} coins', { n: big(n) }));
+    this.refresh();
+  }
+
   /** podzáložka speciální nabídky */
   spSub: 'offer' | 'gems' | 'pass' = 'offer';
   gemPage = 0;
@@ -2903,6 +3172,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const a = (this.d.adv ??= newAdv());
     const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
     const can = this.canReward();
+    // časově omezený balíček (startovní / vánoční) nahoře
+    y += this.bundleCard(y, D);
     // reklamní kampaň
     this.card(y, 238, 'plum', D);
     add(this.add.image(62, y + 70, 'icons', 'tv').setScale(5).setDepth(D + 2));
@@ -2962,8 +3233,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const gems = this.d.gems ?? 0;
     add(this.add.text(W / 2, y + 14, t('Máš {n} 💎', { n: gems }), txt(26, PAL.ice)).setOrigin(0.5).setDepth(D + 2));
     // tři stránky (vše se nevejde): Rychlé · Napořád · Vzhled
-    const pw = (W - 60) / 3;
-    ([[0, t('⚡ Rychlé')], [1, t('★ Napořád')], [2, t('🎨 Vzhled')]] as [number, string][]).forEach(([pg, label], i) => {
+    const pw = (W - 70) / 4;
+    ([[0, t('⚡ Rychlé')], [1, t('★ Napořád')], [2, t('🎨 Vzhled')], [3, t('🛒 Koupit')]] as [number, string][]).forEach(([pg, label], i) => {
       const b = this.btn(20 + i * (pw + 10), y + 34, pw, 40, () => ((this.gemPage = pg), this.openShop('special', false)), D + 3);
       this.drawBtn(b, label, true, this.gemPage === pg ? 'amber' : 'plum');
       b.label.setFontSize(21).setScale(Math.min(1, (b.w - 10) / b.label.width));
@@ -2980,6 +3251,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     };
     // vzhled: místo emoji náhled skutečného obrázku
     const lookIcon: Partial<Record<GemItem, [string, string, number]>> = { lookTap: ['obj', 'luxTap', 2.5], lookTables: ['obj', 'luxTable', 1.6], lookLivery: ['waiter_lux', '0', 2.2] };
+    if (this.gemPage === 3) return this.gemPacks(y + 84, D);
     const ids: GemItem[] = this.gemPage === 2 ? GEM_LOOK : this.gemPage === 0
       ? ['hhnow', 'quiver', 'brewnow', 'vipnow', 'skip4', 'skip24']
       : ['chestbot', (['off1', 'off2', 'off3'] as GemItem[]).find((o) => !this.owns(o)) ?? 'off3', 'vipdoor', 'autohh', 'chronicle'];
@@ -3001,16 +3273,26 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       }
       yy += 72;
     }
-    // balíčky za peníze jen na stránce Napořád (na Rychlé se nevejdou)
-    if (this.gemPage !== 1) return;
+  }
+
+  /** Diamanty → Koupit: balíčky za peníze, první nákup každého ×2 */
+  private gemPacks(yy: number, D: number) {
+    const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (this.shopObjs.push(o), o);
     // zablikání jen jednou (další překreslení záložky už ne)
     this.time.delayedCall(0, () => (this.gemBuyHint = false));
-    add(this.add.text(20, yy + 4, t('Koupit diamanty'), txt(20, PAL.gold)).setDepth(D + 2));
-    yy += 32;
-    (['gems100', 'gems550'] as ProductId[]).forEach((id, i) => {
-      const bw = (W - 30) / 2;
-      const b = this.btn(10 + i * (bw + 10), yy, bw, 60, () => void this.iapBuy(id), D + 3);
-      this.drawBtn(b, `${PRODUCTS[id].gems} 💎 · ${iap.price(id)}`, iap.available, 'amber');
+    yy += this.bundleCard(yy, D);
+    const packs = GEM_PACKS.filter((id) => !iap.available || iap.has(id));
+    for (const id of packs) {
+      const base = PRODUCTS[id].gems ?? 0, n = packGems(this.d.offers, id, base), dbl = n > base;
+      this.card(yy, 66, dbl ? 'plum' : 'ink', D);
+      add(this.add.text(44, yy + 33, '💎', txt(30, PAL.white)).setOrigin(0.5).setDepth(D + 2));
+      add(this.add.text(80, yy + (dbl ? 6 : 18), t('{n} diamantů', { n }), txt(24, PAL.ice)).setDepth(D + 2));
+      if (dbl) {
+        const ds = add(this.add.text(80, yy + 38, t('první nákup ×2 (jinak {n})', { n: base }), txt(17, PAL.gold)).setDepth(D + 2));
+        ds.setScale(Math.min(1, 290 / ds.width));
+      }
+      const b = this.btn(W - 160, yy + 9, 138, 48, () => void this.iapBuy(id), D + 3);
+      this.drawBtn(b, iap.price(id), iap.available, 'amber');
       this.shopObjs.push(b.bg, b.label, b.zone);
       // přišel z počítadla diamantů nahoře → balíčky zablikají
       if (this.gemBuyHint) {
@@ -3018,11 +3300,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         hl.lineStyle(4, col('gold')).strokeRoundedRect(b.x - 4, b.y - 4, b.w + 8, b.h + 8, 10);
         this.tweens.add({ targets: hl, alpha: 0.2, yoyo: true, repeat: 3, duration: 350 });
       }
-    });
+      yy += 72;
+    }
     if (!iap.available) {
       // dlouhé překlady: zalomit a zmenšit, ať nepřetečou přes okraj ani pod lištu
-      const ft = add(this.add.text(W / 2, yy + 83, t('nákup jen v mobilní aplikaci'), txt(19, PAL.bone)).setOrigin(0.5).setAlign('center').setWordWrapWidth(W - 40).setDepth(D + 2));
-      ft.setScale(Math.min(1, (MB - 6 - (yy + 66)) / ft.height, (W - 30) / ft.width));
+      const ft = add(this.add.text(W / 2, yy + 20, t('nákup jen v mobilní aplikaci'), txt(19, PAL.bone)).setOrigin(0.5).setAlign('center').setWordWrapWidth(W - 40).setDepth(D + 2));
+      ft.setScale(Math.min(1, (W - 30) / ft.width));
     }
   }
 
@@ -4328,6 +4611,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       // po najmutí obsluhy se +1 roztáhne přes celou šíři (pozice tlačítka +1 se nastavuje v refresh)
       const bw = w - 20;
       const buy = this.btn(x + 10, y + L.btn, bw, L.btnH, () => this.buy(pubIdx, def), depth);
+      buy.denied = () => this.coinVidChip(buy);
       const staff = this.btn(x + 10, y + L.btn, (bw - 8) / 2, L.btnH, () => this.staffTap(pubIdx, def), depth);
       // dva řádky (obsluha + cena) hustěji, ať se vejdou do tlačítka bez zmenšení
       buy.label.setLineSpacing(-5);
@@ -4358,7 +4642,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.tapBlock = now + 300;
       this.tapLast = b;
       sfx.init();
-      if (!b.enabled) return sfx.error();
+      if (!b.enabled) {
+        b.denied?.();
+        return sfx.error();
+      }
       fn();
       if (label.active) this.tweens.add({ targets: label, scale: { from: 0.88, to: 1 }, duration: 120 });
     };
@@ -5480,7 +5767,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         sfx.init();
         sfx.click();
         this.spSub = 'gems';
-        this.gemPage = 1;
+        this.gemPage = 3;
         this.gemBuyHint = true;
         this.openShop('special', false);
       });

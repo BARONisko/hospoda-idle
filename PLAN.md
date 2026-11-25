@@ -458,3 +458,10 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   návod končí „Ťukni na Obchod“ → „Kup vylepšení ×3“ (krok „Ťukni na Menu“ zrušen; bez peněz šetří přes bubliny hostů);
   pilulka „do hygieny N %“, horní nápisy mizí dolů (nevjíždějí do lišty úkolu), kolečko číšníka „najmi / cena“.
   Zamčené Menu: vybrána varianta A (odemčené + jen nejbližší zamčená se jménem); ladění ?menu=x|b|c.
+- Lákadla (25. 11., výběr uživatele 1–4, pravidlo jedné nabídky): src/core/offers.ts. Startovní balíček 49 Kč (300 💎, Štamgast 3 dny,
+  livreje; nabídne se od první hygieny, ve které se nic neodemyká = starterFrom(), platí 48 h, jen jednou), Vánoční balík 79 Kč
+  (700 💎, Štamgast 7 dní, 1. 12.–6. 1., jednou za sezónu), balíčky 💎 25/49/199/499/999 Kč na stránce Diamanty → 🛒 Koupit
+  (první nákup každého ×2), video za coins: ťuk na nákup bez coins → na 5 s tlačítko „📺 Video: +30 min výdělku“ (10× denně,
+  do ligy se nepočítá). Vyskakovací nabídka nejvýš 1 za spuštění, ne dřív než 3 min po startu, každá nejvýš 1× denně;
+  jinak jen karta nahoře v Speciální nabídka → Nabídka. Vzhled okna ?offer=a|b|c (návrhy /mnt/project-files/vydelek/nabidka-ABC.png).
+  Nové produkty v Play Console: gems50, gems1500, gems3500, starter, xmas (docs/play-console.md); nezaložený produkt se nenabízí.

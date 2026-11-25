@@ -5,19 +5,26 @@ export interface IapProvider {
   buy(id: ProductId): Promise<boolean | 'pending'>;
   /** cena z obchodu (např. „49 Kč“); jinak se ukáže výchozí */
   price?(id: ProductId): string | undefined;
+  /** je produkt založený v obchodě? (nezaložený se nenabízí) */
+  has?(id: ProductId): boolean;
   /** trvalé nákupy, které hráč vlastní (obnovení po přeinstalaci) */
   owned?(): Promise<ProductId[]>;
   /** zaplacené, ale nepřipsané spotřební nákupy (dřív čekající platba): spotřebuje je a vrátí, co připsat */
   unclaimed?(): Promise<ProductId[]>;
 }
 
-export type ProductId = 'gems100' | 'gems550' | 'pass' | 'noads';
-/** produkty: diamanty v balíčku a výchozí cena */
+export type ProductId = 'gems50' | 'gems100' | 'gems550' | 'gems1500' | 'gems3500' | 'pass' | 'noads' | 'starter' | 'xmas';
+/** produkty: diamanty v balíčku a výchozí cena (startovní a vánoční balík: obsah v core/offers.ts) */
 export const PRODUCTS: Record<ProductId, { gems?: number; price: string }> = {
+  gems50: { gems: 50, price: '25 Kč' },
   gems100: { gems: 100, price: '49 Kč' },
   gems550: { gems: 550, price: '199 Kč' },
+  gems1500: { gems: 1500, price: '499 Kč' },
+  gems3500: { gems: 3500, price: '999 Kč' },
   pass: { price: '99 Kč' },
   noads: { price: '99 Kč' },
+  starter: { price: '49 Kč' },
+  xmas: { price: '79 Kč' },
 };
 
 let provider: IapProvider | null = null;
@@ -35,6 +42,10 @@ export function onIapReady(f: () => void) {
 export const iap = {
   get available() {
     return !!provider;
+  },
+  /** jde produkt teď koupit (obchod připojený a produkt v něm založený) */
+  has(id: ProductId) {
+    return !!provider && (provider.has?.(id) ?? true);
   },
   price(id: ProductId) {
     return provider?.price?.(id) ?? PRODUCTS[id].price;

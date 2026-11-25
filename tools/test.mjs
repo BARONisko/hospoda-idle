@@ -520,7 +520,10 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   const p = await page('?fakeshop=1');
   await S(p, (s) => { s.d.tut = -1; s.d.coins = 1e6; s.buy(0, s.cards[1].def); s.hire(0, s.cards[0].def); s.d.gems = 0; s.spSub = 'gems'; s.openShop('special', false); });
   await p.evaluate(() => game.scene.getScene('Pub').iapBuy('gems550'));
-  ok('diamanty: balíček připsán', await S(p, (s) => s.d.gems === 550));
+  ok('diamanty: první nákup balíčku ×2', await S(p, (s) => s.d.gems === 1100));
+  await p.evaluate(() => game.scene.getScene('Pub').iapBuy('gems550'));
+  ok('diamanty: druhý nákup téhož balíčku bez dvojnásobku', await S(p, (s) => s.d.gems === 1650));
+  await S(p, (s) => { s.d.gems = 550; });
   ok('diamanty: časoskok 4 h dá výdělek, liga se nemění', await S(p, (s) => { const c = s.d.coins, l = s.d.league?.me ?? 0; s.gemBuy('skip4'); return s.d.coins > c && s.d.gems === 530 && (s.d.league?.me ?? 0) === l; }));
   ok('diamanty: VIP vrátný napořád', await S(p, (s) => { s.d.gems += 600; return s.gemBuy('vipdoor') && s.d.own.includes('vipdoor') && !s.gemBuy('vipdoor'); }));
   ok('diamanty: offline II až po offline I, +2 h za stupeň', await S(p, (s) => { s.d.gems = 2000; const c0 = s.offCap(); const no2 = !s.gemBuy('off2'); s.gemBuy('off1'); s.gemBuy('off2'); return no2 && s.offCap() - c0 === 4 * 3600; }));
@@ -537,6 +540,19 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     await S(p, (s, x) => { s.spSub = x; s.openShop('special', false); }, sub);
     ok(`speciální nabídka: záložka ${sub}`, await S(p, (s) => s.shopObjs.length > 15));
   }
+  // lákadla: startovní balíček, vánoční balík, video za coins
+  ok('startovní balíček: až od hygieny bez odemykání', await S(p, (s) => s.starterFrom() >= 1));
+  await S(p, (s) => { s.closeShop(); s.d.offers = { starterAt: Date.now() }; s.d.gems = 0; s.d.own = (s.d.own ?? []).filter((x) => x !== 'lookLivery'); window.pu = s.d.pass?.until ?? 0; s.spSub = 'offer'; s.openShop('special', false); });
+  ok('startovní balíček: karta v Nabídce', await S(p, (s) => s.shopObjs.some((o) => o.text === s.bundleTitle('starter'))));
+  await p.evaluate(() => game.scene.getScene('Pub').iapBuy('starter'));
+  ok('startovní balíček: 300 💎, livreje, +3 dny Štamgasta, jen jednou', await S(p, (s) => s.d.gems === 300 && s.d.own.includes('lookLivery') && s.d.pass.until - Math.max(Date.now(), window.pu) > 2.9 * 86400e3 && s.d.offers.bought.includes('starter')));
+  await S(p, (s) => { s.closeShop(); s.offerPop('xmas'); });
+  ok('vánoční balík: okno nabídky', await S(p, (s) => s.awayObjs.length > 8));
+  await S(p, (s) => s.awayClose());
+  await S(p, (s) => { s.d.tut = -1; s.d.coins = 0; s.d.offers.vid = undefined; s.closeShop(); s.refresh(); const c = s.cards[0]; c.buy.zone.emit('pointerdown'); });
+  ok('video za coins: ťuk na nákup bez coins nabídne video', await S(p, (s) => !!s.coinChip));
+  await p.evaluate(() => game.scene.getScene('Pub').coinVid());
+  ok('video za coins: +30 min výdělku, počítá se denní limit', await S(p, (s) => s.d.coins > 0 && s.d.offers.vid.n === 1 && !s.coinChip));
   ok('bez chyb v konzoli (diamanty)', p.errors.length === 0);
   await p.close();
 }

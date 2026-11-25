@@ -152,6 +152,8 @@ export interface Save {
   pass?: import('./special').PassState;
   own?: string[];
   noAds?: boolean;
+  /** lákadla: startovní a vánoční balík, první nákup diamantů ×2, videa za coins (core/offers.ts) */
+  offers?: import('./offers').OfferState;
   /** už se zeptal na upozornění; kolikrát vyzval k hodnocení v obchodě */
   ntfAsk?: boolean;
   rev?: number;
