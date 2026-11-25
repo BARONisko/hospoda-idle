@@ -2254,7 +2254,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.row(y0, RH, D, t('Zavolat hygienu'), this.hygGemsLeft() > 0 ? t('krígly: {k} (+{b} % výdělek) · hygiena +{g} 💎', kv) : t('krígly: {k} (+{b} % výdělek) · 💎 zase zítra', kv), 'blood', PAL.sand);
     const pb = this.btn(W - 212, y0 + 12, 190, 62, () => this.askPrestige(), D + 2);
     this.hygBtn = pb;
-    const pm = prestigeMin(this.d.stats.prestiges, this.kAll());
+    const pm = prestigeMin(this.d.stats.prestiges);
     this.drawBtn(pb, k >= pm ? t('+{k} krígel', { k: big(k) }) : t('{k} / {m} krígel', { k: big(k), m: big(pm) }), k >= pm, 'red');
     this.shopObjs.push(pb.bg, pb.label, pb.zone);
     if (!offer.length) this.shopObjs.push(this.add.text(W / 2, y0 + 150, t('Teď tu nic není.\nOtevři další stanice.'), txt(22, PAL.fog)).setOrigin(0.5).setAlign('center').setDepth(D + 1));
@@ -3806,7 +3806,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.openShop(tab);
     };
     // QA hospoda 66: hygiena má přednost před splněným úkolem (kdo úkoly nevybírá, radu hygieny jinak nikdy neviděl)
-    const k = this.kriglyNow(), pm = prestigeMin(d.stats.prestiges, this.kAll());
+    const k = this.kriglyNow(), pm = prestigeMin(d.stats.prestiges);
     if (k >= pm && k >= d.krigle * 0.3) return { text: t('Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.', { k: big(k), v: big(Math.round(k * KRIGL_BONUS * 100)) }), go: open('shop', 'up') };
     if (this.claimable()) return { text: t('Máš splněný úkol – vyzvedni odměnu v Úkolech.'), go: open('tasks') };
     const now = Date.now();
@@ -4106,7 +4106,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   // ---------- prestiž: hygiena ----------
   private askPrestige() {
     const k = this.kriglyNow();
-    if (k < prestigeMin(this.d.stats.prestiges, this.kAll())) return sfx.error();
+    if (k < prestigeMin(this.d.stats.prestiges)) return sfx.error();
     this.closeShop();
     const D = 520;
     const objs: Phaser.GameObjects.GameObject[] = [];
@@ -5771,7 +5771,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.hygW = 0;
       return;
     }
-    const k = this.kriglyNow(), pm = prestigeMin(this.d.stats.prestiges, this.kAll());
+    const k = this.kriglyNow(), pm = prestigeMin(this.d.stats.prestiges);
     const full = k >= pm;
     const fr = full ? 1 : Math.min(0.99, this.kriglyCont() / pm);
     // plný krígl pulzuje (překresluje se jen tehdy)
@@ -5880,7 +5880,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   static QH = 60;
 
   private qctx(): QCtx {
-    return { lock: (k) => this.tileLock(k), krigly: () => [this.kriglyNow(), prestigeMin(this.d.stats.prestiges, this.kAll())] };
+    return { lock: (k) => this.tileLock(k), krigly: () => [this.kriglyNow(), prestigeMin(this.d.stats.prestiges)] };
   }
 
   private qCur(): QuestDef | null {

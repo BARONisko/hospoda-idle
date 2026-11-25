@@ -4,11 +4,11 @@
 // DAYS=60 = kolik dní; pozdní kola jsou pomalá na výpočet, rok trvá desítky minut)
 // Odhad, ne přesný výpočet – předpoklady jsou v P níže a v komentářích. Pass a 💎 nepočítá (hráč zdarma).
 process.env.CHAIN = '1';
-const { run, MENU_HYG, PRESTIGE_GROW, PRESTIGE_MIN, PRESTIGE_FIRST, SEAL, VYCEP, vycepCost } = await import('../_tmp/sim.mjs');
+const { run, MENU_HYG, PRESTIGE_GROW, PRESTIGE_MIN, PRESTIGE_FIRST, prestigeMin, SEAL, VYCEP, vycepCost } = await import('../_tmp/sim.mjs');
 
 const STARE = !!process.env.STARE;
 const kf = (r, p) => Math.floor(2 * (r / (1e5 * 10 ** (p - 1))) ** 0.25);
-const goalOf = (n, held) => (n ? Math.max(PRESTIGE_MIN, Math.ceil(PRESTIGE_GROW * held)) : PRESTIGE_FIRST);
+const goalOf = (n) => prestigeMin(n);
 // body stromu hostinského (tools/sim/skills.mjs, dny 1/7/30/100/365) → podíl stromu; celý strom ≈ +10 % výdělku (cesta Výčep)
 const PTS = { slabší: [17, 43, 117, 209, 369], běžný: [37, 113, 212, 347, 610], zapálený: [86, 185, 315, 486, 749] };
 const PD = [1, 7, 30, 100, 365];
@@ -56,7 +56,7 @@ for (const pl of P) {
     return seal * brew * tree * cup * vy * decor * (1 + pl.ads);
   };
   const newRound = (day) => {
-    goal = goalOf(n, k); // laťka ze všech získaných krígel (od 25. 11. 2026, dřív z držených)
+    goal = goalOf(n); // laťka podle čísla hygieny (od 25. 11. 2026, dřív 7 % držených krígel)
     T = roundT(pubs, k, goal, mult(day));
     prog = 0;
   };

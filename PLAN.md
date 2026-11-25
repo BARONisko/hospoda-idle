@@ -478,3 +478,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   ze všech získaných krígel (kAll), dřív z držených (utrácení ji snižovalo). Menu se odemyká: pivovar 4., Chrám 11., výzdoba 20.,
   šipky 30., liga 40. hygiena (dřív 3/6/10/15/20) → liga: slabší den 20, běžný den 8, zapálený den 3,5. Liga: soupeř z průměru
   3 týdnů, těsný výsledek ±5 % = zůstává (výhra dál s odměnou; tools/sim/league.mjs 26 týdnů s náhodou).
+- Laťka hygieny (přání uživatele 25. 11.: „podle peněz a čísla hygieny“, ne krígel): tržba kola musí dát aspoň
+  max(6, ⌈6·1,07^(n−14)⌉) krígel (n = kolikátá hygiena; 20. → 10, 40. → 35, 60. → 135). Utrácení ani krígly z ligy/truhly laťku
+  nemění. Sim dnů: tempo stejné jako dřív bez utrácení (liga běžný den 8, kolo za měsíc ~22 h).

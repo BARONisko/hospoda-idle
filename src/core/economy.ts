@@ -205,8 +205,12 @@ export const PRESTIGE_FIRST = 4;
 /** každá další hygiena musí přinést aspoň +10 % krígel, co už máš (kola se tak pomalu prodlužují: 9 → 14 → … → 22 min) */
 /** po kolikáté hygieně se odemkne dlaždice menu (jediný zdroj pro PubScene.tileLock, nápovědu i tools/sim/days.mjs) */
 export const MENU_HYG: Record<string, number> = { krigl: 1, brew: 4, temple: 11, decor: 20, darts: 30, league: 40 }; // 25. 11. 2026: dřív 1/3/6/10/15/20 (běžný hráč měl vše za 2,5 dne)
-export const PRESTIGE_GROW = 0.07; // hospoda 67: dřív 0,1 (kolo 37 trvalo ~11 h); 7 % = 20. kolo ~15 min, 40. ~2 h
-export const prestigeMin = (prestiges: number, krigle = 0) => (prestiges > 0 ? Math.max(PRESTIGE_MIN, Math.ceil(PRESTIGE_GROW * krigle)) : PRESTIGE_FIRST);
+/** Laťka hygieny (přání uživatele 25. 11. 2026: „podle peněz a čísla hygieny“, ne podle krígel – utrácení ji nesníží):
+ *  tržba kola musí dát aspoň 6 · 1,07^(n − 14) krígel (n = kolikátá hygiena). Krígly z kola = tržba kola (coins), takže
+ *  laťka = potřebná tržba, která s každou hygienou roste o ~31 % (1,07^4). Dřív 7 % držených krígel (≈ stejné tempo bez utrácení). */
+export const PRESTIGE_GROW = 1.07;
+export const PRESTIGE_AT = 14;
+export const prestigeMin = (prestiges: number) => (prestiges > 0 ? Math.max(PRESTIGE_MIN, Math.ceil(PRESTIGE_MIN * PRESTIGE_GROW ** (prestiges - PRESTIGE_AT))) : PRESTIGE_FIRST);
 
 /** obchod s krígly: trvalá vylepšení (přežijí hygienu), platí se krígly; většina jde donekonečna (cena roste exponenciálně) */
 export type KriglId = 'speed' | 'start' | 'offline' | 'events' | 'keepMgr' | 'cthulhu' | 'krigly';
