@@ -38,6 +38,7 @@ import { mastStage, mastRank, mastProg, RANKS, RANK_COLORS, MAST_MAX } from '../
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave, wipe } from '../core/save';
 import { PubView, LOOK, REKO, livery } from '../game/PubView';
+import { spassAdd, SPassKind } from '../core/spass';
 import { RekoState, REKO_HYG, REKO_OFFLINE_H, REKO_STARS, REKO_GOLD, newReko, rekoCount, rekoMax, nextTask, rekoReady, chapter, taskProg, taskDone, rekoStar, RekoTask } from '../core/reko';
 import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
 import { GUESTS } from '../game/PubView';
@@ -2554,6 +2555,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const b = this.btn(W - 172, y0 + 6, 150, 54, () => {
         if (w.claimed || w.prog < w.goal) return sfx.error();
         w.claimed = true;
+        this.spPts('weekly');
         this.d.krigle += 5;
         const R = this.rk();
         if (R) rekoCount(R, 'weekly');
@@ -2590,6 +2592,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const b = this.btn(W - 172, y + 10, 150, 54, () => {
         if (tk.claimed || !done) return sfx.error();
         tk.claimed = true;
+        this.spPts('daily');
         const n = this.taskReward();
         this.gain(n);
         sfx.fanfare();
@@ -2886,6 +2889,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (!chestReady(this.d.chest)) return;
     const { st, day } = openChest(this.d.chest);
     this.d.chest = st;
+    this.spPts('chest');
     const txt1 = this.chestGive(CHEST_REW[day - 1], x2 ? 2 : 1);
     store(this.d);
     this.tsCache = undefined;
@@ -4497,6 +4501,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       dn.shift = switchPhase(false);
     }
     this.d.stats.prestiges++;
+    this.spPts('hyg');
     const R = this.rk();
     if (R) (rekoCount(R, 'hyg'), rekoMax(R, 'kmax', k));
     meter.track('hygiene', { n: this.d.stats.prestiges, pubs: n });
@@ -6274,6 +6279,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (pi >= 0 && this.views.length > 1 && pi !== this.sel && !this.shopObjs.length) this.selectPub?.(pi);
     if (rekoReady(R)) this.time.delayedCall(1800, () => this.banner(this.views[0].cam, t('Kapitola hotová: můžeš zavolat Rekonstrukci ★{n}!', { n: R.star + 1 })));
     store(this.d);
+  }
+
+  /** sezónní pass: body (jen v běžící sezóně) */
+  private spPts(kind: SPassKind) {
+    this.d.spass = spassAdd(this.d.spass, kind);
   }
 
   /** co přinese hvězdička */

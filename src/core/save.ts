@@ -138,6 +138,8 @@ export interface Save {
   weekly?: Weekly;
   /** Rekonstrukce ★ a Kniha hostinského (od Ligy) */
   reko?: import('./reko').RekoState;
+  /** sezónní pass (src/core/spass.ts) */
+  spass?: import('./spass').SPassState;
   /** po Rekonstrukci ukázat oslavu nové hvězdy */
   rekoMsg?: number;
   /** týdenní liga */
