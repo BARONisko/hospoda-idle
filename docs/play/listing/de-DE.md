@@ -1,36 +1,54 @@
 TITLE: P.U.B. Idle: Kneipen-Tycoon
 SHORT: Von der Spelunke zur legendären Kneipe: Zapf Bier für Vampire und Cthulhu!
 FULL:
-Willkommen in Bernds Spelunke! Du startest mit einem quietschenden Zapfhahn und ein paar wackligen Tischen – und machst aus diesem Loch eine Kneipe, von der man sogar in der Unterwelt spricht.
+P.U.B. Idle ist ein entspanntes Idle-Kneipen-Tycoon über eine Kneipe, die nie schließt. Du erbst Bernds Spelunke – einen quietschenden Zapfhahn, ein paar wacklige Tische und einen Keller, in den sich niemand traut – und machst daraus nach und nach eine Kneipe, von der man sogar in der Unterwelt spricht.
 
-🍺 TIPPEN, ZAPFEN, VERDIENEN
-Tipp auf den Zapfhahn, koch in der Küche, roll Fässer aus dem Fasskeller hoch und würfle in der Ecke. Mit jeder Stufe bringt jedes Bier mehr ein.
+Spiel zwei Minuten im Bus oder lass das Spiel einen ganzen Tag liegen. Dein Personal zapft weiter, während du weg bist – wenn du zurückkommst, wartet eine volle Kasse auf dich.
 
-👨‍🍳 PERSONAL EINSTELLEN – IM SCHLAF VERDIENEN
-Kellner, Köche und Manager halten die Kneipe am Laufen, während du weg bist. Wenn du zurückkommst, ist die Kasse voll.
+VERDIENE, AUCH WENN DU NICHT SPIELST
+• Stell Kellner, Köche und Manager ein, die die Kneipe für dich führen
+• Hol dir deine Offline-Einnahmen, sobald du das Spiel öffnest
+• Lass dich benachrichtigen, wenn die Kasse voll ist oder ein VIP-Gast kommt
+• Kurze Runden, einhändig, im Hochformat – fürs Handy gemacht
 
-🏚️ NEUE KNEIPEN ERÖFFNEN
-Die Kellerschenke voller Vampire und Skelette, Froschs Laden im Sumpf – und am Ende Cthulhus Tempel.
+BAU EINE KNEIPE, VON DER ALLE REDEN
+• Tipp auf den Zapfhahn, koch in der Küche, roll Fässer aus dem Keller und würfle in der Ecke
+• Verbessere jede Station, damit jedes Bier mehr wert ist
+• Dekoriere die Kneipe und schalte neue Gäste für deine Sammlung frei
+• Bau den Fähigkeitenbaum deines Wirts aus und wähle deinen eigenen Weg zum Reichtum
 
-🌙 TAG UND NACHT
-Tagsüber zahlen gewöhnliche Leute mit coins. Nachts kommen die Monster heraus und zahlen mit Knochen.
+ENTDECKE SELTSAME NEUE KNEIPEN
+• Die Kellerschenke voller Vampire und Skelette
+• Froschs Laden tief im Sumpf
+• Cthulhus Tempel, wo die seltsamsten Stammgäste warten
+Alle Kneipen verdienen gleichzeitig, so wächst dein Imperium an allen Fronten.
 
-🧼 DEN INSPEKTOR RUFEN
-Hol das Gesundheitsamt ins Haus: Schließ die Kneipe, fang neu an und verdiene Krüge – ein dauerhafter Einkommensbonus, der jeden neuen Durchlauf schneller macht.
+TAG UND NACHT
+Tagsüber zahlen normale Leute mit Coins. Wenn die Nacht hereinbricht, kommen die Monster heraus und zahlen mit Knochen. Gib Knochen im Beinhaus für Verbesserungen aus, die deine ganze Kneipe stärker machen.
 
-🎯 MEHR ALS NUR TIPPEN
+MIT JEDER RUNDE SCHNELLER
+Wenn das Wachstum nachlässt, ruf den Hygieneinspektor. Die Kneipe schließt, du fängst neu an und bekommst Krüge – einen dauerhaften Einnahmebonus, der jede neue Runde schneller macht als die letzte. Das ist das Herz des Spiels: ein bisschen Planung, und deine Einnahmen wachsen von Tausenden auf Zahlen mit Buchstaben dahinter.
+
+MEHR ALS NUR TIPPEN
 • Brau dein eigenes Bier in der Brauerei
-• Spiel Darts (301) um Preise
-• Schlag deinen Rivalen in der wöchentlichen Liga
+• Spiel Darts (301) gegen die Stammgäste um Preise
+• Schlag deinen Rivalen in der Wochenliga und gewinn den Ligapokal
 • Wirf den Knochenwürfel im Beinhaus
-• Sammle Talismane, Gäste und Deko
-• Bau den Fähigkeitenbaum deines Wirts aus
+• Beende Kneipenschlägereien, bevor deine Gäste weglaufen
+• Bediene VIP-Gäste für große Belohnungen
+• Sammle Talismane, seltene Funde, Gäste und Deko
 
-🎁 FAIR UND ENTSPANNT
+SPIEL, WIE DU WILLST
 • Läuft offline, ganz ohne Internet
 • Werbung ist freiwillig – nur wenn du einen Bonus willst
-• Tägliche Truhe, Tages- und Wochenaufgaben
-• Kurze Runden, einhändig, im Hochformat
+• Tägliche Truhe, Tagesaufgaben und eine Wochen-Herausforderung
+• Dein Fortschritt wird automatisch gesichert – ohne Konto und Anmeldung
+• Eine kurze Anleitung zeigt dir die Grundlagen, die Hilfe im Spiel erklärt den Rest
 • 12 Sprachen
 
-Ein Pixel-Art-Idle-Tycoon von einem kleinen tschechischen Indie-Entwickler. Zapf das erste Bier – die Stammgäste warten schon!
+FÜR WEN IST ES?
+Wenn du Idle-Spiele, Tycoon-Spiele, Kneipen- oder Restaurant-Management und ein bisschen schwarzen Humor magst, fühlst du dich hier wie zu Hause. Kein Stress, kein Druck – nur eine Kneipe, die immer besser wird, während du dein Leben lebst.
+
+P.U.B. Idle ist ein Pixel-Art-Idle-Tycoon von einem kleinen tschechischen Indie-Entwickler. Wir lesen jede Bewertung und bringen regelmäßig Updates mit neuen Inhalten. Hast du eine Idee für die Kneipe? Schreib sie in eine Bewertung.
+
+Zapf das erste Bier. Die Stammgäste warten.

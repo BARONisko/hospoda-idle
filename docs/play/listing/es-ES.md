@@ -1,36 +1,54 @@
 TITLE: P.U.B. Idle: Tycoon de Bares
 SHORT: Convierte un antro en un bar de leyenda. ¡Sirve cerveza a vampiros y a Cthulhu!
 FULL:
-¡Te damos la bienvenida a El Antro de Bernardo! Empiezas con un grifo que chirría y unas cuantas mesas cojas, y conviertes este agujero en un bar del que se hablará hasta en el inframundo.
+P.U.B. Idle es un tycoon de bares idle y relajado sobre un bar que nunca cierra. Heredas El Antro de Bernardo – un grifo que chirría, unas cuantas mesas cojas y un sótano al que nadie se atreve a bajar – y poco a poco lo conviertes en un bar del que se hablará hasta en el inframundo.
 
-🍺 TOCA, SIRVE, GANA
-Toca el grifo, prepara platos en la cocina, sube barriles de la bodega y juega a los dados en el rincón. Con cada nivel, cada cerveza vale más.
+Juega dos minutos en el autobús o deja el juego un día entero. Tu personal sigue sirviendo cerveza mientras no estás, así que cada vez que vuelves te espera una caja llena.
 
-👨‍🍳 CONTRATA PERSONAL: GANA MIENTRAS DUERMES
-Camareros, cocineros y gerentes mantienen el bar en marcha cuando no estás. Al volver, te espera la caja llena.
+GANA INCLUSO CUANDO NO JUEGAS
+• Contrata camareros, cocineros y encargados que llevan el bar por ti
+• Recoge tus ganancias sin conexión en cuanto abres el juego
+• Recibe un aviso cuando la caja esté llena o llegue un cliente VIP
+• Partidas cortas, con una mano y en vertical: hecho para el móvil
 
-🏚️ ABRE NUEVOS BARES
-La Taberna del sótano, llena de vampiros y esqueletos; El Garito de la Rana, en pleno pantano… y, por último, el Templo de Cthulhu.
+CREA UN BAR DEL QUE HABLE TODO EL MUNDO
+• Toca el grifo, cocina, sube barriles del sótano y juega a los dados en el rincón
+• Mejora cada estación para que cada cerveza valga más
+• Decora el bar y desbloquea nuevos clientes para tu colección
+• Desarrolla el árbol de habilidades de tu tabernero y elige tu propio camino a la riqueza
 
-🌙 DÍA Y NOCHE
-De día, la gente corriente paga con coins. De noche salen los monstruos y pagan con huesos.
+DESCUBRE BARES NUEVOS Y EXTRAÑOS
+• La Taberna del sótano, llena de vampiros y esqueletos
+• El Garito de la Rana, en pleno pantano
+• El Templo de Cthulhu, donde esperan los clientes más raros de todos
+Todos los bares ganan a la vez, así que tu imperio crece en todos los frentes.
 
-🧼 LLAMA AL INSPECTOR DE SANIDAD
-Cierra el bar, empieza de cero y gana jarras: una bonificación permanente de ingresos que hace más rápida cada nueva partida.
+DÍA Y NOCHE
+De día, la gente normal paga en coins. Cuando cae la noche, salen los monstruos y pagan en huesos. Gasta los huesos en el Osario en mejoras que hacen más fuerte todo tu bar.
 
-🎯 MUCHO MÁS QUE TOCAR
+MÁS RÁPIDO EN CADA PARTIDA
+Cuando el crecimiento se frene, llama al inspector de sanidad. El bar cierra, empiezas de cero y ganas jarras: una bonificación permanente de ingresos que hace cada nueva partida más rápida que la anterior. Ese es el corazón del juego: un poco de planificación y tus ingresos pasan de miles a cifras con letras detrás.
+
+MÁS QUE TOCAR LA PANTALLA
 • Elabora tu propia cerveza en la cervecería
-• Juega a los dardos (301) y llévate premios
-• Vence a tu rival en la liga semanal
+• Juega a los dardos (301) contra los clientes habituales por premios
+• Gana a tu rival en la liga semanal y llévate la Copa de la Liga
 • Tira el dado de hueso en el Osario
-• Colecciona talismanes, clientes y decoración
-• Desarrolla el árbol de habilidades de tu tabernero
+• Acaba con las peleas antes de que se vayan tus clientes
+• Atiende a clientes VIP a cambio de grandes recompensas
+• Colecciona talismanes, hallazgos raros, clientes y decoración
 
-🎁 JUSTO Y RELAJADO
+JUEGA A TU MANERA
 • Funciona sin conexión, no necesita internet
 • Los anuncios son opcionales: solo si quieres una bonificación
-• Cofre diario, tareas diarias y semanales
-• Partidas cortas, con una mano y en vertical
+• Cofre diario, tareas diarias y un desafío semanal
+• Tu progreso se guarda solo, sin cuenta ni inicio de sesión
+• Una breve guía te enseña lo básico y la ayuda del juego explica el resto
 • 12 idiomas
 
-Un idle tycoon en pixel art de un pequeño desarrollador indie checo. Sirve la primera cerveza: ¡los clientes habituales te esperan!
+¿PARA QUIÉN ES?
+Si te gustan los juegos idle, los tycoon, gestionar un bar o un restaurante y un poco de humor negro, aquí te sentirás como en casa. Sin estrés ni presiones: solo un bar que mejora mientras tú vives tu vida.
+
+P.U.B. Idle es un tycoon idle en pixel art creado por un pequeño desarrollador independiente checo. Leemos todas las reseñas y añadimos contenido nuevo con actualizaciones periódicas. ¿Tienes una idea para el bar? Cuéntanosla en una reseña.
+
+Sirve la primera cerveza. Los clientes habituales te esperan.

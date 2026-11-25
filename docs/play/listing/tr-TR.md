@@ -1,36 +1,54 @@
 TITLE: P.U.B. Idle: Meyhane Patronu
 SHORT: Köhne batakhaneyi efsane meyhaneye çevir. Vampirlere ve Cthulhu'ya bira sun!
 FULL:
-Beran'ın Batakhanesi'ne hoş geldin! Elinde gıcırdayan tek bir bira musluğu ve birkaç sallanan masa var – ve bu izbeyi yeraltı dünyasında bile konuşulan bir meyhaneye dönüştüreceksin.
+P.U.B. Idle, hiç kapanmayan bir meyhane hakkında rahat bir idle meyhane patronu oyunu. Beran'ın Batakhanesi sana kalıyor – gıcırdayan tek bir bira musluğu, birkaç sallanan masa ve kimsenin inmeye cesaret edemediği bir mahzen – ve onu adım adım yeraltı dünyasında bile konuşulan bir meyhaneye dönüştürüyorsun.
 
-🍺 DOKUN, DOLDUR, KAZAN
-Bira musluğuna dokun, mutfakta yemek pişir, mahzenden fıçı yuvarla ve köşede zar at. Her seviyede her bira daha çok kazandırır.
+Otobüste iki dakika oyna ya da oyunu bütün gün kenara bırak. Sen yokken personelin bira doldurmaya devam eder, her döndüğünde seni dolu bir kasa bekler.
 
-👨‍🍳 PERSONEL AL – UYURKEN KAZAN
-Garsonlar, aşçılar ve müdürler sen yokken meyhaneyi çekip çevirir. Döndüğünde kasa dolmuş olur.
+OYNAMADIĞINDA BİLE KAZAN
+• Meyhaneyi senin yerine işleten garsonlar, aşçılar ve müdürler tut
+• Oyunu açtığın anda çevrimdışı kazancını topla
+• Kasa dolduğunda ya da VIP misafir geldiğinde bildirim al
+• Kısa oturumlar, tek el, dikey ekran – telefon için yapıldı
 
-🏚️ YENİ MEYHANELER AÇ
-Vampirler ve iskeletlerle dolu Mahzen Meyhanesi, bataklıktaki Kurbağanın Mekânı – ve en sonunda Cthulhu Tapınağı.
+HERKESİN KONUŞTUĞU BİR MEYHANE KUR
+• Bira musluğuna dokun, mutfakta yemek pişir, mahzenden fıçı çıkar ve köşede zar at
+• Her istasyonu geliştir, her bira daha çok kazandırsın
+• Meyhaneyi süsle ve koleksiyonuna yeni misafirler ekle
+• Meyhanecinin yetenek ağacını geliştir ve zenginliğe giden kendi yolunu seç
 
-🌙 GÜNDÜZ VE GECE
-Gündüz sıradan insanlar coins ile öder. Gece canavarlar ortaya çıkar ve kemikle öder.
+TUHAF YENİ MEKÂNLAR KEŞFET
+• Vampirler ve iskeletlerle dolu Mahzen Meyhanesi
+• Bataklığın derinlerinde Kurbağanın Mekânı
+• En tuhaf müdavimlerin beklediği Cthulhu Tapınağı
+Bütün mekânlar aynı anda kazanır, böylece imparatorluğun her cephede büyür.
 
-🧼 SAĞLIK MÜFETTİŞİNİ ÇAĞIR
-Meyhaneyi kapat, baştan başla ve kupa kazan – her yeni turu hızlandıran kalıcı bir gelir bonusu.
+GECE VE GÜNDÜZ
+Gündüz sıradan insanlar coins ile öder. Gece çökünce canavarlar ortaya çıkar ve kemikle öder. Kemikleri Kemikhane'de bütün meyhaneni güçlendiren geliştirmelere harca.
 
-🎯 DOKUNMAKTAN FAZLASI
+HER TURDA DAHA HIZLI
+Büyüme yavaşlayınca sağlık müfettişini çağır. Meyhane kapanır, baştan başlarsın ve kupa kazanırsın – her yeni turu bir öncekinden hızlı yapan kalıcı bir gelir bonusu. Oyunun kalbi burası: biraz planlama ile gelirin binlerden sonunda harfler olan sayılara çıkar.
+
+DOKUNMAKTAN FAZLASI
 • Bira fabrikasında kendi biranı üret
-• Ödüller için dart (301) oyna
-• Haftalık ligde rakibini geç
+• Müdavimlere karşı ödüller için dart (301) oyna
+• Haftalık ligde rakibini yen ve Lig Kupası'nı kazan
 • Kemikhane'de kemik zarı at
-• Koleksiyonuna tılsım, misafir ve dekorasyon ekle
-• Meyhanecinin yetenek ağacını geliştir
+• Misafirlerin kaçmadan kavgaları ayır
+• Büyük ödüller için VIP misafirlere hizmet et
+• Tılsım, nadir buluntu, misafir ve dekorasyon topla
 
-🎁 ADİL VE RAHAT
+KENDİ TARZINDA OYNA
 • Çevrimdışı çalışır, internet gerekmez
 • Reklamlar isteğe bağlı – yalnızca bonus istediğinde
-• Günlük sandık, günlük ve haftalık görevler
-• Kısa oturumlar, tek el, dikey ekran
+• Günlük sandık, günlük görevler ve haftalık meydan okuma
+• İlerlemen kendiliğinden yedeklenir – hesap ve giriş gerekmez
+• Kısa bir rehber temelleri gösterir, oyun içi yardım gerisini anlatır
 • 12 dil
 
-Küçük bir Çek bağımsız geliştiriciden piksel art bir idle tycoon. İlk birayı doldur – müdavimler bekliyor!
+KİMLER İÇİN?
+Idle oyunları, tycoon oyunlarını, bar ya da restoran işletmeyi ve biraz kara mizahı seviyorsan burada kendini evinde hissedeceksin. Stres yok, baskı yok – sen hayatını yaşarken gittikçe güzelleşen bir meyhane var.
+
+P.U.B. Idle, küçük bir Çek bağımsız geliştiricinin piksel sanatlı idle tycoon oyunudur. Her yorumu okuyor ve düzenli güncellemelerle yeni içerik ekliyoruz. Meyhane için bir fikrin mi var? Yorumda yaz.
+
+İlk birayı doldur. Müdavimler bekliyor.
