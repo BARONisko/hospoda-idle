@@ -450,3 +450,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Ověřeno na snímcích ve vzhledu B: VIP host + pruh, rvačka, návštěvník, zlatý sud. Návrhy pozdních cílů: docs/navrhy-ui/krigly-cile/.
 - Hospoda 73: kontrola Googlu buildu 12 prošla (publikováno 12. 11.); build 13 (Actions č. 13, 7882606) v uzavřeném testu Alpha,
   odeslán ke kontrole. Pozdní cíl pro krígly odložen (uživatel), odměny ligy beze změny.
+- Zpětná vazba testerů (Testers Community, 25. 11.): žádné pády ani chyby. Do Nastavení přibyl poslední řádek se třemi tlačítky:
+  v aplikaci Ohodnotit (Obchod Play) / Sdílet (@capacitor/share) / Soukromí (zásady), na webu místo hodnocení „Hra do složky“
+  (v aplikaci pro Android se už nenabízí). Překlep „Weeldy challenge“ ve hře není. Nový popis v obchodě: docs/play/listing/.

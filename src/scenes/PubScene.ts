@@ -4,6 +4,7 @@ import { t, lang, LANGS, AVAILABLE, setLang } from '../i18n';
 import { txt } from '../ui/font';
 import { Capacitor } from '@capacitor/core';
 import { InAppReview } from '@capacitor-community/in-app-review';
+import { Share } from '@capacitor/share';
 import { stats as meter } from '../core/stats';
 import { fitPads, type R } from '../ui/touch';
 import { helpPanel, helpState, MENU_HYG } from '../ui/help';
@@ -139,6 +140,33 @@ function pickBackup(done: (text: string) => void) {
   if ((navigator as Navigator & { userActivation?: { isActive: boolean } }).userActivation?.isActive) return open();
   window.addEventListener('pointerup', open);
   window.addEventListener('touchend', open);
+}
+
+// odkazy z Nastavení (přání testerů Google Play: ohodnotit, sdílet, zásady soukromí)
+const PLAY_URL = 'https://play.google.com/store/apps/details?id=cz.baronisko.pubidle';
+const PRIVACY_URL = () => `https://baronisko.github.io/hospoda-idle/${lang === 'cs' ? 'soukromi-cs' : 'soukromi'}.html`;
+/** otevře odkaz mimo hru: v aplikaci přechod stránky (Capacitor ho pošle do Obchodu Play / prohlížeče), na webu nová karta */
+function openExternal(url: string) {
+  if (Capacitor.isNativePlatform()) location.href = url;
+  else window.open(url, '_blank', 'noopener');
+}
+/** sdílení hry: v aplikaci systémové okno Sdílet, na webu Web Share nebo zkopírování odkazu; vrací false, když nešlo nic */
+async function shareGame(): Promise<'ok' | 'copied' | 'fail'> {
+  const text = t('Zahraj si P.U.B. Idle – idle hospoda s pivem, upíry a Cthulhu!');
+  try {
+    if (Capacitor.isNativePlatform()) {
+      await Share.share({ title: 'P.U.B. Idle', text, url: PLAY_URL, dialogTitle: t('Sdílet') });
+      return 'ok';
+    }
+    if (navigator.share) {
+      await navigator.share({ title: 'P.U.B. Idle', text, url: PLAY_URL });
+      return 'ok';
+    }
+    await navigator.clipboard.writeText(`${text} ${PLAY_URL}`);
+    return 'copied';
+  } catch {
+    return 'fail';
+  }
 }
 
 /** Stáhne offline verzi hry (složka PUB-Idle s index.html v zipu; sestavuje tools/offline.mjs). */
@@ -2279,7 +2307,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // a výška řádku musí zůstat ≥ 59 log. px = dotykové místo ≥ 44 CSS px
     y0 -= 16;
     // výška řádku tak, aby se vešly všechny (nápověda, zvuky, hudba, záloha, jazyk, složka, upozornění, začít znovu)
-    const n = 7 + (location.protocol.startsWith('http') ? 1 : 0) + (notify.available ? 1 : 0) + (meter.available ? 1 : 0);
+    // poslední řádek: tři tlačítka – v aplikaci Ohodnotit / Sdílet / Soukromí, na webu místo hodnocení „Hra do složky“
+    // (v aplikaci pro Android zip ke stažení není; řádků tak zůstává nejvýš 10)
+    const native = Capacitor.isNativePlatform(), web = location.protocol.startsWith('http') && !native;
+    const n = 8 + (notify.available ? 1 : 0) + (meter.available ? 1 : 0);
     const RH = Math.min(96, Math.floor((MB - y0 - 6) / n));
     this.shopObjs.push(this.add.text(W - 12, y0 - 4, t('verze {v}', { v: __APP_VERSION__ }), txt(16, PAL.fog)).setOrigin(1, 1).setDepth(D + 2));
     // nápověda „Jak to funguje“ nahoře (přání uživatele: informace o různých věcech ve hře)
@@ -2331,8 +2362,6 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       [t('Jazyk / Language'), LANGS[lang], () => setLang(AVAILABLE[(AVAILABLE.indexOf(lang) + 1) % AVAILABLE.length])],
     ];
     // offline verze do složky (zip s index.html) – nabízí se jen na webu, ne ve hře spuštěné z disku
-    const web = location.protocol.startsWith('http');
-    if (web) rows.push([t('Hra do složky'), t('Stáhnout'), downloadOffline]);
     // záloha hry: dvě tlačítka v jednom řádku
     {
       const y = y0 + vols.length * RH;
@@ -2382,7 +2411,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     rows.forEach(([title, val, fn], i) => {
       i += vols.length + 1;
       const y = y0 + i * RH;
-      this.row(y, RH, D, title, title === t('Hra do složky') ? t('spustíš ji z disku bez internetu') : title === t('Upozornění') ? t('plná hospoda, VIP host, truhla, chrám') : title === t('Statistiky') ? t('anonymní – pomáhají hru vylepšovat') : title === t('Začít znovu') ? t('celá hra od začátku, i s návodem') : title === t('Zvuk výdělku') ? t('cinkání stanic – ťukni = přepni a poslechni') : '', 'ink', PAL.bone, Math.min(RH < 70 ? 240 : 300, W - 232 - 34)); // text nesmí pod tlačítko (od W − 232)
+      this.row(y, RH, D, title, title === t('Upozornění') ? t('plná hospoda, VIP host, truhla, chrám') : title === t('Statistiky') ? t('anonymní – pomáhají hru vylepšovat') : title === t('Začít znovu') ? t('celá hra od začátku, i s návodem') : title === t('Zvuk výdělku') ? t('cinkání stanic – ťukni = přepni a poslechni') : '', 'ink', PAL.bone, Math.min(RH < 70 ? 240 : 300, W - 232 - 34)); // text nesmí pod tlačítko (od W − 232)
       const bs = Math.min(60, RH - 14);
       const b = this.btn(W - 232, y + (RH - 8 - bs) / 2, 210, bs, () => {
         fn();
@@ -2392,7 +2421,30 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.drawBtn(b, val, true, title === t('Začít znovu') ? (ask ? 'red' : 'amber') : 'plum');
       this.shopObjs.push(b.bg, b.label, b.zone);
     });
-    const fy = y0 + (vols.length + 1 + rows.length) * RH + 30;
+    // ohodnotit / sdílet / zásady soukromí: tři tlačítka přes celou šířku řádku
+    {
+      const y = y0 + (vols.length + 1 + rows.length) * RH;
+      const bs = Math.min(60, RH - 14), by = y + (RH - 8 - bs) / 2, gap = 10, bw = Math.floor((W - 44 - 2 * gap) / 3);
+      const links: [string, keyof typeof PAL, () => void][] = [
+        web ? [t('Hra do složky'), 'green', downloadOffline] : [t('Ohodnotit'), 'green', () => openExternal(PLAY_URL)],
+        [t('Sdílet'), 'blue', () => void shareGame().then((r) => {
+          // zrušené systémové okno Sdílet je taky „fail“ – hláška jen když nešlo ani zkopírovat odkaz
+          if (r === 'copied') this.banner(this.views[0].cam, t('Odkaz zkopírován'));
+          else if (r === 'fail' && !native && !navigator.share) this.banner(this.views[0].cam, t('Sdílení tu nejde'));
+        })],
+        [t('Soukromí'), 'plum', () => openExternal(PRIVACY_URL())],
+      ];
+      links.forEach(([label, c, fn], k) => {
+        const b = this.btn(22 + k * (bw + gap), by, bw, bs, () => {
+          sfx.click();
+          meter.track('opts_link', { k });
+          fn();
+        }, D + 2);
+        this.drawBtn(b, label, true, c);
+        this.shopObjs.push(b.bg, b.label, b.zone);
+      });
+    }
+    const fy = y0 + (vols.length + 2 + rows.length) * RH + 30;
     if (fy < MB - 10) this.shopObjs.push(this.add.text(W / 2, fy, lang === 'cs' ? 'P.U.B. Idle – Pajzl Tycoon' : 'P.U.B. Idle: Pub Tycoon', txt(18, PAL.slate)).setOrigin(0.5).setDepth(D + 1));
   }
 
