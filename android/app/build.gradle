@@ -12,6 +12,12 @@ android {
         versionName "1.0." + (System.getenv("VERSION_CODE") ?: "0")
         // AdMob: bez nastavení testovací ID Googlu (reklamy jen zkušební)
         manifestPlaceholders = [admobAppId: (System.getenv("ADMOB_APP_ID") ?: "ca-app-pub-3940256099942544~3347511713")]
+        // Google Play Hry: ID hry a žebříčků z Play Console (GitHub Variables PG_APP_ID, PG_LB_KRIGLE, PG_LB_LEVEL, PG_LB_TEMPLE);
+        // bez PG_APP_ID se Play Hry nespustí a hra skryje žebříčky i cloud
+        resValue "string", "game_services_project_id", (System.getenv("PG_APP_ID") ?: "")
+        resValue "string", "pg_lb_krigle", (System.getenv("PG_LB_KRIGLE") ?: "")
+        resValue "string", "pg_lb_level", (System.getenv("PG_LB_LEVEL") ?: "")
+        resValue "string", "pg_lb_temple", (System.getenv("PG_LB_TEMPLE") ?: "")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -51,6 +57,8 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
+    // Google Play Hry v2 (přihlášení, žebříčky, uložení v cloudu) – core/playgames.ts + PlayGamesPlugin.java
+    implementation "com.google.android.gms:play-services-games-v2:21.0.0"
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"

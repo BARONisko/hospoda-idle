@@ -1593,5 +1593,22 @@
  "Hospoda mezitím vydělávala – kasa je plná a čekají nové úkoly.": "주점은 계속 돈을 벌었어요. 금고가 가득 찼고 새 임무가 기다려요.",
  "Hospoda bez hostinského chátrá": "주인 없는 주점이 엉망이 되고 있어요",
  "Vrať se pro výdělek a denní truhlu – číšníci to sami dlouho neutáhnou.": "수익과 일일 상자를 받으러 돌아오세요. 웨이터들만으로는 오래 못 버텨요.",
- "úr. {n}": "Lv.{n}"
+ "úr. {n}": "Lv.{n}",
+ "Krígly {k} · hostinský úr. {l}": "맥주잔 {k} · 주인장 Lv.{l}",
+ "Uložená hra v cloudu": "클라우드 저장",
+ "V Google Play je hra s větším postupem.\nCloud: {k1} krígel, hostinský úr. {l1}{w}\nTento telefon: {k2} krígel, hostinský úr. {l2}": "Google Play에 진행도가 더 높은 저장이 있습니다.\n클라우드: 맥주잔 {k1}, 주인장 Lv.{l1}{w}\n이 휴대폰: 맥주잔 {k2}, 주인장 Lv.{l2}",
+ "uloženo {t}": "저장 {t}",
+ "Hra, kterou nevybereš, se přepíše.": "선택하지 않은 저장은 덮어씁니다.",
+ "Načíst z cloudu": "클라우드에서 불러오기",
+ "Hrát tuto": "이걸로 플레이",
+ "Hra načtená z cloudu Google Play": "Google Play 클라우드에서 불러왔습니다",
+ "Google Play Hry teď nejdou – zkus to později": "Google Play 게임즈에 연결할 수 없습니다. 나중에 다시 시도하세요",
+ "Žebříčky": "리더보드",
+ "Google Play Hry": "Google Play 게임즈",
+ "nepřihlášeno – žebříčky a cloud": "로그인 안 됨 – 리더보드와 클라우드",
+ "cloud: ukládá se samo": "클라우드: 자동 저장",
+ "cloud: uloženo před {n} min": "클라우드: {n}분 전 저장",
+ "Uloženo v cloudu Google Play": "Google Play 클라우드에 저장됨",
+ "Přihlásit": "로그인",
+ "Žebříček Chrámu": "신전 리더보드"
 }

@@ -1593,5 +1593,22 @@
  "Hospoda mezitím vydělávala – kasa je plná a čekají nové úkoly.": "Die Kneipe hat weiter verdient – die Kasse ist voll und neue Aufgaben warten.",
  "Hospoda bez hostinského chátrá": "Ohne Wirt verfällt die Kneipe",
  "Vrať se pro výdělek a denní truhlu – číšníci to sami dlouho neutáhnou.": "Hol dir deine Einnahmen und die Tagestruhe – die Kellner schaffen es nicht lange allein.",
- "úr. {n}": "St. {n}"
+ "úr. {n}": "St. {n}",
+ "Krígly {k} · hostinský úr. {l}": "Krüge {k} · Wirt St. {l}",
+ "Uložená hra v cloudu": "Cloud-Spielstand",
+ "V Google Play je hra s větším postupem.\nCloud: {k1} krígel, hostinský úr. {l1}{w}\nTento telefon: {k2} krígel, hostinský úr. {l2}": "Bei Google Play gibt es einen Spielstand mit mehr Fortschritt.\nCloud: {k1} Krüge, Wirt St. {l1}{w}\nDieses Handy: {k2} Krüge, Wirt St. {l2}",
+ "uloženo {t}": "gespeichert {t}",
+ "Hra, kterou nevybereš, se přepíše.": "Der nicht gewählte Spielstand wird überschrieben.",
+ "Načíst z cloudu": "Aus der Cloud laden",
+ "Hrát tuto": "Diesen spielen",
+ "Hra načtená z cloudu Google Play": "Spiel aus der Google Play Cloud geladen",
+ "Google Play Hry teď nejdou – zkus to později": "Google Play Spiele gerade nicht verfügbar – später erneut versuchen",
+ "Žebříčky": "Bestenlisten",
+ "Google Play Hry": "Google Play Spiele",
+ "nepřihlášeno – žebříčky a cloud": "nicht angemeldet – Bestenlisten und Cloud",
+ "cloud: ukládá se samo": "Cloud: speichert automatisch",
+ "cloud: uloženo před {n} min": "Cloud: vor {n} Min. gespeichert",
+ "Uloženo v cloudu Google Play": "In der Google Play Cloud gespeichert",
+ "Přihlásit": "Anmelden",
+ "Žebříček Chrámu": "Tempel-Bestenliste"
 }

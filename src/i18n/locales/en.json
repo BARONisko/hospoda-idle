@@ -1593,5 +1593,22 @@
  "Hospoda mezitím vydělávala – kasa je plná a čekají nové úkoly.": "The pub kept earning – the cash box is full and new tasks are waiting.",
  "Hospoda bez hostinského chátrá": "The pub is falling apart without its landlord",
  "Vrať se pro výdělek a denní truhlu – číšníci to sami dlouho neutáhnou.": "Come back for your earnings and the daily chest – the waiters can't manage alone for long.",
- "úr. {n}": "Lv. {n}"
+ "úr. {n}": "Lv. {n}",
+ "Krígly {k} · hostinský úr. {l}": "Tankards {k} · landlord lv. {l}",
+ "Uložená hra v cloudu": "Cloud save",
+ "V Google Play je hra s větším postupem.\nCloud: {k1} krígel, hostinský úr. {l1}{w}\nTento telefon: {k2} krígel, hostinský úr. {l2}": "Google Play has a save with more progress.\nCloud: {k1} tankards, landlord lv. {l1}{w}\nThis phone: {k2} tankards, landlord lv. {l2}",
+ "uloženo {t}": "saved {t}",
+ "Hra, kterou nevybereš, se přepíše.": "The save you don't pick will be overwritten.",
+ "Načíst z cloudu": "Load from cloud",
+ "Hrát tuto": "Play this one",
+ "Hra načtená z cloudu Google Play": "Game loaded from Google Play cloud",
+ "Google Play Hry teď nejdou – zkus to později": "Google Play Games unavailable – try again later",
+ "Žebříčky": "Leaderboards",
+ "Google Play Hry": "Google Play Games",
+ "nepřihlášeno – žebříčky a cloud": "not signed in – leaderboards and cloud",
+ "cloud: ukládá se samo": "cloud: saves automatically",
+ "cloud: uloženo před {n} min": "cloud: saved {n} min ago",
+ "Uloženo v cloudu Google Play": "Saved to Google Play cloud",
+ "Přihlásit": "Sign in",
+ "Žebříček Chrámu": "Temple leaderboard"
 }

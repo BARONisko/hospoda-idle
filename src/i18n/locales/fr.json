@@ -1593,5 +1593,22 @@
  "Hospoda mezitím vydělávala – kasa je plná a čekají nové úkoly.": "Le pub a continué à gagner – la caisse est pleine et de nouvelles tâches t'attendent.",
  "Hospoda bez hostinského chátrá": "Le pub tombe en ruine sans son patron",
  "Vrať se pro výdělek a denní truhlu – číšníci to sami dlouho neutáhnou.": "Reviens chercher tes gains et le coffre du jour – les serveurs ne tiendront pas longtemps seuls.",
- "úr. {n}": "Niv. {n}"
+ "úr. {n}": "Niv. {n}",
+ "Krígly {k} · hostinský úr. {l}": "Chopes {k} · tavernier niv. {l}",
+ "Uložená hra v cloudu": "Sauvegarde cloud",
+ "V Google Play je hra s větším postupem.\nCloud: {k1} krígel, hostinský úr. {l1}{w}\nTento telefon: {k2} krígel, hostinský úr. {l2}": "Google Play a une sauvegarde plus avancée.\nCloud : {k1} chopes, tavernier niv. {l1}{w}\nCe téléphone : {k2} chopes, tavernier niv. {l2}",
+ "uloženo {t}": "sauvegardée {t}",
+ "Hra, kterou nevybereš, se přepíše.": "La partie non choisie sera écrasée.",
+ "Načíst z cloudu": "Charger du cloud",
+ "Hrát tuto": "Jouer celle-ci",
+ "Hra načtená z cloudu Google Play": "Partie chargée depuis le cloud Google Play",
+ "Google Play Hry teď nejdou – zkus to později": "Google Play Jeux indisponible – réessaie plus tard",
+ "Žebříčky": "Classements",
+ "Google Play Hry": "Google Play Jeux",
+ "nepřihlášeno – žebříčky a cloud": "non connecté – classements et cloud",
+ "cloud: ukládá se samo": "cloud : sauvegarde automatique",
+ "cloud: uloženo před {n} min": "cloud : sauvegardé il y a {n} min",
+ "Uloženo v cloudu Google Play": "Sauvegardé dans le cloud Google Play",
+ "Přihlásit": "Se connecter",
+ "Žebříček Chrámu": "Classement du Temple"
 }

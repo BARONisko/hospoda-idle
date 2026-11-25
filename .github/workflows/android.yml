@@ -1,6 +1,7 @@
 # Sestavení Android aplikace (Capacitor): AAB pro Google Play + APK pro instalaci do telefonu (obojí podepsané nahrávacím klíčem → nové APK jde nainstalovat přes staré, postup zůstane).
 # Spouští se ručně (Actions → Android → Run workflow) nebo pushem tagu v*.
 # Podpis: tajemství KEYSTORE_BASE64 + KEYSTORE_PASSWORD (alias „upload“). Bez nich jen nepodepsaný AAB a ladicí APK.
+# Play Hry: proměnné PG_APP_ID, PG_LB_KRIGLE, PG_LB_LEVEL, PG_LB_TEMPLE (bez nich se žebříčky a cloud skryjí).
 # Reklamy: proměnné (Variables) ADMOB_APP_ID + ADMOB_REWARDED; bez nich testovací reklamy Googlu.
 name: Android
 on:
@@ -42,6 +43,11 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: upload
+          # Google Play Hry (žebříčky + cloud): Variables z Play Console → Herní služby Play → Konfigurace
+          PG_APP_ID: ${{ vars.PG_APP_ID }}
+          PG_LB_KRIGLE: ${{ vars.PG_LB_KRIGLE }}
+          PG_LB_LEVEL: ${{ vars.PG_LB_LEVEL }}
+          PG_LB_TEMPLE: ${{ vars.PG_LB_TEMPLE }}
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon bundleRelease assembleRelease

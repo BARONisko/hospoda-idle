@@ -27,6 +27,7 @@ import { isNight, nightForced, phaseLeft, DAY_MS, bonesFor, nightCfg, retune, ni
 import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
 import { notify, NOTE, Note } from '../core/notify';
+import { pg, showBoards, signIn as pgSignIn, saveNow as pgSaveNow } from '../core/playgames';
 import { chestReady, chestDay, openChest, jokerFree, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, GEM_PERM, GEM_LOOK, CHRONICLE_BONUS, VIP_GEMS, GOLD_GEMS, GEMS_FREE, PRESTIGE_GEMS_DAY, RESPEC_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
 import { templeState, isWeekend, ROUNDS_PER_DAY, sealBonus, TempleState, weekendKey, ALTAR_PER, weekendLeft } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
@@ -1334,6 +1335,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   ];
 
   tileH = 118;
+  /** kde je tlačítko online žebříčků (návrhy 25. 11. 2026): a = Nastavení + Chrám, b = + hlavička Ligy, c = + hlavička Menu */
+  lbMode = (new URLSearchParams(location.search).get('lb') ?? 'c') as 'a' | 'b' | 'c';
   /** návrhy zamčeného Menu (posudek nováčka: 10 z 12 dlaždic zamčených bez názvu = zeď):
    *  x = dosavadní, a = odemčené + jen nejbližší zamčená, b = všechny se jménem a siluetou, c = odemčené + pruh „Brzy“ */
   menuMode = (new URLSearchParams(location.search).get('menu') ?? 'a') as 'x' | 'a' | 'b' | 'c'; // výběr uživatele: A
@@ -1475,6 +1478,17 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     }, D + 5);
     this.drawBtn(close, '✕', true, 'red');
     this.shopObjs.push(close.bg, close.label, close.zone);
+    // online žebříčky Google Play: tlačítko v hlavičce Menu (návrh C) nebo Ligy (návrh B); A = jen Nastavení a Chrám
+    if (pg.available && ((tab === 'home' && this.lbMode === 'c') || (tab === 'league' && this.lbMode === 'b'))) {
+      const bw = tab === 'home' ? 190 : 64;
+      const lb = this.btn(W - 72 - bw, y0 + 10, bw, 42, () => {
+        sfx.click();
+        meter.track('pg_boards', { from: tab });
+        void showBoards().then((ok) => ok || this.banner(this.views[0].cam, t('Google Play Hry teď nejdou – zkus to později')));
+      }, D + 5);
+      this.drawBtn(lb, tab === 'home' ? '🏆 ' + t('Žebříčky') : '🏆', true, 'blue');
+      this.shopObjs.push(lb.bg, lb.label, lb.zone);
+    }
     const cy0 = y0 + 112;
     if (tab === 'home') this.menuGrid(y0, D);
     else if (tab === 'daynight') this.dayNightTab(cy0 - 40, D);
@@ -2659,8 +2673,29 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       [t('Jazyk / Language'), LANGS[lang], () => setLang(AVAILABLE[(AVAILABLE.indexOf(lang) + 1) % AVAILABLE.length])],
     ];
     // offline verze do složky (zip s index.html) – nabízí se jen na webu, ne ve hře spuštěné z disku
-    // záloha hry: dvě tlačítka v jednom řádku
-    {
+    // záloha hry: dvě tlačítka v jednom řádku; v aplikaci s Google Play Hrami místo ní žebříčky a cloud
+    if (pg.available) {
+      const y = y0 + vols.length * RH;
+      const mins = pg.savedAt ? Math.floor((Date.now() - pg.savedAt) / 60000) : -1;
+      this.row(y, RH, D, t('Google Play Hry'), !pg.signedIn ? t('nepřihlášeno – žebříčky a cloud') : mins < 0 ? t('cloud: ukládá se samo') : t('cloud: uloženo před {n} min', { n: mins }), 'ink', PAL.bone, Math.min(RH < 70 ? 240 : 300, W - 232 - 34));
+      const bs = Math.min(60, RH - 14), by = y + (RH - 8 - bs) / 2;
+      const lb = this.btn(W - 232, by, 102, bs, () => {
+        sfx.click();
+        meter.track('pg_boards', { from: 'opts' });
+        void showBoards().then((ok) => ok || this.banner(this.views[0].cam, t('Google Play Hry teď nejdou – zkus to později')));
+      }, D + 2);
+      this.drawBtn(lb, t('Žebříčky'), true, 'blue');
+      const sv = this.btn(W - 124, by, 102, bs, () => {
+        sfx.click();
+        void (pg.signedIn ? pgSaveNow() : pgSignIn()).then((ok) => {
+          if (pg.signedIn && ok) this.banner(this.views[0].cam, t('Uloženo v cloudu Google Play'));
+          else if (!ok) this.banner(this.views[0].cam, t('Google Play Hry teď nejdou – zkus to později'));
+          if (this.tab === 'opts') this.openShop('opts', false);
+        });
+      }, D + 2);
+      this.drawBtn(sv, pg.signedIn ? t('Uložit') : t('Přihlásit'), true, 'green');
+      this.shopObjs.push(lb.bg, lb.label, lb.zone, sv.bg, sv.label, sv.zone);
+    } else {
       const y = y0 + vols.length * RH;
       this.row(y, RH, D, t('Záloha hry'), t('přenos mezi webem a složkou'), 'ink', PAL.bone, Math.min(RH < 70 ? 240 : 300, W - 232 - 34));
       const bs = Math.min(60, RH - 14), by = y + (RH - 8 - bs) / 2;

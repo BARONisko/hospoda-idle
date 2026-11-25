@@ -1593,5 +1593,22 @@
  "Hospoda mezitím vydělávala – kasa je plná a čekají nové úkoly.": "酒馆一直在赚钱——钱箱满了，新任务也在等你。",
  "Hospoda bez hostinského chátrá": "没有老板，酒馆快撑不住了",
  "Vrať se pro výdělek a denní truhlu – číšníci to sami dlouho neutáhnou.": "回来领取收入和每日宝箱——服务员们撑不了多久。",
- "úr. {n}": "等级 {n}"
+ "úr. {n}": "等级 {n}",
+ "Krígly {k} · hostinský úr. {l}": "酒杯 {k} · 老板 {l}级",
+ "Uložená hra v cloudu": "云端存档",
+ "V Google Play je hra s větším postupem.\nCloud: {k1} krígel, hostinský úr. {l1}{w}\nTento telefon: {k2} krígel, hostinský úr. {l2}": "Google Play 上有进度更高的存档。\n云端：{k1} 个酒杯，老板 {l1}级{w}\n本机：{k2} 个酒杯，老板 {l2}级",
+ "uloženo {t}": "保存于 {t}",
+ "Hra, kterou nevybereš, se přepíše.": "未选择的存档将被覆盖。",
+ "Načíst z cloudu": "从云端读取",
+ "Hrát tuto": "玩这个",
+ "Hra načtená z cloudu Google Play": "已从 Google Play 云端读取游戏",
+ "Google Play Hry teď nejdou – zkus to později": "Google Play 游戏暂不可用，请稍后再试",
+ "Žebříčky": "排行榜",
+ "Google Play Hry": "Google Play 游戏",
+ "nepřihlášeno – žebříčky a cloud": "未登录 – 排行榜和云端",
+ "cloud: ukládá se samo": "云端：自动保存",
+ "cloud: uloženo před {n} min": "云端：{n} 分钟前已保存",
+ "Uloženo v cloudu Google Play": "已保存到 Google Play 云端",
+ "Přihlásit": "登录",
+ "Žebříček Chrámu": "神殿排行榜"
 }

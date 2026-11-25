@@ -1593,5 +1593,22 @@
  "Hospoda mezitím vydělávala – kasa je plná a čekají nové úkoly.": "Knajpa dalej zarabiała – kasa jest pełna, a nowe zadania czekają.",
  "Hospoda bez hostinského chátrá": "Knajpa bez gospodarza podupada",
  "Vrať se pro výdělek a denní truhlu – číšníci to sami dlouho neutáhnou.": "Wróć po zarobek i dzienną skrzynię – kelnerzy długo sami nie dadzą rady.",
- "úr. {n}": "Poz. {n}"
+ "úr. {n}": "Poz. {n}",
+ "Krígly {k} · hostinský úr. {l}": "Kufle {k} · karczmarz poz. {l}",
+ "Uložená hra v cloudu": "Zapis w chmurze",
+ "V Google Play je hra s větším postupem.\nCloud: {k1} krígel, hostinský úr. {l1}{w}\nTento telefon: {k2} krígel, hostinský úr. {l2}": "W Google Play jest zapis z większym postępem.\nChmura: {k1} kufli, karczmarz poz. {l1}{w}\nTen telefon: {k2} kufli, karczmarz poz. {l2}",
+ "uloženo {t}": "zapisano {t}",
+ "Hra, kterou nevybereš, se přepíše.": "Niewybrany zapis zostanie nadpisany.",
+ "Načíst z cloudu": "Wczytaj z chmury",
+ "Hrát tuto": "Graj w ten",
+ "Hra načtená z cloudu Google Play": "Gra wczytana z chmury Google Play",
+ "Google Play Hry teď nejdou – zkus to později": "Gry Google Play niedostępne – spróbuj później",
+ "Žebříčky": "Rankingi",
+ "Google Play Hry": "Gry Google Play",
+ "nepřihlášeno – žebříčky a cloud": "niezalogowano – rankingi i chmura",
+ "cloud: ukládá se samo": "chmura: zapisuje się sama",
+ "cloud: uloženo před {n} min": "chmura: zapisano {n} min temu",
+ "Uloženo v cloudu Google Play": "Zapisano w chmurze Google Play",
+ "Přihlásit": "Zaloguj",
+ "Žebříček Chrámu": "Ranking Świątyni"
 }

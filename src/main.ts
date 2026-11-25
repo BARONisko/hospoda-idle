@@ -2,7 +2,8 @@ import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { initAdMob } from './core/admob';
 import { initBilling } from './core/billing';
-import { initBackup } from './core/backup';
+import { initBackup, wasWiped } from './core/backup';
+import { initPlayGames, pg } from './core/playgames';
 import Phaser from 'phaser';
 import '@fontsource/jersey-10/latin-ext-400.css';
 import '@fontsource/jersey-10/latin-400.css';
@@ -113,6 +114,8 @@ guard(Phaser.Game.prototype, 'step');
 // Mobil na výšku: logické rozlišení 540×960 (9:16), roztažení na displej se zachováním poměru.
 // mobilní aplikace: po přeinstalaci / na novém telefonu obnovit hru ze zálohy Androidu – dřív, než se hra načte
 await initBackup();
+// Google Play Hry: porovnat hru s cloudem (načíst / zeptat se) ještě před startem hry
+await initPlayGames(wasWiped);
 const game = new Phaser.Game({
   type: Phaser.WEBGL,
   parent: 'game',
@@ -181,6 +184,17 @@ onSaveIssue((k) => {
   el.onclick = () => (k === 'tab' ? location.reload() : el.remove());
   document.body.appendChild(el);
 });
+
+// hra se při startu načetla z cloudu Google Play → krátký pruh nahoře
+if (pg.restored) {
+  const el = document.createElement('div');
+  el.style.cssText =
+    'position:fixed;left:0;right:0;top:env(safe-area-inset-top);z-index:98;background:#7ac25a;color:#2e222f;font:bold 15px/1.35 Arial,sans-serif;padding:10px 12px;text-align:center';
+  el.textContent = t('Hra načtená z cloudu Google Play');
+  el.onclick = () => el.remove();
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 6000);
+}
 
 // mobilní aplikace: reklamy za odměnu (AdMob)
 void initAdMob();

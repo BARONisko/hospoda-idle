@@ -1593,5 +1593,22 @@
  "Hospoda mezitím vydělávala – kasa je plná a čekají nové úkoly.": "Meyhane kazanmaya devam etti – kasa dolu ve yeni görevler bekliyor.",
  "Hospoda bez hostinského chátrá": "Sahibi olmayan meyhane dağılıyor",
  "Vrať se pro výdělek a denní truhlu – číšníci to sami dlouho neutáhnou.": "Kazancın ve günlük sandık için geri dön – garsonlar tek başına uzun dayanamaz.",
- "úr. {n}": "Sv. {n}"
+ "úr. {n}": "Sv. {n}",
+ "Krígly {k} · hostinský úr. {l}": "Kupalar {k} · meyhaneci sv. {l}",
+ "Uložená hra v cloudu": "Bulut kaydı",
+ "V Google Play je hra s větším postupem.\nCloud: {k1} krígel, hostinský úr. {l1}{w}\nTento telefon: {k2} krígel, hostinský úr. {l2}": "Google Play'de daha ilerlemiş bir kayıt var.\nBulut: {k1} maşrapa, meyhaneci sv. {l1}{w}\nBu telefon: {k2} maşrapa, meyhaneci sv. {l2}",
+ "uloženo {t}": "kaydedildi {t}",
+ "Hra, kterou nevybereš, se přepíše.": "Seçmediğin kayıt üzerine yazılır.",
+ "Načíst z cloudu": "Buluttan yükle",
+ "Hrát tuto": "Bununla oyna",
+ "Hra načtená z cloudu Google Play": "Oyun Google Play bulutundan yüklendi",
+ "Google Play Hry teď nejdou – zkus to později": "Google Play Oyunlar şu an kullanılamıyor – sonra tekrar dene",
+ "Žebříčky": "Sıralamalar",
+ "Google Play Hry": "Google Play Oyunlar",
+ "nepřihlášeno – žebříčky a cloud": "giriş yok – sıralamalar ve bulut",
+ "cloud: ukládá se samo": "bulut: kendiliğinden kaydeder",
+ "cloud: uloženo před {n} min": "bulut: {n} dk önce kaydedildi",
+ "Uloženo v cloudu Google Play": "Google Play bulutuna kaydedildi",
+ "Přihlásit": "Giriş yap",
+ "Žebříček Chrámu": "Tapınak sıralaması"
 }

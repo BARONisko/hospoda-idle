@@ -1593,5 +1593,22 @@
  "Hospoda mezitím vydělávala – kasa je plná a čekají nové úkoly.": "O bar continuou faturando – o caixa está cheio e novas tarefas esperam.",
  "Hospoda bez hostinského chátrá": "O bar está desmoronando sem o dono",
  "Vrať se pro výdělek a denní truhlu – číšníci to sami dlouho neutáhnou.": "Volte para pegar seus ganhos e o baú diário – os garçons não aguentam sozinhos por muito tempo.",
- "úr. {n}": "Nv. {n}"
+ "úr. {n}": "Nv. {n}",
+ "Krígly {k} · hostinský úr. {l}": "Canecas {k} · taberneiro nv. {l}",
+ "Uložená hra v cloudu": "Jogo salvo na nuvem",
+ "V Google Play je hra s větším postupem.\nCloud: {k1} krígel, hostinský úr. {l1}{w}\nTento telefon: {k2} krígel, hostinský úr. {l2}": "O Google Play tem um jogo salvo com mais progresso.\nNuvem: {k1} canecas, taberneiro nv. {l1}{w}\nEste celular: {k2} canecas, taberneiro nv. {l2}",
+ "uloženo {t}": "salvo {t}",
+ "Hra, kterou nevybereš, se přepíše.": "O jogo que você não escolher será substituído.",
+ "Načíst z cloudu": "Carregar da nuvem",
+ "Hrát tuto": "Jogar este",
+ "Hra načtená z cloudu Google Play": "Jogo carregado da nuvem do Google Play",
+ "Google Play Hry teď nejdou – zkus to později": "Google Play Games indisponível – tente mais tarde",
+ "Žebříčky": "Placares",
+ "Google Play Hry": "Google Play Games",
+ "nepřihlášeno – žebříčky a cloud": "sem login – placares e nuvem",
+ "cloud: ukládá se samo": "nuvem: salva sozinho",
+ "cloud: uloženo před {n} min": "nuvem: salvo há {n} min",
+ "Uloženo v cloudu Google Play": "Salvo na nuvem do Google Play",
+ "Přihlásit": "Entrar",
+ "Žebříček Chrámu": "Placar do Templo"
 }

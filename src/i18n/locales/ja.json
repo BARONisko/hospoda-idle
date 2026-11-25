@@ -1593,5 +1593,22 @@
  "Hospoda mezitím vydělávala – kasa je plná a čekají nové úkoly.": "酒場は稼ぎ続けていました。レジは満杯、新しいタスクも待っています。",
  "Hospoda bez hostinského chátrá": "店主のいない酒場が荒れてきています",
  "Vrať se pro výdělek a denní truhlu – číšníci to sami dlouho neutáhnou.": "稼ぎとデイリー宝箱を受け取りに戻ろう。ウェイターだけでは長く持ちません。",
- "úr. {n}": "Lv.{n}"
+ "úr. {n}": "Lv.{n}",
+ "Krígly {k} · hostinský úr. {l}": "ジョッキ {k} · 店主Lv.{l}",
+ "Uložená hra v cloudu": "クラウドのセーブ",
+ "V Google Play je hra s větším postupem.\nCloud: {k1} krígel, hostinský úr. {l1}{w}\nTento telefon: {k2} krígel, hostinský úr. {l2}": "Google Play にもっと進んだセーブがあります。\nクラウド: ジョッキ {k1}、店主Lv.{l1}{w}\nこのスマホ: ジョッキ {k2}、店主Lv.{l2}",
+ "uloženo {t}": "保存 {t}",
+ "Hra, kterou nevybereš, se přepíše.": "選ばなかったセーブは上書きされます。",
+ "Načíst z cloudu": "クラウドから読み込む",
+ "Hrát tuto": "こちらで遊ぶ",
+ "Hra načtená z cloudu Google Play": "Google Play クラウドから読み込みました",
+ "Google Play Hry teď nejdou – zkus to později": "Google Play ゲームに接続できません。後でもう一度お試しください",
+ "Žebříčky": "ランキング",
+ "Google Play Hry": "Google Play ゲーム",
+ "nepřihlášeno – žebříčky a cloud": "未ログイン – ランキングとクラウド",
+ "cloud: ukládá se samo": "クラウド: 自動保存",
+ "cloud: uloženo před {n} min": "クラウド: {n}分前に保存",
+ "Uloženo v cloudu Google Play": "Google Play クラウドに保存しました",
+ "Přihlásit": "ログイン",
+ "Žebříček Chrámu": "神殿ランキング"
 }

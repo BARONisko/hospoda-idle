@@ -264,9 +264,21 @@ export function load(): Save {
 export const SAVE_KEY = KEY;
 export const WIPED_KEY = 'pubidle_wiped';
 /** zrcadlo uložení (mobilní aplikace: úložiště, které Android zálohuje) – nastaví core/backup.ts; now = hned (odchod ze hry) */
-let mirror: ((raw: string, now: boolean) => void) | undefined;
+const mirrors: ((raw: string, now: boolean) => void)[] = [];
 export function setMirror(fn: (raw: string, now: boolean) => void) {
-  mirror = fn;
+  mirrors.push(fn);
+}
+/** další odběratel uložení (core/playgames.ts – cloud Google Play) */
+export const addMirror = setMirror;
+
+/** Hra z cloudu (core/playgames.ts): přepíše uložení v telefonu a dál nic neukládá (hra se načte znovu / teprve startuje). */
+export function replaceSave(raw: string, lock = false) {
+  if (lock) locked = true;
+  try {
+    localStorage.setItem(KEY, raw);
+  } catch {
+    /* plné úložiště */
+  }
 }
 
 export function store(d: Save, flush = false) {
@@ -281,7 +293,7 @@ export function store(d: Save, flush = false) {
     localStorage.setItem(KEY, raw);
     if (localStorage.getItem(OWNER) !== TAB) localStorage.setItem(OWNER, TAB);
     fullWarned = false;
-    mirror?.(raw, flush);
+    for (const m of mirrors) m(raw, flush);
   } catch {
     // plné nebo zakázané úložiště – hráči to říct (jednou, dokud se zas nepovede uložit)
     if (!fullWarned) issue('full');

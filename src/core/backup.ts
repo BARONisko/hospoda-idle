@@ -8,12 +8,15 @@ import { setMirror, SAVE_KEY, WIPED_KEY } from './save';
 
 const BK = 'pubidle_save';
 let last = 0;
+/** hráč dal „Začít znovu“ (pro core/playgames.ts: cloud přepsat bez ptaní) */
+export let wasWiped = false;
 
 /** Zavolat před startem hry: obnoví hru ze zálohy (když v telefonu žádná není) a zapne zrcadlení. */
 export async function initBackup(): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
   try {
     if (localStorage.getItem(WIPED_KEY)) {
+      wasWiped = true;
       // hráč dal „Začít znovu“ → zálohu zahodit, ať se smazaná hra nevrátí
       await Preferences.remove({ key: BK });
       localStorage.removeItem(WIPED_KEY);

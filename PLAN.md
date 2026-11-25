@@ -513,3 +513,9 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Posudek před vydáním (25. 11.): upozornění na neotevřenou denní truhlu (týž den za 3 h, nejpozději 20:00) a návrat po 2 a 5 dnech
   v 18:00 (NOTE.back2/back5). Méně textu na hlavní obrazovce: ?ui=0|a|b|c (návrhy /mnt/project-files/prvni-obrazovka/navrhy-ABC.png),
   výchozí B = bez „ťukni sem!“ po návodu (pulzující zlatý obrys pruhu), bez jmen číšníků, hygiena jen „N %“, cedule stylu bez výhody.
+- Google Play Hry (25. 11. 2026): online žebříčky a uložení v cloudu – src/core/playgames.ts + vlastní nativní plugin
+  android/.../PlayGamesPlugin.java (Play Games Services v2). Žebříčky: krígly celkem, úroveň hostinského, Chrám (chapadla za kolo).
+  Cloud: porovnání podle „celkem vyděláno“, prázdný telefon = načte sám, cloud dál = okno s volbou, „Začít znovu“ cloud přepíše.
+  Tlačítka: Nastavení (řádek Google Play Hry místo Zálohy hry), konec kola v Chrámu, hlavička Menu (návrh C, ?lb=a|b|c).
+  ID z Play Console přes GitHub Variables PG_APP_ID, PG_LB_KRIGLE, PG_LB_LEVEL, PG_LB_TEMPLE (bez nich se vše skryje).
+  Ladění na webu ?pg=1 (předstíraný Google Play), test: node tools/test-playgames.mjs.

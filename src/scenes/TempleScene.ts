@@ -1,4 +1,5 @@
 import { GEMS_FREE } from '../core/special';
+import { pg, submit as pgSubmit, showBoards } from '../core/playgames';
 // Chrám v potopeném R'lyeh – víkendový boss. Akční: ťukání do Cthulhu, swipe seká chapadla, inkoust se stírá,
 // hlubinní lezou na molo. Oltář má svíce (životy kola). Kultisté (max 2) po stranách sekají chapadla sami.
 import Phaser from 'phaser';
@@ -749,6 +750,8 @@ export class TempleScene extends Phaser.Scene {
     this.endFightObjs();
     this.clearUi();
     this.T.best = Math.max(this.T.best ?? 0, this.gotTen);
+    // online žebříček Chrámu (Google Play si nechá nejlepší kolo dne / týdne / vůbec)
+    pgSubmit('temple', this.gotTen);
     this.host.templeSave();
     sfx.fanfare();
     this.topBar(why);
@@ -762,6 +765,7 @@ export class TempleScene extends Phaser.Scene {
     const pend = this.T.pend?.length ?? 0;
     if (pend) this.button(W / 2 - 160, 560, 320, 70, t('Otevřít truhly ({n})', { n: pend }), 'amber', true, () => this.openChests());
     else this.button(W / 2 - 130, 560, 260, 70, t('Pokračovat'), 'green', true, () => this.lobby());
+    if (pg.available && pg.boards.includes('temple')) this.button(W / 2 - 150, 668, 300, 62, t('Žebříček Chrámu'), 'blue', true, () => void showBoards('temple'));
   }
 
   /** otevírání truhel: truhla se natřese, otevře a odměna z ní vyskočí (chapadla vždy, k tomu něco navíc) */

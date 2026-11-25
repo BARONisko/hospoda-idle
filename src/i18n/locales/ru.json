@@ -1593,5 +1593,22 @@
  "Hospoda mezitím vydělávala – kasa je plná a čekají nové úkoly.": "Трактир продолжал зарабатывать – касса полна, ждут новые задания.",
  "Hospoda bez hostinského chátrá": "Без хозяина трактир приходит в упадок",
  "Vrať se pro výdělek a denní truhlu – číšníci to sami dlouho neutáhnou.": "Вернись за выручкой и ежедневным сундуком – официанты долго одни не справятся.",
- "úr. {n}": "Ур. {n}"
+ "úr. {n}": "Ур. {n}",
+ "Krígly {k} · hostinský úr. {l}": "Кружки {k} · трактирщик ур. {l}",
+ "Uložená hra v cloudu": "Сохранение в облаке",
+ "V Google Play je hra s větším postupem.\nCloud: {k1} krígel, hostinský úr. {l1}{w}\nTento telefon: {k2} krígel, hostinský úr. {l2}": "В Google Play есть сохранение с бо́льшим прогрессом.\nОблако: {k1} кружек, трактирщик ур. {l1}{w}\nЭтот телефон: {k2} кружек, трактирщик ур. {l2}",
+ "uloženo {t}": "сохранено {t}",
+ "Hra, kterou nevybereš, se přepíše.": "Невыбранное сохранение будет перезаписано.",
+ "Načíst z cloudu": "Загрузить из облака",
+ "Hrát tuto": "Играть в это",
+ "Hra načtená z cloudu Google Play": "Игра загружена из облака Google Play",
+ "Google Play Hry teď nejdou – zkus to později": "Google Play Игры недоступны – попробуй позже",
+ "Žebříčky": "Рейтинги",
+ "Google Play Hry": "Google Play Игры",
+ "nepřihlášeno – žebříčky a cloud": "нет входа – рейтинги и облако",
+ "cloud: ukládá se samo": "облако: сохраняется само",
+ "cloud: uloženo před {n} min": "облако: сохранено {n} мин назад",
+ "Uloženo v cloudu Google Play": "Сохранено в облаке Google Play",
+ "Přihlásit": "Войти",
+ "Žebříček Chrámu": "Рейтинг Храма"
 }
