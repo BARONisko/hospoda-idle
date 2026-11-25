@@ -2495,7 +2495,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   private tasksTab(y0: number, D: number) {
     const RH = 80;
-    const head = (y: number, s: string) => this.shopObjs.push(this.add.text(20, y, s, txt(24, PAL.gold)).setDepth(D + 1));
+    const head = (y: number, s: string) => this.shopObjs.push(this.add.text(20, y, s, txt(24, PAL.gold)).setWordWrapWidth(500).setDepth(D + 1));
     // úkol od hostinského je jen v liště nad hospodou (přání uživatele: v záložce Úkoly ho nechce)
     // týdenní výzva
     {
