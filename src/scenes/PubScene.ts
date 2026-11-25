@@ -12,7 +12,7 @@ import { confetti, rays, bigText, coinFountain, popText, punch, flashRect } from
 import { big, dur } from '../core/num';
 import { WAITERS, WAITER_MAX, BAR_CAP, crew, tripTime, smileBonus, hireCost as wHireCost, UP_MAX as W_UP_MAX, freePoints, xpProgress, xpFor, spent as wSpent, earned as wEarned, MAX_POINTS, upName as wUpName, waiterLvl, waiterRate, tray, SMILE_STEP, START_CREW, beersPerCycle, type WaiterUp } from '../core/waiters';
 import { milestoneCount } from '../core/economy';
-import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, setCthOld, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H, STYLES, pubStyle, styleGap, styleCount, hasStyle, isStyle, pubStyles, styleSupplyMult, supplyIn, supplyOut, STYLE_MIX, STAR_LVL, STAR_MAX, starsOf, starMult, starCost, starKey, ACT_STEP, MENU_EARN } from '../core/economy';
+import { STATIONS, STATIONS5, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, setCthOld, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H, STYLES, pubStyle, styleGap, styleCount, hasStyle, isStyle, pubStyles, styleSupplyMult, supplyIn, supplyOut, STYLE_MIX, STAR_LVL, STAR_MAX, starsOf, starMult, starCost, starKey, ACT_STEP, MENU_EARN } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { iap, ProductId, PRODUCTS, onIapReady } from '../core/shop';
@@ -52,6 +52,7 @@ const STAFF_LABEL: Record<string, [string, string, string]> = {
   kitchen: [t('Kuchař'), t('kuchař'), t('Kuchař nastoupil!')],
   cellar: [t('Sklepník'), t('sklepník'), t('Sklepník nastoupil!')],
   dice: [t('Kostlivec'), t('kostlivec'), t('Kostlivec nastoupil!')],
+  pool: [t('Markér'), t('markér'), t('Markér nastoupil!')],
 };
 const H = 960;
 const T = 16;
@@ -84,15 +85,21 @@ const SBAR = 46;
 /** výhled hospody (1 hospoda; u 2–3 hospod včetně záložek) a výška záložek hospod (2–3 hospody) */
 /** výška 444 = celá místnost (14 dlaždic) při přiblížení „celá šířka místnosti“ (přání uživatele: všechny tři stoly
  *  celé, nic uříznutého po stranách) – zbytek místa dostanou dlaždice stanic */
-const VIEW_H = 444;
+let VIEW_H = 444;
 const TABH = 56;
 /** spodní okraj hospody = horní okraj dlaždic stanic */
-const PUB_BOT = TOP + VIEW_H;
+let PUB_BOT = TOP + VIEW_H;
 /** dlaždice stanic 2×2 (návrh B) */
 const TILE_PAD = 10;
 const TILE_GAP = 8;
 const TILE_W = (W - 2 * TILE_PAD - TILE_GAP) / 2;
 const TILE_H = Math.floor((960 - NAV_H - PUB_BOT - 18 - TILE_GAP) / 2);
+/** pátá stanice (★2 Rekonstrukce, varianta A): úzká karta přes celou šířku pod mřížkou 2×2, hospoda o tolik nižší */
+const NARROW_H = 72;
+const setLayout = (five: boolean) => {
+  VIEW_H = five ? 444 - NARROW_H - TILE_GAP : 444;
+  PUB_BOT = TOP + VIEW_H;
+};
 /** horní řádek přes hospodu: pilulka úkolu a hygieny */
 const PILL_H = 46;
 /** kulatá tlačítka číšníků vlevo dole v hospodě: střed k-tého, poloměr */
@@ -248,6 +255,8 @@ interface Card {
   adG: Phaser.GameObjects.Graphics;
   adT: Phaser.GameObjects.Text;
   adZ: Phaser.GameObjects.Zone;
+  /** úzká karta páté stanice (varianta A) */
+  narrow?: boolean;
 }
 
 /**
@@ -285,6 +294,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   static iapHooked = false;
   create() {
     this.d = load();
+    setLayout((this.d.reko?.star ?? 0) >= 2);
     PubScene.cur = this;
     if (!PubScene.iapHooked) {
       PubScene.iapHooked = true;
@@ -991,7 +1001,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const sub = (act: number, x: string) => (many ? PUB_NAMES[act] + ' · ' + x : x);
     const acts = this.d.pubs.map((p) => p.act as number);
     const ups: Offer[] = this.d.pubs.flatMap((p) =>
-      STATIONS.filter((d) => (p.st[d.id]?.lvl ?? 0) > 0).map((d) => upDef(p.act, d.id, upTiers(this.d.up, p.act, d.id) + 1)),
+      this.stations().filter((d) => (p.st[d.id]?.lvl ?? 0) > 0).map((d) => upDef(p.act, d.id, upTiers(this.d.up, p.act, d.id) + 1)),
     ).map((u) => ({
         title: t('{s} ×{m}', { s: STATION_NAMES[u.act][u.station], m: u.mult }),
         sub: sub(u.act, t('stupeň {n}', { n: u.tier })),
@@ -4030,7 +4040,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (this.claimable()) return { text: t('Máš splněný úkol – vyzvedni odměnu v Úkolech.'), go: open('tasks') };
     const now = Date.now();
     if (p.mgr && !this.boosted(p) && (p.boostReady ?? 0) <= now) return { text: t('Pusť schopnost manažera „{s}“ – výdělek ×{m}.', { s: MANAGERS[p.act].skill, m: BOOST_MULT }), go: () => this.useSkill(i) };
-    for (const def of STATIONS) {
+    for (const def of this.stations()) {
       const st = p.st[def.id];
       const cost = def.staff * actMult(p.act) * (1 - this.ts().staff);
       if (st && st.lvl > 0 && !st.auto && d.coins >= cost) return { text: def.id === 'tap' ? t('Najmi číšníky na Pípu – pípa pak točí sama a oni roznášejí pivo, i když tu nejsi.') : t('Najmi obsluhu na „{s}“ – pak pracuje sama, i když tu nejsi.', { s: STATION_NAMES[p.act][def.id] }) };
@@ -4047,7 +4057,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (this.tabAlert('temple')) return { text: t('Je víkend – v Chrámu čeká Cthulhu.'), go: () => this.openTemple() };
     // na co šetřit: nejlevnější další úroveň stanice ve vybrané hospodě
     let best: { name: string; cost: number } | null = null;
-    for (const def of STATIONS) {
+    for (const def of this.stations()) {
       const lvl = p.st[def.id]?.lvl ?? 0;
       const cost = Math.ceil(costN(def, lvl, 1) * actMult(p.act) * starCost(this.d.stars, p.act, def.id));
       if (!best || cost < best.cost) best = { name: STATION_NAMES[p.act][def.id], cost };
@@ -4894,34 +4904,37 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   /** obrázek stanice na dlaždici */
-  private static TILE_ICON: Record<string, string> = { tap: 'tap', kitchen: 'stove0', cellar: 'barrel', dice: 'slots' };
+  private static TILE_ICON: Record<string, string> = { tap: 'tap', kitchen: 'stove0', cellar: 'barrel', dice: 'slots', pool: 'pool' };
   /** svislé rozložení dlaždice: název, úroveň, tečky mistrovství, pruh, tlačítko */
   private static TL = { name: 7, lvl: 40, dots: 67, bar: 79, barH: 14, btn: 103, btnH: 56 };
+  /** úzká karta páté stanice: název a úroveň vlevo, pruh pod nimi, tlačítka vpravo */
+  private static TLN = { name: 4, lvl: 30, dots: 0, bar: 54, barH: 10, btn: 8, btnH: 56 };
+  private static NBTN = 250;
 
   /** stanice jako dlaždice 2×2 pod hospodou (návrh B): obrázek, název, úroveň, pruh postupu, velké tlačítko +1 */
   private addCards(pubIdx: number, depth = 10) {
-    const L = PubScene.TL;
-    STATIONS.forEach((def, i) => {
-      const x = TILE_PAD + (i % 2) * (TILE_W + TILE_GAP), y = PUB_BOT + 9 + Math.floor(i / 2) * (TILE_H + TILE_GAP);
-      const w = TILE_W, h = TILE_H;
+    this.stations().forEach((def, i) => {
+      const narrow = i >= 4, L = narrow ? PubScene.TLN : PubScene.TL;
+      const x = TILE_PAD + (narrow ? 0 : (i % 2) * (TILE_W + TILE_GAP)), y = PUB_BOT + 9 + Math.floor(i / 2) * (TILE_H + TILE_GAP);
+      const w = narrow ? W - 2 * TILE_PAD : TILE_W, h = narrow ? NARROW_H : TILE_H;
       const box = this.add.graphics().setDepth(depth);
       box.fillStyle(col('dusk')).fillRoundedRect(x, y, w, h, 12);
-      const icon = this.add.image(x + 34, y + 40, 'obj', PubScene.TILE_ICON[def.id]).setDepth(depth);
-      icon.setScale(Math.min(3, 50 / icon.width, 62 / icon.height));
-      const name = this.add.text(x + 64, y + L.name, '', txt(30, PAL.bone)).setDepth(depth);
+      const icon = this.add.image(x + 34, y + (narrow ? h / 2 : 40), 'obj', PubScene.TILE_ICON[def.id]).setDepth(depth);
+      icon.setScale(Math.min(3, 50 / icon.width, (narrow ? 50 : 62) / icon.height));
+      const name = this.add.text(x + 64, y + L.name, '', txt(narrow ? 24 : 30, PAL.bone)).setDepth(depth);
       const lvl = this.add.text(x + 64, y + L.lvl, '', txt(21, PAL.fog)).setDepth(depth);
       const bar = this.add.graphics().setDepth(depth);
-      const info = this.add.text(x + w / 2, y + L.bar + L.barH / 2, '', txt(18, PAL.white)).setOrigin(0.5).setDepth(depth + 1);
+      const info = this.add.text(narrow ? x + 64 + (w - 64 - PubScene.NBTN - 20) / 2 : x + w / 2, y + L.bar + L.barH / 2, '', txt(18, PAL.white)).setOrigin(0.5).setDepth(depth + 1);
       const tag = this.add.text(x, y, '', txt(15, PAL.sand)).setOrigin(0, 0.5).setDepth(depth + 1).setVisible(false);
       // ťuknutím na dlaždici (nad tlačítkem) se ručně spustí cyklus (dokud stanice nemá obsluhu)
-      const tapZone = this.add.zone(x, y, w, L.btn - 6).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(depth);
+      const tapZone = this.add.zone(x, y, narrow ? w - PubScene.NBTN - 20 : w, narrow ? h : L.btn - 6).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(depth);
       tapZone.on('pointerdown', () => this.manual(pubIdx, def));
       // karta A (výběr uživatele, docs/navrhy-ui/karta-obsluha-ABC.png): bez obsluhy obsluha a +1 vedle sebe,
       // po najmutí obsluhy se +1 roztáhne přes celou šíři (pozice tlačítka +1 se nastavuje v refresh)
-      const bw = w - 20;
-      const buy = this.btn(x + 10, y + L.btn, bw, L.btnH, () => this.buy(pubIdx, def), depth);
+      const bw = narrow ? PubScene.NBTN : w - 20, bx0 = narrow ? x + w - 10 - bw : x + 10;
+      const buy = this.btn(bx0, y + L.btn, bw, L.btnH, () => this.buy(pubIdx, def), depth);
       buy.denied = () => this.coinVidChip(buy, this.offer(this.d.pubs[pubIdx], def).price);
-      const staff = this.btn(x + 10, y + L.btn, (bw - 8) / 2, L.btnH, () => this.staffTap(pubIdx, def), depth);
+      const staff = this.btn(bx0, y + L.btn, (bw - 8) / 2, L.btnH, () => this.staffTap(pubIdx, def), depth);
       // dva řádky (obsluha + cena) hustěji, ať se vejdou do tlačítka bez zmenšení
       buy.label.setLineSpacing(-5);
       staff.label.setLineSpacing(-5);
@@ -4931,7 +4944,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       // dotykové místo ×2 ≥ 44 CSS px (odznak je menší)
       const adZ = this.add.zone(0, 0, 60, 60).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(depth + 4);
       adZ.on('pointerdown', () => void this.stationAd(pubIdx, def.id));
-      this.cards.push({ tag, pub: pubIdx, def, box, name, lvl, bar, info, buy, staff, tapZone, x, y, w, h, icon, bnum, adG, adT, adZ });
+      this.cards.push({ tag, pub: pubIdx, def, box, name, lvl, bar, info, buy, staff, tapZone, x, y, w, h, icon, bnum, adG, adT, adZ, narrow });
     });
   }
 
@@ -5029,6 +5042,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // popisek se vždy vejde do tlačítka (dlouhé překlady přetékaly do vedlejšího tlačítka)
     const lw = b.label.width, lh = b.label.height;
     if (lw && lh) b.label.setScale(Math.min(1, (b.w - 10) / lw, (b.h - 4) / lh));
+  }
+
+  /** stanice (s pátou po ★2 Rekonstrukci) */
+  private stations() {
+    return (this.d.reko?.star ?? 0) >= 2 ? STATIONS5 : STATIONS;
   }
 
   private st(p: PubState, id: string) {
@@ -5379,7 +5397,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private bonesPerSec(autoOnly = false) {
     let r = 0;
     for (const p of this.d.pubs)
-      for (const def of STATIONS) {
+      for (const def of this.stations()) {
         const s = p.st[def.id];
         if (!s || s.lvl === 0 || (autoOnly && !s.auto)) continue;
         r += (bonesFor(s.lvl) / this.cyc(def)) * (!autoOnly && this.boosted(p) ? BOOST_MULT : 1);
@@ -5604,7 +5622,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   private rate(p: PubState) {
     let r = 0;
-    for (const def of STATIONS) {
+    for (const def of this.stations()) {
       const s = p.st[def.id];
       if (!s?.auto) continue;
       // pípa: vydělá jen to, co číšníci stihnou roznést (+ jejich spropitné)
@@ -5877,7 +5895,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.coinT -= dt;
     this.d.pubs.forEach((p, i) => {
       let open = 0;
-      for (const def of STATIONS) {
+      for (const def of this.stations()) {
         const s = p.st[def.id];
         if (!s || s.lvl === 0) continue;
         open++;
@@ -6786,10 +6804,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     for (const r of this.shopRows) this.drawBtn(r.b, big(r.o.cost), this.d.coins >= r.o.cost, 'green');
     for (const r of this.decorRows) this.drawBtn(r.b, big(r.cost), this.d.coins >= r.cost, 'amber');
 
-    const L = PubScene.TL;
     // velikost písma měnit jen při změně (setFontSize text pokaždé znovu vykreslí)
     const fs = (o: Phaser.GameObjects.Text, n: number) => o.style.fontSize !== `${n}px` && o.setFontSize(n);
     for (const c of this.cards) {
+      const L = c.narrow ? PubScene.TLN : PubScene.TL;
       const p = this.d.pubs[c.pub];
       const s = this.st(p, c.def.id);
       const open = s.lvl > 0;
@@ -6799,7 +6817,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       c.icon.setAlpha(open ? 1 : 0.45);
       c.name.setText(STATION_NAMES[p.act][c.def.id]).setAlpha(open ? 1 : 0.55);
       c.lvl.setText(open ? t('úroveň {n}', { n: s.lvl }) : t('zavřeno'));
-      c.lvl.setScale(Math.min(1, (w - 74) / Math.max(1, c.lvl.width)));
+      c.lvl.setScale(Math.min(1, (w - 74 - (c.narrow ? PubScene.NBTN + 20 : 0)) / Math.max(1, c.lvl.width)));
       c.info.setText('');
       const sl = STAFF_LABEL[c.def.id];
       // plný bar / čekající talíře: místo prázdného místa tlačítko, které číšníkům pomůže (najme dalšího / otevře body)
@@ -6808,14 +6826,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const fix = Date.now() - (c.jamAt ?? 0) < 5000 ? this.waiterFix(c.pub) : null;
       const half = (open && !s.auto) || !!fix;
       // tlačítko +1: přes celou šíři dlaždice, bez obsluhy vpravo vedle tlačítka obsluhy (to je vlevo)
-      const full = w - 20, hw = (full - 8) / 2;
+      const full = c.narrow ? PubScene.NBTN : w - 20, hw = (full - 8) / 2, bx0 = c.narrow ? x + w - 10 - full : x + 10;
       if (c.buy.w !== (half ? hw : full)) {
-        c.buy.x = half ? x + 10 + hw + 8 : x + 10;
+        c.buy.x = half ? bx0 + hw + 8 : bx0;
         c.buy.w = half ? hw : full;
         c.buy.zone.setPosition(c.buy.x, c.buy.y).setSize(c.buy.w, c.buy.h);
         c.buy.label.setX(c.buy.x + c.buy.w / 2);
       }
-      fs(c.buy.label, half ? 22 : 30);
+      fs(c.buy.label, half ? 22 : c.narrow ? 24 : 30);
       // přes celou šíři na jeden řádek („+1 · 1.8K“, „Otevřít · 60“), v půlce na dva
       const one = (s2: string) => (half ? s2 : s2.replace('\n', ' · '));
       this.drawBtn(c.buy, open ? one(`+${n}\n${big(price)}`) : one(t('Otevřít\n{n}', { n: big(price) })), this.d.coins >= price, 'green');
@@ -6842,10 +6860,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const stars = starsOf(this.d.stars, p.act, c.def.id);
       // ×2 za reklamu (návrh B): kulatý odznak v pravém horním rohu dlaždice; běží → červený s odpočtem
       const adLeft = (p.adx?.[c.def.id] ?? 0) - Date.now();
-      const adShow = open && !this.night && (adLeft > 0 || this.canReward());
+      const adShow = open && !c.narrow && !this.night && (adLeft > 0 || this.canReward());
       // název se vejde vedle odznaku ×2
       c.name.setScale(1);
-      c.name.setScale(Math.min(1, (w - 64 - 8 - (adShow ? 44 : 0)) / Math.max(1, c.name.width)));
+      c.name.setScale(Math.min(1, (w - 64 - 8 - (adShow ? 44 : 0) - (c.narrow ? PubScene.NBTN + 20 : 0)) / Math.max(1, c.name.width)));
       c.tag.setVisible(stars > 0);
       if (stars > 0) {
         // rámeček podle počtu hvězd: bronz, stříbro, zlato, diamant, purpur
@@ -6868,12 +6886,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         fs(c.adT, adLeft > 0 ? 15 : 20);
         c.adZ.setPosition(ax, ay);
       }
-      const bx = x + 10, bw = w - 20, by = y + L.bar;
+      const bx = c.narrow ? x + 64 : x + 10, bw = c.narrow ? w - 64 - PubScene.NBTN - 30 : w - 20, by = y + L.bar;
       c.bar.fillStyle(col('ink')).fillRoundedRect(bx, by, bw, L.barH, 6);
       if (open && s.prog > 0) c.bar.fillStyle(col(s.auto ? 'mint' : 'amber')).fillRoundedRect(bx, by, Math.max(12, bw * Math.min(1, s.prog)), L.barH, 6);
       if (open && !s.auto && s.prog === 0) {
         c.info.setText(t('ťukni sem!')).setColor(PAL.gold);
-        fs(c.info, 26);
+        fs(c.info, c.narrow ? 18 : 26);
       } else fs(c.info, 18);
       c.info.setScale(1);
       c.info.setScale(Math.min(1, (bw - 4) / Math.max(1, c.info.width)));

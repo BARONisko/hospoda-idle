@@ -507,4 +507,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   řádek v Úkolech → okno Knihy. Splněný úkol = kousek v hospodě (★1 nové kresby rk*, ★2–★5 zatím stávající kresby).
 - Rekonstrukce = hygiena navíc po celé kapitole, dá hvězdu: ★1 nový vzhled Pajzlu (návrhy A/B/C, snímek
   /mnt/project-files/navrhy-vyber/rekonstrukce-vzhled-ABC.png, zatím A), ★4 kasa +2 h, ★5 zlatý štít. Krígly nemaže.
-- Čeká: Petrův výběr vzhledu, ★2 pátá stanice (varianta A), vlastní kresby pro ★2–★5.
+- ★2 pátá stanice hotová (varianta A): Kulečník / Krvavý kulečník / Žabí kuželky / Kulečník hlubin (POOL v economy.ts,
+  úzká karta pod mřížkou, hospoda o 80 px nižší, stůl v hospodě). Není ve stylech, hvězdách stanic ani mistrovství.
+- Čeká: Petrův výběr vzhledu, vlastní kresby pro ★2–★5.

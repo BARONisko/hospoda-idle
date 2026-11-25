@@ -24,13 +24,16 @@ export const STATIONS: StationDef[] = [
   { id: 'cellar', name: t('Sklep se sudy'), base: 720, growth: 1.14, income: 70, cycle: 9, staff: 40000 },
   { id: 'dice', name: t('Kostky v rohu'), base: 8640, growth: 1.13, income: 600, cycle: 20, staff: 500000 },
 ];
+/** pátá stanice (★2 Rekonstrukce): jen u hráčů s 2 hvězdičkami podniku – nepočítá se do stylů, hvězd ani mistrovství */
+export const POOL: StationDef = { id: 'pool', name: t('Kulečník'), base: 103680, growth: 1.13, income: 1200, cycle: 40, staff: 6e6 };
+export const STATIONS5: StationDef[] = [...STATIONS, POOL];
 
 /** názvy stanic podle hospody (dějství) */
 export const STATION_NAMES: Record<number, Record<string, string>> = {
-  1: { tap: t('Pípa'), kitchen: t('Kuchyně'), cellar: t('Sklep se sudy'), dice: t('Kostky v rohu') },
-  2: { tap: t('Pípa s krví'), kitchen: t('Kotel s guláškem'), cellar: t('Sudomorův sklep'), dice: t('Kostky s kostlivcem') },
-  3: { tap: t('Bahenní pípa'), kitchen: t('Žabí kuchyně'), cellar: t('Studna'), dice: t('Pulčí závody') },
-  4: { tap: t('Pípa z hlubin'), kitchen: t('Obětní kotel'), cellar: t('Potopená kaple'), dice: t('Kostky osudu') },
+  1: { tap: t('Pípa'), kitchen: t('Kuchyně'), cellar: t('Sklep se sudy'), dice: t('Kostky v rohu'), pool: t('Kulečník') },
+  2: { tap: t('Pípa s krví'), kitchen: t('Kotel s guláškem'), cellar: t('Sudomorův sklep'), dice: t('Kostky s kostlivcem'), pool: t('Krvavý kulečník') },
+  3: { tap: t('Bahenní pípa'), kitchen: t('Žabí kuchyně'), cellar: t('Studna'), dice: t('Pulčí závody'), pool: t('Žabí kuželky') },
+  4: { tap: t('Pípa z hlubin'), kitchen: t('Obětní kotel'), cellar: t('Potopená kaple'), dice: t('Kostky osudu'), pool: t('Kulečník hlubin') },
 };
 export const PUB_NAMES: Record<number, string> = { 1: t('Pajzl u Berana'), 2: t('Sklepní krčma'), 3: t('Žabákův podnik'), 4: t('Chrám Cthulhu') };
 /** každá další hospoda vydělává řádově víc (dřív 50×, teď 10× – menší čísla, víc prostoru pro bonusy) */
@@ -171,7 +174,7 @@ export const UPGRADES: UpgradeDef[] = [1, 2, 3, 4].flatMap((act) =>
 
 /** vylepšení libovolného stupně (obchod jde donekonečna: každý stupeň ×3, cena ×1000) */
 export function upDef(act: number, station: string, tier: number): UpgradeDef {
-  const d = STATIONS.find((x) => x.id === station)!;
+  const d = STATIONS5.find((x) => x.id === station)!;
   return { id: `${act}_${station}_${tier}`, act, station, tier, cost: d.staff * 10 * 1000 ** (tier - 1) * actMult(act), mult: 3 };
 }
 

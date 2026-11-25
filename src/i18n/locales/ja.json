@@ -1580,5 +1580,12 @@
  "Rekonstrukce: splň všechny úkoly": "改装：すべてのタスクを達成",
  "Hospody se zavřou jako při hygieně (coins, úrovně a vylepšení od nuly). Krígly, obchod s krígly, číšníci, strom, šipky, talismany, kosti a výzdoba zůstanou.": "衛生検査と同じく酒場が閉まります（coins、レベル、強化はゼロから）。ジョッキ、ジョッキの店、店員、ツリー、ダーツ、お守り、骨、内装は残ります。",
  "Dostaneš: {g}": "もらえるもの：{g}",
- "Rekonstruovat": "改装する"
+ "Rekonstruovat": "改装する",
+ "Kulečník": "ビリヤード",
+ "Krvavý kulečník": "血のビリヤード",
+ "Žabí kuželky": "カエルのボウリング",
+ "Kulečník hlubin": "深淵のビリヤード",
+ "Markér": "マーカー",
+ "markér": "マーカー",
+ "Markér nastoupil!": "マーカーを雇った！"
 }

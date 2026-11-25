@@ -348,6 +348,15 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   }).then((r) => (r !== true && console.log(r), r)) === true);
   await p.waitForTimeout(1500);
   ok('Rekonstrukce: ★1, hygiena proběhla, Pajzl má nový vzhled a další kapitola běží', await S(p, (s) => s.d.reko.star === 1 && s.d.stats.prestiges === 46 && s.views[0].bg.texture.key.startsWith('pubBgReko') && s.qCur()?.id.startsWith('rk:t0')));
+  ok('★2: pátá stanice (úzká karta pod mřížkou), otevře se, vydělává a hospoda je nižší', await S(p, (s) => {
+    s.d.reko.star = 2; localStorage.setItem('pubidle_save_v1', JSON.stringify(s.d)); s.scene.restart(); return true; }));
+  await p.waitForTimeout(1500);
+  ok('★2: karta Kulečník, otevření a výdělek', await S(p, (s) => {
+    const c = s.cards.find((k) => k.def.id === 'pool' && k.pub === 0);
+    s.d.coins = 1e9; s.buy(0, c.def); const opened = s.d.pubs[0].st.pool?.lvl === 1;
+    const r0 = s.rate(s.d.pubs[0]); s.d.pubs[0].st.pool.auto = true; const earns = s.rate(s.d.pubs[0]) > r0;
+    return (c && c.narrow && c.y + c.h <= 960 - 84 && opened && earns && s.views[0].cam.height < 444) || JSON.stringify({ c: !!c, opened, earns });
+  }).then((r) => (r !== true && console.log(r), r)) === true);
   ok('bez chyb v konzoli (Rekonstrukce)', p.errors.length === 0);
   if (p.errors.length) console.log(p.errors);
   await p.close();
