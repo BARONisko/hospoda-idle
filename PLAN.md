@@ -453,3 +453,8 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Zpětná vazba testerů (Testers Community, 25. 11.): žádné pády ani chyby. Do Nastavení přibyl poslední řádek se třemi tlačítky:
   v aplikaci Ohodnotit (Obchod Play) / Sdílet (@capacitor/share) / Soukromí (zásady), na webu místo hodnocení „Hra do složky“
   (v aplikaci pro Android se už nenabízí). Překlep „Weeldy challenge“ ve hře není. Nový popis v obchodě: docs/play/listing/.
+- Posudek nováčka (2026-11-25, /mnt/project-files/posudek-zabavnosti): rvačka po ~60 s skončí sama (bez odměny, talisman ji zkracuje);
+  den a noc až od 1. hygieny (dřív první noc v 8. minutě; kdo noc už zažil, tomu zůstane; ?night=1 dál funguje);
+  návod končí „Ťukni na Obchod“ → „Kup vylepšení ×3“ (krok „Ťukni na Menu“ zrušen; bez peněz šetří přes bubliny hostů);
+  pilulka „do hygieny N %“, horní nápisy mizí dolů (nevjíždějí do lišty úkolu), kolečko číšníka „najmi / cena“.
+  Návrhy zamčeného Menu: ?menu=a (jen nejbližší zamčená) | b (všechny se jménem) | c (pruh „Brzy“) – čeká na výběr.

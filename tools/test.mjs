@@ -355,7 +355,7 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
 // 6c) první noc stojí, dokud hráč v průvodci neťukne na Dál
 {
   const p = await page('?nightcycle=1');
-  await S(p, (s) => { s.d.tut = -1; s.tutShow(); s.d.nightInfo = false; s.d.dn = { lvl: 0, v2: true }; s.d.dn.shift = window.__night.switchPhase(true); s.openShop('shop', false); });
+  await S(p, (s) => { s.d.tut = -1; s.tutShow(); s.d.nightInfo = false; s.d.stats.prestiges = 1; s.d.dn = { lvl: 0, v2: true }; s.d.dn.shift = window.__night.switchPhase(true); s.openShop('shop', false); });
   await p.waitForTimeout(3000);
   ok('první noc: běží a průvodce čeká na zavřené menu', await S(p, (s) => s.night && !s.guideCur && s.d.guideQ.includes('night')));
   ok('první noc: zatím neubývá', await p.evaluate(() => window.__night.phaseLeft() > 59_000 * 0.99 - 1000));

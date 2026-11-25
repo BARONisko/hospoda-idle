@@ -11,6 +11,8 @@ export const NIGHT_MAX_LVL = 420; // až 8 min
 export const bonesFor = (lvl: number) => milestoneCount(lvl);
 
 const forced = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('night') : null;
+/** ladění ?night=1: noc hned, i před 1. hygienou */
+export const nightForced = forced === '1';
 
 /** nastavuje scéna: mult = prodloužení noci ze statů, lvl = úroveň „Delší noc“, shift = posun cyklu (ruční přepínač) */
 export const nightCfg = { mult: 1, lvl: 0, shift: 0 };

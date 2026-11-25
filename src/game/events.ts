@@ -52,7 +52,11 @@ export class PubEvents {
     if (a) {
       a.t += dt;
       if (a.kind === 'brawl' && Math.floor(a.t / 3) !== Math.floor((a.t - dt) / 3)) this.host.views[a.view].leaveOne();
-      if (a.t >= a.dur) this.end(false);
+      if (a.t >= a.dur) {
+        // rvačka se po čase uklidní sama (přání uživatele: idle hra nesmí trestat, že se hráč nedívá)
+        if (a.kind === 'brawl') this.host.banner(this.host.views[a.view].cam, t('Rvačka skončila, hosté se vracejí.'));
+        this.end(false);
+      }
       return;
     }
     this.next -= dt;
@@ -144,9 +148,10 @@ export class PubEvents {
       });
       this.host.banner(v.cam, t('Netopýr! Chyť ho!'), true);
     } else if (kind === 'brawl') {
-      // rvačka trvá, dokud ji hráč nerozežene; mezitím odcházejí hosté a výdělek hospody klesá
-      a.dur = Infinity;
-      const need = Math.max(3, Math.round(10 * (1 - (this.host.brawlCut?.() ?? 0))));
+      // rvačka trvá, dokud ji hráč nerozežene, nejdéle ~1 min (pak se uklidní sama, bez odměny); mezitím odcházejí hosté a výdělek klesá
+      const cut = this.host.brawlCut?.() ?? 0;
+      a.dur = Math.max(20, Math.round(60 * (1 - cut)));
+      const need = Math.max(3, Math.round(10 * (1 - cut)));
       // jen na podlaze hospody (ne u horní zdi s policemi ani za barem): dlaždice x 2–17, y 6,7–12,5
       const fx0 = Math.max(x0 + 30, v.ox + 2 * 16), fx1 = Math.min(x1 - 30, v.ox + 17 * 16);
       // ne za ikonami číšníků a ×1 dole ve výřezu (řada ikon ~95 px obrazovky nad spodním okrajem)
