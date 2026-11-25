@@ -10,7 +10,7 @@ import { sfx } from '../core/sfx';
 import { confetti, rays, bigText, pointAt } from '../ui/juice';
 import { STAT_NAMES, OSSUARY, TEMPLE_STATS, type StatId } from '../core/talisman';
 import {
-  TempleState, templeState, cultIdle, isWeekend, msToSwitch, ROUNDS_PER_DAY, ROUND_S, bossHp, DIFFS, DIFF_REW, DIFF_NAMES, setDiff, ALTAR_PER, altarCost, weekendKey, tapPower, chestTen, TEMPLE_UPS, sealBonus,
+  TempleState, templeState, cultIdle, isWeekend, msToSwitch, ROUNDS_PER_DAY, ROUND_S, bossHp, DIFFS, diffRew, diffName, diffMech, setDiff, ALTAR_PER, altarCost, weekendKey, tapPower, chestTen, TEMPLE_UPS, sealBonus,
 } from '../core/temple';
 
 const W = 540, H = 960;
@@ -212,7 +212,7 @@ export class TempleScene extends Phaser.Scene {
   }
 
   private tenMult() {
-    return (1 + this.host.templeStats().tentacles) * DIFF_REW[this.diff() - 1];
+    return (1 + this.host.templeStats().tentacles) * diffRew(this.diff());
   }
 
   /** zvolená obtížnost 1–5 */
@@ -274,15 +274,15 @@ export class TempleScene extends Phaser.Scene {
     const d = this.diff();
     const seal = this.host.templeReward('seal', 1);
     const tal = this.host.templeReward('talis', 1);
-    const kr = this.host.templeReward('krigle', Math.round(this.kriglyGift() * DIFF_REW[d - 1]));
+    const kr = this.host.templeReward('krigle', Math.round(this.kriglyGift() * diffRew(d)));
     const dp = this.host.templeReward('darts', 2 * d);
-    const gm = this.host.templeReward('gems', GEMS_FREE.boss * d);
+    const gm = this.host.templeReward('gems', GEMS_FREE.boss * Math.min(d, DIFFS));
     // první vítězství = milník (nabídka na 24 h, vyskočí až podle pravidla jedné nabídky)
     if (this.T.boss === 1) this.host.msStart('boss1');
     let msg = t('CTHULHU PORAŽEN!') + '\n' + seal + '\n' + tal + '\n' + kr + '\n' + dp + '\n' + gm;
-    if (d < DIFFS && (this.T.maxD ?? 1) <= d) {
+    if ((this.T.maxD ?? 1) <= d) {
       this.T.maxD = d + 1;
-      msg += '\n' + t('Odemčena obtížnost {d}!', { d: DIFF_NAMES[d] });
+      msg += '\n' + t('Odemčena obtížnost {d}!', { d: diffName(d + 1) });
     }
     sfx.fanfare();
     this.cameras.main.flash(500, 120, 255, 160);
@@ -312,7 +312,7 @@ export class TempleScene extends Phaser.Scene {
     const by = fromSide ? Phaser.Math.Between(SEA + 40, PIER - 40) : H + 20;
     const ax = ALTAR.x + Phaser.Math.Between(-40, 40), ay = ALTAR.y - 30;
     this.tents.push({
-      bx, by, ax, ay, p: 0, growT: ([0, 7.5, 6.5, 6, 4.2][ph] / (1 + 0.1 * (this.diff() - 1))) * Phaser.Math.FloatBetween(0.85, 1.15), ph: Math.random() * 6, amp: Phaser.Math.Between(18, 34) * (Math.random() < 0.5 ? -1 : 1),
+      bx, by, ax, ay, p: 0, growT: ([0, 7.5, 6.5, 6, 4.2][ph] / (1 + 0.1 * (diffMech(this.diff()) - 1))) * Phaser.Math.FloatBetween(0.85, 1.15), ph: Math.random() * 6, amp: Phaser.Math.Between(18, 34) * (Math.random() < 0.5 ? -1 : 1),
       curl: Math.random() < 0.5 ? -1 : 1, cut: 1, state: 'grow', pts: [], hue: Math.random() < 0.15 ? 1 : 0,
     });
   }
@@ -396,7 +396,7 @@ export class TempleScene extends Phaser.Scene {
     this.left -= dt;
     const ph = this.phase();
     // vyšší obtížnost: víc a rychlejších chapadel, inkoust a hlubinní dřív a častěji
-    const k = this.diff() - 1, fast = 1 + 0.18 * k;
+    const k = diffMech(this.diff()) - 1, fast = 1 + 0.18 * k;
     this.spawnT -= dt;
     if (this.spawnT <= 0 && this.tents.filter((x) => x.state === 'grow').length < [0, 4, 5, 5, 7][ph] + k) {
       this.spawnTent();
@@ -579,7 +579,7 @@ export class TempleScene extends Phaser.Scene {
     this.topBar(we ? t('Víkend v R\'lyeh · zbývá {d} d {h} h', { d: dd, h: hh % 24 }) : t('Chrám je zavřený · otevře za {d} d {h} h', { d: dd, h: hh % 24 }));
     this.button(W - 120, 18, 104, 60, t('Obchod'), 'plum', true, () => this.shop());
     this.panel(120, 230);
-    this.text(W / 2, 134, t('CTHULHU · {n}. probuzení', { n: T.boss + 1 }) + ` · ${DIFF_NAMES[this.diff() - 1]}`, 30, PAL.gold, 0.5);
+    this.text(W / 2, 134, t('CTHULHU · {n}. probuzení', { n: T.boss + 1 }) + ` · ${diffName(this.diff())}`, 30, PAL.gold, 0.5);
     this.hpBar(30, 176, W - 60, 26, this.ui);
     this.text(W / 2, 214, t('fáze {p}/4 · truhly {c}/10 · pečetě R\'lyeh: {s} (výdělek +{v} %)', { p: this.phase(), c: T.chests, s: T.boss, v: Math.round(sealBonus(T.boss, T.old) * 1000) / 10 }), 18, PAL.bone, 0.5).setScale(1);
     this.text(W / 2, 244, t('síla zásahu: {n}', { n: big(Math.round(this.power())) }), 20, PAL.mint, 0.5);
@@ -597,12 +597,13 @@ export class TempleScene extends Phaser.Scene {
     if (we) {
       // obtížnosti: každá má vlastní životy bosse (pokračuje se, kde hráč skončil); další se odemkne poražením předchozí
       this.panel(712, 112);
-      this.text(W / 2, 720, t('Obtížnost (víc životů a nástrah, odměny ×{r})', { r: String(DIFF_REW[this.diff() - 1]).replace('.', ',') }), 18, PAL.bone, 0.5);
-      const bw = (W - 60) / DIFFS;
-      for (let d = 1; d <= DIFFS; d++) {
+      this.text(W / 2, 720, t('Obtížnost (víc životů a nástrah, odměny ×{r})', { r: String(diffRew(this.diff())).replace('.', ',') }), 18, PAL.bone, 0.5);
+      // po V nekonečně dál: ukáže se 5 stupňů končících nejvyšším odemčeným
+      const bw = (W - 60) / DIFFS, d0 = Math.max(1, Math.max(DIFFS, T.maxD ?? 1) - DIFFS + 1);
+      for (let d = d0; d < d0 + DIFFS; d++) {
         const open = d <= (T.maxD ?? 1);
         const hp = d === this.diff() ? T.hp : T.lv?.[d]?.hp ?? 1;
-        this.button(30 + (d - 1) * bw + 3, 748, bw - 6, 64, open ? `${DIFF_NAMES[d - 1]}\n${Math.ceil(Math.max(0, hp) * 100)} %` : `${DIFF_NAMES[d - 1]}\n✕`, d === this.diff() ? 'red' : 'blue', open, () => {
+        this.button(30 + (d - d0) * bw + 3, 748, bw - 6, 64, open ? `${diffName(d)}\n${Math.ceil(Math.max(0, hp) * 100)} %` : `${diffName(d)}\n✕`, d === this.diff() ? 'red' : 'blue', open, () => {
           if (d === this.diff()) return;
           setDiff(T, d);
           this.lobby();
@@ -774,7 +775,7 @@ export class TempleScene extends Phaser.Scene {
     const chest = this.add.image(W / 2, 420, 'obj', 'chest').setScale(7).setDepth(55);
     this.ui.push(chest);
     // výsledek je daný předem, kolo se jen „dotočí“
-    const mult = (1 + this.host.templeStats().tentacles) * DIFF_REW[d - 1];
+    const mult = (1 + this.host.templeStats().tentacles) * diffRew(d);
     const ten = Math.round(chestTen(T.boss) * mult);
     const r = Math.random();
     const kind = r < 0.2 ? 'bones' : r < 0.35 ? 'krigle' : r < 0.55 ? 'stat' : r < 0.62 ? 'talis' : 'ten2';
@@ -805,7 +806,7 @@ export class TempleScene extends Phaser.Scene {
       sfx.fanfare();
       T.ten += ten;
       const extra = kind === 'bones' ? this.host.templeReward('bones', 5 * d)
-        : kind === 'krigle' ? this.host.templeReward('krigle', Math.max(1, Math.round(this.kriglyGift() * 0.1 * DIFF_REW[d - 1])))
+        : kind === 'krigle' ? this.host.templeReward('krigle', Math.max(1, Math.round(this.kriglyGift() * 0.1 * diffRew(d))))
         : kind === 'stat' ? this.host.templeReward('stat', d)
         : kind === 'talis' ? this.host.templeReward('talis', 1)
         : (T.ten += ten, t('Plná truhla! Chapadla ×2'));

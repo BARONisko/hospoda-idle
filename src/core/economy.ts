@@ -211,6 +211,10 @@ export const MENU_HYG: Record<string, number> = { krigl: 1, brew: 4, temple: 11,
 export const PRESTIGE_GROW = 1.07;
 export const PRESTIGE_AT = 14;
 export const prestigeMin = (prestiges: number) => (prestiges > 0 ? Math.max(PRESTIGE_MIN, Math.ceil(PRESTIGE_MIN * PRESTIGE_GROW ** (prestiges - PRESTIGE_AT))) : PRESTIGE_FIRST);
+/** k hygieně ještě celoživotní výdělek (coins) – přání uživatele 25. 11.: „odemykat hygienou a k tomu výdělkem“ */
+// prahy ≈ celoživotní výdělek kousek za danou hygienou (tools/sim/days.mjs: brew 4. hyg. 1,7e9, Chrám 11. 7,4e9, výzdoba 20. 2,3e10,
+// šipky 30. 2,4e11, liga 40. 3,2e12) → kdo jde na hygienu co nejdřív, dostane novinku až uprostřed dalšího kola
+export const MENU_EARN: Record<string, number> = { krigl: 0, brew: 2e9, temple: 8e9, decor: 2.5e10, darts: 2.5e11, league: 4e12 };
 
 /** obchod s krígly: trvalá vylepšení (přežijí hygienu), platí se krígly; většina jde donekonečna (cena roste exponenciálně) */
 export type KriglId = 'speed' | 'start' | 'offline' | 'events' | 'keepMgr' | 'cthulhu' | 'krigly';

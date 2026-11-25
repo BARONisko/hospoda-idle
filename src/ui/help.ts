@@ -6,7 +6,7 @@ import { t } from '../i18n';
 import { PAL } from '../data/palette';
 import { txt } from './font';
 import { big } from '../core/num';
-import { MENU_HYG } from '../core/economy';
+import { MENU_HYG, MENU_EARN } from '../core/economy';
 import { collHire } from '../core/collector';
 import { sfx } from '../core/sfx';
 
@@ -147,6 +147,8 @@ export const HELP: HelpTopic[] = [
 /** věta pro zamčené téma (klíč dlaždice menu jako v tileLock) */
 export function helpLockText(key: string): string {
   const n = MENU_HYG[key];
+  const c = MENU_EARN[key] ?? 0;
+  if (n && c) return t('Odemkne se po {n}. hygieně a {c} coins celkového výdělku.', { n, c: big(c) });
   if (n) return t('Odemkne se po {n}. hygieně.', { n });
   if (key === 'coll') return t('Odemkne se po první noci, až budeš mít {n} kostí.', { n: big(collHire(0)) });
   if (key === 'keeper') return t('Odemkne se po {n}. hygieně.', { n: 2 });

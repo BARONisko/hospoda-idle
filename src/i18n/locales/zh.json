@@ -1435,5 +1435,13 @@
  "nebo jednorázově: {s}": "或一次性:{s}",
  "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nTěsná výhra – zůstáváš: {l}": "奖励：+{g} 💎、+{k} 酒杯和一个护身符。\n联赛奖杯：整周收入 +{p} %。\n险胜——保级：{l}",
  "Těsná prohra – zůstáváš: {l}": "惜败——保级：{l}",
- "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "如果结果接近（差距在 5 % 以内），你会留在当前联赛。"
+ "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "如果结果接近（差距在 5 % 以内），你会留在当前联赛。",
+ "Ligový pohár": "联赛奖杯",
+ "Vlastnosti se sčítají: {v}": "属性相加：{v}",
+ "Odkud mám výdělek": "我的收入来源",
+ "Zatím žádné bonusy – přibudou s krígly a dalšími částmi hry.": "暂无加成——酒杯和游戏的其他部分会带来加成。",
+ "Celkem ×{m}": "合计 ×{m}",
+ "po {n}. hygieně a {c} coins výdělku": "第{n}次检查后且收入{c}金币",
+ "ještě {c} coins výdělku": "还差{c}金币收入",
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "第{n}次检查后且总收入达{c}金币时解锁。"
 }

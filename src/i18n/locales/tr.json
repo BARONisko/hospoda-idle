@@ -1435,5 +1435,13 @@
  "nebo jednorázově: {s}": "ya da tek seferlik: {s}",
  "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nTěsná výhra – zůstáváš: {l}": "Ödül: +{g} 💎, +{k} kupa ve tılsım.\nLig bonusu: tüm hafta gelir +{p} %.\nKıl payı galibiyet – kaldığın lig: {l}",
  "Těsná prohra – zůstáváš: {l}": "Kıl payı mağlubiyet – kaldığın lig: {l}",
- "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "Sonuç yakınsa (fark %5'e kadar) liginde kalırsın."
+ "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "Sonuç yakınsa (fark %5'e kadar) liginde kalırsın.",
+ "Ligový pohár": "Lig kupası",
+ "Vlastnosti se sčítají: {v}": "Özellikler toplanır: {v}",
+ "Odkud mám výdělek": "Gelirim nereden geliyor",
+ "Zatím žádné bonusy – přibudou s krígly a dalšími částmi hry.": "Henüz bonus yok – kupalar ve oyunun diğer bölümleriyle gelecek.",
+ "Celkem ×{m}": "Toplam ×{m}",
+ "po {n}. hygieně a {c} coins výdělku": "{n}. denetimden ve {c} coins kazançtan sonra",
+ "ještě {c} coins výdělku": "{c} coins kazanç kaldı",
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "{n}. denetimden ve toplam {c} coins kazançtan sonra açılır."
 }

@@ -1435,5 +1435,13 @@
  "nebo jednorázově: {s}": "또는 1회 구매: {s}",
  "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nTěsná výhra – zůstáváš: {l}": "보상: +{g} 💎, +{k} 맥주잔, 부적.\n리그 컵: 일주일 내내 수입 +{p} %.\n아슬아슬한 승리 – 잔류: {l}",
  "Těsná prohra – zůstáváš: {l}": "아슬아슬한 패배 – 잔류: {l}",
- "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "결과가 근소하면(차이 5 % 이내) 현재 리그에 남습니다."
+ "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "결과가 근소하면(차이 5 % 이내) 현재 리그에 남습니다.",
+ "Ligový pohár": "리그 컵",
+ "Vlastnosti se sčítají: {v}": "능력치는 합산: {v}",
+ "Odkud mám výdělek": "수입의 출처",
+ "Zatím žádné bonusy – přibudou s krígly a dalšími částmi hry.": "아직 보너스가 없습니다. 맥주잔과 게임의 다른 요소로 생깁니다.",
+ "Celkem ×{m}": "합계 ×{m}",
+ "po {n}. hygieně a {c} coins výdělku": "{n}번째 점검 후 {c} 코인 수입 시",
+ "ještě {c} coins výdělku": "수입 {c} 코인 남음",
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "{n}번째 점검 후 총수입 {c} 코인이면 해금됩니다."
 }

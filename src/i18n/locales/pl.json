@@ -1435,5 +1435,13 @@
  "nebo jednorázově: {s}": "lub jednorazowo: {s}",
  "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nTěsná výhra – zůstáváš: {l}": "Nagroda: +{g} 💎, +{k} kufli i talizman.\nPuchar ligi: zarobek +{p} % przez cały tydzień.\nWygrana o włos – zostajesz w: {l}",
  "Těsná prohra – zůstáváš: {l}": "Przegrana o włos – zostajesz w: {l}",
- "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "Przy wyrównanym wyniku (różnica do 5 %) zostajesz w swojej lidze."
+ "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "Przy wyrównanym wyniku (różnica do 5 %) zostajesz w swojej lidze.",
+ "Ligový pohár": "Puchar ligi",
+ "Vlastnosti se sčítají: {v}": "Cechy się sumują: {v}",
+ "Odkud mám výdělek": "Skąd mam dochód",
+ "Zatím žádné bonusy – přibudou s krígly a dalšími částmi hry.": "Na razie brak bonusów – pojawią się z kuflami i innymi częściami gry.",
+ "Celkem ×{m}": "Razem ×{m}",
+ "po {n}. hygieně a {c} coins výdělku": "po {n}. sanepidzie i {c} coins zarobku",
+ "ještě {c} coins výdělku": "jeszcze {c} coins zarobku",
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "Odblokuje się po {n}. sanepidzie i {c} coins łącznego zarobku."
 }

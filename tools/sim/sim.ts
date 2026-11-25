@@ -156,7 +156,7 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600, goal = 0, kf:
 }
 
 // pro tools/sim/days.mjs
-export { MENU_HYG, PRESTIGE_GROW, PRESTIGE_MIN, PRESTIGE_FIRST, prestigeMin, VYCEP, vycepCost } from '../../src/core/economy';
+export { MENU_HYG, MENU_EARN, PRESTIGE_GROW, PRESTIGE_MIN, PRESTIGE_FIRST, prestigeMin, VYCEP, vycepCost } from '../../src/core/economy';
 export { SEAL_BONUS as SEAL } from '../../src/core/temple';
 
 const WAITERS_ON = !process.env.NO_WAITERS;

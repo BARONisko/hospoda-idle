@@ -1435,5 +1435,13 @@
  "nebo jednorázově: {s}": "или разово: {s}",
  "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nTěsná výhra – zůstáváš: {l}": "Награда: +{g} 💎, +{k} кружек и талисман.\nКубок лиги: доход +{p} % на всю неделю.\nПобеда с минимальным отрывом – остаёшься в: {l}",
  "Těsná prohra – zůstáváš: {l}": "Поражение с минимальным отрывом – остаёшься в: {l}",
- "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "При близком результате (разница до 5 %) ты остаёшься в своей лиге."
+ "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "При близком результате (разница до 5 %) ты остаёшься в своей лиге.",
+ "Ligový pohár": "Кубок лиги",
+ "Vlastnosti se sčítají: {v}": "Свойства складываются: {v}",
+ "Odkud mám výdělek": "Откуда мой доход",
+ "Zatím žádné bonusy – přibudou s krígly a dalšími částmi hry.": "Бонусов пока нет – они появятся с кружками и другими частями игры.",
+ "Celkem ×{m}": "Итого ×{m}",
+ "po {n}. hygieně a {c} coins výdělku": "после {n}-й санинспекции и {c} coins дохода",
+ "ještě {c} coins výdělku": "ещё {c} coins дохода",
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "Откроется после {n}-й санинспекции и {c} coins общего дохода."
 }

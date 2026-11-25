@@ -12,7 +12,7 @@ import { confetti, rays, bigText, coinFountain, popText, punch, flashRect } from
 import { big, dur } from '../core/num';
 import { WAITERS, WAITER_MAX, BAR_CAP, crew, tripTime, smileBonus, hireCost as wHireCost, UP_MAX as W_UP_MAX, freePoints, xpProgress, xpFor, spent as wSpent, earned as wEarned, MAX_POINTS, upName as wUpName, waiterLvl, waiterRate, tray, SMILE_STEP, START_CREW, beersPerCycle, type WaiterUp } from '../core/waiters';
 import { milestoneCount } from '../core/economy';
-import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, setCthOld, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H, STYLES, pubStyle, styleGap, styleCount, hasStyle, isStyle, pubStyles, styleSupplyMult, supplyIn, supplyOut, STYLE_MIX, STAR_LVL, STAR_MAX, starsOf, starMult, starCost, starKey, ACT_STEP } from '../core/economy';
+import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, setCthOld, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H, STYLES, pubStyle, styleGap, styleCount, hasStyle, isStyle, pubStyles, styleSupplyMult, supplyIn, supplyOut, STYLE_MIX, STAR_LVL, STAR_MAX, starsOf, starMult, starCost, starKey, ACT_STEP, MENU_EARN } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { iap, ProductId, PRODUCTS, onIapReady } from '../core/shop';
@@ -480,6 +480,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.coinIcon = this.add.image(32, 33, 'obj', 'coin').setScale(3.6).setDepth(101);
     this.coinsText = this.add.text(62, 1, '', txt(44, PAL.gold)).setDepth(101);
     this.rateText = this.add.text(64, 41, '', txt(22, PAL.mint)).setDepth(101);
+    this.rateText.setInteractive({ useHandCursor: true }).on('pointerdown', () => this.incomePopup());
     this.infoText = this.add.text(0, 41, '', txt(20, PAL.fog)).setDepth(101);
     // ×1 / ×10 / MAX: vpravo dole v hospodě, hned nad dlaždicemi stanic (v dosahu palce)
     this.modeBtn = this.btn(W - 12 - 92, PUB_BOT - 12 - 52, 92, 52, () => {
@@ -801,8 +802,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       case 'temple':
       case 'decor':
       case 'darts':
-      case 'league':
-        return after(MENU_HYG[name]);
+      case 'league': {
+        // přání uživatele 25. 11.: odemyká se hygienou a k tomu výdělkem (celoživotní coins, MENU_EARN)
+        const n = MENU_HYG[name], c = MENU_EARN[name] ?? 0;
+        if (hyg < n) return c > d.earned ? t('po {n}. hygieně a {c} coins výdělku', { n: String(n), c: big(c) }) : after(n);
+        return d.earned >= c ? null : t('ještě {c} coins výdělku', { c: big(c - d.earned) });
+      }
       case 'daynight': return d.nightInfo ? null : t('po první noci');
       // přání uživatele (hospoda 72): strom až po 2. hygieně (dřív od 5. úrovně = v prvních minutách hry); kdo už ve stromu utrácel, tomu zůstane
       case 'keeper': return treeSpent(d.skills) > 0 ? null : after(2);
@@ -1457,6 +1462,76 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       ['keeper', t('Hostinský'), 2, 1],
       ['league', t('Liga'), 3, 1],
     ];
+  }
+
+  /** „Odkud mám výdělek“ (přání uživatele 25. 11., návrh E): rozpad násobku výdělku podle zdrojů.
+   *  Násobky (×) se násobí, vlastnosti (+ %) se nejdřív sečtou. Ťuknutí na výdělek v horní liště. */
+  incomeSources() {
+    const d = this.d, mul: [string, number][] = [], add: [string, number][] = [];
+    const kq = this.kAll();
+    if (kq) mul.push([t('Krígly'), 1 + KRIGL_BONUS * kq]);
+    if (this.kl('cthulhu') || d.cthOld) mul.push([t('Zlatý výčep'), kCthulhu(this.kl('cthulhu'), d.cthOld ?? 0)]);
+    const dec = (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0);
+    if (dec) mul.push([t('Výzdoba'), 1 + dec]);
+    if (d.brew && brewBonus(d.brew)) mul.push([t('Pivovar'), 1 + brewBonus(d.brew)]);
+    const seal = sealBonus(d.temple?.boss ?? 0, d.temple?.old);
+    if (seal) mul.push([t('Chrám'), 1 + seal]);
+    if (cupMult(d.league) > 1) mul.push([t('Ligový pohár'), cupMult(d.league)]);
+    if (season) mul.push([SEASONS[season].name, 1 + SEASON_BONUS]);
+    if (adMult(d.adv) > 1) mul.push([t('Reklamní kampaň'), adMult(d.adv)]);
+    if (passOn(d.pass)) mul.push([t('Štamgast'), PASS_MULT]);
+    if (this.evBoostUntil > Date.now()) mul.push([t('Upíří hodina'), 2]);
+    // vlastnosti „výdělek“ (sčítají se, viz ts())
+    const tal = stats(d.talis).income, tree = treeStats(d.skills, stats({})).income;
+    let oss = 0, tem = 0;
+    for (const o of OSSUARY) if (o.stat === 'income') oss += (d.oss?.income ?? 0) * o.per;
+    for (const o of TEMPLE_STATS) if (o.stat === 'income') tem += (d.oss?.income ?? 0) * o.per;
+    const al = d.temple?.altar, alt = al && al.wk === weekendKey() ? ((al.lv as Record<string, number>).income ?? 0) * ALTAR_PER : 0;
+    const dar = dartStats(d.darts).income ?? 0;
+    const chr = this.owns('chronicle') ? CHRONICLE_BONUS : 0;
+    ([[t('Talismany'), tal], [t('Hostinský'), tree], [t('Kostnice'), oss], [t('Chrám'), tem], [t('Oltář (týden)'), alt], [t('Šipky'), dar], [t('Pivní kronika'), chr]] as [string, number][]).forEach((r) => r[1] > 0.0005 && add.push(r));
+    const sum = add.reduce((a, r) => a + r[1], 0);
+    mul.sort((a, b) => b[1] - a[1]);
+    add.sort((a, b) => b[1] - a[1]);
+    const total = mul.reduce((a, r) => a * r[1], 1) * (1 + sum);
+    return { mul, add, sum, total };
+  }
+
+  private incomePopup() {
+    if (this.night) return;
+    const D = 520, { mul, add, sum, total } = this.incomeSources();
+    const fx = (m: number) => (m >= 100 ? big(m) : String(Math.round(m * 100) / 100).replace('.', ','));
+    const fp = (v: number) => String(Math.round(v * 1000) / 10).replace('.', ',');
+    const rows: [string, string, string][] = mul.map(([n, m]) => [n, '×' + fx(m), PAL.gold]);
+    if (add.length) rows.push([t('Vlastnosti se sčítají: {v}', { v: '×' + fx(1 + sum) }), '', PAL.mint]);
+    add.forEach(([n, v]) => rows.push(['   ' + n, '+' + fp(v) + ' %', PAL.bone]));
+    const RH = 36, bx = 30, bw = W - 60, bh = 206 + Math.max(1, rows.length) * RH, by = Math.max(TOP + 10, (H - bh) / 2);
+    const objs: Phaser.GameObjects.GameObject[] = [];
+    const close = () => objs.forEach((o) => o.destroy());
+    const shade = this.add.rectangle(0, 0, W, H, 0x000000, 0.65).setOrigin(0).setDepth(D).setInteractive();
+    shade.on('pointerdown', close);
+    const g = this.add.graphics().setDepth(D + 1);
+    g.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
+    g.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
+    g.lineStyle(4, col('gold')).strokeRoundedRect(bx, by, bw, bh, 16);
+    objs.push(shade, g);
+    const tt = this.add.text(W / 2, by + 18, t('Odkud mám výdělek'), txt(30, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 2);
+    objs.push(tt);
+    rows.forEach(([n, v, c], i) => {
+      const y = by + 66 + i * RH;
+      const a = this.add.text(bx + 22, y, n, txt(22, c)).setDepth(D + 2);
+      const b = this.add.text(bx + bw - 22, y, v, txt(22, c)).setOrigin(1, 0).setDepth(D + 2);
+      a.setScale(Math.min(1, (bw - 44 - b.width - 12) / a.width));
+      objs.push(a, b);
+    });
+    if (!rows.length) objs.push(this.add.text(bx + 22, by + 66, t('Zatím žádné bonusy – přibudou s krígly a dalšími částmi hry.'), txt(20, PAL.fog)).setWordWrapWidth(bw - 44).setDepth(D + 2));
+    const ty = by + 66 + Math.max(1, rows.length) * RH + 6;
+    g.fillStyle(col('gold')).fillRect(bx + 22, ty, bw - 44, 2);
+    objs.push(this.add.text(W / 2, ty + 12, t('Celkem ×{m}', { m: fx(total) }), txt(26, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 2));
+    const ok = this.btn(W / 2 - 90, by + bh - 66, 180, 52, close, D + 3);
+    this.drawBtn(ok, t('Zavřít'), true, 'green');
+    objs.push(ok.bg, ok.label, ok.zone);
+    sfx.click();
   }
 
   tsCache?: ReturnType<typeof stats>;

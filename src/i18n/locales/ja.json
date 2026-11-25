@@ -1435,5 +1435,13 @@
  "nebo jednorázově: {s}": "または1回払い:{s}",
  "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nTěsná výhra – zůstáváš: {l}": "報酬：+{g} 💎、+{k} ジョッキ、お守り。\nリーグカップ：1週間ずっと収入 +{p} %。\n僅差の勝利：残留 {l}",
  "Těsná prohra – zůstáváš: {l}": "僅差の敗北：残留 {l}",
- "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "僅差（5 %以内）の場合は、今のリーグに残留します。"
+ "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "僅差（5 %以内）の場合は、今のリーグに残留します。",
+ "Ligový pohár": "リーグ杯",
+ "Vlastnosti se sčítají: {v}": "能力は合算: {v}",
+ "Odkud mám výdělek": "収入の内訳",
+ "Zatím žádné bonusy – přibudou s krígly a dalšími částmi hry.": "まだボーナスはありません。ジョッキやゲームの他の要素で増えます。",
+ "Celkem ×{m}": "合計 ×{m}",
+ "po {n}. hygieně a {c} coins výdělku": "{n}回目の検査後、{c}コイン獲得で",
+ "ještě {c} coins výdělku": "あと{c}コインの収入",
+ "Odemkne se po {n}. hygieně a {c} coins celkového výdělku.": "{n}回目の検査後、総収入{c}コインで解放。"
 }

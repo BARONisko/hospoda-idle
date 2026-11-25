@@ -95,9 +95,22 @@ export const DIFFS = 5;
 export const DIFF_HP = [1, 3, 8, 20, 50];
 export const DIFF_REW = [1, 1.6, 2.5, 4, 6];
 export const DIFF_NAMES = ['I', 'II', 'III', 'IV', 'V'];
+/** nekonečný Chrám (přání uživatele 25. 11., návrh H): po V pokračuje VI, VII … – životy ×2,5, odměny ×1,4 za stupeň
+ *  (odměny rostou pomaleji než životy, takže hlubší stupeň je výzva, ne nutnost); žebříček přijde později */
+export const diffHp = (d: number) => (d <= DIFFS ? DIFF_HP[Math.max(1, d) - 1] : DIFF_HP[DIFFS - 1] * 2.5 ** (d - DIFFS));
+export const diffRew = (d: number) => (d <= DIFFS ? DIFF_REW[Math.max(1, d) - 1] : Math.round(DIFF_REW[DIFFS - 1] * 1.4 ** (d - DIFFS) * 10) / 10);
+/** římské číslo obtížnosti (I … XX … C …) */
+export function diffName(d: number) {
+  const R: [number, string][] = [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
+  let n = Math.max(1, Math.floor(d)), s = '';
+  for (const [v, c] of R) while (n >= v) (s += c), (n -= v);
+  return s;
+}
+/** mechanika boje (počet a rychlost chapadel) roste jen do VII – dál už jen životy a odměny */
+export const diffMech = (d: number) => Math.min(d, 7);
 
 /** životy bosse (v bodech zásahu): podle obtížnosti, mírně roste s každým poraženým */
-export const bossHp = (boss: number, diff = 1) => Math.round(30000 * 1.15 ** boss * DIFF_HP[diff - 1]);
+export const bossHp = (boss: number, diff = 1) => Math.round(30000 * 1.15 ** boss * diffHp(diff));
 
 /** přepnout obtížnost: životy a truhly té minulé se uloží, nová pokračuje tam, kde hráč skončil */
 export function setDiff(s: TempleState, d: number) {

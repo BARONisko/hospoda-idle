@@ -481,3 +481,10 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Laťka hygieny (přání uživatele 25. 11.: „podle peněz a čísla hygieny“, ne krígel): tržba kola musí dát aspoň
   max(6, ⌈6·1,07^(n−14)⌉) krígel (n = kolikátá hygiena; 20. → 10, 40. → 35, 60. → 135). Utrácení ani krígly z ligy/truhly laťku
   nemění. Sim dnů: tempo stejné jako dřív bez utrácení (liga běžný den 8, kolo za měsíc ~22 h).
+- Posudek systémů (25. 11., výběr uživatele A, C, E–J): Menu se odemyká hygienou A celoživotním výdělkem (MENU_EARN v economy.ts:
+  pivovar 2e9, Chrám 8e9, výzdoba 2,5e10, šipky 2,5e11, liga 4e12 – kousek za danou hygienou, zamčená dlaždice ukazuje „ještě X coins“);
+  ťuknutí na výdělek v horní liště = okno „Odkud mám výdělek“ (PubScene.incomeSources: násobky × a sčítané vlastnosti + %);
+  nekonečný Chrám: po V obtížnost VI, VII … (životy ×2,5, odměny ×1,4 za stupeň, mechanika boje roste jen do VII, 💎 jen do V;
+  výběr ukazuje 5 stupňů končících nejvyšším odemčeným; žebříček později). Zaklikávací pomůcka s návrhy (Rekonstrukce ★, 35 úkolů
+  s nábytkem, týdenní pravidla, efekty, 2. řada výzdoby, drobnosti): https://claude.ai/artifact/AJrpra31oAsdYLfUx7SiRf.
+  Pátá stanice: návrhy A/B/C v /mnt/project-files/pata-stanice (čeká na výběr).
