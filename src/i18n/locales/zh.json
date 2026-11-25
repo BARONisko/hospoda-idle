@@ -1642,5 +1642,11 @@
  "{a}–{b} z {n}": "{a}–{b} / {n}",
  "Zlatá řada · {p}": "黄金线 · {p}",
  "ukládá se samo · naposledy před {n} min": "自动保存 · {n} 分钟前",
- "Uložit teď": "立即保存"
+ "Uložit teď": "立即保存",
+ "Po druhé Rekonstrukci přibude pátá stanice (třeba kulečník) v úzké kartě pod ostatními.": "第二次翻修后，会在其他工位下方的窄卡片中出现第五个工位（例如台球）。",
+ "Kniha hostinského a Rekonstrukce": "店主之书与翻修",
+ "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "联赛开放时，店主之书也随之开启：一章章任务，可在任务和酒馆上方的横条中找到。每完成一个任务，酒馆就会多一件陈设，有时还有礼物。完成整章后即可翻修——一次不清除酒杯的额外检查，并获得一颗星：酒馆新外观、第五个工位、更长的收银时间，以及直到★10的更多奖励。",
+ "Sezónní pass": "赛季通行证",
+ "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "每个赛季持续4周，共30级。通过每日任务、每日宝箱、每周挑战和检查获得通行证积分。每一级在免费线上都有奖励；奖励更丰厚的黄金线可以购买。通行证在任务中。",
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "在应用中可以登录 Google Play 游戏——进度也会保存到云端，并可在在线排行榜（酒杯、店主等级、神殿）中竞争。"
 }

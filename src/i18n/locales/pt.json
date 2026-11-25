@@ -1642,5 +1642,11 @@
  "{a}–{b} z {n}": "{a}–{b} de {n}",
  "Zlatá řada · {p}": "Trilha dourada · {p}",
  "ukládá se samo · naposledy před {n} min": "salva sozinho · há {n} min",
- "Uložit teď": "Salvar já"
+ "Uložit teď": "Salvar já",
+ "Po druhé Rekonstrukci přibude pátá stanice (třeba kulečník) v úzké kartě pod ostatními.": "Depois da segunda Reforma surge uma quinta estação (como a sinuca) num cartão estreito abaixo das outras.",
+ "Kniha hostinského a Rekonstrukce": "Livro do taberneiro e Reforma",
+ "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "Com a Liga abre-se o Livro do taberneiro: capítulos de tarefas que você encontra em Tarefas e na barra acima da taverna. Cada tarefa concluída acrescenta um móvel à taverna e às vezes um presente. Depois de um capítulo inteiro vem a Reforma – uma inspeção extra que não apaga suas canecas e dá uma estrela: novo visual da taverna, uma quinta estação, um caixa mais longo e mais prêmios até ★10.",
+ "Sezónní pass": "Passe de temporada",
+ "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "Cada temporada dura 4 semanas e tem 30 níveis. Você ganha pontos do passe com tarefas diárias, o baú diário, o desafio semanal e as inspeções. Cada nível tem um prêmio na trilha grátis; a Trilha dourada com prêmios maiores pode ser comprada. O passe fica em Tarefas.",
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "No app você pode entrar no Google Play Games – seu progresso passa a ser salvo também na nuvem e você compete em placares online (canecas, nível do taberneiro, Templo)."
 }

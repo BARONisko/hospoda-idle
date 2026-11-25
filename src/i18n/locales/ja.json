@@ -1642,5 +1642,11 @@
  "{a}–{b} z {n}": "{a}–{b} / {n}",
  "Zlatá řada · {p}": "ゴールドライン・{p}",
  "ukládá se samo · naposledy před {n} min": "自動保存 · {n}分前",
- "Uložit teď": "今すぐ保存"
+ "Uložit teď": "今すぐ保存",
+ "Po druhé Rekonstrukci přibude pátá stanice (třeba kulečník) v úzké kartě pod ostatními.": "2回目の改装の後、5つ目のステーション（ビリヤードなど）が他の下の細いカードに加わります。",
+ "Kniha hostinského a Rekonstrukce": "店主の本と改装",
+ "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "リーグと一緒に店主の本が開きます。タスクと酒場の上のバーにあるタスクの章です。タスクを達成するたびに酒場に家具が1つ増え、ときどき贈り物ももらえます。章をすべて終えると改装ができます。ジョッキが消えない追加の検査で、星がもらえます：酒場の新しい見た目、5つ目のステーション、長いレジ、そして★10までのさまざまな報酬。",
+ "Sezónní pass": "シーズンパス",
+ "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "各シーズンは4週間で、30段階あります。パスのポイントはデイリータスク、デイリー宝箱、週間チャレンジ、検査でもらえます。各段階には無料ラインの報酬があり、より大きな報酬のゴールドラインは購入できます。パスはタスクにあります。",
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "アプリではGoogle Play ゲームにログインできます。進行状況がクラウドにも保存され、オンラインランキング（ジョッキ、店主レベル、神殿）で競えます。"
 }

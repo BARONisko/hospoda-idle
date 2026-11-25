@@ -1642,5 +1642,11 @@
  "{a}–{b} z {n}": "{a}–{b} de {n}",
  "Zlatá řada · {p}": "Fila dorada · {p}",
  "ukládá se samo · naposledy před {n} min": "se guarda solo · última vez hace {n} min",
- "Uložit teď": "Guardar ya"
+ "Uložit teď": "Guardar ya",
+ "Po druhé Rekonstrukci přibude pátá stanice (třeba kulečník) v úzké kartě pod ostatními.": "Tras la segunda Reforma aparece una quinta estación (por ejemplo, billar) en una tarjeta estrecha debajo de las demás.",
+ "Kniha hostinského a Rekonstrukce": "Libro del tabernero y Reforma",
+ "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "Con la Liga se abre el Libro del tabernero: capítulos de tareas que encontrarás en Tareas y en la barra sobre la taberna. Cada tarea cumplida añade un mueble a la taberna y a veces un regalo. Tras un capítulo entero llega la Reforma: una inspección extra que no borra tus jarras y da una estrella: nuevo aspecto de la taberna, una quinta estación, una caja más larga y más premios hasta ★10.",
+ "Sezónní pass": "Pase de temporada",
+ "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "Cada temporada dura 4 semanas y tiene 30 niveles. Ganas puntos del pase con las tareas diarias, el cofre diario, el desafío semanal y las inspecciones. Cada nivel tiene un premio en la fila gratuita; la Fila dorada con premios mayores se puede comprar. El pase está en Tareas.",
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "En la app puedes iniciar sesión en Google Play Juegos: tu progreso se guarda también en la nube y compites en clasificaciones en línea (jarras, nivel de tabernero, Templo)."
 }

@@ -1642,5 +1642,11 @@
  "{a}–{b} z {n}": "{a}–{b} z {n}",
  "Zlatá řada · {p}": "Złota ścieżka · {p}",
  "ukládá se samo · naposledy před {n} min": "zapisuje się sama · {n} min temu",
- "Uložit teď": "Zapisz teraz"
+ "Uložit teď": "Zapisz teraz",
+ "Po druhé Rekonstrukci přibude pátá stanice (třeba kulečník) v úzké kartě pod ostatními.": "Po drugim Remoncie pojawia się piąte stanowisko (na przykład bilard) w wąskiej karcie pod pozostałymi.",
+ "Kniha hostinského a Rekonstrukce": "Księga karczmarza i Remont",
+ "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "Razem z Ligą otwiera się Księga karczmarza: rozdziały zadań, które znajdziesz w Zadaniach i na pasku nad karczmą. Każde wykonane zadanie dodaje do karczmy kawałek wyposażenia, a czasem prezent. Po całym rozdziale przychodzi Remont – dodatkowy sanepid, który nie kasuje kufli i daje gwiazdkę: nowy wygląd karczmy, piąte stanowisko, dłuższą kasę i kolejne nagrody aż do ★10.",
+ "Sezónní pass": "Przepustka sezonowa",
+ "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "Każdy sezon trwa 4 tygodnie i ma 30 poziomów. Punkty przepustki dostajesz za codzienne zadania, codzienną skrzynię, wyzwanie tygodnia i sanepid. Każdy poziom ma nagrodę na darmowej ścieżce; Złotą ścieżkę z większymi nagrodami możesz kupić. Przepustkę znajdziesz w Zadaniach.",
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "W aplikacji możesz zalogować się do Gier Google Play – postęp zapisuje się wtedy także w chmurze, a ty rywalizujesz w rankingach online (kufle, poziom karczmarza, Świątynia)."
 }

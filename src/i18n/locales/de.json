@@ -1642,5 +1642,11 @@
  "{a}–{b} z {n}": "{a}–{b} von {n}",
  "Zlatá řada · {p}": "Goldene Reihe · {p}",
  "ukládá se samo · naposledy před {n} min": "speichert automatisch · zuletzt vor {n} Min.",
- "Uložit teď": "Jetzt sichern"
+ "Uložit teď": "Jetzt sichern",
+ "Po druhé Rekonstrukci přibude pátá stanice (třeba kulečník) v úzké kartě pod ostatními.": "Nach der zweiten Renovierung kommt eine fünfte Station (etwa Billard) in einer schmalen Karte unter den anderen hinzu.",
+ "Kniha hostinského a Rekonstrukce": "Buch des Wirts und Renovierung",
+ "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "Mit der Liga öffnet sich das Buch des Wirts: Kapitel mit Aufgaben, die du unter Aufgaben und in der Leiste über der Kneipe findest. Jede erledigte Aufgabe bringt ein Stück Einrichtung in die Kneipe und manchmal ein Geschenk. Nach einem ganzen Kapitel kommt die Renovierung – eine zusätzliche Hygiene, die deine Krüge nicht löscht und einen Stern bringt: neues Aussehen der Kneipe, eine fünfte Station, eine längere Kasse und weitere Belohnungen bis ★10.",
+ "Sezónní pass": "Saisonpass",
+ "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "Jede Saison dauert 4 Wochen und hat 30 Stufen. Punkte für den Pass bekommst du für tägliche Aufgaben, die tägliche Truhe, die Wochenherausforderung und die Hygiene. Jede Stufe hat eine Belohnung in der kostenlosen Reihe; die Goldene Reihe mit größeren Belohnungen kannst du kaufen. Den Pass findest du unter Aufgaben.",
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "In der App kannst du dich bei Google Play Spiele anmelden – dein Fortschritt wird dann auch in der Cloud gespeichert und du trittst in Online-Bestenlisten an (Krüge, Wirtsstufe, Tempel)."
 }

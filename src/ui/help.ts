@@ -32,7 +32,7 @@ export const HELP: HelpTopic[] = [
   {
     title: t('Stanice a úrovně'),
     icon: ['obj', 'tap'],
-    text: t('Pípa, kuchyně, sklep a kostky jsou stanice – každá vydělává coins pořád dokola. Bez obsluhy ji spustíš ťuknutím, s obsluhou běží sama. Každá úroveň přidá výdělek a stojí víc než ta předchozí; na milnících 25, 50, 100, 200… úrovní se výdělek stanice zdvojnásobí. Když stanici během jednoho kola dotáhneš hodně vysoko, dostane po hygieně hvězdu – bod do stromu hostinského.'),
+    text: t('Pípa, kuchyně, sklep a kostky jsou stanice – každá vydělává coins pořád dokola. Bez obsluhy ji spustíš ťuknutím, s obsluhou běží sama. Každá úroveň přidá výdělek a stojí víc než ta předchozí; na milnících 25, 50, 100, 200… úrovní se výdělek stanice zdvojnásobí. Když stanici během jednoho kola dotáhneš hodně vysoko, dostane po hygieně hvězdu – bod do stromu hostinského.') + ' ' + t('Po druhé Rekonstrukci přibude pátá stanice (třeba kulečník) v úzké kartě pod ostatními.'),
   },
   {
     title: t('Číšníci a obsluha'),
@@ -53,6 +53,11 @@ export const HELP: HelpTopic[] = [
     title: t('Úkoly a denní truhla'),
     icon: ['icons', 'clipboard'],
     text: t('V Úkolech najdeš denní úkoly (odměna v coins) a týdenní výzvu (talisman a krígly); po ní přijde zlatá výzva s 💎. Úkol od hostinského v liště nad hospodou tě postupně provede celou hrou – tlačítko UKAŽ ukáže, kam ťuknout. Úspěchy (krígl za každý) jsou ve Sbírce. Ve Speciální nabídce na tebe každý den čeká truhla zdarma; sedmý den série je zlatá truhla s 💎 a jeden vynechaný den za týden ti odpustí žolík.'),
+  },
+  {
+    title: t('Sezónní pass'),
+    icon: ['obj', 'chest'],
+    text: t('Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.'),
   },
   {
     title: t('Šťastná hodina a manažeři'),
@@ -133,9 +138,15 @@ export const HELP: HelpTopic[] = [
     text: t('Každý týden soupeříš s jiným hospodským – vyhraje, kdo za týden víc vydělá. Výhra znamená postup do vyšší ligy a odměnu (krígly, 💎 a talisman), prohra sestup o ligu níž. Soupeř během týdne zrychluje, tak nepolevuj. Za 💎 si v lize můžeš pomoct.') + ' ' + t('Vítěz navíc získá Ligový pohár – výdělek +10 % za každou ligu po celý další týden.') + ' ' + t('Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.'),
   },
   {
+    title: t('Kniha hostinského a Rekonstrukce'),
+    icon: ['icons', 'star'],
+    lock: 'league',
+    text: t('S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.'),
+  },
+  {
     title: t('Ukládání a záloha'),
     icon: ['obj', 'note'],
-    text: t('Hra se ukládá sama každých pár sekund a při odchodu. V mobilní aplikaci se postup navíc zálohuje přes zálohu Androidu do tvého Google účtu, takže po přeinstalaci nezmizí. Na webu je hra uložená v prohlížeči – v Nastavení si můžeš zálohu stáhnout do souboru (Uložit) a zase ji načíst (Nahrát). Začít znovu smaže celou hru.'),
+    text: t('Hra se ukládá sama každých pár sekund a při odchodu. V mobilní aplikaci se postup navíc zálohuje přes zálohu Androidu do tvého Google účtu, takže po přeinstalaci nezmizí. Na webu je hra uložená v prohlížeči – v Nastavení si můžeš zálohu stáhnout do souboru (Uložit) a zase ji načíst (Nahrát). Začít znovu smaže celou hru.') + ' ' + t('V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).'),
   },
   {
     title: t('Statistiky a soukromí'),

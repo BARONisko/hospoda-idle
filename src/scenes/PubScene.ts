@@ -129,6 +129,8 @@ const UI_LEAN = ((): number => {
     return 2;
   }
 })();
+/** skrytý vývojářský režim (7× ťuknout na číslo verze v Nastavení): ukáže admin věci */
+let devMode = false;
 /** hráč vypnul anonymní statistiky (Nastavení) */
 let statsOff = false;
 
@@ -205,11 +207,13 @@ function downloadOffline() {
 function loadOpts() {
   try {
     // sv/mv = hlasitost zvuků/hudby 0–1; starší uložení měla jen zapnuto/vypnuto (snd/mus)
-    const o = JSON.parse(localStorage.getItem(OPTS_KEY) ?? '{}') as { snd?: boolean; mus?: boolean; sv?: number; mv?: number; nt?: boolean; cs?: number; so?: boolean };
+    const o = JSON.parse(localStorage.getItem(OPTS_KEY) ?? '{}') as { snd?: boolean; mus?: boolean; sv?: number; mv?: number; nt?: boolean; cs?: number; so?: boolean; dv?: boolean };
     notesOn = !!o.nt;
     statsOff = !!o.so;
     meter.set(!statsOff, { lang, app: Capacitor.isNativePlatform() ? 'android' : 'web' });
-    sfx.coinStyle = o.cs ?? 0;
+    devMode = !!o.dv;
+    // varianty zvuku výdělku jsou jen ve vývojářském režimu – hráč má vždy výchozí A melodii
+    sfx.coinStyle = devMode ? (o.cs ?? 0) : 0;
     sfx.setSfxVol(o.sv ?? (o.snd === false ? 0 : 1));
     sfx.setMusVol(o.mv ?? (o.mus === false ? 0 : 1));
   } catch {
@@ -218,7 +222,7 @@ function loadOpts() {
 }
 function saveOpts() {
   try {
-    localStorage.setItem(OPTS_KEY, JSON.stringify({ sv: sfx.sfxVol, mv: sfx.musVol, nt: notesOn, cs: sfx.coinStyle, so: statsOff }));
+    localStorage.setItem(OPTS_KEY, JSON.stringify({ sv: sfx.sfxVol, mv: sfx.musVol, nt: notesOn, cs: sfx.coinStyle, so: statsOff, dv: devMode }));
   } catch {
     /* nic */
   }
@@ -2640,9 +2644,23 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // poslední řádek: tři tlačítka – v aplikaci Ohodnotit / Sdílet / Soukromí, na webu místo hodnocení „Hra do složky“
     // (v aplikaci pro Android zip ke stažení není; řádků tak zůstává nejvýš 10)
     const native = Capacitor.isNativePlatform(), web = location.protocol.startsWith('http') && !native;
-    const n = 8 + (notify.available ? 1 : 0) + (meter.available ? 1 : 0);
+    const n = 7 + (devMode ? 1 : 0) + (notify.available ? 1 : 0) + (meter.available ? 1 : 0);
     const RH = Math.min(96, Math.floor((MB - y0 - 6) / n));
-    this.shopObjs.push(this.add.text(W - 12, y0 - 4, t('verze {v}', { v: __APP_VERSION__ }), txt(16, PAL.fog)).setOrigin(1, 1).setDepth(D + 2));
+    // číslo verze; 7 ťuknutí za sebou (do 3 s) přepne skrytý vývojářský režim (admin věci, např. varianty zvuku výdělku)
+    const ver = this.add.text(W - 12, y0 - 4, t('verze {v}', { v: __APP_VERSION__ }) + (devMode ? ' · dev' : ''), txt(16, PAL.fog)).setOrigin(1, 1).setDepth(D + 2);
+    ver.setInteractive({ useHandCursor: false }).on('pointerdown', () => {
+      const now = Date.now();
+      this.devTaps = now - this.devTapAt < 3000 ? this.devTaps + 1 : 1;
+      this.devTapAt = now;
+      if (this.devTaps < 7) return;
+      this.devTaps = 0;
+      devMode = !devMode;
+      if (!devMode) sfx.coinStyle = 0;
+      saveOpts();
+      sfx.fanfare();
+      this.openShop('opts', false);
+    });
+    this.shopObjs.push(ver);
     // nápověda „Jak to funguje“ nahoře (přání uživatele: informace o různých věcech ve hře)
     {
       this.row(y0, RH, D, t('Jak to funguje'), t('stručně o všem, co ve hře je'), 'ink', PAL.bone, Math.min(RH < 70 ? 240 : 300, W - 232 - 34));
@@ -2682,15 +2700,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.shopObjs.push(minus.bg, minus.label, minus.zone, plus.bg, plus.label, plus.zone, val, bar);
     });
     const CS = [t('A melodie'), t('B náhodně'), t('C střídání'), t('vypnuto')];
-    const rows: [string, string, () => void][] = [
-      // zvuk výdělku (cinkání, které hraje pořád): ťuknutí přepne a hned přehraje ukázku
-      [t('Zvuk výdělku'), CS[sfx.coinStyle] ?? CS[0], () => {
+    const rows: [string, string, () => void][] = [[t('Jazyk / Language'), LANGS[lang], () => this.pickLang(false)]];
+    // zvuk výdělku (varianty A/B/C/vypnuto) je admin věc – jen ve vývojářském režimu (přání uživatele 25. 11. 2026)
+    if (devMode)
+      rows.push([t('Zvuk výdělku'), CS[sfx.coinStyle] ?? CS[0], () => {
         sfx.coinStyle = (sfx.coinStyle + 1) % 4;
         saveOpts();
         for (let k = 0; k < 6; k++) this.time.delayedCall(k * 300, () => sfx.coin(1));
-      }],
-      [t('Jazyk / Language'), LANGS[lang], () => this.pickLang(false)],
-    ];
+      }]);
     // offline verze do složky (zip s index.html) – nabízí se jen na webu, ne ve hře spuštěné z disku
     // záloha hry: dvě tlačítka v jednom řádku; v aplikaci s Google Play Hrami místo ní žebříčky a cloud
     if (pg.available) {
@@ -4963,6 +4980,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   pubTabs: Btn[] = [];
   sel = 0;
   swipe: number | null = null;
+  /** Nastavení: ťuknutí na číslo verze (7× = vývojářský režim) */
+  private devTaps = 0;
+  private devTapAt = 0;
   /** Nastavení: čas prvního ťuku na „Smazat hru“ (druhý do 6 s smaže) */
   wipeAsk = 0;
 

@@ -1642,5 +1642,11 @@
  "{a}–{b} z {n}": "{a}–{b} / {n}",
  "Zlatá řada · {p}": "Altın sıra · {p}",
  "ukládá se samo · naposledy před {n} min": "kendiliğinden kaydeder · {n} dk önce",
- "Uložit teď": "Şimdi kaydet"
+ "Uložit teď": "Şimdi kaydet",
+ "Po druhé Rekonstrukci přibude pátá stanice (třeba kulečník) v úzké kartě pod ostatními.": "İkinci Yenilemeden sonra diğerlerinin altında dar bir kartta beşinci bir istasyon (örneğin bilardo) belirir.",
+ "Kniha hostinského a Rekonstrukce": "Meyhanecinin Kitabı ve Yenileme",
+ "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "Lig ile birlikte Meyhanecinin Kitabı açılır: Görevler'de ve meyhanenin üstündeki şeritte bulacağın görev bölümleri. Tamamlanan her görev meyhaneye bir eşya, bazen de hediye ekler. Bir bölümün tamamından sonra Yenileme gelir – kupalarını silmeyen ek bir denetim ve bir yıldız: yeni meyhane görünümü, beşinci istasyon, daha uzun kasa ve ★10'a kadar başka ödüller.",
+ "Sezónní pass": "Sezon kartı",
+ "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "Her sezon 4 hafta sürer ve 30 kademesi vardır. Kart puanlarını günlük görevler, günlük sandık, haftalık meydan okuma ve denetimlerden kazanırsın. Her kademenin ücretsiz sırada bir ödülü var; daha büyük ödüllü Altın sırayı satın alabilirsin. Kartı Görevler'de bulursun.",
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "Uygulamada Google Play Oyunlar'a giriş yapabilirsin – ilerlemen buluta da kaydedilir ve çevrimiçi sıralamalarda (kupalar, meyhaneci seviyesi, Tapınak) yarışırsın."
 }

@@ -521,3 +521,6 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Ladění na webu ?pg=1 (předstíraný Google Play), test: node tools/test-playgames.mjs.
 - Výběr jazyka (návrh A, Petr 25. 11.): při prvním spuštění okno „LANGUAGE“ (vždy anglicky) s mřížkou 2×6 jazyků v originále,
   předvybraný jazyk telefonu, „Play“ uloží volbu (pickLang). Stejné okno v Nastavení → Jazyk (dřív se jazyky jen přepínaly dokola).
+- Nastavení pročištěno (25. 11. 2026): „Zvuk výdělku“ (varianty A/B/C) jen ve skrytém vývojářském režimu – 7× ťuknout na číslo
+  verze v Nastavení (u verze pak „· dev“); hráč má vždy A melodii. Návod „Jak to funguje“ doplněn: témata Sezónní pass,
+  Kniha hostinského a Rekonstrukce, věta o páté stanici a o Google Play Hrách (cloud, žebříčky).
