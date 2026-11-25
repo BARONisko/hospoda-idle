@@ -10,7 +10,7 @@ import { sfx } from '../core/sfx';
 import { confetti, rays, bigText, pointAt } from '../ui/juice';
 import { STAT_NAMES, OSSUARY, TEMPLE_STATS, type StatId } from '../core/talisman';
 import {
-  TempleState, templeState, cultIdle, isWeekend, msToSwitch, ROUNDS_PER_DAY, ROUND_S, bossHp, DIFFS, DIFF_REW, DIFF_NAMES, setDiff, ALTAR_PER, altarCost, weekendKey, tapPower, chestTen, TEMPLE_UPS, SEAL_BONUS,
+  TempleState, templeState, cultIdle, isWeekend, msToSwitch, ROUNDS_PER_DAY, ROUND_S, bossHp, DIFFS, DIFF_REW, DIFF_NAMES, setDiff, ALTAR_PER, altarCost, weekendKey, tapPower, chestTen, TEMPLE_UPS, sealBonus,
 } from '../core/temple';
 
 const W = 540, H = 960;
@@ -581,7 +581,7 @@ export class TempleScene extends Phaser.Scene {
     this.panel(120, 230);
     this.text(W / 2, 134, t('CTHULHU · {n}. probuzení', { n: T.boss + 1 }) + ` · ${DIFF_NAMES[this.diff() - 1]}`, 30, PAL.gold, 0.5);
     this.hpBar(30, 176, W - 60, 26, this.ui);
-    this.text(W / 2, 214, t('fáze {p}/4 · truhly {c}/10 · pečetě R\'lyeh: {s} (výdělek +{v} %)', { p: this.phase(), c: T.chests, s: T.boss, v: Math.round(T.boss * SEAL_BONUS * 100) }), 18, PAL.bone, 0.5).setScale(1);
+    this.text(W / 2, 214, t('fáze {p}/4 · truhly {c}/10 · pečetě R\'lyeh: {s} (výdělek +{v} %)', { p: this.phase(), c: T.chests, s: T.boss, v: Math.round(sealBonus(T.boss, T.old) * 1000) / 10 }), 18, PAL.bone, 0.5).setScale(1);
     this.text(W / 2, 244, t('síla zásahu: {n}', { n: big(Math.round(this.power())) }), 20, PAL.mint, 0.5);
     const kult = T.up.kult ?? 0;
     this.text(W / 2, 274, kult ? t('kultistů: {n} – sekají chapadla a sbírají i bez tebe', { n: kult }) : t('kultistu najmeš v Obchodě'), 18, PAL.fog, 0.5);

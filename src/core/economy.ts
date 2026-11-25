@@ -203,6 +203,8 @@ export const PRESTIGE_MIN = 6;
 /** první hygiena (cesta k 2. hospodě) jde dřív: stačí 4 krígly (~1,6M tržby, cca 15 min) */
 export const PRESTIGE_FIRST = 4;
 /** každá další hygiena musí přinést aspoň +10 % krígel, co už máš (kola se tak pomalu prodlužují: 9 → 14 → … → 22 min) */
+/** po kolikáté hygieně se odemkne dlaždice menu (jediný zdroj pro PubScene.tileLock, nápovědu i tools/sim/days.mjs) */
+export const MENU_HYG: Record<string, number> = { krigl: 1, brew: 4, temple: 11, decor: 20, darts: 30, league: 40 }; // 25. 11. 2026: dřív 1/3/6/10/15/20 (běžný hráč měl vše za 2,5 dne)
 export const PRESTIGE_GROW = 0.07; // hospoda 67: dřív 0,1 (kolo 37 trvalo ~11 h); 7 % = 20. kolo ~15 min, 40. ~2 h
 export const prestigeMin = (prestiges: number, krigle = 0) => (prestiges > 0 ? Math.max(PRESTIGE_MIN, Math.ceil(PRESTIGE_GROW * krigle)) : PRESTIGE_FIRST);
 
@@ -219,6 +221,9 @@ export interface KriglItem {
   eff: (lvl: number) => string;
 }
 const exp = (base: number, g: number) => (l: number) => Math.ceil(base * g ** l);
+/** úrovně Zlatého výčepu za starých pravidel (PubScene nastaví z uložení d.cthOld, kvůli popisku v obchodě) */
+let cthOld = 0;
+export const setCthOld = (n: number) => (cthOld = n);
 const pc = (v: number) => String(Math.round(v * 10) / 10).replace('.', ',');
 /** násobek délky cyklů: −0,9 % za úroveň */
 export const kSpeed = (n: number) => 0.991 ** n;
@@ -229,8 +234,14 @@ export const OFFLINE_MAX_H = 12;
 export const kOffline = (n: number) => Math.min(OFFLINE_MAX_H - OFFLINE_BASE_H, n * 5 / 60); // hospoda 67: +5 min za úroveň (dřív +30 s, strop byl nedosažitelný)
 /** násobek intervalu událostí (nejméně 0,25): 2× −25 %, pak už jen −1 % za úroveň */
 export const kEvents = (n: number) => Math.max(0.25, 0.75 ** Math.min(n, 2) * 0.99 ** Math.max(0, n - 2));
-/** Zlatý výčep (dřív „Probudit Cthulhu“, id zůstává kvůli uložení): ×1,5, ×1,75, ×2 … */
-export const kCthulhu = (n: number) => (n ? 1.25 + 0.25 * n : 1);
+/** Zlatý výčep (dřív „Probudit Cthulhu“, id zůstává kvůli uložení): od 25. 11. 2026 +0,9 % za úroveň (pravidlo pod 1 %).
+ *  old = úrovně koupené za starých pravidel (×1,5 +0,25 za úroveň) – ty hráči zůstanou, nové úrovně už po 0,9 % */
+export const VYCEP = 0.009;
+export const kCthulhu = (n: number, old = 0) => {
+  const o = Math.min(n, old);
+  return (o ? 1.25 + 0.25 * o : 1) * (1 + VYCEP * (n - o));
+};
+export const vycepCost = (n: number) => Math.ceil(15 * 1.3 ** n);
 /** věrnost hostů: XP = příchody hostů, max 10 úrovní, 1. úroveň 20 000 příchodů, každá další ×1,3; +5 % spropitného za úroveň */
 export const GUEST_MAX = 10;
 export const guestNeed = (lvl: number) => Math.round(20000 * 1.3 ** lvl);
@@ -253,7 +264,7 @@ export const KRIGL_SHOP: KriglItem[] = [
   { id: 'events', name: t('Rušnější hospoda'), cost: (n) => (n < 2 ? [15, 45][n] : Math.ceil(45 * 1.15 ** (n - 1))), eff: (n) => t('události o {v} % častěji', { v: pc((1 / kEvents(n) - 1) * 100) }) },
   { id: 'krigly', name: t('Hlubší sklep'), cost: exp(40, 2.5), eff: (n) => t('krígly z hygieny +{v} %', { v: Math.round(kKrigly(n) * 100) }) },
   { id: 'keepMgr', name: t('Věrní manažeři'), cost: () => 200, max: 1, eff: (n) => (n ? t('manažeři zůstanou i po hygieně') : t('manažeři po hygieně odejdou')) },
-  { id: 'cthulhu', name: t('Zlatý výčep'), cost: exp(300, 3), eff: (n) => t('výdělek všude ×{v}', { v: pc(kCthulhu(n)) }) },
+  { id: 'cthulhu', name: t('Zlatý výčep'), cost: vycepCost, eff: (n) => t('výdělek +{v} %', { v: pc((kCthulhu(n, cthOld) - 1) * 100) }) },
 ];
 /** je položka na maximu (strop úrovní nebo už nic nepřidá) */
 export const kMaxed = (it: KriglItem, n: number) => (it.max !== undefined && n >= it.max) || (it.id === 'events' && kEvents(n) <= 0.25) || (it.id === 'offline' && kOffline(n) >= OFFLINE_MAX_H - OFFLINE_BASE_H);

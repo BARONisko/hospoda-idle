@@ -472,3 +472,9 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   za video denně → +3 💎 a 2 h výdělku (řádek v kartě Reklamní kampaň). Nabídka po milníku: nová hospoda / první poražený
   Cthulhu → „Oslavný balík“ `milestone` 79 Kč (500 💎, 8 h výdělku, Štamgast 3 dny) na 24 h, jednou za milník.
   Snímky /mnt/project-files/vydelek/lakadla-5-7.png.
+- Kontrola ekonomiky (25. 11. 2026, schváleno body 1–4 + laťka hygieny): nová simulace dnů tools/sim/days.mjs (offline, Chrám,
+  pivovar, strom, pohár, Zlatý výčep, výzdoba, reklama; slabší/běžný/zapálený, DAYS=60). Pravidlo pod 1 %: Zlatý výčep +0,9 %/úr.
+  (cena 15·1,3^n), pečeť Chrámu +0,9 % – co hráč měl dřív, zůstává po starém (d.cthOld, temple.old, d.bon9). Laťka hygieny 7 %
+  ze všech získaných krígel (kAll), dřív z držených (utrácení ji snižovalo). Menu se odemyká: pivovar 4., Chrám 11., výzdoba 20.,
+  šipky 30., liga 40. hygiena (dřív 3/6/10/15/20) → liga: slabší den 20, běžný den 8, zapálený den 3,5. Liga: soupeř z průměru
+  3 týdnů, těsný výsledek ±5 % = zůstává (výhra dál s odměnou; tools/sim/league.mjs 26 týdnů s náhodou).

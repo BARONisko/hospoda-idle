@@ -1432,5 +1432,8 @@
  "3 dny zdarma, pak {p} měsíčně": "3 gün ücretsiz, sonra ayda {p}",
  "Předplatit · {p} měsíčně": "Abone ol · ayda {p}",
  "Obnovuje se každý měsíc. Zrušíš kdykoli v Google Play.": "Her ay yenilenir. Google Play'den istediğin zaman iptal et.",
- "nebo jednorázově: {s}": "ya da tek seferlik: {s}"
+ "nebo jednorázově: {s}": "ya da tek seferlik: {s}",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nTěsná výhra – zůstáváš: {l}": "Ödül: +{g} 💎, +{k} kupa ve tılsım.\nLig bonusu: tüm hafta gelir +{p} %.\nKıl payı galibiyet – kaldığın lig: {l}",
+ "Těsná prohra – zůstáváš: {l}": "Kıl payı mağlubiyet – kaldığın lig: {l}",
+ "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "Sonuç yakınsa (fark %5'e kadar) liginde kalırsın."
 }

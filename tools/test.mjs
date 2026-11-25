@@ -244,10 +244,20 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   if (lg3 !== true) console.log(lg3);
   ok('liga 💎: posila ×2, zavřená pípa, divoká karta (1× denně / týdně)', lg3 === true);
   // odemykání menu pomaleji: pivovar po 3., Chrám 6., výzdoba 10., šipky 15., liga 20. hygieně; co bylo odemčené, zůstává
-  ok('menu: odemykání 1/3/6/10/15/20 hygien, odemčené zůstává', await S(p, (s) => {
+  // 25. 11. 2026: těsný výsledek (±5 %) = zůstává v lize, výhra dál s odměnou
+  ok('liga: těsná výhra i prohra = zůstává ve stejné lize', await S(p, (s) => {
+    const one = (me) => {
+      const L = s.league(); L.tier = 3; L.start -= 7 * 86400000; L.rAt = L.start + 7 * 86400000; L.rival = 1000; L.me = me;
+      const g0 = s.d.gems ?? 0; s.leagueCheck(); s.awayObjs.forEach((o) => o.destroy()); s.awayObjs = [];
+      return [s.d.league.tier, (s.d.gems ?? 0) - g0];
+    };
+    const [t1, g1] = one(1020), [t2, g2] = one(970), [t3] = one(1200);
+    return (t1 === 3 && g1 === 90 && t2 === 3 && g2 === 0 && t3 === 4) || JSON.stringify([t1, g1, t2, g2, t3]);
+  }) === true);
+  ok('menu: odemykání 1/4/11/20/30/40 hygien, odemčené zůstává', await S(p, (s) => {
     const pr = s.d.stats.prestiges, mo = s.d.menuOpen; s.d.menuOpen = [];
     const at = (n, k) => ((s.d.stats.prestiges = n - 1), !!s.tileLock(k)) && ((s.d.stats.prestiges = n), !s.tileLock(k));
-    const r = at(1, 'krigl') && at(3, 'brew') && at(6, 'temple') && at(10, 'decor') && at(15, 'darts') && at(20, 'league');
+    const r = at(1, 'krigl') && at(4, 'brew') && at(11, 'temple') && at(20, 'decor') && at(30, 'darts') && at(40, 'league');
     s.d.stats.prestiges = 0; s.d.menuOpen = ['league']; const keep = !s.tileLock('league');
     s.d.stats.prestiges = pr; s.d.menuOpen = mo;
     return r && keep && !s.constructor.TILES.some((x) => x[0] === 'talis');

@@ -1432,5 +1432,8 @@
  "3 dny zdarma, pak {p} měsíčně": "3 дня бесплатно, затем {p} в месяц",
  "Předplatit · {p} měsíčně": "Подписаться · {p} в месяц",
  "Obnovuje se každý měsíc. Zrušíš kdykoli v Google Play.": "Продлевается каждый месяц. Отменить можно в любой момент в Google Play.",
- "nebo jednorázově: {s}": "или разово: {s}"
+ "nebo jednorázově: {s}": "или разово: {s}",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nTěsná výhra – zůstáváš: {l}": "Награда: +{g} 💎, +{k} кружек и талисман.\nКубок лиги: доход +{p} % на всю неделю.\nПобеда с минимальным отрывом – остаёшься в: {l}",
+ "Těsná prohra – zůstáváš: {l}": "Поражение с минимальным отрывом – остаёшься в: {l}",
+ "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "При близком результате (разница до 5 %) ты остаёшься в своей лиге."
 }

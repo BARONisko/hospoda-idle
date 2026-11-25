@@ -6,11 +6,12 @@ import { t } from '../i18n';
 import { PAL } from '../data/palette';
 import { txt } from './font';
 import { big } from '../core/num';
+import { MENU_HYG } from '../core/economy';
 import { collHire } from '../core/collector';
 import { sfx } from '../core/sfx';
 
-/** po kolikáté hygieně se odemkne dlaždice menu (jediný zdroj pro PubScene.tileLock i nápovědu) */
-export const MENU_HYG: Record<string, number> = { krigl: 1, brew: 3, temple: 6, decor: 10, darts: 15, league: 20 };
+/** po kolikáté hygieně se odemkne dlaždice menu – čísla jsou v core/economy.ts (kvůli simulaci tools/sim/days.mjs) */
+export { MENU_HYG } from '../core/economy';
 
 export interface HelpTopic {
   title: string;
@@ -129,7 +130,7 @@ export const HELP: HelpTopic[] = [
     title: t('Liga'),
     icon: ['obj', 'trophy'],
     lock: 'league',
-    text: t('Každý týden soupeříš s jiným hospodským – vyhraje, kdo za týden víc vydělá. Výhra znamená postup do vyšší ligy a odměnu (krígly, 💎 a talisman), prohra sestup o ligu níž. Soupeř během týdne zrychluje, tak nepolevuj. Za 💎 si v lize můžeš pomoct.') + ' ' + t('Vítěz navíc získá Ligový pohár – výdělek +10 % za každou ligu po celý další týden.'),
+    text: t('Každý týden soupeříš s jiným hospodským – vyhraje, kdo za týden víc vydělá. Výhra znamená postup do vyšší ligy a odměnu (krígly, 💎 a talisman), prohra sestup o ligu níž. Soupeř během týdne zrychluje, tak nepolevuj. Za 💎 si v lize můžeš pomoct.') + ' ' + t('Vítěz navíc získá Ligový pohár – výdělek +10 % za každou ligu po celý další týden.') + ' ' + t('Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.'),
   },
   {
     title: t('Ukládání a záloha'),

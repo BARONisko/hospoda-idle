@@ -1432,5 +1432,8 @@
  "3 dny zdarma, pak {p} měsíčně": "免费3天,之后每月{p}",
  "Předplatit · {p} měsíčně": "订阅 · 每月{p}",
  "Obnovuje se každý měsíc. Zrušíš kdykoli v Google Play.": "每月自动续订。可随时在Google Play取消。",
- "nebo jednorázově: {s}": "或一次性:{s}"
+ "nebo jednorázově: {s}": "或一次性:{s}",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nTěsná výhra – zůstáváš: {l}": "奖励：+{g} 💎、+{k} 酒杯和一个护身符。\n联赛奖杯：整周收入 +{p} %。\n险胜——保级：{l}",
+ "Těsná prohra – zůstáváš: {l}": "惜败——保级：{l}",
+ "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "如果结果接近（差距在 5 % 以内），你会留在当前联赛。"
 }

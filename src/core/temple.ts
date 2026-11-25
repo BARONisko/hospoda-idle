@@ -11,6 +11,8 @@ export interface TempleState {
   hp: number;
   /** poražení bossové celkem (síla dalšího bosse, trvalé pečetě) */
   boss: number;
+  /** pečetě získané před 25. 11. 2026 (dál po 10 %) */
+  old?: number;
   /** chapadla (víkendová měna) */
   ten: number;
   /** odehraná kola: den + počet */
@@ -173,5 +175,8 @@ export const TEMPLE_UPS: TempleUp[] = [
 export const ALTAR_PER = 0.009;
 export const altarCost = (n: number) => Math.ceil(300 * 1.5 ** n);
 
-/** pečeť R'lyeh za poraženého bosse: trvale + výdělek v hospodách */
-export const SEAL_BONUS = 0.1;
+/** pečeť R'lyeh za poraženého bosse: trvale + výdělek v hospodách. Od 25. 11. 2026 +0,9 % (pravidlo pod 1 %);
+ *  pečetě získané dřív (old) dál po 10 % */
+export const SEAL_BONUS = 0.009;
+export const SEAL_OLD = 0.1;
+export const sealBonus = (boss: number, old = 0) => SEAL_OLD * Math.min(boss, old) + SEAL_BONUS * Math.max(0, boss - old);

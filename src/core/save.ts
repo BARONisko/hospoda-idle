@@ -118,6 +118,9 @@ export interface Save {
   sk2?: boolean;
   /** nové ceny uzlů (hospoda 63b) – body jednou vráceny */
   sk3?: boolean;
+  /** 25. 11. 2026 (pravidlo pod 1 %): Zlatý výčep a pečetě Chrámu po 0,9 % – úrovně výčepu za starých pravidel (zůstávají); pečetě v temple.old */
+  cthOld?: number;
+  bon9?: boolean;
   skR?: number;
   /** mistrovství stanic: odsloužené sekundy podle stanice (součet hospod, přežije hygienu) */
   mast?: Record<string, number>;

@@ -1432,5 +1432,8 @@
  "3 dny zdarma, pak {p} měsíčně": "3日間無料、その後月額{p}",
  "Předplatit · {p} měsíčně": "登録・月額{p}",
  "Obnovuje se každý měsíc. Zrušíš kdykoli v Google Play.": "毎月自動更新。Google Playでいつでも解約できます。",
- "nebo jednorázově: {s}": "または1回払い:{s}"
+ "nebo jednorázově: {s}": "または1回払い:{s}",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nTěsná výhra – zůstáváš: {l}": "報酬：+{g} 💎、+{k} ジョッキ、お守り。\nリーグカップ：1週間ずっと収入 +{p} %。\n僅差の勝利：残留 {l}",
+ "Těsná prohra – zůstáváš: {l}": "僅差の敗北：残留 {l}",
+ "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "僅差（5 %以内）の場合は、今のリーグに残留します。"
 }

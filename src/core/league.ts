@@ -32,6 +32,8 @@ export interface LeagueState {
   /** 💎 Zavřená pípa soupeře: od kdy (ms) a v který den (max 1× denně) */
   stopFrom?: number;
   stopDay?: string;
+  /** minulé týdny (až 3) pro výpočet soupeře */
+  prev?: { me: number; base?: number }[];
   /** Ligový pohár: liga (1–5), kterou hráč vyhrál minulý týden → tento týden výdělek +LG_CUP × liga */
   cup?: number;
 }
@@ -79,12 +81,15 @@ const weekTotal = (rate: number, tier: number) => ((rate * 86400) / Math.log(GRO
 
 /** výdělek soupeře na začátku týdne: vyrovnaný podle toho, kolik hráč vydělal minulý týden
  *  (s ohledem na to, jak od té doby zrychlil), jinak podle jeho výdělku za sekundu */
-export function rivalRate(tier: number, myRate: number, last?: { me: number; base?: number }) {
+export function rivalRate(tier: number, myRate: number, last?: { me: number; base?: number } | { me: number; base?: number }[]) {
   const byRate = (Math.max(1, myRate) * TIER_F[tier - 1]) / TIER_F[0];
+  // 25. 11. 2026: průměr posledních až 3 týdnů (jeden silný/slabý týden nerozhodí soupeře – dřív hráč střídal výhra/prohra)
+  const hist = (Array.isArray(last) ? last : last ? [last] : []).filter((h) => h.me > 0 && h.base);
   // první týden (bez historie): mírnější, aby i slabší hráč měl šanci
-  if (!last || !(last.me > 0) || !last.base) return byRate * 0.45;
-  const grew = Math.min(6, Math.max(1, myRate / last.base));
-  const target = last.me * grew * TIER_F[tier - 1];
+  if (!hist.length) return byRate * 0.45;
+  // strop zrychlení 6× za každý týden stáří (starší týden mohl být mnohem menší)
+  const grown = hist.map((h, i) => h.me * Math.min(6 ** (hist.length - i), Math.max(1, myRate / h.base!)));
+  const target = (grown.reduce((a, b) => a + b, 0) / grown.length) * TIER_F[tier - 1];
   // nejvýš 2× a nejméně ¼ toho, co by dal výdělek za sekundu (aby jeden divný týden nerozhodil vše)
   return Math.min(byRate * 2, Math.max(byRate / 4, target / weekTotal(1, tier)));
 }
@@ -110,6 +115,10 @@ export function rivalScore(L: LeagueState, now = Date.now()) {
 }
 
 export const weekEnd = (L: LeagueState) => L.start + WEEK;
+/** těsný výsledek (do ±5 %): odměna za výhru ano, ale hráč zůstává v lize (nepostoupí ani nesestoupí) */
+export const LG_BAND = 0.05;
+/** posun v lize podle výsledku: +1 postup, 0 zůstává, −1 sestup */
+export const leagueMove = (me: number, rival: number) => (!(rival > 0) ? (me > rival ? 1 : -1) : me > rival * (1 + LG_BAND) ? 1 : me < rival * (1 - LG_BAND) ? -1 : 0);
 // ---------- odměny za výhru (přání uživatele, hospoda 72: kdo platí 💎 za Posilu / Zavřenou pípu, musí za výhru dostat víc) ----------
 /** 💎 za výhru = LG_WIN_GEMS × liga (30 … 150; dřív 2 × liga – míň než jedna Posila za 20 💎) */
 export const LG_WIN_GEMS = 30;

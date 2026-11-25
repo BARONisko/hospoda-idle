@@ -1432,5 +1432,8 @@
  "3 dny zdarma, pak {p} měsíčně": "3 jours gratuits, puis {p} par mois",
  "Předplatit · {p} měsíčně": "S'abonner · {p} par mois",
  "Obnovuje se každý měsíc. Zrušíš kdykoli v Google Play.": "Se renouvelle chaque mois. Résiliable à tout moment dans Google Play.",
- "nebo jednorázově: {s}": "ou en une fois : {s}"
+ "nebo jednorázově: {s}": "ou en une fois : {s}",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nTěsná výhra – zůstáváš: {l}": "Récompense : +{g} 💎, +{k} chopes et un talisman.\nCoupe de la ligue : gains +{p} % toute la semaine.\nVictoire serrée : tu restes en : {l}",
+ "Těsná prohra – zůstáváš: {l}": "Défaite serrée : tu restes en : {l}",
+ "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "Si le résultat est serré (écart jusqu'à 5 %), tu restes dans ta ligue."
 }

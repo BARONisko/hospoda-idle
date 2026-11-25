@@ -10,8 +10,9 @@ export const simCount = { levels: 0 };
 interface St { lvl: number; auto: boolean }
 const fmt = (s: number) => (s < 3600 ? `${(s / 60).toFixed(1)} min` : `${(s / 3600).toFixed(2)} h`);
 
-/** goal: zastav, až krígly v běhu (kf) dosáhnou goal, a vrať čas v s; kf = varianta vzorce krígel */
-export function run(pubs: number, krigle: number, maxT = 6 * 3600, goal = 0, kf: (run: number, pubs: number) => number = (r, p) => kriglyFor(r, p)): any {
+/** goal: zastav, až krígly v běhu (kf) dosáhnou goal, a vrať čas v s; kf = varianta vzorce krígel;
+ *  mult = ostatní bonusy výdělku (Chrám, pivovar, strom, pohár, výčep… – tools/sim/days.mjs); po 1 h krok roste (rychlost) */
+export function run(pubs: number, krigle: number, maxT = 6 * 3600, goal = 0, kf: (run: number, pubs: number) => number = (r, p) => kriglyFor(r, p), mult = 1): any {
   const st: St[][] = Array.from({ length: pubs }, (_, i) => STATIONS.map((d) => ({ lvl: d.id === 'tap' && i === 0 ? 1 : 0, auto: false })));
   const up: string[] = [];
   // číšníci: první nastoupí s kostlivcem na pípě, pípa vydělá jen to, co roznesou
@@ -21,7 +22,7 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600, goal = 0, kf:
   // mrtvá místa: nejdelší čekání mezi nákupy (do 1 h a 1–6 h), počet čekání > 60 s v 1. hodině
   let lastBuy = 0, gap1 = 0, gapL = 0, long1 = 0;
   const bought = () => { const g = t - lastBuy; if (t <= 3600) { gap1 = Math.max(gap1, g); if (g > 60) { long1++; if (process.env.GAPS) console.log(`  čekání ${g} s končí v ${(t / 60).toFixed(1)} min, příjem ${rate().toFixed(1)}/s`); } } else gapL = Math.max(gapL, g); lastBuy = t; };
-  const kb = 1 + KRIGL_BONUS * krigle;
+  const kb = (1 + KRIGL_BONUS * krigle) * mult;
   const spent = Array(pubs).fill(0), lvls = Array(pubs).fill(0);
   const mc = (p: number, i: number) => (st[p][i].lvl > 0 ? milestoneCount(st[p][i].lvl) : -1);
   // styl hospody + zásobování (OLD=1 = bez nich, pro srovnání)
@@ -138,9 +139,10 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600, goal = 0, kf:
     });
     if (anyAff && process.env.REAL) bought();
     const r = rate();
-    coins += r;
-    run += r;
-    t += 1;
+    const dt = t < 3600 ? 1 : Math.max(1, Math.floor(t / 1200));
+    coins += r * dt;
+    run += r * dt;
+    t += dt;
     for (const [name, v] of [['1K', 1e3], ['1M', 1e6], ['1B', 1e9]] as const) if (run >= v && !(name in marks)) marks[name] = t;
     if (goal && kf(run, pubs) >= goal) return t;
     if (kriglyFor(run, pubs) >= PRESTIGE_FIRST && !('1. hygiena' in marks)) marks['1. hygiena'] = t;
@@ -152,6 +154,10 @@ export function run(pubs: number, krigle: number, maxT = 6 * 3600, goal = 0, kf:
   if (pubs > 1) res['útrata po hospodách %'] = spent.map((x) => ((100 * x) / spent.reduce((a, b) => a + b, 0)).toFixed(2)).join(' / ') + '; úrovně ' + lvls.join(' / ') + '  (konec: ' + st.map((ps) => ps.map((x) => x.lvl).join(',')).join(' | ') + ')';
   return res;
 }
+
+// pro tools/sim/days.mjs
+export { MENU_HYG, PRESTIGE_GROW, PRESTIGE_MIN, PRESTIGE_FIRST, VYCEP, vycepCost } from '../../src/core/economy';
+export { SEAL_BONUS as SEAL } from '../../src/core/temple';
 
 const WAITERS_ON = !process.env.NO_WAITERS;
 const OLD = !!process.env.OLD;

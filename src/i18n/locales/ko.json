@@ -1432,5 +1432,8 @@
  "3 dny zdarma, pak {p} měsíčně": "3일 무료, 이후 월 {p}",
  "Předplatit · {p} měsíčně": "구독 · 월 {p}",
  "Obnovuje se každý měsíc. Zrušíš kdykoli v Google Play.": "매달 갱신돼요. Google Play에서 언제든 해지할 수 있어요.",
- "nebo jednorázově: {s}": "또는 1회 구매: {s}"
+ "nebo jednorázově: {s}": "또는 1회 구매: {s}",
+ "Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nTěsná výhra – zůstáváš: {l}": "보상: +{g} 💎, +{k} 맥주잔, 부적.\n리그 컵: 일주일 내내 수입 +{p} %.\n아슬아슬한 승리 – 잔류: {l}",
+ "Těsná prohra – zůstáváš: {l}": "아슬아슬한 패배 – 잔류: {l}",
+ "Při těsném výsledku (rozdíl do 5 %) zůstáváš ve své lize.": "결과가 근소하면(차이 5 % 이내) 현재 리그에 남습니다."
 }

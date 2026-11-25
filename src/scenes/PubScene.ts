@@ -12,7 +12,7 @@ import { confetti, rays, bigText, coinFountain, popText, punch, flashRect } from
 import { big, dur } from '../core/num';
 import { WAITERS, WAITER_MAX, BAR_CAP, crew, tripTime, smileBonus, hireCost as wHireCost, UP_MAX as W_UP_MAX, freePoints, xpProgress, xpFor, spent as wSpent, earned as wEarned, MAX_POINTS, upName as wUpName, waiterLvl, waiterRate, tray, SMILE_STEP, START_CREW, beersPerCycle, type WaiterUp } from '../core/waiters';
 import { milestoneCount } from '../core/economy';
-import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H, STYLES, pubStyle, styleGap, styleCount, hasStyle, isStyle, pubStyles, styleSupplyMult, supplyIn, supplyOut, STYLE_MIX, STAR_LVL, STAR_MAX, starsOf, starMult, starCost, starKey, ACT_STEP } from '../core/economy';
+import { STATIONS, StationDef, STATION_NAMES, PUB_NAMES, costN, affordable, payout, actMult, nextMilestone, upMult, upDef, upTiers, UpgradeDef, MANAGERS, mgrCost, BOOST_MULT, BOOST_S, BOOST_CD, kriglyFor, KRIGL_BONUS, setCthOld, prestigeMin, KRIGL_SHOP, KriglItem, startCoins, DECOR, kSpeed, kOffline, kEvents, kCthulhu, kKrigly, kMaxed, guestLvl, guestTips, GUEST_MAX, OFFLINE_MAX_H, STYLES, pubStyle, styleGap, styleCount, hasStyle, isStyle, pubStyles, styleSupplyMult, supplyIn, supplyOut, STYLE_MIX, STAR_LVL, STAR_MAX, starsOf, starMult, starCost, starKey, ACT_STEP } from '../core/economy';
 import { sfx } from '../core/sfx';
 import { ads } from '../core/ads';
 import { iap, ProductId, PRODUCTS, onIapReady } from '../core/shop';
@@ -22,13 +22,13 @@ import { season, SEASONS, SEASON_BONUS } from '../core/season';
 /** kdy přijde sezónní host (karta ve Sbírce, dokud ho hráč neviděl; data podle core/season.ts) */
 const SEASON_WHEN: Record<string, string> = { monk: t('1. 12. – 6. 1.'), muertos0: t('20. 10. – 3. 11.'), brewer: t('15. 9. – 10. 10.') };
 import { VISITORS, Visitor, VisitCtx, VIS_GOLD, VIS_GEMS_DAY, visGems } from '../game/visitors';
-import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward, winGems, cupMult, LG_CUP, rivalInfo, rivalRate, LG_BOOST, LG_WILD, LG_STOP, fxOn, fxLeft, boostShare } from '../core/league';
+import { LEAGUES, LeagueState, weekStart, rivalTick, weekEnd, winReward, winGems, cupMult, LG_CUP, rivalInfo, rivalRate, leagueMove, LG_BOOST, LG_WILD, LG_STOP, fxOn, fxLeft, boostShare } from '../core/league';
 import { isNight, nightForced, phaseLeft, DAY_MS, bonesFor, nightCfg, retune, nightLen, nightShare, switchPhase, nightCost, nightCostN, NIGHT_MAX_LVL, SWITCH_LVL, SWITCH_COST } from '../core/night';
 import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
 import { notify, NOTE, Note } from '../core/notify';
 import { chestReady, chestDay, openChest, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, GEM_PERM, GEM_LOOK, CHRONICLE_BONUS, VIP_GEMS, GOLD_GEMS, GEMS_FREE, PRESTIGE_GEMS_DAY, RESPEC_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
-import { templeState, isWeekend, ROUNDS_PER_DAY, SEAL_BONUS, TempleState, weekendKey, ALTAR_PER, weekendLeft } from '../core/temple';
+import { templeState, isWeekend, ROUNDS_PER_DAY, sealBonus, TempleState, weekendKey, ALTAR_PER, weekendLeft } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { TREE, TREE_BY_ID, TREE_BRANCHES, TREE_COLORS, STAR_TEXT, treeSpent, treeCan, hasStar, treeStats, xpNeed, oldXpNeed, lvlFromTotal, respecCost, pathX, type StarId, type TreeNode } from '../core/skilltree';
 import { collHire, collSpdCost, collAmtCost, COLL_AMT_MAX } from '../core/collector';
@@ -341,6 +341,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.d.skills = [];
       this.d.sk3 = true;
     }
+    // 25. 11. 2026 (pravidlo pod 1 %): Zlatý výčep a pečetě Chrámu nově po 0,9 % – co hráč už má, zůstane po starém
+    if (!this.d.bon9) {
+      this.d.cthOld = this.kl('cthulhu');
+      if (this.d.temple) this.d.temple.old = this.d.temple.boss;
+      this.d.bon9 = true;
+    }
+    setCthOld(this.d.cthOld ?? 0);
     for (const p of this.d.pubs) {
       if (p.st.tap?.auto && !p.w?.length) p.w = START_CREW();
       // v3: číšníci se levelovali ~20× moc rychle → zkušenosti, úrovně i body všem vynulovat (přání uživatele)
@@ -662,7 +669,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // liga: o kolik soupeř mezitím přidal (jen když je to pořád stejný týden)
     const L = this.league();
     let rival: { add: number; lead: number } | undefined;
-    // liga ještě zamčená (odemyká se po 20. hygieně) → o soupeři v okně nepsat, nový hráč by nevěděl, o co jde
+    // liga ještě zamčená (odemyká se po MENU_HYG.league. hygieně) → o soupeři v okně nepsat, nový hráč by nevěděl, o co jde
     if (L.start <= leftAt && !this.tileLock('league')) {
       const before = rivalTick(L, leftAt);
       const after = rivalTick(L);
@@ -784,7 +791,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (d.menuOpen?.includes(name)) return null;
     // menu se odemyká postupně (přání uživatele): ne všechno naráz po 1. hygieně
     // pořadí (přání uživatele): nejvýš jedna novinka za kolo, vždy se šipkou a krátkým návodem
-    // 1. hygiena krígly · 2. Hostinský · první noc kosti (Kostnice, Sběrač) · 3. pivovar · 6. Chrám · 10. výzdoba · 15. šipky · 20. Liga
+    // 1. hygiena krígly a noc · 2. Hostinský · 4. pivovar · 11. Chrám · 20. výzdoba · 30. šipky · 40. Liga (25. 11. 2026, dřív 3/6/10/15/20)
     // (pomaleji – přání uživatele, dřív 1–6 a vše odemčené za ~1 h)
     // prahy hygien v MENU_HYG (ui/help.ts) – stejná čísla ukazuje nápověda „Jak to funguje“
     const hyg = d.stats.prestiges, after = (n: number) => (hyg >= n ? null : t('po {n}. hygieně', { n: String(n) }));
@@ -1099,7 +1106,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.applyKup();
       return STAT_NAMES[o.stat](n * o.per);
     }
-    if (kind === 'seal') return t('Pečeť R\'lyeh: výdělek všude +{v} %', { v: Math.round((this.d.temple?.boss ?? 0) * SEAL_BONUS * 100) });
+    if (kind === 'seal') return t('Pečeť R\'lyeh: výdělek všude +{v} %', { v: Math.round(sealBonus(this.d.temple?.boss ?? 0, this.d.temple?.old) * 1000) / 10 });
     const tl = (this.d.talis ??= {});
     const pool = TALISMANS.filter((x) => x.temple);
     const d = pool.find((x) => !tl[x.id]) ?? Phaser.Utils.Array.GetRandom(pool);
@@ -1491,11 +1498,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       let tier = L?.tier ?? 1, cup = 0;
       if (L) {
         const rival = rivalTick(L, weekEnd(L));
-        const win = L.me > rival;
+        const win = L.me > rival, move = leagueMove(L.me, rival);
         // odměny (hospoda 72): 💎 30 × liga, krígly podle vlastněných, Ligový pohár = výdělek +10 % × liga na celý další týden
         const k = win ? winReward(tier, this.d.krigle) : 0, gm = win ? winGems(tier) : 0;
         cup = win ? tier : 0;
-        this.leagueResult = { win, me: L.me, rival, tier, name: rivalInfo(L).name, wild: !win && !!L.wild && tier > 1, k, g: gm };
+        this.leagueResult = { win, me: L.me, rival, tier, name: rivalInfo(L).name, wild: !win && move < 0 && !!L.wild && tier > 1, stay: move === 0, k, g: gm };
         this.d.leagueHist = [...(this.d.leagueHist ?? []), [tier, win] as [number, boolean]].slice(-8);
         if (win) {
           this.d.krigle += k;
@@ -1503,12 +1510,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
           // liga → šipky: +3 body
           if (this.d.darts) this.d.darts.pts += 3;
           this.leagueWinDrop = true;
-          tier = Math.min(LEAGUES.length, tier + 1);
-        } else if (!L.wild) tier = Math.max(1, tier - 1); // Divoká karta: zůstává
+          if (move > 0) tier = Math.min(LEAGUES.length, tier + 1);
+        } else if (!L.wild && move < 0) tier = Math.max(1, tier - 1); // Divoká karta nebo těsná prohra: zůstává
       }
       // soupeř vyrovnaný podle minulého týdne (kolik hráč skutečně vydělal), vyšší liga o kus silnější
       const my = Math.max(1, this.totalRate());
-      L = { week: String(ws), start: ws, tier, rate: rivalRate(tier, my, L ? { me: L.me, base: L.base } : undefined), me: 0, rival: 0, rAt: ws, base: my, ...(cup ? { cup } : {}) };
+      const prev = L ? [...(L.prev ?? []), { me: L.me, base: L.base }].slice(-3) : [];
+      L = { week: String(ws), start: ws, tier, rate: rivalRate(tier, my, prev), me: 0, rival: 0, rAt: ws, base: my, prev, ...(cup ? { cup } : {}) };
       this.d.league = L;
       store(this.d);
     }
@@ -1519,7 +1527,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   leagueLive?: () => void;
   leagueLiveT = 0;
   dnT = 1;
-  leagueResult?: { win: boolean; me: number; rival: number; tier: number; name: string; wild?: boolean; k?: number; g?: number };
+  leagueResult?: { win: boolean; me: number; rival: number; tier: number; name: string; wild?: boolean; stay?: boolean; k?: number; g?: number };
   leagueWinDrop = false;
 
   /** okno s výsledkem minulého týdne */
@@ -1543,7 +1551,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const tx = (y: number, s2: string, size: number, c: string) => objs.push(this.add.text(W / 2, y, s2, txt(size, c)).setOrigin(0.5, 0).setAlign('center').setWordWrapWidth(W - 100).setDepth(D + 2));
     tx(284, r.win ? t('Vyhrál jsi ligu!') : t('Prohrál jsi ligu…'), 34, r.win ? PAL.gold : PAL.scarlet);
     tx(344, t('Tvoje tržba: {a} coins\n{s}: {b} coins', { a: big(r.me), b: big(r.rival), s: r.name }), 22, PAL.bone);
-    tx(420, r.win ? t('Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nPostupuješ do: {l}', { k: big(r.k ?? winReward(r.tier)), g: r.g ?? winGems(r.tier), p: Math.round(LG_CUP * r.tier * 100), l: LEAGUES[Math.min(LEAGUES.length, r.tier + 1) - 1] }) : r.wild ? t('Divoká karta – zůstáváš: {l}', { l: LEAGUES[r.tier - 1] }) : t('Sestupuješ do: {l}', { l: LEAGUES[Math.max(1, r.tier - 1) - 1] }), 22, r.win ? PAL.mint : PAL.fog);
+    const rw = { k: big(r.k ?? winReward(r.tier)), g: r.g ?? winGems(r.tier), p: Math.round(LG_CUP * r.tier * 100), l: LEAGUES[Math.min(LEAGUES.length, r.tier + (r.stay ? 0 : 1)) - 1] };
+    tx(420, r.win ? (r.stay ? t('Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nTěsná výhra – zůstáváš: {l}', rw) : t('Odměna: +{g} 💎, +{k} krígel a talisman.\nLigový pohár: výdělek +{p} % na celý týden.\nPostupuješ do: {l}', rw)) : r.stay ? t('Těsná prohra – zůstáváš: {l}', { l: LEAGUES[r.tier - 1] }) : r.wild ? t('Divoká karta – zůstáváš: {l}', { l: LEAGUES[r.tier - 1] }) : t('Sestupuješ do: {l}', { l: LEAGUES[Math.max(1, r.tier - 1) - 1] }), 22, r.win ? PAL.mint : PAL.fog);
     const close = () => {
       objs.forEach((o) => o.destroy());
       this.awayObjs = [];
@@ -2245,7 +2254,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.row(y0, RH, D, t('Zavolat hygienu'), this.hygGemsLeft() > 0 ? t('krígly: {k} (+{b} % výdělek) · hygiena +{g} 💎', kv) : t('krígly: {k} (+{b} % výdělek) · 💎 zase zítra', kv), 'blood', PAL.sand);
     const pb = this.btn(W - 212, y0 + 12, 190, 62, () => this.askPrestige(), D + 2);
     this.hygBtn = pb;
-    const pm = prestigeMin(this.d.stats.prestiges, this.d.krigle);
+    const pm = prestigeMin(this.d.stats.prestiges, this.kAll());
     this.drawBtn(pb, k >= pm ? t('+{k} krígel', { k: big(k) }) : t('{k} / {m} krígel', { k: big(k), m: big(pm) }), k >= pm, 'red');
     this.shopObjs.push(pb.bg, pb.label, pb.zone);
     if (!offer.length) this.shopObjs.push(this.add.text(W / 2, y0 + 150, t('Teď tu nic není.\nOtevři další stanice.'), txt(22, PAL.fog)).setOrigin(0.5).setAlign('center').setDepth(D + 1));
@@ -3797,7 +3806,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.openShop(tab);
     };
     // QA hospoda 66: hygiena má přednost před splněným úkolem (kdo úkoly nevybírá, radu hygieny jinak nikdy neviděl)
-    const k = this.kriglyNow(), pm = prestigeMin(d.stats.prestiges, d.krigle);
+    const k = this.kriglyNow(), pm = prestigeMin(d.stats.prestiges, this.kAll());
     if (k >= pm && k >= d.krigle * 0.3) return { text: t('Zavolej hygienu (Obchod): dostaneš +{k} krígel = výdělek navždy +{v} %.', { k: big(k), v: big(Math.round(k * KRIGL_BONUS * 100)) }), go: open('shop', 'up') };
     if (this.claimable()) return { text: t('Máš splněný úkol – vyzvedni odměnu v Úkolech.'), go: open('tasks') };
     const now = Date.now();
@@ -4097,7 +4106,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   // ---------- prestiž: hygiena ----------
   private askPrestige() {
     const k = this.kriglyNow();
-    if (k < prestigeMin(this.d.stats.prestiges, this.d.krigle)) return sfx.error();
+    if (k < prestigeMin(this.d.stats.prestiges, this.kAll())) return sfx.error();
     this.closeShop();
     const D = 520;
     const objs: Phaser.GameObjects.GameObject[] = [];
@@ -4924,7 +4933,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.kAll()) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu')) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + SEAL_BONUS * (this.d.temple?.boss ?? 0)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * cupMult(this.d.league) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act) * ((p.adx?.[def.id] ?? 0) > Date.now() ? 2 : 1);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.kAll()) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu'), this.d.cthOld ?? 0) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + sealBonus(this.d.temple?.boss ?? 0, this.d.temple?.old)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * cupMult(this.d.league) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act) * ((p.adx?.[def.id] ?? 0) > Date.now() ? 2 : 1);
   }
 
   // ---------- obchod s krígly ----------
@@ -5762,7 +5771,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.hygW = 0;
       return;
     }
-    const k = this.kriglyNow(), pm = prestigeMin(this.d.stats.prestiges, this.d.krigle);
+    const k = this.kriglyNow(), pm = prestigeMin(this.d.stats.prestiges, this.kAll());
     const full = k >= pm;
     const fr = full ? 1 : Math.min(0.99, this.kriglyCont() / pm);
     // plný krígl pulzuje (překresluje se jen tehdy)
@@ -5871,7 +5880,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   static QH = 60;
 
   private qctx(): QCtx {
-    return { lock: (k) => this.tileLock(k), krigly: () => [this.kriglyNow(), prestigeMin(this.d.stats.prestiges, this.d.krigle)] };
+    return { lock: (k) => this.tileLock(k), krigly: () => [this.kriglyNow(), prestigeMin(this.d.stats.prestiges, this.kAll())] };
   }
 
   private qCur(): QuestDef | null {
