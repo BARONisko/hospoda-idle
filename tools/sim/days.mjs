@@ -29,15 +29,20 @@ const P = [
   { who: 'zapálený', sess: 8, act: 1800, off: 0.3, boss: 1, brew: 2, ads: 0.2, cup: 0.12 },
 ];
 const OFF_CAP = 8 * 3600;
+// REKO=1: Kniha hostinského a Rekonstrukce ★ (od Ligy). Kapitola ★n hotová za RD[n-1] dní od odemčení Ligy (odhad podle úkolů:
+// ★2 čeká na Cthulhu II o víkendu, ★4–★5 na ligu, Chrám a hodnosti). Rekonstrukce = hygiena místo běžné (na konci kola), krígly nemaže;
+// ★2 pátá stanice (Kulečník), ★4 kasa offline +2 h. Výsledky srovnej s REKO=0.
+const REKO = process.env.REKO === '1';
+const RD = { slabší: [7, 25, 45, 75, 110], běžný: [5, 18, 32, 55, 85], zapálený: [4, 14, 25, 42, 65] };
 const cache = new Map();
 // zrychlení: krígly a bonusy zaokrouhlené (krígly na 2 %, bonusy na 5 %) → výsledky se opakují z mezipaměti
 const q = (x, st) => (x < 50 ? x : Math.round(Math.exp(Math.round(Math.log(x) / st) * st)));
-const roundT = (pubs, k, goal, m) => {
+const roundT = (pubs, k, goal, m, five = false) => {
   const kq = q(k, 0.02), mq = Math.exp(Math.round(Math.log(m) / 0.05) * 0.05);
-  const key = `${pubs}|${kq}|${goal}|${mq.toFixed(3)}`;
+  const key = `${pubs}|${kq}|${goal}|${mq.toFixed(3)}|${five}`;
   if (!cache.has(key)) {
     const t0 = Date.now();
-    const t = run(pubs, kq, 60 * 3600, goal, kf, mq);
+    const t = run(pubs, kq, 60 * 3600, goal, kf, mq, five);
     if (process.env.DEBUG) console.error(`run ${pubs} k${kq} cíl ${goal} ×${mq.toFixed(2)} → ${typeof t === 'number' ? (t / 60).toFixed(0) + ' min' : '∞'} (${Date.now() - t0} ms)`);
     cache.set(key, typeof t === 'number' ? t : Infinity);
   }
@@ -47,7 +52,7 @@ const roundT = (pubs, k, goal, m) => {
 for (const pl of P) {
   let n = 0, k = 0, held = 0, pubs = 1, cth = 0, prog = 0, T = 0, goal = 0;
   const unlock = {}, log = [];
-  let templeDay = null, decorDay = null, leagueDay = null;
+  let templeDay = null, decorDay = null, leagueDay = null, star = 0, pend = 0;
   const mult = (day) => {
     const bosses = templeDay === null ? 0 : Math.floor((day - templeDay) / 7 / pl.boss);
     const seal = 1 + (STARE ? 0.1 : SEAL) * bosses;
@@ -60,16 +65,19 @@ for (const pl of P) {
   };
   const newRound = (day) => {
     goal = goalOf(n); // laťka podle čísla hygieny (od 25. 11. 2026, dřív 7 % držených krígel)
-    T = roundT(pubs, k, goal, mult(day));
+    T = roundT(pubs, k, goal, mult(day), star >= 2);
     prog = 0;
   };
   newRound(0);
   const DAYS = Number(process.env.DAYS ?? 60);
-  const marks = [1, 3, 7, 14, 30, 60, 100, 365].filter((d) => d <= DAYS);
+  const marks = [1, 3, 7, 14, 30, 45, 60, 75, 90, 100, 120, 365].filter((d) => d <= DAYS);
   for (let day = 0; day < DAYS; day++) {
     for (let s = 0; s < pl.sess; s++) {
       const now = day + s / pl.sess;
-      if (day || s) prog = Math.min(T, prog + pl.off * Math.min(OFF_CAP, (86400 - pl.sess * pl.act) / pl.sess));
+      // Rekonstrukce: kapitola hotová → hráč ji udělá místo nejbližší hygieny (dostane krígly za celé kolo, laťka neroste navíc)
+      if (REKO && leagueDay !== null && star + pend < 5 && now >= leagueDay + RD[pl.who][star + pend]) pend++;
+      const cap = OFF_CAP + (REKO && star >= 4 ? 2 * 3600 : 0);
+      if (day || s) prog = Math.min(T, prog + pl.off * Math.min(cap, (86400 - pl.sess * pl.act) / pl.sess));
       let a = pl.act;
       while (a > 0) {
         const need = T - prog;
@@ -77,6 +85,7 @@ for (const pl of P) {
         a -= Math.max(0, need);
         // hygiena
         n++; k += goal; held += goal; pubs = Math.min(3, pubs + 1);
+        if (pend) (pend--, star++, log.push(`den ${(now + 1).toFixed(1)}: Rekonstrukce ★${star} (${n}. hygiena)`));
         for (const [key, h] of Object.entries(MENU_HYG)) if (n === h) unlock[key] = now;
         if (n === MENU_HYG.temple) templeDay = now;
         if (n === MENU_HYG.decor) decorDay = now;
@@ -91,5 +100,5 @@ for (const pl of P) {
     if (marks.includes(day + 1)) log.push(`den ${day + 1}: ${n} hygien, kolo ${(T / 3600).toFixed(1)} h, krígel ${k}, výčep ${cth}, bonusy ×${mult(day + 1).toFixed(2)}`);
   }
   const u = Object.entries(MENU_HYG).map(([key, h]) => `${key} (${h}.) ${unlock[key] === undefined ? '–' : 'den ' + (unlock[key] + 1).toFixed(1)}`).join(', ');
-  console.log(`${pl.who}${STARE ? ' [STARÉ bonusy]' : ''}\n  odemčení: ${u}\n  ${log.join('\n  ')}`);
+  console.log(`${pl.who}${STARE ? ' [STARÉ bonusy]' : ''}${REKO ? ' [REKO]' : ''}\n  odemčení: ${u}\n  ${log.join('\n  ')}`);
 }

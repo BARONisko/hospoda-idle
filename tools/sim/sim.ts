@@ -2,7 +2,9 @@
 // Spuštění: node tools/sim/run.mjs   → časy do milníků (1K, 1M, první prestiž…) pro 1.–3. hospodu.
 import { crew, beersPerCycle, START_CREW, hireCost, freePoints, UP_MAX, WAITER_MAX, type WaiterState, type WaiterUp } from '../../src/core/waiters';
 import { milestoneCount, styleSupplyMult } from '../../src/core/economy';
-import { STATIONS, StationDef, payout, cost, actMult, UPGRADES, upMult, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN, PRESTIGE_FIRST } from '../../src/core/economy';
+import { STATIONS as STATIONS4, STATIONS5, StationDef, payout, cost, actMult, UPGRADES as UP4, upDef, upMult, kriglyFor, KRIGL_BONUS, PRESTIGE_MIN, PRESTIGE_FIRST } from '../../src/core/economy';
+/** five = pátá stanice (★2 Rekonstrukce) */
+const UP5 = [...UP4, ...[1, 2, 3, 4].flatMap((act) => [1, 2, 3].map((k) => upDef(act, 'pool', k)))];
 
 /** počítadla pro tools/sim/skills.mjs (koupené úrovně = XP hostinského) */
 export const simCount = { levels: 0 };
@@ -12,7 +14,8 @@ const fmt = (s: number) => (s < 3600 ? `${(s / 60).toFixed(1)} min` : `${(s / 36
 
 /** goal: zastav, až krígly v běhu (kf) dosáhnou goal, a vrať čas v s; kf = varianta vzorce krígel;
  *  mult = ostatní bonusy výdělku (Chrám, pivovar, strom, pohár, výčep… – tools/sim/days.mjs); po 1 h krok roste (rychlost) */
-export function run(pubs: number, krigle: number, maxT = 6 * 3600, goal = 0, kf: (run: number, pubs: number) => number = (r, p) => kriglyFor(r, p), mult = 1): any {
+export function run(pubs: number, krigle: number, maxT = 6 * 3600, goal = 0, kf: (run: number, pubs: number) => number = (r, p) => kriglyFor(r, p), mult = 1, five = false): any {
+  const STATIONS = five ? STATIONS5 : STATIONS4, UPGRADES = five ? UP5 : UP4;
   const st: St[][] = Array.from({ length: pubs }, (_, i) => STATIONS.map((d) => ({ lvl: d.id === 'tap' && i === 0 ? 1 : 0, auto: false })));
   const up: string[] = [];
   // číšníci: první nastoupí s kostlivcem na pípě, pípa vydělá jen to, co roznesou
