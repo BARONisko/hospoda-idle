@@ -257,6 +257,8 @@ export function store(d: Save, flush = false) {
   // hodiny vrácené dozadu nesmí posunout čas odchodu (přetáčení hodin = opakovaný offline výdělek); víc než den = oprava hodin
   const now = Date.now();
   d.at = d.at > now && d.at - now < 86_400_000 ? d.at : now;
+  // pojistka po letech hraní: číslo přes ~1,8e308 je Infinity, uložilo by se jako null a oprava by ho vynulovala
+  for (const k of ['coins', 'earned', 'run', 'krigle'] as const) if (d[k] === Infinity) d[k] = Number.MAX_VALUE;
   try {
     const raw = JSON.stringify(d);
     localStorage.setItem(KEY, raw);

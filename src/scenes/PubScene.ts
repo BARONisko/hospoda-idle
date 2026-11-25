@@ -2947,16 +2947,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.offerPop(id);
   }
 
-  /** vzhled okna nabídky: ?offer=a|b|c (návrhy pro uživatele) */
-  static OFFER_LOOK = (new URLSearchParams(location.search).get('offer') ?? 'a') as 'a' | 'b' | 'c';
-
   /** okno s nabídkou balíčku */
   offerPop(id: 'starter' | 'xmas') {
     const D = 520;
     const objs: Phaser.GameObjects.GameObject[] = [];
     const add = <T extends Phaser.GameObjects.GameObject>(o: T) => (objs.push(o), o);
-    const look = PubScene.OFFER_LOOK;
-    add(this.add.rectangle(0, 0, W, H, 0x000000, look === 'c' ? 0.8 : 0.65).setOrigin(0).setDepth(D).setInteractive());
+    add(this.add.rectangle(0, 0, W, H, 0x000000, 0.65).setOrigin(0).setDepth(D).setInteractive());
     const close = () => {
       this.awayObjs.forEach((o) => o.destroy());
       this.awayObjs = [];
@@ -2981,8 +2977,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       return g;
     };
     const fit = (o: Phaser.GameObjects.Text, w: number) => o.setScale(Math.min(1, w / o.width));
-    if (look === 'a') {
-      // A: plakát uprostřed – nadpis, seznam obsahu s ikonami, cena
+    {
+      // vzhled A „plakát“ (výběr uživatele, /mnt/project-files/vydelek/nabidka-ABC.png) – nadpis, seznam obsahu s ikonami, cena
       const bh = 290 + items.length * 92, bx = 34, by = Math.round((TOP + MB - bh) / 2), bw = W - 68;
       panel(bx, by, bw, bh, 'dusk', 'gold');
       const rib = add(this.add.graphics().setDepth(D + 2));
@@ -2999,54 +2995,6 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const b = this.btn(bx + 30, by + bh - 150, bw - 60, 76, buy, D + 3);
       this.drawBtn(b, t('Koupit · {p}', { p: iap.price(id) }), true, 'green');
       const no = this.btn(W / 2 - 100, by + bh - 62, 200, 48, close, D + 3);
-      this.drawBtn(no, t('Ne, díky'), true, 'slate');
-      objs.push(b.bg, b.label, b.zone, no.bg, no.label, no.zone);
-    } else if (look === 'b') {
-      // B: karta zespodu – obsah ve třech dlaždicích vedle sebe, zavírací křížek
-      const bh = 470, by = MB - bh + 10, bx = 12, bw = W - 24;
-      panel(bx, by, bw, bh, 'plum', 'sand');
-      fit(add(this.add.text(bx + 24, by + 22, this.bundleTitle(id), txt(32, PAL.gold)).setDepth(D + 3)), bw - 110);
-      left.setOrigin(0, 0.5).setPosition(bx + 26, by + 82);
-      const x = this.btn(bx + bw - 70, by + 14, 56, 56, close, D + 3);
-      this.drawBtn(x, '✕', true, 'ink');
-      const n = items.length, gap = 12, tw = (bw - 40 - gap * (n - 1)) / n;
-      items.forEach((it, i) => {
-        const tx = bx + 20 + i * (tw + gap), ty = by + 112;
-        const g = add(this.add.graphics().setDepth(D + 2));
-        g.fillStyle(col('ink')).fillRoundedRect(tx, ty, tw, 190, 12);
-        add(this.bundleIcon(tx + tw / 2, ty + 62, it.icon, D + 3, 1.4));
-        const s = add(this.add.text(tx + tw / 2, ty + 140, it.s, txt(19, PAL.bone)).setOrigin(0.5).setAlign('center').setWordWrapWidth(tw - 14).setDepth(D + 3));
-        s.setScale(Math.min(1, 84 / s.height));
-      });
-      const b = this.btn(bx + 20, by + bh - 128, bw - 40, 80, buy, D + 3);
-      this.drawBtn(b, t('Koupit · {p}', { p: iap.price(id) }), true, 'amber');
-      objs.push(x.bg, x.label, x.zone, b.bg, b.label, b.zone);
-    } else {
-      // C: slavnostní – paprsky, velký nadpis, obsah jako štítky, cena pulzuje
-      const cx = W / 2;
-      const r = add(this.add.graphics().setDepth(D + 1).setPosition(cx, 330));
-      for (let i = 0; i < 16; i++) {
-        const a = (i / 16) * Math.PI * 2;
-        r.fillStyle(col(id === 'xmas' ? 'scarlet' : 'gold'), 0.12).fillTriangle(0, 0, Math.cos(a) * 480, Math.sin(a) * 480, Math.cos(a + 0.18) * 480, Math.sin(a + 0.18) * 480);
-      }
-      this.tweens.add({ targets: r, angle: 360, duration: 40000, repeat: -1 });
-      const title = add(this.add.text(cx, 150, this.bundleTitle(id).toUpperCase(), txt(44, PAL.gold)).setOrigin(0.5).setStroke(PAL.ink, 8).setDepth(D + 3));
-      fit(title, W - 40);
-      add(this.add.text(cx, 330, '💎', txt(120, PAL.white)).setOrigin(0.5).setDepth(D + 2));
-      left.setY(220);
-      items.forEach((it, i) => {
-        const y = 470 + i * 70;
-        const g = add(this.add.graphics().setDepth(D + 2));
-        g.fillStyle(col('dusk')).fillRoundedRect(60, y - 28, W - 120, 56, 28);
-        g.lineStyle(3, col('sand')).strokeRoundedRect(60, y - 28, W - 120, 56, 28);
-        add(this.bundleIcon(100, y, it.icon, D + 3, 0.8));
-        fit(add(this.add.text(136, y, it.s, txt(22, PAL.white)).setOrigin(0, 0.5).setDepth(D + 3)), W - 210);
-      });
-      const by = 470 + items.length * 70 + 10;
-      const b = this.btn(60, by, W - 120, 80, buy, D + 3);
-      this.drawBtn(b, t('Koupit · {p}', { p: iap.price(id) }), true, 'green');
-      this.tweens.add({ targets: b.label, scale: { from: b.label.scale, to: b.label.scale * 1.08 }, yoyo: true, repeat: -1, duration: 600 });
-      const no = this.btn(cx - 100, by + 100, 200, 48, close, D + 3);
       this.drawBtn(no, t('Ne, díky'), true, 'slate');
       objs.push(b.bg, b.label, b.zone, no.bg, no.label, no.zone);
     }
