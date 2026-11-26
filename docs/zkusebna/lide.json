@@ -1,0 +1,12 @@
+{
+ "_about": "Výsledky testu na živých lidech (návod docs/zkusebna/test-na-lidech.md). Časy v sekundách od spuštění nové hry, minuty jsou minuty hraní. null = nestalo se nebo neměřeno. Řádek s example=true se nepočítá, smaž ho nebo nech jako vzor.",
+ "testers": [
+  {"example": true, "name": "vzor", "plays_idle": false, "phone": "Android, menší displej", "one_hand": true,
+   "first_tap_s": 6, "first_buy_s": 35, "first_staff_s": 210, "tutorial_done_s": 320,
+   "stuck": [{"t": 70, "s": 25, "why": "nevěděl, že má ťukat na pípu, čekal na coins"}],
+   "bored_min": 9, "quit_min": 14, "prestige_min": null,
+   "came_back_next_day": true, "sessions_next_day": 3, "wants_more": true,
+   "h": {"H1": 1, "H2": 2, "H3": 1, "H4": 2, "H5": 1, "H6": 2, "M1": 2, "U1": 1, "L3": 2, "P3": null},
+   "said": ["Aha, ono to pak točí samo.", "Co je ten krígl?", "Vrátil jsem se kvůli té noci s kostlivci."]}
+ ]
+}

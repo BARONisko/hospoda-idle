@@ -8,3 +8,4 @@ dist-offline
 
 # pracovní kopie pomocníků Claude
 .claude/worktrees/
+ZkusebnaRuns/

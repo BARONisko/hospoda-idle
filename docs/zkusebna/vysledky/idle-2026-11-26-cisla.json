@@ -1,0 +1,673 @@
+{
+ "metrics": {
+  "first_tap_s": 6.25,
+  "first_buy_s": 12.5,
+  "first_staff_s": 44.75,
+  "tutorial_done_s": 319.5,
+  "longest_no_progress_s": 91.5,
+  "loop_ok_by_10min": 2,
+  "buy_gap_max_h1_s": 144,
+  "buy_gap_median_h1_s": 8.0,
+  "price_growth": 1.1,
+  "longest_unaffordable_s": 114,
+  "jumps_per_30min": 2.4498638964501973,
+  "income_growth_per_hour": 1.0,
+  "offers_max_30min": 4,
+  "offline_return_value": 456.75943396226415,
+  "weak_longest_unaffordable_s": 8,
+  "new_thing_gap_max_s": 3649,
+  "new_mechanics_per_5min_max": 6,
+  "surprise_gap_max_s": 208,
+  "routine_max_s": 180,
+  "grind_growth": 2.0,
+  "content_hours": 0.9848611111111111,
+  "first_prestige_min": 17.808333333333334,
+  "prestige_speedup": 1.6913285600636436,
+  "weak_vs_strong_prestige": 1.023397285914834
+ },
+ "table": [
+  {
+   "code": "S1",
+   "name": "Čas do prvního ťuknutí, které vydělá (odhad pro člověka)",
+   "metric": "first_tap_s",
+   "value": 6.25,
+   "unit": "s",
+   "good": 10,
+   "bad": 30,
+   "score": 2,
+   "note": "bot 2 s → člověk asi 6 s"
+  },
+  {
+   "code": "S2",
+   "name": "Čas do prvního nákupu (odhad pro člověka)",
+   "metric": "first_buy_s",
+   "value": 12.5,
+   "unit": "s",
+   "good": 40,
+   "bad": 120,
+   "score": 2,
+   "note": "bot 3 s → člověk asi 12 s"
+  },
+  {
+   "code": "S3",
+   "name": "Čas do první automatizace (obsluha u stanice, odhad pro člověka)",
+   "metric": "first_staff_s",
+   "value": 44.75,
+   "unit": "s",
+   "good": 240,
+   "bad": 600,
+   "score": 2,
+   "note": "bot 16 s → člověk asi 45 s"
+  },
+  {
+   "code": "S4",
+   "name": "Konec návodu (odhad pro člověka)",
+   "metric": "tutorial_done_s",
+   "value": 319.5,
+   "unit": "s",
+   "good": [
+    90,
+    360
+   ],
+   "bad": [
+    30,
+    720
+   ],
+   "score": 2,
+   "note": "bot 213 s → člověk asi 320 s"
+  },
+  {
+   "code": "S5",
+   "name": "Nejdelší bezradnost (prvních 15 min)",
+   "metric": "longest_no_progress_s",
+   "value": 91.5,
+   "unit": "s",
+   "good": 15,
+   "bad": 40,
+   "score": 0,
+   "note": "od 69. s nováčka nic nového (bot čeká na coins; člověk by tu nejspíš ťukal na hosty)"
+  },
+  {
+   "code": "S6",
+   "name": "Stav v 10. minutě (nákup + automatizace)",
+   "metric": "loop_ok_by_10min",
+   "value": 2,
+   "unit": "z 2",
+   "good": 2,
+   "bad": 0,
+   "score": 2,
+   "note": ""
+  },
+  {
+   "code": "T1",
+   "name": "Nejdelší mezera mezi nákupy v 1. hodině",
+   "metric": "buy_gap_max_h1_s",
+   "value": 144,
+   "unit": "s",
+   "good": 180,
+   "bad": 480,
+   "score": 2,
+   "note": ""
+  },
+  {
+   "code": "T1m",
+   "name": "Medián mezery mezi nákupy v 1. hodině",
+   "metric": "buy_gap_median_h1_s",
+   "value": 8.0,
+   "unit": "s",
+   "good": [
+    8,
+    40
+   ],
+   "bad": [
+    3,
+    120
+   ],
+   "score": 2,
+   "note": ""
+  },
+  {
+   "code": "T3",
+   "name": "Růst cen (další úroveň / předchozí, stejná věc)",
+   "metric": "price_growth",
+   "value": 1.1,
+   "unit": "×",
+   "good": [
+    1.07,
+    1.15
+   ],
+   "bad": [
+    1.04,
+    1.25
+   ],
+   "score": 2,
+   "note": "2635 dvojic nákupů po sobě (pozn.: bot kupuje po 1 úrovni, cena je odhadnutá z úbytku coins)"
+  },
+  {
+   "code": "T4",
+   "name": "Nejdelší doba, kdy si hráč nemůže nic koupit",
+   "metric": "longest_unaffordable_s",
+   "value": 114,
+   "unit": "s",
+   "good": 240,
+   "bad": 600,
+   "score": 2,
+   "note": "nejhorší má bezny; počítá se jen vybraná hospoda"
+  },
+  {
+   "code": "T5",
+   "name": "Hrbolatost (skoky výdělku ×2 za 30 min)",
+   "metric": "jumps_per_30min",
+   "value": 2.4498638964501973,
+   "unit": "",
+   "good": 2,
+   "bad": 0,
+   "score": 2,
+   "note": "49 skoků za 600 min (bez skoků způsobených hygienou)"
+  },
+  {
+   "code": "T6",
+   "name": "Počet dostupných nákupů naráz (nejvíc v 1. půlhodině)",
+   "metric": "offers_max_30min",
+   "value": 4,
+   "unit": "",
+   "good": [
+    2,
+    6
+   ],
+   "bad": [
+    1,
+    12
+   ],
+   "score": 2,
+   "note": ""
+  },
+  {
+   "code": "L1",
+   "name": "Růst výdělku za hodinu (medián)",
+   "metric": "income_growth_per_hour",
+   "value": 1.0,
+   "unit": "×",
+   "good": 3,
+   "bad": 1.5,
+   "score": 0,
+   "note": "nejlepší výdělek dosud, poměr hodina/hodina: 12.21, 1.00, 1.39, 1.00, 1.26, 2.33, 1.00, 1.00, 1.00"
+  },
+  {
+   "code": "L2",
+   "name": "Hodnota návratu (slabší hráč: coins po pauze / cena nejlevnějšího užitečného nákupu)",
+   "metric": "offline_return_value",
+   "value": 456.75943396226415,
+   "unit": "×",
+   "good": 5,
+   "bad": 1,
+   "score": 2,
+   "note": "návraty: 457×, 40652×, 2981× (nejhorší platí; měřítko = medián cen posledních 5 nákupů před odchodem)"
+  },
+  {
+   "code": "O1",
+   "name": "Nejdelší mezera mezi novými věcmi (první 2 hodiny)",
+   "metric": "new_thing_gap_max_s",
+   "value": 3649,
+   "unit": "s",
+   "good": 600,
+   "bad": 1500,
+   "score": 0,
+   "note": "od 59. do 120. min běžného bota žádná nová věc (boti nechodí do Menu)"
+  },
+  {
+   "code": "O2",
+   "name": "Nejvíc nových mechanik v 5 min (1. půlhodina)",
+   "metric": "new_mechanics_per_5min_max",
+   "value": 6,
+   "unit": "",
+   "good": 2,
+   "bad": 4,
+   "score": 0,
+   "note": "první ťuk, první nákup, noví hosté, konec návodu a druhy událostí (počítá se jen první událost) se nepočítají"
+  },
+  {
+   "code": "O3",
+   "name": "Nejdelší pauza mezi překvapeními",
+   "metric": "surprise_gap_max_s",
+   "value": 208,
+   "unit": "s",
+   "good": 240,
+   "bad": 600,
+   "score": 2,
+   "note": ""
+  },
+  {
+   "code": "N1",
+   "name": "Nuda: nejdelší úsek čisté rutiny",
+   "metric": "routine_max_s",
+   "value": 180,
+   "unit": "s",
+   "good": 150,
+   "bad": 360,
+   "score": 1,
+   "note": "rutina = jen další úrovně stanic (nákup úrovně rutinu nepřeruší)"
+  },
+  {
+   "code": "N2",
+   "name": "Nuda: růst čekání na nákup (poslední třetina / první třetina)",
+   "metric": "grind_growth",
+   "value": 2.0,
+   "unit": "×",
+   "good": 2,
+   "bad": 5,
+   "score": 2,
+   "note": "medián čekání na nákup: první třetina 2.0 s, poslední 4.0 s"
+  },
+  {
+   "code": "P1",
+   "name": "Minuty do první hygieny (běžný bot)",
+   "metric": "first_prestige_min",
+   "value": 17.808333333333334,
+   "unit": "min",
+   "good": [
+    15,
+    45
+   ],
+   "bad": [
+    8,
+    90
+   ],
+   "score": 2,
+   "note": ""
+  },
+  {
+   "code": "P2",
+   "name": "Zrychlení po hygieně (2. běh dožene výdělek 1. běhu)",
+   "metric": "prestige_speedup",
+   "value": 1.6913285600636436,
+   "unit": "×",
+   "good": 3,
+   "bad": 1.5,
+   "score": 1,
+   "note": "1. běh došel na 3240/s za 18 min, 2. běh za 10 min"
+  },
+  {
+   "code": "W1",
+   "name": "Slabší hráč: minuty do první hygieny / běžný bot",
+   "metric": "weak_vs_strong_prestige",
+   "value": 1.023397285914834,
+   "unit": "×",
+   "good": 2.5,
+   "bad": 5,
+   "score": 2,
+   "note": "slabý 178 min od instalace (z toho hrál 18 min, zbytek pauzy), běžný 18 min"
+  },
+  {
+   "code": "W2",
+   "name": "Slabší hráč: nejdelší doba bez dostupného nákupu",
+   "metric": "weak_longest_unaffordable_s",
+   "value": 8,
+   "unit": "s",
+   "good": 180,
+   "bad": 480,
+   "score": 2,
+   "note": ""
+  },
+  {
+   "code": "D3",
+   "name": "Zásoba obsahu (kdy přestanou novinky)",
+   "metric": "content_hours",
+   "value": 0.9848611111111111,
+   "unit": "h",
+   "good": 10,
+   "bad": 4,
+   "score": 0,
+   "note": "poslední novinka v 59. min, pak už jen opakování do konce záznamu (10.0 h; noví hosté se nepočítají)"
+  }
+ ],
+ "curve": [
+  {
+   "min": 0,
+   "score": 94,
+   "what": [
+    "first",
+    "nová stanice",
+    "obsluha",
+    "událost zvládnutá",
+    "vylepšení",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 5,
+   "score": 160,
+   "what": [
+    "first",
+    "nová stanice",
+    "obsluha",
+    "událost zvládnutá",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 10,
+   "score": 58,
+   "what": [
+    "first",
+    "událost zvládnutá",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 15,
+   "score": 90,
+   "what": [
+    "first",
+    "hygiena",
+    "nová stanice",
+    "obsluha",
+    "událost zvládnutá"
+   ]
+  },
+  {
+   "min": 20,
+   "score": 117,
+   "what": [
+    "first",
+    "nová stanice",
+    "událost zvládnutá",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 25,
+   "score": 110,
+   "what": [
+    "first",
+    "noc",
+    "nová stanice",
+    "obsluha",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 30,
+   "score": 102,
+   "what": [
+    "first",
+    "noc",
+    "událost zvládnutá",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 35,
+   "score": 70,
+   "what": [
+    "nová stanice"
+   ]
+  },
+  {
+   "min": 40,
+   "score": 62,
+   "what": [
+    "noc",
+    "událost zvládnutá",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 45,
+   "score": 98,
+   "what": [
+    "hygiena",
+    "nová stanice",
+    "obsluha"
+   ]
+  },
+  {
+   "min": 50,
+   "score": 127,
+   "what": [
+    "noc",
+    "nová stanice",
+    "obsluha",
+    "událost zvládnutá",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 55,
+   "score": 101,
+   "what": [
+    "first",
+    "noc",
+    "nová stanice",
+    "obsluha",
+    "událost zvládnutá",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 60,
+   "score": 92,
+   "what": [
+    "obsluha"
+   ]
+  },
+  {
+   "min": 65,
+   "score": 89,
+   "what": [
+    "noc",
+    "obsluha",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 70,
+   "score": 70,
+   "what": [
+    "událost zvládnutá"
+   ]
+  },
+  {
+   "min": 75,
+   "score": 49,
+   "what": [
+    "noc"
+   ]
+  },
+  {
+   "min": 80,
+   "score": 33,
+   "what": [
+    "noc"
+   ]
+  },
+  {
+   "min": 85,
+   "score": 38,
+   "what": [
+    "událost zvládnutá",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 90,
+   "score": 27,
+   "what": [
+    "noc",
+    "událost zvládnutá"
+   ]
+  },
+  {
+   "min": 95,
+   "score": 85,
+   "what": [
+    "hygiena",
+    "nová stanice",
+    "obsluha"
+   ]
+  },
+  {
+   "min": 100,
+   "score": 128,
+   "what": [
+    "noc",
+    "nová stanice",
+    "obsluha",
+    "událost zvládnutá"
+   ]
+  },
+  {
+   "min": 105,
+   "score": 116,
+   "what": [
+    "noc",
+    "událost zvládnutá",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 110,
+   "score": 95,
+   "what": [
+    "nová stanice",
+    "obsluha"
+   ]
+  },
+  {
+   "min": 115,
+   "score": 78,
+   "what": [
+    "noc",
+    "nová stanice",
+    "obsluha"
+   ]
+  },
+  {
+   "min": 120,
+   "score": 100,
+   "what": [
+    "obsluha"
+   ]
+  },
+  {
+   "min": 125,
+   "score": 82,
+   "what": [
+    "noc",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 130,
+   "score": 108,
+   "what": [
+    "noc",
+    "obsluha",
+    "událost zvládnutá"
+   ]
+  },
+  {
+   "min": 135,
+   "score": 114,
+   "what": [
+    "událost zvládnutá"
+   ]
+  },
+  {
+   "min": 140,
+   "score": 56,
+   "what": [
+    "noc"
+   ]
+  },
+  {
+   "min": 145,
+   "score": 47,
+   "what": [
+    "obsluha",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 150,
+   "score": 33,
+   "what": [
+    "noc"
+   ]
+  },
+  {
+   "min": 155,
+   "score": 39,
+   "what": [
+    "událost zvládnutá"
+   ]
+  },
+  {
+   "min": 160,
+   "score": 28,
+   "what": [
+    "noc",
+    "událost zvládnutá"
+   ]
+  },
+  {
+   "min": 165,
+   "score": 31,
+   "what": [
+    "noc",
+    "událost zvládnutá"
+   ]
+  },
+  {
+   "min": 170,
+   "score": 26,
+   "what": [
+    "událost zvládnutá"
+   ]
+  },
+  {
+   "min": 175,
+   "score": 20,
+   "what": [
+    "noc",
+    "událost zvládnutá"
+   ]
+  },
+  {
+   "min": 180,
+   "score": 0,
+   "what": []
+  }
+ ],
+ "quit_min": {
+  "impatient": 2.65,
+  "usual": 37.775,
+  "patient": null
+ },
+ "runs": {
+  "novacek": {
+   "seconds": 901,
+   "real_s": 71,
+   "marks": 277,
+   "errors": []
+  },
+  "bezny": {
+   "seconds": 10801,
+   "real_s": 511,
+   "marks": 2626,
+   "errors": []
+  },
+  "slaby": {
+   "seconds": 15845,
+   "real_s": 25,
+   "marks": 222,
+   "errors": []
+  },
+  "dlouhy": {
+   "seconds": 36002,
+   "real_s": 1148,
+   "marks": 6027,
+   "errors": []
+  }
+ }
+}

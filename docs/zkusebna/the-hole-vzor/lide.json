@@ -1,0 +1,10 @@
+{
+ "_about": "Výsledky testu na živých lidech (návod docs/zkusebna/test-na-lidech.md). Časy v sekundách od spuštění nové hry. Řádek s example=true se nepočítá, smaž ho nebo nech jako vzor.",
+ "testers": [
+  {"example": true, "name": "vzor", "first_dig_s": 40, "first_sale_s": 260, "first_buy_s": 420,
+   "stuck": [{"t": 95, "s": 50, "why": "nevěděl, kam s plným kyblíkem"}],
+   "bored_min": 22, "quit_min": 35, "wants_more": true,
+   "h": {"H1": 1, "H2": 1, "H3": 2, "H4": 0, "H5": 1, "H6": 2},
+   "said": ["Kde se to prodává?", "Ten balónek je super."]}
+ ]
+}
