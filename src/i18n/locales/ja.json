@@ -1665,5 +1665,7 @@
  "Relikviář": "聖遺物箱",
  "{a} / {b} relikvií z Chrámu": "神殿の聖遺物 {a} / {b}",
  "Každý poražený Cthulhu zanechá další relikvii.": "クトゥルフを倒すたびに聖遺物が1つ残る。",
- "poraz Cthulhu v Chrámu": "神殿でクトゥルフを倒す"
+ "poraz Cthulhu v Chrámu": "神殿でクトゥルフを倒す",
+ "+{v}/s": "+{v}/秒",
+ "×2 za {n} úr.": "あと{n}Lvで×2"
 }

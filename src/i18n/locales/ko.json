@@ -1665,5 +1665,7 @@
  "Relikviář": "성유물함",
  "{a} / {b} relikvií z Chrámu": "신전 성유물 {a} / {b}",
  "Každý poražený Cthulhu zanechá další relikvii.": "쓰러뜨린 크툴루마다 성유물을 하나 남깁니다.",
- "poraz Cthulhu v Chrámu": "신전에서 크툴루 처치"
+ "poraz Cthulhu v Chrámu": "신전에서 크툴루 처치",
+ "+{v}/s": "+{v}/초",
+ "×2 za {n} úr.": "{n}레벨 후 ×2"
 }

@@ -247,6 +247,9 @@ interface Btn {
 }
 
 interface Card {
+  /** text „+X/s · ×2 za N úr.“ na pruhu karty a klíč, kdy ho přepočítat */
+  infoTxt?: string;
+  infoKey?: string;
   /** kdy naposled číšníci nestíhali (tlačítko pomoci na kartě drží 5 s, ať nebliká) */
   jamAt?: number;
   /** řádek stylu / zásobování vedle pruhu */
@@ -4708,6 +4711,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     meter.track(this.d.tut < 0 ? 'tutorial_done' : 'tutorial_step', { step: i + 1 });
     // konec návodu: začne celý nový den (noc s kostmi přijde až za 8 min)
     if (this.d.tut < 0) {
+      // Zkušebna 26. 11.: po návodu chvíle klidu – dřív hned vyskočil návštěvník přes HOTOVO! a za ním událost
+      this.visitT = Math.max(this.visitT, 90);
+      this.ev.next = Math.max(this.ev.next, 45);
       const dn = (this.d.dn ??= { lvl: 0, v2: true });
       nightCfg.shift = dn.shift ?? 0;
       dn.shift = switchPhase(false);
@@ -6249,6 +6255,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         if (!zone.visible || this.awayObjs.length) return;
         sfx.init();
         sfx.click();
+        // přání uživatele 26. 11.: plný krígl (100 %) = rovnou okno hygieny (má vlastní potvrzení); pod 100 % Obchod s hygienou
+        if (this.kriglyNow() >= prestigeMin(this.d.stats.prestiges)) return this.askPrestige();
         this.shopSub = 'up';
         this.openShop('shop', false);
       });
@@ -7226,7 +7234,24 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       // pípa s číšníky: plný bar = číšníci nestíhají
       if (c.def.id === 'kitchen' && s.auto && !this.night && this.served(p) && (p.dish?.n ?? 0) + 1 > FOOD_CAP) c.info.setText(t('talíře čekají – číšníci nestíhají!')).setColor(PAL.sand);
       else if (c.def.id === 'tap' && s.auto && !this.night && p.w?.length && (p.bar?.n ?? 0) + this.beers(p) > BAR_CAP) c.info.setText(t('bar plný – číšníci nestíhají!')).setColor(PAL.sand);
-      else c.info.setColor(PAL.white);
+      else if (open) {
+        // Zkušebna 26. 11.: karta říká, co nákup přidá (+X/s) a kolik úrovní chybí do dalšího ×2
+        const key = `${s.lvl}|${n}|${s.auto ? 1 : 0}|${Math.round(this.rate(p))}`;
+        if (c.infoKey !== key) {
+          c.infoKey = key;
+          let gain = 0;
+          if (s.auto && n > 0) {
+            const r0 = this.rate(p);
+            s.lvl += n;
+            gain = this.rate(p) - r0;
+            s.lvl -= n;
+          }
+          const nm = nextMilestone(s.lvl), left = nm == null ? 0 : nm - s.lvl;
+          const ms = left > 0 && left <= 25 ? t('×2 za {n} úr.', { n: left }) : '';
+          c.infoTxt = gain > 0 ? [t('+{v}/s', { v: big(gain) }), ms].filter(Boolean).join(' · ') : ms;
+        }
+        c.info.setText(c.infoTxt ?? '').setColor(PAL.white);
+      } else c.info.setColor(PAL.white);
       c.bar.clear();
       // mistrovství (návrh 2): za úrovní název hodnosti, pod tím 10 teček stupňů v barvě hodnosti
       const ms2 = open ? this.mast(c.def.id) : 0;

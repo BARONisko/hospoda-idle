@@ -1665,5 +1665,7 @@
  "Relikviář": "Реликварий",
  "{a} / {b} relikvií z Chrámu": "{a} / {b} реликвий из Храма",
  "Každý poražený Cthulhu zanechá další relikvii.": "Каждый побеждённый Ктулху оставляет ещё одну реликвию.",
- "poraz Cthulhu v Chrámu": "победи Ктулху в Храме"
+ "poraz Cthulhu v Chrámu": "победи Ктулху в Храме",
+ "+{v}/s": "+{v}/с",
+ "×2 za {n} úr.": "×2 через {n} ур."
 }

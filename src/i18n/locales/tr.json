@@ -1665,5 +1665,7 @@
  "Relikviář": "Emanetler",
  "{a} / {b} relikvií z Chrámu": "Tapınaktan {a} / {b} emanet",
  "Každý poražený Cthulhu zanechá další relikvii.": "Yenilen her Cthulhu bir emanet daha bırakır.",
- "poraz Cthulhu v Chrámu": "Tapınakta Cthulhu’yu yen"
+ "poraz Cthulhu v Chrámu": "Tapınakta Cthulhu’yu yen",
+ "+{v}/s": "+{v}/sn",
+ "×2 za {n} úr.": "{n} sv. sonra ×2"
 }

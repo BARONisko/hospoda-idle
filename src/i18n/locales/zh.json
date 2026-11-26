@@ -1665,5 +1665,7 @@
  "Relikviář": "圣物匣",
  "{a} / {b} relikvií z Chrámu": "神殿圣物 {a} / {b}",
  "Každý poražený Cthulhu zanechá další relikvii.": "每击败一次克苏鲁就留下一件圣物。",
- "poraz Cthulhu v Chrámu": "在神殿击败克苏鲁"
+ "poraz Cthulhu v Chrámu": "在神殿击败克苏鲁",
+ "+{v}/s": "+{v}/秒",
+ "×2 za {n} úr.": "再升{n}级 ×2"
 }
