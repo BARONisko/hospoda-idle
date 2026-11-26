@@ -1700,5 +1700,7 @@
  "ťuká na bubliny za tebe": "toca las burbujas por ti",
  "{s}: výdělek ×{m} na {n} s": "{s}: ingresos ×{m} durante {n} s",
  "odměny bez reklam · jednou, navždy": "recompensas sin anuncios · un pago, para siempre",
- "Nový host ve Sbírce: {s}": "Nuevo cliente en la Colección: {s}"
+ "Nový host ve Sbírce: {s}": "Nuevo cliente en la Colección: {s}",
+ "po této hygieně: {s}": "tras esta inspección: {s}",
+ "další novinka: {s} po {n}. hygieně": "próxima novedad: {s} tras la inspección {n}"
 }

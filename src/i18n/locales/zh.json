@@ -1700,5 +1700,7 @@
  "ťuká na bubliny za tebe": "替你点客人的气泡",
  "{s}: výdělek ×{m} na {n} s": "{s}：收入×{m}，持续{n}秒",
  "odměny bez reklam · jednou, navždy": "无广告领奖励 · 一次购买，永久有效",
- "Nový host ve Sbírce: {s}": "图鉴新客人：{s}"
+ "Nový host ve Sbírce: {s}": "图鉴新客人：{s}",
+ "po této hygieně: {s}": "本次卫生检查后：{s}",
+ "další novinka: {s} po {n}. hygieně": "下一个新内容：第 {n} 次卫生检查后的 {s}"
 }

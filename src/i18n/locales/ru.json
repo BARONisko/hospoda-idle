@@ -1700,5 +1700,7 @@
  "ťuká na bubliny za tebe": "жмёт на пузыри гостей за тебя",
  "{s}: výdělek ×{m} na {n} s": "{s}: доход ×{m} на {n} с",
  "odměny bez reklam · jednou, navždy": "награды без рекламы · один раз, навсегда",
- "Nový host ve Sbírce: {s}": "Новый гость в Коллекции: {s}"
+ "Nový host ve Sbírce: {s}": "Новый гость в Коллекции: {s}",
+ "po této hygieně: {s}": "после этой проверки: {s}",
+ "další novinka: {s} po {n}. hygieně": "следующая новинка: {s} после {n}-й проверки"
 }

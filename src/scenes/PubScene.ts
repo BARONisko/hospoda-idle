@@ -635,6 +635,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       },
       boostAll: (ms) => (this.evBoostUntil = Date.now() + ms),
       extraKinds: () => ((this.d.reko?.star ?? 0) >= 6 ? ['wedding'] : []),
+      // Zkušebna O1 (Petr 26. 11., bez změny ekonomiky – odměna události nezávisí na druhu): události přicházejí postupně –
+      // zlato a rvačka hned, žáby po 1. hygieně, netopýr a banshee po 3. hygieně (dřív všech 5 v první půlhodině, pak 1 h nic nového)
+      baseKinds: () => {
+        const h = this.d.stats.prestiges;
+        return EVENT_KINDS.filter((k) => k === 'gold' || k === 'brawl' || (k === 'frogs' && h >= 1) || h >= 3);
+      },
       onEvent: (k, ok) => {
         if (!ok) return;
         this.tryDrop(k === 'brawl' ? 0.06 : 0.04);
@@ -978,6 +984,16 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       case 'coll': return d.nightInfo && (d.bones ?? 0) >= collHire(0) ? null : t('od {n} kostí', { n: big(collHire(0)) });
       default: return null;
     }
+  }
+
+  /** nejbližší zamčená dlaždice Menu, která se odemyká hygienou (pro okno hygieny) */
+  private nextUnlock(): { label: string; n: number; earnOk: boolean } | null {
+    const list: [string, number][] = [['keeper', 2], ...Object.entries(MENU_HYG)];
+    const open = this.d.menuOpen ?? [];
+    const cand = list.filter(([k, n]) => !open.includes(k) && this.tileLock(k) && n > this.d.stats.prestiges).sort((x, y) => x[1] - y[1])[0];
+    if (!cand) return null;
+    const tile = PubScene.TILES.find(([tab, sub]) => (sub && tab === 'shop' ? sub : tab) === cand[0]);
+    return tile ? { label: tile[2], n: cand[1], earnOk: this.d.earned >= (MENU_EARN[cand[0]] ?? 0) } : null;
   }
 
   /** nově odemčené dlaždice oznámit */
@@ -4676,12 +4692,18 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     objs.push(this.add.text(W / 2, cy + 30, '➜', txt(48, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 2));
     tx(cy + 132, '×' + ((1 + nw) / (1 + cur)).toFixed(2).replace('.', ','), 64, PAL.gold);
     tx(cy + 206, t('výdělek navždy'), 22, PAL.bone);
+    // Zkušebna O1/L1 (Petr 26. 11.): bez další hospody okno jmenuje nejbližší odemčení v Menu
+    const nu = next ? null : this.nextUnlock();
     if (next) tx(cy + 240, t('+ nová hospoda: {n}', { n: next }), 24, PAL.mint);
+    else if (nu) {
+      const soon = nu.n <= this.d.stats.prestiges + 1 && nu.earnOk;
+      tx(cy + 240, soon ? t('po této hygieně: {s}', { s: nu.label }) : t('další novinka: {s} po {n}. hygieně', { s: nu.label, n: nu.n }), soon ? 24 : 20, soon ? PAL.mint : PAL.sand);
+    }
     // Zkušebna P3 (Petr vybral C): co zůstane a jestli se vyplatí počkat 5 min
     const k5 = this.kriglyNow(this.d.run + this.totalRate() * 300) - k;
     const keep = t('zůstane: 💎 · číšníci · sbírka · krígly');
     const wait = k5 >= 1 ? t('za 5 min: krígly +{n}', { n: k5 }) : t('teď je dobrá chvíle');
-    const ly = cy + (next ? 276 : 246);
+    const ly = cy + (next || nu ? 276 : 246);
     tx(ly, keep, 18, PAL.mint);
     tx(ly + 26, wait, 18, k5 >= 1 ? PAL.sand : PAL.mint);
     const close = () => {
@@ -7388,8 +7410,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (fix) this.drawBtn(c.staff, fix.label, fix.ok, 'amber', half);
       else this.drawBtn(c.staff, `${sl[0]}\n${big(staff)}`, this.d.coins >= staff, 'plum', half);
       // pípa s číšníky: plný bar = číšníci nestíhají
-      if (c.def.id === 'kitchen' && s.auto && !this.night && this.served(p) && (p.dish?.n ?? 0) + 1 > FOOD_CAP) c.info.setText(t('talíře čekají – číšníci nestíhají!')).setColor(PAL.sand);
-      else if (c.def.id === 'tap' && s.auto && !this.night && p.w?.length && (p.bar?.n ?? 0) + this.beers(p) > BAR_CAP) c.info.setText(t('bar plný – číšníci nestíhají!')).setColor(PAL.sand);
+      // Zkušebna H2 (3. běh): varování jen když s tím jde něco udělat (tlačítko vedle) – bez akce svítilo do konce hry
+      if (fix && c.def.id === 'kitchen' && s.auto && !this.night && this.served(p) && (p.dish?.n ?? 0) + 1 > FOOD_CAP) c.info.setText(t('talíře čekají – číšníci nestíhají!')).setColor(PAL.sand);
+      else if (fix && c.def.id === 'tap' && s.auto && !this.night && p.w?.length && (p.bar?.n ?? 0) + this.beers(p) > BAR_CAP) c.info.setText(t('bar plný – číšníci nestíhají!')).setColor(PAL.sand);
       else if (open) {
         // Zkušebna 26. 11.: karta říká, co nákup přidá (+X/s) a kolik úrovní chybí do dalšího ×2
         const key = `${s.lvl}|${n}|${s.auto ? 1 : 0}|${Math.round(this.rate(p))}`;

@@ -1700,5 +1700,7 @@
  "ťuká na bubliny za tebe": "klika bańki gości za ciebie",
  "{s}: výdělek ×{m} na {n} s": "{s}: zarobek ×{m} przez {n} s",
  "odměny bez reklam · jednou, navždy": "nagrody bez reklam · raz, na zawsze",
- "Nový host ve Sbírce: {s}": "Nowy gość w Kolekcji: {s}"
+ "Nový host ve Sbírce: {s}": "Nowy gość w Kolekcji: {s}",
+ "po této hygieně: {s}": "po tej inspekcji: {s}",
+ "další novinka: {s} po {n}. hygieně": "następna nowość: {s} po {n}. inspekcji"
 }

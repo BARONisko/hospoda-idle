@@ -175,9 +175,9 @@ export const UPGRADES: UpgradeDef[] = [1, 2, 3, 4].flatMap((act) =>
 /** vylepšení libovolného stupně (obchod jde donekonečna: každý stupeň ×3, cena ×1000) */
 export function upDef(act: number, station: string, tier: number): UpgradeDef {
   const d = STATIONS5.find((x) => x.id === station)!;
-  // Zkušebna 26. 11.: první vylepšení Pípy (konec návodu) za 60 místo 150 – dřív nováček 2+ min jen šetřil bez nákupu
+  // Zkušebna 26. 11.: první vylepšení Pípy (konec návodu) za 30 (dřív 150, pak 60) – nováček nešetří dvakrát po sobě (Petr 26. 11.)
   const first = act === 1 && station === 'tap' && tier === 1;
-  return { id: `${act}_${station}_${tier}`, act, station, tier, cost: first ? 60 : d.staff * 10 * 1000 ** (tier - 1) * actMult(act), mult: 3 };
+  return { id: `${act}_${station}_${tier}`, act, station, tier, cost: first ? 30 : d.staff * 10 * 1000 ** (tier - 1) * actMult(act), mult: 3 };
 }
 
 /** koupené stupně stanice v hospodě */

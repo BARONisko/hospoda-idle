@@ -1700,5 +1700,7 @@
  "ťuká na bubliny za tebe": "taps guest bubbles for you",
  "{s}: výdělek ×{m} na {n} s": "{s}: income ×{m} for {n} s",
  "odměny bez reklam · jednou, navždy": "rewards without ads · one-time, forever",
- "Nový host ve Sbírce: {s}": "New guest in the Collection: {s}"
+ "Nový host ve Sbírce: {s}": "New guest in the Collection: {s}",
+ "po této hygieně: {s}": "after this inspection: {s}",
+ "další novinka: {s} po {n}. hygieně": "next new feature: {s} after inspection {n}"
 }

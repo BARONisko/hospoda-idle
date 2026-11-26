@@ -29,6 +29,8 @@ export interface EventHost {
   brawlCut?(): number;
   /** události navíc (★6 svatba), losují se mezi ostatními */
   extraKinds?(): EventKind[];
+  /** které základní události už smí přijít (Zkušebna O1: postupně, ať jsou novinky i v 2. hodině); bez toho všechny */
+  baseKinds?(): EventKind[];
 }
 
 interface Target {
@@ -64,7 +66,7 @@ export class PubEvents {
       return;
     }
     this.next -= dt;
-    if (this.next <= 0) this.start(Phaser.Utils.Array.GetRandom([...EVENT_KINDS, ...(this.host.extraKinds?.() ?? [])]));
+    if (this.next <= 0) this.start(Phaser.Utils.Array.GetRandom([...(this.host.baseKinds?.() ?? EVENT_KINDS), ...(this.host.extraKinds?.() ?? [])]));
   }
 
   /** ťuknutí do hospody (souřadnice světa); true = trefa */
