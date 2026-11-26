@@ -1667,5 +1667,15 @@
  "Každý poražený Cthulhu zanechá další relikvii.": "每击败一次克苏鲁就留下一件圣物。",
  "poraz Cthulhu v Chrámu": "在神殿击败克苏鲁",
  "+{v}/s": "+{v}/秒",
- "×2 za {n} úr.": "再升{n}级 ×2"
+ "×2 za {n} úr.": "再升{n}级 ×2",
+ "s obsluhou +{v}/s": "雇人后 +{v}/秒",
+ "jistota, +1 💎": "稳妥，+1 💎",
+ "půl na půl: nic, nebo pokuta": "五五开：没事或罚款",
+ "×2 výdělek na 10 min": "收入×2，10分钟",
+ "nic se nestane": "什么也不会发生",
+ "za 1,5 min asi vrátí +{n}": "1.5分钟后大概还 +{n}",
+ "půl na půl: +{n}, nebo ocet": "五五开：+{n} 或一桶醋",
+ "spíš ×2 na 3 min, jinak škoda": "多半3分钟×2，否则受损",
+ "(strop {h} h)": "（上限 {h} 小时）",
+ "stačí na: {s}": "够买：{s}"
 }

@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
-# Zkušebna P.U.B. Idle – celý běh jedním příkazem (bez okna): vite → 4 boti → čísla + zadání pro hodnotitele.
+# Zkušebna P.U.B. Idle – celý běh jedním příkazem (bez okna): build → vite preview → 4 boti → čísla + zadání pro hodnotitele.
 # Použití: bash tools/zkusebna/run.sh [složka běhu]   (výchozí ZkusebnaRuns/<datum_čas>)
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 RUN="${1:-ZkusebnaRuns/$(date +%Y-%m-%d_%H%M)}"
 mkdir -p "$RUN"
-if ! curl -s -o /dev/null http://localhost:5177/; then
-  npx vite --port 5177 --strictPort > "$RUN/vite.log" 2>&1 &
-  VITE=$!
-  trap 'kill $VITE 2>/dev/null || true' EXIT
-  for _ in $(seq 1 40); do curl -s -o /dev/null http://localhost:5177/ && break; sleep 0.5; done
-fi
+# boti hrají sestavenou hru (vite preview), ne vývojový server: úprava zdrojáku během běhu by hru přenačetla a boti by se zpomalili na skutečný čas
+npm run build > "$RUN/build.log" 2>&1
+npx vite preview --port 5178 --strictPort > "$RUN/vite.log" 2>&1 &
+VITE=$!
+trap 'kill $VITE 2>/dev/null || true' EXIT
+for _ in $(seq 1 40); do curl -s -o /dev/null http://localhost:5178/ && break; sleep 0.5; done
+export ZK_URL=http://localhost:5178/
 node tools/zkusebna/bot.mjs novacek "$RUN" 15 cs &
 node tools/zkusebna/bot.mjs bezny "$RUN" 180 cs &
 node tools/zkusebna/bot.mjs slaby "$RUN" 240 cs &

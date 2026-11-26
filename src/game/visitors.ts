@@ -26,6 +26,8 @@ export interface Choice {
   /** cena v coins (zobrazí se na tlačítku), 0 = zdarma */
   cost: (c: VisitCtx) => number;
   run: (c: VisitCtx) => void;
+  /** Zkušebna (H2): krátce, co volba udělá – pod tlačítkem */
+  hint: (c: VisitCtx) => string;
 }
 
 export interface Visitor {
@@ -44,10 +46,11 @@ export const VISITORS: Visitor[] = [
     key: 'inspector',
     name: t('Hygienik'),
     text: t('Našel v guláši vlas. „To bude pokuta, pane hostinský…“'),
-    a: { label: t('Podplatit'), cost: (c) => c.income(120), run: (c) => (c.say(t('Hygienik spokojeně odešel.')), c.gem()) },
+    a: { label: t('Podplatit'), cost: (c) => c.income(120), run: (c) => (c.say(t('Hygienik spokojeně odešel.')), c.gem()), hint: () => t('jistota, +1 💎') },
     b: {
       label: t('Riskovat'),
       cost: () => 0,
+      hint: () => t('půl na půl: nic, nebo pokuta'),
       run: (c) => {
         if (chance(0.5, c)) return c.say(t('Vlas byl tvůj. Hygienik se omluvil!'));
         const n = c.fine(300);
@@ -63,12 +66,13 @@ export const VISITORS: Visitor[] = [
     a: {
       label: t('Koupit recept'),
       cost: (c) => c.income(180),
+      hint: () => t('×2 výdělek na 10 min'),
       run: (c) => {
         c.boost(600_000);
         c.say(t('Nový recept! ×2 výdělek na 10 min'));
       },
     },
-    b: { label: t('Odmítnout'), cost: () => 0, run: (c) => c.say(t('Sládek odešel ke konkurenci.')) },
+    b: { label: t('Odmítnout'), cost: () => 0, run: (c) => c.say(t('Sládek odešel ke konkurenci.')), hint: () => t('nic se nestane') },
   },
   {
     key: 'reg_pepik',
@@ -77,6 +81,7 @@ export const VISITORS: Visitor[] = [
     a: {
       label: t('Nalít mu'),
       cost: (c) => c.income(60),
+      hint: (c) => t('za 1,5 min asi vrátí +{n}', { n: big(c.income(240)) }),
       run: (c) => {
         c.say(t('Pepík pije na sekeru…'));
         const back = c.income(240);
@@ -88,7 +93,7 @@ export const VISITORS: Visitor[] = [
         });
       },
     },
-    b: { label: t('Vyhodit ho'), cost: () => 0, run: (c) => c.say(t('Pepík uraženě odešel.')) },
+    b: { label: t('Vyhodit ho'), cost: () => 0, run: (c) => c.say(t('Pepík uraženě odešel.')), hint: () => t('nic se nestane') },
   },
   {
     key: 'stranger',
@@ -97,6 +102,7 @@ export const VISITORS: Visitor[] = [
     a: {
       label: t('Koupit sud'),
       cost: (c) => c.income(300),
+      hint: (c) => t('půl na půl: +{n}, nebo ocet', { n: big(c.income(900)) }),
       run: (c) => {
         if (chance(0.5, c)) {
           const n = c.income(900);
@@ -105,7 +111,7 @@ export const VISITORS: Visitor[] = [
         } else (c.say(t('Byl v něm jen ocet…')), c.gem());
       },
     },
-    b: { label: t('Ne, díky'), cost: () => 0, run: (c) => c.say(t('Muž v kabátě zmizel ve tmě.')) },
+    b: { label: t('Ne, díky'), cost: () => 0, run: (c) => c.say(t('Muž v kabátě zmizel ve tmě.')), hint: () => t('nic se nestane') },
   },
   {
     key: 'influencer',
@@ -114,6 +120,7 @@ export const VISITORS: Visitor[] = [
     a: {
       label: t('Pustit ji'),
       cost: () => 0,
+      hint: () => t('spíš ×2 na 3 min, jinak škoda'),
       run: (c) => {
         if (chance(0.6, c)) {
           c.boost(180_000);
@@ -126,7 +133,7 @@ export const VISITORS: Visitor[] = [
         }
       },
     },
-    b: { label: t('Zakázat'), cost: () => 0, run: (c) => c.say(t('Influencerka natočila stížnost.')) },
+    b: { label: t('Zakázat'), cost: () => 0, run: (c) => c.say(t('Influencerka natočila stížnost.')), hint: () => t('nic se nestane') },
   },
 ];
 

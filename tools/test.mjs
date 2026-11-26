@@ -439,7 +439,8 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   }
   ok('hygiena: průvodce novou hospodou dokončen ťukáním prstem', await S(p, (s) => !s.guideCur && s.d.pubs[1].st.tap.lvl > 0 && s.d.pubs[1].st.tap.auto));
   // šipka průvodce „nové v menu“ míří na tu dlaždici, kterou menu opravdu kreslí (dřív index v celém seznamu → zaseknutý průvodce)
-  ok('průvodce: šipka míří na správnou dlaždici menu', await S(p, (s) => { s.closeShop(); s.openMenu(); // menu mohl nechat otevřené průvodce „nové v menu“ (openMenu přepíná) const r = s.menuTiles(); const keys = r.tiles.map(r.keyOf);
+  ok('průvodce: šipka míří na správnou dlaždici menu', await S(p, (s) => { s.closeShop(); s.openMenu(); // menu mohl nechat otevřené průvodce „nové v menu“ (openMenu přepíná)
+    const r = s.menuTiles(); const keys = r.tiles.map(r.keyOf);
     const okk = keys.every((k) => { const a = s.guideSteps('tile:' + k)[1].at(); const z = a && s.shopObjs.find((o) => o.type === 'Zone' && Math.abs(o.x - a[0]) < 3 && Math.abs(o.y - a[1]) < 3 && Math.abs(o.width - a[2]) < 3); return !!z; });
     s.closeShop(); return okk; }));
   ok('bez chyb v konzoli (hygiena)', p.errors.length === 0);

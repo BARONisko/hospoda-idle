@@ -1667,5 +1667,15 @@
  "Každý poražený Cthulhu zanechá další relikvii.": "쓰러뜨린 크툴루마다 성유물을 하나 남깁니다.",
  "poraz Cthulhu v Chrámu": "신전에서 크툴루 처치",
  "+{v}/s": "+{v}/초",
- "×2 za {n} úr.": "{n}레벨 후 ×2"
+ "×2 za {n} úr.": "{n}레벨 후 ×2",
+ "s obsluhou +{v}/s": "직원 고용 시 +{v}/초",
+ "jistota, +1 💎": "확실, +1 💎",
+ "půl na půl: nic, nebo pokuta": "반반: 무사 또는 벌금",
+ "×2 výdělek na 10 min": "10분간 수입 ×2",
+ "nic se nestane": "아무 일도 없음",
+ "za 1,5 min asi vrátí +{n}": "1.5분 뒤 +{n} 갚을 듯",
+ "půl na půl: +{n}, nebo ocet": "반반: +{n} 또는 식초",
+ "spíš ×2 na 3 min, jinak škoda": "아마 3분 ×2, 아니면 손해",
+ "(strop {h} h)": "(최대 {h}시간)",
+ "stačí na: {s}": "구매 가능: {s}"
 }

@@ -32,6 +32,14 @@ await p.addInitScript(() => {
   Date.now = () => o() + window.__skew;
 });
 const errors = new Map();
+// ZK_PROF: kde bot tráví skutečný čas (evaluate / tap / screenshot), výpis po 200 tazích
+const PROF = { ev: 0, evN: 0, tap: 0, tapN: 0, shot: 0 };
+if (process.env.ZK_PROF) {
+  const ev = p.evaluate.bind(p), tp = p.touchscreen.tap.bind(p.touchscreen), sc = p.screenshot.bind(p);
+  p.evaluate = async (...a) => { const t = Date.now(); try { return await ev(...a); } finally { PROF.ev += Date.now() - t; PROF.evN++; } };
+  p.touchscreen.tap = async (...a) => { const t = Date.now(); try { return await tp(...a); } finally { PROF.tap += Date.now() - t; PROF.tapN++; } };
+  p.screenshot = async (...a) => { const t = Date.now(); try { return await sc(...a); } finally { PROF.shot += Date.now() - t; } };
+}
 p.on('pageerror', (e) => errors.set(e.message, (errors.get(e.message) ?? 0) + 1));
 p.on('console', (m) => m.type() === 'error' && !m.text().includes('404') && errors.set(m.text(), (errors.get(m.text()) ?? 0) + 1));
 await p.goto(URL);
@@ -51,6 +59,19 @@ await p.evaluate(() => {
   };
 });
 
+// tlačítka hry: zóna → tlačítko (bot pak ví, které svítí); nabídky k zaplacení se počítají
+const patch = () => p.evaluate(() => {
+  const s = game.scene.getScene('Pub');
+  if (!s || s.__zk) return;
+  s.__zk = true;
+  window.__offers = window.__offers ?? [];
+  const ob = s.btn.bind(s);
+  s.btn = (...a) => { const b = ob(...a); b.zone.__btn = b; return b; };
+  const op = s.offerPop.bind(s);
+  s.offerPop = (id) => { window.__offers.push(String(id)); return op(id); };
+});
+await patch();
+
 let T = 0; // herní sekundy od startu
 const marks = [], samples = [];
 let shots = 0, lastShotT = -1e9;
@@ -60,7 +81,16 @@ const K = 405 / 540;
 // by ťuknutí do okna (hloubka 500+) spadlo do hospody pod ním
 const tap = async (x, y) => {
   await p.evaluate(() => { window.__skew += 33; window.__tm += 33; game.step(window.__tm, 33); });
-  await p.touchscreen.tap(x * K, y * K);
+  // dotyk jako události v prohlížeči (touchstart/touchend na plátně), bez čekání na snímek:
+  // p.touchscreen.tap po hodině hry čekal na vykreslení až 2 s na ťuk (dlouhý bot běžel skoro ve skutečném čase)
+  await p.evaluate(([cx, cy]) => {
+    const c = game.canvas, r = c.getBoundingClientRect();
+    const mk = () => new Touch({ identifier: 1, target: c, clientX: r.left + cx, clientY: r.top + cy, pageX: r.left + cx, pageY: r.top + cy });
+    const fire = (type, list) => c.dispatchEvent(new TouchEvent(type, { touches: list, targetTouches: list, changedTouches: [mk()], bubbles: true, cancelable: true }));
+    fire('touchstart', [mk()]);
+    window.__skew += 33; window.__tm += 33; game.step(window.__tm, 33);
+    fire('touchend', []);
+  }, [x * K, y * K]);
 };
 const step = (sec) => p.evaluate((s) => window.__step(s), sec);
 
@@ -115,7 +145,9 @@ const read = () => p.evaluate(() => {
   return {
     i, dn, poor: !!s.tutPoor, r: s.tutRect ?? null, tip: tt ? [tt.x, tt.y] : null, g: g ? g.id + ':' + g.i : '', gr, gok, gtext,
     tutText: (s.tutHead?.text ?? '') + ' – ' + (s.tutBub?.text ?? ''),
-    away: zc(s.awayObjs ?? []), shop: (s.shopObjs ?? []).length, modal, cards, afford, evt, wp: (s.wPanel ?? []).length, wpb: (s.wPanelBtns ?? []).map((x) => x.b).filter((b) => b.visible && b.enabled).map((b) => [b.x + b.w / 2, b.y + b.h / 2]), mode: s.mode, modeBtn: s.modeBtn?.visible ? [s.modeBtn.x + s.modeBtn.w / 2, s.modeBtn.y + s.modeBtn.h / 2] : null,
+    away: zc(s.awayObjs ?? []), shop: (s.shopObjs ?? []).length, modal, cards, afford, evt, menuOpen: (s.shopObjs ?? []).length > 0, tab: s.tab,
+    words: s.children.list.filter((o) => o.type === 'Text' && o.visible && o.alpha > 0.2 && o.text && o.y > -20 && o.y < 980).reduce((a, o) => a + (o.text.match(/[\p{L}]{2,}/gu) ?? []).length, 0),
+    offers: (window.__offers ?? []).length, wp: (s.wPanel ?? []).length, wpb: (s.wPanelBtns ?? []).map((x) => x.b).filter((b) => b.visible && b.enabled).map((b) => [b.x + b.w / 2, b.y + b.h / 2]), mode: s.mode, modeBtn: s.modeBtn?.visible ? [s.modeBtn.x + s.modeBtn.w / 2, s.modeBtn.y + s.modeBtn.h / 2] : null,
     qbtn: s.qUi?.btn?.visible ? [s.qUi.btn.x + 54, s.qUi.btn.y + 23, s.qUi.btn.label.text, s.qUi.title.text] : null,
     coins: d.coins, run: d.run, rate, kNow, pubs: d.pubs.length, pr: d.stats?.prestiges ?? 0, krigle: d.krigle ?? 0, gems: d.gems ?? 0,
     bones: d.bones ?? 0, night: !!s.night, klvl: d.klvl ?? 1, events: d.stats?.events ?? 0, ach: (d.ach ?? []).length, seen: [...(d.seen ?? [])],
@@ -139,6 +171,7 @@ async function record(st) {
     if (st.pr > prev.pr) {
       mark(T, 'prestige', `krigle=${st.krigle - prev.krigle} total=${st.krigle} pubs=${st.pubs}`);
       first('prestige', 'první hygiena');
+      await patch();
       prev = st;
       return;
     }
@@ -161,6 +194,7 @@ async function record(st) {
       }
     }
     if (st.evt && !prev.evt) { mark(T, 'event_start', st.evt.kind); first('event:' + st.evt.kind, st.evt.kind); }
+    if (st.offers > prev.offers) { mark(T, 'offer', 'nabídka k zaplacení'); first('offer', ''); }
     if (st.events > prev.events) { mark(T, 'event', `n=${st.events}`); first('event', ''); }
     if (st.ach > prev.ach) mark(T, 'ach', `n=${st.ach}`);
     if (st.klvl > prev.klvl) { mark(T, 'level', `klvl=${st.klvl}`); first('level', ''); }
@@ -178,13 +212,62 @@ async function record(st) {
   }
   if (T - lastSample >= 5) {
     lastSample = T;
-    samples.push({ t: Math.round(T), coins: st.coins, run: st.run, rate: st.rate, afford: st.afford, klvl: st.klvl, pubs: st.pubs, prestiges: st.pr, krigle: st.krigle, gems: st.gems, bones: st.bones, night: st.night, kNow: st.kNow });
+    samples.push({ t: Math.round(T), coins: st.coins, run: st.run, rate: st.rate, afford: st.afford, klvl: st.klvl, pubs: st.pubs, prestiges: st.pr, krigle: st.krigle, gems: st.gems, bones: st.bones, night: st.night, kNow: st.kNow, words: st.words, menu: st.menuOpen });
   }
   prev = st;
 }
 
 // prahy hygieny bez importu: zjistí se z tlačítka (askPrestige odmítne pod prahem) – použijeme kriglyNow a tvar z economy
 await p.evaluate(() => { window.__pmin = (n) => (n === 0 ? 4 : Math.max(6, Math.ceil(6 * 1.07 ** (Math.min(n, 70) - 14)))); });
+
+// Menu jako hráč: ťukne na Menu, pak na dlaždici (kam ukazuje i průvodce), v okně ťuká na tlačítka, která svítí
+// (nikdy ne na platbu skutečnými penězi – Speciální nabídku si jen prohlédne), pak zavře. První návštěva = snímek.
+const seenTab = new Set();
+let menuIdx = 0, lastMenuT = 0;
+async function menuVisit(maxTaps) {
+  const tiles = await p.evaluate(() => {
+    const s = game.scene.getScene('Pub');
+    s.closeShop(); s.openMenu();
+    const r = s.menuTiles();
+    return r.tiles.map(r.keyOf).filter((k) => !s.tileLock?.(k));
+  });
+  await step(0.3);
+  const pick = ['obchod', 'ukoly', ...tiles.filter((k) => k !== 'opts')]; // spodní lišta: Obchod (vylepšení ×3), Úkoly
+  if (!pick.length) { await p.evaluate(() => game.scene.getScene('Pub').closeShop()); return; }
+  const k = pick[menuIdx++ % pick.length];
+  const at = await p.evaluate((k) => {
+    const s = game.scene.getScene('Pub');
+    if (k === 'obchod' || k === 'ukoly') { s.closeShop(); const b = s.navBtns[k === 'obchod' ? 1 : 2]; return [b.x, b.y, b.w, b.h]; }
+    try { return s.guideSteps('tile:' + k)[1].at(); } catch { return null; }
+  }, k);
+  if (!at) { await p.evaluate(() => game.scene.getScene('Pub').closeShop()); return; }
+  await tap(at[0] + at[2] / 2, at[1] + at[3] / 2);
+  await step(0.5);
+  let f = null;
+  const w = (await read()).words;
+  if (!seenTab.has(k)) { seenTab.add(k); first('screen:' + k, k); f = await shot('menu_' + k, true); }
+  let bought = 0;
+  if (k !== 'special' && k !== 'league') {
+    for (let i = 0; i < maxTaps; i++) {
+      const b = await p.evaluate(() => {
+        const s = game.scene.getScene('Pub');
+        const z = (s.shopObjs ?? []).filter((o) => o.type === 'Zone' && o.visible && o.input?.enabled && o.__btn?.enabled && o.__btn.visible && o.y > 120)
+          .filter((o) => !/€|Kč|\$|zł|£|USD|EUR|reklam|video|Smazat|jazyk/i.test(o.__btn.label?.text ?? ''));
+        if (!z.length) return null;
+        const o = z[Math.floor(Math.random() * z.length)];
+        return [o.x + o.width / 2, o.y + o.height / 2, o.__btn.label?.text ?? ''];
+      });
+      if (!b) break;
+      await tap(b[0], b[1]);
+      await step(0.4);
+      bought++;
+      if (!(await p.evaluate(() => (game.scene.getScene('Pub').shopObjs ?? []).length))) break; // okno se zavřelo
+    }
+  }
+  mark(T, 'menu', `${k} taps=${bought} words=${w}`, f);
+  await p.evaluate(() => { const s = game.scene.getScene('Pub'); s.closeShop(); s.awayClose?.(); });
+  await step(0.3);
+}
 
 let kReadyT = null, stuckMarkT = -1e9; // běžný hráč: první hygiena minutu po tom, co jde (cíl „do hygieny 100 %“ na obrazovce)
 let tick = 0, lastQ = 0, taps = 0, stuck = 0, sessionStart = 0;
@@ -195,6 +278,7 @@ await record(await read());
 await shot('start', true);
 while (T < end) {
   let st = null;
+  const _t0 = Date.now();
   try { st = await read(); } catch { st = null; }
   if (!st) { await step(1); T += 1; continue; }
   await record(st);
@@ -215,6 +299,7 @@ while (T < end) {
     continue;
   }
   tick++;
+  if (process.env.ZK_PROF && tick % 200 === 0) { console.log('PROF', Math.round(T), JSON.stringify(PROF), await p.evaluate(() => { const s = game.scene.getScene('Pub'); return [s.children.list.length, s.tweens.getTweens?.().length, s.time._active?.length, game.loop.running, game.loop.sleeping]; })); for (const k in PROF) PROF[k] = 0; }
   // pojistka: má na nákup, a přesto 3 min nic nekoupil → zapsat (zaseknutí bota nebo hry, se snímkem)
   if (persona !== 'slaby' && st.afford > 0 && T - lastBuyT > 180 && T - stuckMarkT > 600 && st.i < 0) { stuckMarkT = T; mark(T, 'bot_stuck', `afford=${st.afford} g=${st.g} away=${st.away.length} wp=${st.wp}`, await shot('zasek', true)); }
   if (process.env.ZK_DEBUG && T - lastBuyT > 120 && tick % 20 === 0) console.log(Math.round(T), JSON.stringify({ i: st.i, g: st.g, away: st.away, modal: st.modal, shop: st.shop, evt: st.evt, q: st.qbtn, afford: st.afford, cards: st.cards }).slice(0, 600));
@@ -242,6 +327,10 @@ while (T < end) {
     await step(0.5);
     const s2 = await read();
     if (s2?.away.length) { mark(T, 'prestige_ask', `krigle_now=${Math.round(st.kNow)}`, st.pr < 2 ? await shot('okno_hygieny', true) : null); await tap(...s2.away[s2.away.length - 1]); }
+  } else if (persona !== 'novacek' && st.i < 0 && !st.g && T - lastMenuT > (persona === 'slaby' ? 240 : 90)) {
+    lastMenuT = T;
+    await menuVisit(persona === 'slaby' ? 2 : 6);
+    await patch();
   } else if (st.qbtn && T - lastQ > 9 && Math.random() < P.quests) { lastQ = T; await tap(st.qbtn[0], st.qbtn[1]); }
   else if (st.tip && tick % 3 === 0) await tap(...st.tip);
   else {
@@ -259,6 +348,7 @@ while (T < end) {
   }
   if (process.env.ZK_DEBUG && T > 480 && T < 500) console.log('TAPDBG', Math.round(T), JSON.stringify(await p.evaluate(() => { const s = game.scene.getScene('Pub'); const ptr = s.input.activePointer; return { last: [Math.round(ptr.x), Math.round(ptr.y)], hits: s.input.hitTestPointer(ptr).map((o) => o.type + '@' + o.depth + (o.name ? ':' + o.name : '')).slice(0, 5), lv: s.d.pubs[0].st.tap.lvl, coins: Math.round(s.d.coins), awayN: (s.awayObjs ?? []).length, tb: s.tapBlock - Date.now() }; })));
   if (did) taps++; else stuck++;
+  if (process.env.ZK_PROF && Date.now() - _t0 > 400) console.log('SLOW', Math.round(T), Date.now() - _t0, 'ms', JSON.stringify({ g: st.g, away: st.away.length, modal: st.modal.length, wp: st.wp, shop: st.shop, evt: st.evt, night: st.night, i: st.i }));
   const th = st.evt?.tg.length ? 0.5 : P.think; // při události ťuká rychle (banshee chce 12 ťuků za 9 s)
   await step(th);
   T += th;

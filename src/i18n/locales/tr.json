@@ -1667,5 +1667,15 @@
  "Každý poražený Cthulhu zanechá další relikvii.": "Yenilen her Cthulhu bir emanet daha bırakır.",
  "poraz Cthulhu v Chrámu": "Tapınakta Cthulhu’yu yen",
  "+{v}/s": "+{v}/sn",
- "×2 za {n} úr.": "{n} sv. sonra ×2"
+ "×2 za {n} úr.": "{n} sv. sonra ×2",
+ "s obsluhou +{v}/s": "personelle +{v}/sn",
+ "jistota, +1 💎": "kesin, +1 💎",
+ "půl na půl: nic, nebo pokuta": "yarı yarıya: hiçbir şey ya da ceza",
+ "×2 výdělek na 10 min": "10 dk ×2 gelir",
+ "nic se nestane": "hiçbir şey olmaz",
+ "za 1,5 min asi vrátí +{n}": "1,5 dk sonra muhtemelen +{n} öder",
+ "půl na půl: +{n}, nebo ocet": "yarı yarıya: +{n} ya da sirke",
+ "spíš ×2 na 3 min, jinak škoda": "büyük ihtimalle 3 dk ×2, yoksa zarar",
+ "(strop {h} h)": "(en fazla {h} sa)",
+ "stačí na: {s}": "yeter: {s}"
 }

@@ -32,12 +32,15 @@ Srovnej s křivkou zájmu. Když se s ní rozcházíš, napiš proč (napříkla
 
 Každé kritérium v oddílu „Ohodnoť ty“ má v `kriteria.json` kotvy pro 0, 1 a 2. Vyber tu, která sedí na důkaz. Pravidla:
 
-- Důkaz = název snímku (`shots/…`) nebo čas (`t=312`) a věta, co tam je. U kritéria s podkladem „design“ (D4) smíš odkázat i na `PLAN.md` nebo soubor v `docs/`.
+- Důkaz = název snímku (`shots/…`) nebo čas (`t=312`) a věta, co tam je. U kritéria s podkladem „design“ (D4, M2–M4) smíš odkázat i na `PLAN.md` nebo soubor v `docs/`.
 - Když váháš mezi dvěma známkami, dej nižší. Dvojka znamená „hráč by si nestěžoval“, ne „na rozpracovanou hru dobré“.
 - Když podklad chybí (snímek to nezachytil, bot k hygieně nedošel, okno návratu nikdo nevyfotil, je potřeba zvuk nebo pohyb), dej `"score": null` a do `evidence` napiš, co chybí. `null` je správná odpověď, vymyšlená známka je chyba.
-- Ke každé známce 0 a 1 napiš `proposal`: jedna konkrétní změna (co, kde na obrazovce), ne obecná rada.
+- Ke každé známce 0 a 1 napiš `proposal`: jedna konkrétní změna (co, kde na obrazovce), ne obecná rada. Před návrhem zkontroluj `docs/pozdeji.md` a `PLAN.md` (viz „Schválená rozhodnutí“).
 - H1 a U1 hodnoť jako člověk s telefonem v jedné ruce: snímek je 540×960, palec dosáhne pohodlně do spodních dvou třetin, tlačítko pod 44 bodů se špatně trefuje.
-- M1 hodnoť jako hráč, který nikdy nezaplatí. Nehodnotíš, jestli je obchod výhodný, ale jestli hra tlačí.
+- M1–M4 mají každé jinou práci, nepleť je. M1 = je obchod poctivý (cena a obsah předem, žádná koupě omylem). M2 = chtěl bych to koupit (hodnota a chvíle). M3 = tlačí hra (odpočty, opakování, vina). M4 = dojde hráč zdarma všude. Jednu vadu započítej jen do jednoho z nich.
+- M2 hodnoť jako hráč, který je ochotný zaplatit. Ceny a obsah si přečti v `src/core/offers.ts`, `src/core/special.ts`, `src/core/billing.ts` a `docs/play-console.md`. Dívej se na snímek `shots/*menu_special*`. Když chybí, je to `null`.
+- M3 a M4 hodnoť jako hráč, který nikdy nezaplatí. Skutečný odpočet, který se neobnoví (startovní balíček 48 h), není nátlak. Počet a časy oken ber ze značek `offer` na časové ose.
+- U2 hodnoť jako příležitostný hráč, který nečte. Méně textu je dobře. Nenavrhuj přidat popisek.
 - P3 hodnoť jen ze snímků před prvním ťuknutím na „zavolat hygienu“. Co víš z PLAN.md, hráč neví.
 - Nejmenuj konkrétní hry jako vzor ke kopírování, jen obecné žánrové vzory.
 - Chyby (hra zamrzla, tlačítko nereaguje) sem nepatří, ty hlásí druhá půlka Zkušebny a `npm test`.
@@ -52,6 +55,19 @@ Do `top10` dej nejslabší kritéria (počítaná i tvoje), u každého proč, n
 4. všechno pozdější.
 
 Problém v první minutě je horší než ve druhé hodině. `summary` = 2–3 věty česky.
+
+### Schválená rozhodnutí (nehodnotit jako chybu)
+
+Tyhle věci Petr vybral schválně. Nesnižuj za ně známku a nenavrhuj je vrátit:
+
+- **Méně textu na hlavní obrazovce** (varianta B, 25. 11.). Kratší popisky jsou záměr.
+- **Pilulka krígl vpravo nahoře ukazuje jen procenta** („26 %“), bez slova „hygiena“.
+- **Menu ukazuje odemčené dlaždice a jednu nejbližší zamčenou** (varianta A). Ostatní zamčené nejsou vidět schválně.
+- **Den a noc začínají až po první hygieně.** Že v prvním běhu noc není, není chyba.
+
+Když kvůli tomu kritérium nejde splnit na 2 (například D1 nebo D4), napiš to do `evidence` a navrhni jinou cestu, ne návrat.
+
+Než navrhneš jakoukoli změnu, podívej se do `docs/pozdeji.md` a `PLAN.md`, jestli o ní Petr už nerozhodl. Zamítnutou nebo odloženou věc nenavrhuj znovu. Když je tvůj návrh v rozporu se starším rozhodnutím a přesto ho máš za nutný, napiš to výslovně a odkaž na to rozhodnutí.
 
 ### Čemu nevěřit
 
@@ -92,5 +108,5 @@ Pravidla tvaru:
 
 - `walkthrough`: nejméně 8 položek. `feel` začíná jedním ze slov „láká“, „nevím“, „nuda“, „je toho moc“.
 - `quit`: vždy všechny čtyři klíče `impatient`, `collector`, `optimizer`, `casual`. `min` je číslo (minuta hraní) nebo `null`. `why` s časem nebo snímkem.
-- `scores`: klíč pro každé kritérium z oddílu „Ohodnoť ty“ (T2, L3, P3, D1, D2, D4, H1–H6, M1, U1). `score` je 0, 1, 2 nebo `null`. `evidence` je povinné vždy. `proposal` je povinné u 0 a 1.
+- `scores`: klíč pro každé kritérium z oddílu „Ohodnoť ty“ (T2, L3, P3, D1, D2, D4, H1–H6, M1–M4, U1, U2). `score` je 0, 1, 2 nebo `null`. `evidence` je povinné vždy. `proposal` je povinné u 0 a 1.
 - `top10`: nejvýš 10 položek, od nejhoršího. `hours` je číslo.

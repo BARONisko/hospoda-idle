@@ -226,8 +226,8 @@ def measure(run):
         if g:
             pts = [0.0] + [t for t in fts if t <= lim] + [lim]
             i = gaps(pts).index(max(g)) if max(g) in gaps(pts) else 0
-            notes["new_thing_gap_max_s"] = f"od {pts[i] / 60:.0f}. do {(pts[i] + max(g)) / 60:.0f}. min běžného bota žádná nová věc (boti nechodí do Menu)"
-        mech = [m["t"] for m in src["marks"] if kind(m).startswith("first:") and not kind(m).startswith(("first:coins", "first:buy", "first:guest", "first:event:", "first:tutorial_done"))]
+            notes["new_thing_gap_max_s"] = f"od {pts[i] / 60:.0f}. do {(pts[i] + max(g)) / 60:.0f}. min běžného bota žádná nová věc (Menu bot prochází, nová okna tam už nebyla)"
+        mech = [m["t"] for m in src["marks"] if kind(m).startswith("first:") and not kind(m).startswith(("first:coins", "first:buy", "first:guest", "first:event:", "first:tutorial_done", "first:screen:", "first:tab"))]  # okna, která si hráč v Menu otevře sám, hra nevnucuje
         v["new_mechanics_per_5min_max"] = max((sum(1 for t in mech if w <= t < w + 300) for w in range(0, 1800, 60)), default=0)
         notes["new_mechanics_per_5min_max"] = "první ťuk, první nákup, noví hosté, konec návodu a druhy událostí (počítá se jen první událost) se nepočítají"
         sur = sorted(m["t"] for m in src["marks"] if base(m) in SURPRISE)
@@ -287,6 +287,27 @@ def measure(run):
             v["weak_vs_strong_prestige"] = (act if act is not None else sla["seconds"] / 60) / ref if ref else None
             notes["weak_vs_strong_prestige"] = (f"slabý {w:.0f} min od instalace (z toho hrál {act:.0f} min, zbytek pauzy), běžný {ref:.0f} min" if w is not None
                                                 else f"slabý nikdy za {sla['seconds'] / 60:.0f} min, běžný {ref:.0f} min")
+    # --- text na obrazovce (počet slov viditelných textů; hlavní obrazovka vs. okna z Menu)
+    main = sorted(x["words"] for tl in all_tl for x in tl["samples"] if x.get("words") is not None and not x.get("menu"))
+    if main:
+        v["words_main_median"] = main[len(main) // 2]
+        v["words_main_max"] = main[-1]
+        notes["words_main_median"] = f"{len(main)} vzorků hlavní obrazovky, medián {main[len(main) // 2]}, max {main[-1]} slov"
+    mw = [(num(m.get("text", ""), "words"), m.get("text", "").split()[0], m) for tl in all_tl for m in tl["marks"] if kind(m) == "menu"]
+    mw += [(x["words"], "menu", x) for tl in all_tl for x in tl["samples"] if x.get("menu") and x.get("words") is not None]
+    mw = [x for x in mw if x[0] is not None]
+    if mw:
+        top = max(mw, key=lambda x: x[0])
+        v["words_menu_max"] = top[0]
+        notes["words_menu_max"] = f"nejvíc textu: okno {top[1]} ({top[0]:.0f} slov, t={top[2]['t']:.0f})"
+    # --- placené nabídky (běžný hráč)
+    if bez:
+        ot = [m["t"] for m in bez["marks"] if kind(m) == "offer"]
+        v["first_offer_min"] = ot[0] / 60 if ot else (bez["seconds"] / 60 if bez["seconds"] >= 360 * 60 else None)
+        notes["first_offer_min"] = f"první vyskakovací nabídka v {ot[0] / 60:.0f}. min" if ot else f"žádná vyskakovací nabídka za {bez['seconds'] / 60:.0f} min"
+        act = sum(b - a for a, b in sessions(bez)) / 3600 or bez["seconds"] / 3600
+        v["offer_popups_per_hour"] = len(ot) / act
+        notes["offer_popups_per_hour"] = f"{len(ot)} nabídek za {act:.1f} h hraní"
     return v, notes, cfg
 
 

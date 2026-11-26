@@ -1667,5 +1667,15 @@
  "Každý poražený Cthulhu zanechá další relikvii.": "Każdy pokonany Cthulhu zostawia kolejną relikwię.",
  "poraz Cthulhu v Chrámu": "pokonaj Cthulhu w Świątyni",
  "+{v}/s": "+{v}/s",
- "×2 za {n} úr.": "×2 za {n} poz."
+ "×2 za {n} úr.": "×2 za {n} poz.",
+ "s obsluhou +{v}/s": "z obsługą +{v}/s",
+ "jistota, +1 💎": "pewne, +1 💎",
+ "půl na půl: nic, nebo pokuta": "pół na pół: nic albo kara",
+ "×2 výdělek na 10 min": "×2 zarobek na 10 min",
+ "nic se nestane": "nic się nie stanie",
+ "za 1,5 min asi vrátí +{n}": "za 1,5 min pewnie odda +{n}",
+ "půl na půl: +{n}, nebo ocet": "pół na pół: +{n} albo ocet",
+ "spíš ×2 na 3 min, jinak škoda": "raczej ×2 na 3 min, inaczej szkody",
+ "(strop {h} h)": "(limit {h} h)",
+ "stačí na: {s}": "wystarczy na: {s}"
 }

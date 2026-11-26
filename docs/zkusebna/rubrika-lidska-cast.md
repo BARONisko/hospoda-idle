@@ -114,17 +114,53 @@ Slabší hráč (nastavení v `kriteria.json` → `bot.weak`): 4 sezení denně 
 
 A dvě otázky navíc, které u idle hry rozhodují:
 
-- M1 Tlačí hra na placení a reklamy hráče, který hraje zdarma?
 - U1 Není toho naráz moc (záložky, červené tečky, okna za sebou)?
+- U2 Kolik textu musím číst? Zahraje si i hráč, který nečte?
 
 Hra má hodně systémů (pivovar, kostnice, chrám, šipky, liga, hostinský, číšníci). U1 hlídá, aby přicházely po jednom a obrazovka zůstala čistá.
 
+## Text na obrazovce
+
+Petr nechce na hráče moc textu (25. 11. vybral variantu B: méně textu na hlavní obrazovce). Bot v každém vzorku po 5 s zapíše `words` (počet slov o 2 a více písmenech ve všech viditelných textech) a `menu` (je otevřené okno menu nebo obchodu). Čísla se nepočítají, názvy karet ano. Obrazovka je 405×720.
+
+| Kód | Kritérium | Jak měřit | Dobře | Špatně | Opora |
+| --- | --- | --- | --- | --- | --- |
+| U2 | Kolik textu musím číst | hodnotitel: snímky hlavní obrazovky, oken a bublin | hraju podle ikon, čísel a šipky; věty do 8 slov; nic se neopakuje | věta nad 8 slov na hlavní obrazovce, odstavec v okně, text dvakrát | odhad |
+| U3 | Slova na hlavní obrazovce | `words_main_median`: medián `words` ve vzorcích s `menu=false` | do 30 | nad 55 | odhad |
+| U4 | Nejvíc slov na hlavní obrazovce | `words_main_max`: maximum ve vzorcích s `menu=false` | do 50 | nad 90 | odhad |
+| U5 | Nejvíc slov v okně | `words_menu_max`: maximum ve vzorcích s `menu=true` | do 70 | nad 130 | odhad |
+
+Méně textu není chyba. Hodnotitel nesmí navrhovat přidání popisků tam, kde je Petr schválně ubral (seznam je v `hodnotitel.md`).
+
+## Obchod a placení
+
+Zdravý stav: placená nabídka je lákavá a na jeden pohled výhodná, přijde ve správnou chvíli, ale hráč zdarma není nikdy zastaven ani otravován. Platí i pravidla Google Play. Každé kritérium má jinou práci:
+
+- M1 = je obchod poctivý (cena, obsah, žádný omyl)?
+- M2 = chci si to koupit (hodnota, správná chvíle)?
+- M3 = tlačí na mě hra (odpočty, opakování, vina)?
+- M4 = dojde hráč zdarma všude?
+- M5, M6 = kdy a jak často vyskakují nabídky (značka `offer`).
+
+| Kód | Kritérium | Jak měřit | Dobře | Špatně | Opora |
+| --- | --- | --- | --- | --- | --- |
+| M1 | Poctivý obchod | hodnotitel: snímky obchodu a `shots/*menu_special*` | u všeho cena v penězích, přesný obsah, jednou / opakovaně; koupě se neplete s nákupem za coins | chybí cena nebo obsah, náhodná odměna, koupě omylem | odhad + Google Play |
+| M2 | Chci si to koupit | hodnotitel: `shots/*menu_special*` + `src/core/offers.ts`, `special.ts`, `billing.ts`, `docs/play-console.md` | nejvýš 4 položky a cena na jeden pohled, aspoň 2× hodnota proti diamantům, přišlo po zážitku | do 5 s nevím, co dostanu, nebo horší než běžný obchod | odhad |
+| M3 | Nátlak | hodnotitel: snímky nabídek + značky `offer` na ose | nejvýš 1 okno za spuštění, každá nabídka 1× denně, skutečný odpočet jen v nabídce, neutrální odmítnutí | obnovovaný nebo krátký odpočet, opakování, zeď s nabídkou, vina, falešná sleva, schovaný křížek | odhad + Google Play |
+| M4 | Hráč zdarma | hodnotitel: čísla botů (P1, T4, D3) + kód obchodu | bez placení a videí P1, T4, D3 aspoň 1; placené jen zrychluje nebo zdobí; video je volba | obsah jen za peníze, vnucená reklama, bot zdarma má 0 | odhad |
+| M5 | První nabídka | `first_offer_min`: minuty hraní do první značky `offer` | 20–120 min | pod 10 min nebo nad 6 h | odhad |
+| M6 | Nabídky za hodinu | `offer_popups_per_hour`: značky `offer` děleno hodinami hraní | nejvýš 1 | 3 a víc | odhad |
+
+M5 má obě meze. Nabídka v 5. minutě je vlezlá. Žádná nabídka za 6 hodin je promarněná šance. Když nabídka v záznamu nepřišla vůbec, počítá se délka záznamu. Krátký záznam bez nabídky proto vyjde dobře, i když o ničem nevypovídá: čti poznámku u čísla.
+
+Skutečný odpočet není nátlak: startovní balíček platí 48 hodin jednou a neobnoví se. Nátlak je odpočet, který se vrací, je krátký nebo běží na hlavní obrazovce.
+
 ## Co má Zkušebna dodat
 
-1. Časová osa každého bota v JSON: čas, coins, výdělek za sekundu, značky (`buy`, `staff`, `unlock`, `upgrade`, `pub`, `prestige`, `quest`, `ach`, `level`, `tab`, `guest`, `event`, `night`, `day`, `offline`, `first:*`), u nákupu cena a kolik nákupů je dostupných.
+1. Časová osa každého bota v JSON: čas, coins, výdělek za sekundu, značky (`buy`, `staff`, `unlock`, `upgrade`, `pub`, `prestige`, `quest`, `ach`, `level`, `tab`, `guest`, `event`, `night`, `day`, `offline`, `offer`, `first:*`), u nákupu cena a kolik nákupů je dostupných. V každém vzorku po 5 s navíc `words` a `menu`.
 2. Boti: nováček (jde podle návodu), běžný (první hygiena, 2. běh), slabší hráč (sezení a pauzy), zrychlení boti na hodiny.
-3. Z toho automaticky 24 čísel: S1–S6, T1, T1m, T3–T6, L1, L2, O1–O3, N1, N2, P1, P2, W1, W2, D3. Hodnotitel podle kotev: T2, L3, P3, D1, D2, D4, H1–H6, M1, U1 (14 známek).
-4. Snímky na výšku: každých 30 s v prvních 10 minutách, každý krok návodu, první nákup (před a po), první obsluha, každá událost, první noc, okno hygieny, první snímek po hygieně, okno návratu a snímek hned po něm, konec každého sezení slabšího hráče, každá záložka menu a obchod za drahokamy.
+3. Z toho automaticky 29 čísel: S1–S6, T1, T1m, T3–T6, L1, L2, O1–O3, N1, N2, P1, P2, W1, W2, D3, M5, M6, U3–U5. Hodnotitel podle kotev: T2, L3, P3, D1, D2, D4, H1–H6, M1–M4, U1, U2 (18 známek).
+4. Snímky na výšku: každých 30 s v prvních 10 minutách, každý krok návodu, první nákup (před a po), první obsluha, každá událost, první noc, okno hygieny, první snímek po hygieně, okno návratu a snímek hned po něm, konec každého sezení slabšího hráče, každá záložka menu, obchod za drahokamy, obrazovka Speciální nabídka (`shots/*menu_special*`) a každé vyskakovací okno s nabídkou.
 5. Simulace 30 min, 1 h, 2 h, „do první hygieny + 2. běh“ a „do vyčerpání novinek“.
 6. Výstup: tabulka známek, rozdíl proti minulému běhu, nejhorších 10 kritérií s návrhem a odhadem práce.
 
