@@ -15,7 +15,8 @@ POSTAV HOSPODU, O KTERÉ SE MLUVÍ
 • Ťukej na pípu, vař v kuchyni, kutálej sudy ze sklepa a hraj kostky v rohu
 • Vylepšuj stanice, ať ti každé pivo vydělá víc
 • Vyzdob hospodu a odemykej nové hosty do sbírky
-• Rozvíjej strom schopností hostinského a vyber si vlastní cestu k bohatství
+• Rozvíjej strom schopností hostinského po třech cestách cechů a vyber si vlastní cestu k bohatství
+• Plň Knihu hostinského a krok za krokem hospodu zrekonstruuj – nový nábytek, kulečník, zlaté stanice a dokonce svatba v hospodě
 
 OBJEV PODIVNÉ NOVÉ HOSPODY
 • Sklepní krčma plná upírů a kostlivců
@@ -42,7 +43,8 @@ HRAJ PO SVÉM
 • Funguje offline, bez internetu
 • Reklamy jsou dobrovolné – jen když chceš bonus
 • Denní truhla, denní úkoly a týdenní výzva
-• Postup se zálohuje sám – bez účtu a přihlašování
+• Postup se ukládá sám – s Google Play Hrami i do cloudu, hrát jde i úplně bez účtu
+• Porovnej krígly, úroveň hostinského a rekord v Chrámu v online žebříčcích Google Play Her
 • Krátký návod tě provede začátkem, nápověda ve hře vysvětlí zbytek
 • 12 jazyků
 

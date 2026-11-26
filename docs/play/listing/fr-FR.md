@@ -15,7 +15,8 @@ CONSTRUIS UN BAR DONT TOUT LE MONDE PARLE
 • Tape sur la pompe, cuisine, remonte les tonneaux de la cave et joue aux dés dans le coin
 • Améliore chaque poste pour que chaque bière rapporte plus
 • Décore le bar et débloque de nouveaux clients pour ta collection
-• Développe l'arbre de talents de ton tavernier et choisis ta propre voie vers la fortune
+• Développe l'arbre de talents de ton tavernier selon trois voies de guilde et choisis ta propre voie vers la fortune
+• Remplis le Livre du tavernier et rénove le bar étoile après étoile – nouveaux meubles, un billard, des postes dorés et même un mariage au bar
 
 DÉCOUVRE D'ÉTRANGES NOUVEAUX BARS
 • La Taverne de la cave, pleine de vampires et de squelettes
@@ -42,7 +43,8 @@ JOUE À TA FAÇON
 • Fonctionne hors ligne, sans connexion internet
 • Pubs facultatives – seulement si tu veux un bonus
 • Coffre quotidien, tâches du jour et un défi de la semaine
-• Ta progression est sauvegardée automatiquement – sans compte ni connexion
+• Ta progression est sauvegardée automatiquement – dans le cloud avec Google Play Jeux, ou joue sans aucun compte
+• Compare tes chopes, ton niveau de tavernier et ton record au Temple dans les classements en ligne de Google Play Jeux
 • Un court tutoriel t'explique les bases, l'aide du jeu explique le reste
 • 12 langues
 

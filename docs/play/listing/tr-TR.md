@@ -15,7 +15,8 @@ HERKESİN KONUŞTUĞU BİR MEYHANE KUR
 • Bira musluğuna dokun, mutfakta yemek pişir, mahzenden fıçı çıkar ve köşede zar at
 • Her istasyonu geliştir, her bira daha çok kazandırsın
 • Meyhaneyi süsle ve koleksiyonuna yeni misafirler ekle
-• Meyhanecinin yetenek ağacını geliştir ve zenginliğe giden kendi yolunu seç
+• Meyhanecinin yetenek ağacını üç lonca yolunda geliştir ve zenginliğe giden kendi yolunu seç
+• Meyhanecinin Kitabı'nı doldur ve meyhaneyi yıldız yıldız yenile – yeni mobilyalar, bilardo masası, altın istasyonlar, hatta meyhanede düğün
 
 TUHAF YENİ MEKÂNLAR KEŞFET
 • Vampirler ve iskeletlerle dolu Mahzen Meyhanesi
@@ -42,7 +43,8 @@ KENDİ TARZINDA OYNA
 • Çevrimdışı çalışır, internet gerekmez
 • Reklamlar isteğe bağlı – yalnızca bonus istediğinde
 • Günlük sandık, günlük görevler ve haftalık meydan okuma
-• İlerlemen kendiliğinden yedeklenir – hesap ve giriş gerekmez
+• İlerlemen kendiliğinden kaydedilir – Google Play Oyunlar ile bulutta da, hesap olmadan da oynayabilirsin
+• Kupalarını, meyhaneci seviyeni ve Tapınak rekorunu Google Play Oyunlar'ın çevrim içi sıralamalarında karşılaştır
 • Kısa bir rehber temelleri gösterir, oyun içi yardım gerisini anlatır
 • 12 dil
 

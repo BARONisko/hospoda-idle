@@ -15,7 +15,8 @@ CREA UN BAR DEL QUE HABLE TODO EL MUNDO
 • Toca el grifo, cocina, sube barriles del sótano y juega a los dados en el rincón
 • Mejora cada estación para que cada cerveza valga más
 • Decora el bar y desbloquea nuevos clientes para tu colección
-• Desarrolla el árbol de habilidades de tu tabernero y elige tu propio camino a la riqueza
+• Desarrolla el árbol de habilidades de tu tabernero por tres caminos de gremio y elige tu propio camino a la riqueza
+• Completa el Libro del tabernero y reforma el bar estrella a estrella: muebles nuevos, una mesa de billar, estaciones doradas e incluso una boda en el bar
 
 DESCUBRE BARES NUEVOS Y EXTRAÑOS
 • La Taberna del sótano, llena de vampiros y esqueletos
@@ -42,7 +43,8 @@ JUEGA A TU MANERA
 • Funciona sin conexión, no necesita internet
 • Los anuncios son opcionales: solo si quieres una bonificación
 • Cofre diario, tareas diarias y un desafío semanal
-• Tu progreso se guarda solo, sin cuenta ni inicio de sesión
+• Tu progreso se guarda solo: con Google Play Juegos también en la nube, o juega sin ninguna cuenta
+• Compara jarras, nivel de tabernero y récord del Templo en clasificaciones online de Google Play Juegos
 • Una breve guía te enseña lo básico y la ayuda del juego explica el resto
 • 12 idiomas
 

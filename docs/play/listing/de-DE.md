@@ -15,7 +15,8 @@ BAU EINE KNEIPE, VON DER ALLE REDEN
 • Tipp auf den Zapfhahn, koch in der Küche, roll Fässer aus dem Keller und würfle in der Ecke
 • Verbessere jede Station, damit jedes Bier mehr wert ist
 • Dekoriere die Kneipe und schalte neue Gäste für deine Sammlung frei
-• Bau den Fähigkeitenbaum deines Wirts aus und wähle deinen eigenen Weg zum Reichtum
+• Bau den Fähigkeitenbaum deines Wirts entlang dreier Gildenwege aus und wähle deinen eigenen Weg zum Reichtum
+• Füll das Buch des Wirts und renoviere die Kneipe Stern für Stern – neue Möbel, ein Billardtisch, goldene Stationen und sogar eine Hochzeit in der Kneipe
 
 ENTDECKE SELTSAME NEUE KNEIPEN
 • Die Kellerschenke voller Vampire und Skelette
@@ -42,7 +43,8 @@ SPIEL, WIE DU WILLST
 • Läuft offline, ganz ohne Internet
 • Werbung ist freiwillig – nur wenn du einen Bonus willst
 • Tägliche Truhe, Tagesaufgaben und eine Wochen-Herausforderung
-• Dein Fortschritt wird automatisch gesichert – ohne Konto und Anmeldung
+• Dein Fortschritt wird automatisch gespeichert – mit Google Play Spiele auch in der Cloud, spielen geht aber auch ganz ohne Konto
+• Vergleiche Krüge, Wirtsstufe und Tempel-Rekord in Online-Bestenlisten bei Google Play Spiele
 • Eine kurze Anleitung zeigt dir die Grundlagen, die Hilfe im Spiel erklärt den Rest
 • 12 Sprachen
 

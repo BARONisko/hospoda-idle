@@ -15,7 +15,8 @@ CRIE UM BAR DE QUE TODO MUNDO FALA
 • Toque na torneira, cozinhe, role barris do porão e jogue dados no canto
 • Melhore cada estação para cada cerveja valer mais
 • Decore o bar e desbloqueie novos clientes para a sua coleção
-• Evolua a árvore de habilidades do seu taberneiro e escolha o seu caminho para a fortuna
+• Evolua a árvore de habilidades do seu taberneiro por três caminhos de guilda e escolha o seu caminho para a fortuna
+• Complete o Livro do taberneiro e reforme o bar estrela por estrela – móveis novos, uma mesa de sinuca, estações douradas e até um casamento no bar
 
 DESCUBRA BARES NOVOS E ESTRANHOS
 • A Taverna do porão, cheia de vampiros e esqueletos
@@ -42,7 +43,8 @@ JOGUE DO SEU JEITO
 • Funciona offline, sem precisar de internet
 • Anúncios são opcionais – só quando você quiser um bônus
 • Baú diário, tarefas diárias e um desafio semanal
-• Seu progresso é salvo automaticamente – sem conta e sem login
+• Seu progresso é salvo automaticamente – na nuvem com o Google Play Games, ou jogue sem conta nenhuma
+• Compare canecas, nível de taberneiro e recorde no Templo nos placares online do Google Play Games
 • Um guia curto mostra o básico e a ajuda do jogo explica o resto
 • 12 idiomas
 

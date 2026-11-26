@@ -15,7 +15,8 @@ BUILD A PUB EVERYONE TALKS ABOUT
 • Tap the beer tap, cook in the kitchen, roll barrels up from the cellar and play dice in the corner
 • Upgrade every station so each beer is worth more
 • Decorate the pub and unlock new guests for your collection
-• Grow your landlord's skill tree and choose your own way to get rich
+• Grow your landlord's skill tree along three guild paths and choose your own way to get rich
+• Fill the Landlord's Book and renovate the pub star by star – new furniture, a billiard table, golden stations and even a wedding in the pub
 
 DISCOVER STRANGE NEW PUBS
 • The Cellar Tavern, full of vampires and skeletons
@@ -42,7 +43,8 @@ PLAY YOUR WAY
 • Works offline – no internet connection needed
 • Ads are optional: watch one only when you want a bonus
 • Daily chest, daily tasks and a weekly challenge keep every day interesting
-• Your progress is backed up automatically – no account or sign-in needed
+• Progress is saved automatically – sign in to Google Play Games for cloud save, or play without any account
+• Compare your tankards, landlord level and Temple record on online leaderboards in Google Play Games
 • A short guide shows you the basics, and the in-game help explains everything else
 • 12 languages
 

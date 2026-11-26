@@ -15,7 +15,8 @@ ZBUDUJ KNAJPĘ, O KTÓREJ MÓWI CAŁE MIASTO
 • Stukaj w nalewak, gotuj w kuchni, wytaczaj beczki z piwnicy i graj w kości w kącie
 • Ulepszaj każde stanowisko, żeby każde piwo było warte więcej
 • Udekoruj knajpę i odblokuj nowych gości do kolekcji
-• Rozwijaj drzewko umiejętności karczmarza i wybierz własną drogę do bogactwa
+• Rozwijaj drzewko umiejętności karczmarza na trzech ścieżkach cechów i wybierz własną drogę do bogactwa
+• Wypełniaj Księgę karczmarza i odnawiaj knajpę gwiazdka po gwiazdce – nowe meble, stół bilardowy, złote stanowiska, a nawet wesele w knajpie
 
 ODKRYJ DZIWNE NOWE KNAJPY
 • Piwniczna karczma pełna wampirów i szkieletów
@@ -42,7 +43,8 @@ GRAJ PO SWOJEMU
 • Działa offline, bez internetu
 • Reklamy są dobrowolne – tylko gdy chcesz bonus
 • Codzienna skrzynia, zadania dzienne i wyzwanie tygodnia
-• Postęp zapisuje się sam – bez konta i logowania
+• Postęp zapisuje się sam – z Grami Google Play także w chmurze, a grać można całkiem bez konta
+• Porównuj kufle, poziom karczmarza i rekord w Świątyni w rankingach online Gier Google Play
 • Krótki samouczek pokaże podstawy, a pomoc w grze wyjaśni resztę
 • 12 języków
 
