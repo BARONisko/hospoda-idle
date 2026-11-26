@@ -223,6 +223,7 @@ await p.evaluate(() => { window.__pmin = (n) => (n === 0 ? 4 : Math.max(6, Math.
 // Menu jako hráč: ťukne na Menu, pak na dlaždici (kam ukazuje i průvodce), v okně ťuká na tlačítka, která svítí
 // (nikdy ne na platbu skutečnými penězi – Speciální nabídku si jen prohlédne), pak zavře. První návštěva = snímek.
 const seenTab = new Set();
+let afterBuyShot = false;
 let menuIdx = 0, lastMenuT = 0;
 async function menuVisit(maxTaps) {
   const tiles = await p.evaluate(() => {
@@ -232,6 +233,10 @@ async function menuVisit(maxTaps) {
     return r.tiles.map(r.keyOf).filter((k) => !s.tileLock?.(k));
   });
   await step(0.3);
+  // Fable (3. běh): snímek mřížky Menu (karta „Až se vrátíš“, silueta další hospody) – jednou před 1. hygienou a jednou po 3.
+  const pr = await p.evaluate(() => game.scene.getScene('Pub').d.stats.prestiges);
+  const gk = 'grid_' + (pr >= 3 ? 'b' : 'a');
+  if (!seenTab.has(gk)) { seenTab.add(gk); await shot('menu_mrizka', true); }
   const pick = ['obchod', 'ukoly', ...tiles.filter((k) => k !== 'opts')]; // spodní lišta: Obchod (vylepšení ×3), Úkoly
   if (!pick.length) { await p.evaluate(() => game.scene.getScene('Pub').closeShop()); return; }
   const k = pick[menuIdx++ % pick.length];
@@ -305,6 +310,8 @@ while (T < end) {
   try { st = await read(); } catch { st = null; }
   if (!st) { await step(1); T += 1; continue; }
   await record(st);
+  // Fable (3. běh): jednou snímek hned po běžném nákupu (vyletí +X/s, pruh zezelená)
+  if (!afterBuyShot && T > 600 && lastBuyT === T) { afterBuyShot = true; await step(0.3); await shot('po_nakupu', true); }
   // Chrám / Šipky otevřené jinudy než z Menu (např. průvodce novinkou tile:temple): podívat se a odejít (dřív bot zůstal v Chrámu do konce)
   const other = await p.evaluate(() => ['Temple', 'Darts'].find((n) => game.scene.isActive(n)) ?? null);
   if (other) {
