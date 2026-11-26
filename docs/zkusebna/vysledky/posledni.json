@@ -30,16 +30,16 @@
    "code": "S4",
    "name": "Konec návodu (odhad pro člověka)",
    "score": 2,
-   "value": "182 s",
-   "why": "bot 122 s → člověk asi 182 s",
+   "value": "140 s",
+   "why": "bot 93 s → člověk asi 140 s",
    "proposal": ""
   },
   {
    "code": "S5",
    "name": "Nejdelší bezradnost (prvních 15 min)",
-   "score": 0,
-   "value": "54 s",
-   "why": "od 64. s nováčka nic nového (bot čeká na coins; člověk by tu nejspíš ťukal na hosty)",
+   "score": 1,
+   "value": "21 s",
+   "why": "od 21. s nováčka nic nového (bot čeká na coins; člověk by tu nejspíš ťukal na hosty)",
    "proposal": ""
   },
   {
@@ -54,15 +54,15 @@
    "code": "T1",
    "name": "Nejdelší mezera mezi nákupy v 1. hodině",
    "score": 2,
-   "value": "62 s",
+   "value": "56 s",
    "why": "",
    "proposal": ""
   },
   {
    "code": "T1m",
    "name": "Medián mezery mezi nákupy v 1. hodině",
-   "score": 2,
-   "value": "8.00 s",
+   "score": 1,
+   "value": "5.50 s",
    "why": "",
    "proposal": ""
   },
@@ -71,22 +71,22 @@
    "name": "Nákup je cítit",
    "score": 1,
    "value": "hodnotitel",
-   "why": "Velké kroky cítit jsou: t=62 otevření kuchyně 1,1 → 2,1/s (+91 %) s nápisem „Kuchař nastoupil!“ (shots/novacek_008_t62_first_station_kitchen.png, minule 0 %); t=120 vylepšení 2,1 → 3,7/s a „Pípa: výdělek ×3!“ (shots/novacek_010_t120_first_upgrade.png); milník „ÚROVEŇ 25! Sklep se sudy: výdělek ×2!“ s paprsky (shots/novacek_032_t612_first_event_bat.png). Běžná úroveň ne: u běžného bota v první hodině zvedne jeden nákup celkový výdělek o medián 0,3 % (153 úseků s jediným nákupem v timeline_bezny.json). Karta ukazuje přírůstek („+7,4/s · ×2 za 24 úr.“), ne „teď → potom“. Úplně první nákup t=3 nezmění nic: +0/s před i po (shots/novacek_003_t3_first_buy.png). Vyletující „+X/s“ po nákupu není na žádném snímku – chybí snímek těsně po běžném nákupu, takže ho neumím potvrdit ani vyvrátit.",
-   "proposal": "Po nákupu úrovně na 1 s přepsat řádek na kartě z „+7,4/s · ×2 za 24 úr.“ na „+7,4 → +7,8/s“ (zeleně, pak zpět) a bot ať fotí 300 ms po prvním a po jednom běžném nákupu."
+   "why": "Velké kroky cítit jsou: t=16 číšníci 0 → 1,1/s, t=64 kuchyně 1,1 → 2,1/s (+82 %, „Kuchař nastoupil!“, shots/novacek_008_t65_first_station_kitchen.png), t=92 vylepšení ×3 2,1 → 5,0/s, t=128 třetí číšník 17 → 30/s, Sklepník 69 → 100/s (+45 %) a na kartě místo „s obsluhou +31/s“ naskočí pruh (shots/slaby_018_t5284_first_event_gold.png → shots/slaby_021_t5293_po_nakupu.png). Běžná úroveň ne: medián +0,58 % celkového výdělku na jeden nákup (151 úseků s jediným nákupem v první hodině, timeline_bezny.json; nováček 0,55 %). Nový snímek po nákupu to potvrzuje: shots/novacek_030_t594_t594.png → shots/novacek_031_t609_po_nakupu.png, Pípa 125 → 127, na kartě před i po „+18/s“, výdělek 2,95K → 2,99K/s (+1,4 % za dvě úrovně), změnilo se jen číslo úrovně a cena; shots/bezny_028_t601_po_nakupu.png totéž. Karta ukazuje přírůstek další úrovně, ne „teď → potom“.",
+   "proposal": "Na 1 s po nákupu úrovně přepsat pruh karty z „+18/s“ na výdělek stanice „teď → potom“ (například „2,29K → 2,31K/s“, zeleně) a pak vrátit; u Pípy nad úrovní 100 vrátit do pruhu „×2 za N úr.“, které tam teď chybí, aby bylo vidět, k čemu úrovně vedou."
   },
   {
    "code": "T3",
    "name": "Růst cen (další úroveň / předchozí, stejná věc)",
    "score": 2,
    "value": "1.13 ×",
-   "why": "3391 dvojic nákupů po sobě (pozn.: bot kupuje po 1 úrovni, cena je odhadnutá z úbytku coins)",
+   "why": "3236 dvojic nákupů po sobě (pozn.: bot kupuje po 1 úrovni, cena je odhadnutá z úbytku coins)",
    "proposal": ""
   },
   {
    "code": "T4",
    "name": "Nejdelší doba, kdy si hráč nemůže nic koupit",
    "score": 2,
-   "value": "70 s",
+   "value": "102 s",
    "why": "nejhorší má bezny; počítá se jen vybraná hospoda",
    "proposal": ""
   },
@@ -94,8 +94,8 @@
    "code": "T5",
    "name": "Hrbolatost (skoky výdělku ×2 za 30 min)",
    "score": 2,
-   "value": "4.05",
-   "why": "81 skoků za 600 min (bez skoků způsobených hygienou)",
+   "value": "4.55",
+   "why": "91 skoků za 600 min (bez skoků způsobených hygienou)",
    "proposal": ""
   },
   {
@@ -110,16 +110,16 @@
    "code": "L1",
    "name": "Růst výdělku za hodinu (medián)",
    "score": 0,
-   "value": "1.00 ×",
-   "why": "nejlepší výdělek dosud, poměr hodina/hodina: 58.32, 1.00, 1.00, 1.00, 1.00, 1.03, 1.00, 1.23, 1.00",
+   "value": "1.04 ×",
+   "why": "nejlepší výdělek dosud, poměr hodina/hodina: 12.33, 1.08, 1.00, 1.04, 1.15, 1.00, 1.00, 1.11, 1.00",
    "proposal": ""
   },
   {
    "code": "L2",
    "name": "Hodnota návratu (slabší hráč: coins po pauze / cena nejlevnějšího užitečného nákupu)",
    "score": 2,
-   "value": "535 ×",
-   "why": "návraty: 535×, 2605×, 13860× (nejhorší platí; měřítko = medián cen posledních 5 nákupů před odchodem)",
+   "value": "919 ×",
+   "why": "návraty: 919×, 12233×, 3471× (nejhorší platí; měřítko = medián cen posledních 5 nákupů před odchodem)",
    "proposal": ""
   },
   {
@@ -127,15 +127,15 @@
    "name": "Okno návratu (Zatímco jsi byl pryč)",
    "score": 2,
    "value": "hodnotitel",
-   "why": "shots/slaby_017_t5281_navrat.png: velké „+296K coins“, „obsluha pracovala 1 h 20 min“, „(strop 8 h)“, „stačí na: Sklepník (40K)“, jedno tlačítko Vybrat, žádné další okno. Hned po zavření shots/slaby_019_t5289_first_screen_ukoly.png: 301K coins, fialový Sklepník 40K a tři zelené nákupy. Totéž při třetím návratu shots/slaby_029_t15845_konec.png (+2.48M, Sklepník 400K). Strop nikdo nenarazil (pauzy 80 min), takže řádek o ztrátě nad stropem ověřit nejde.",
+   "why": "shots/slaby_017_t5280_navrat.png: velké „+332K coins“, „obsluha pracovala 1 h 20 min“, „(strop 8 h)“, „stačí na: Sklepník (40K)“, jedno tlačítko Vybrat, žádné další okno. Hned po zavření shots/slaby_018_t5284_first_event_gold.png: 340K coins, fialový Sklepník 40K a čtyři zelené nákupy; shots/slaby_021_t5293_po_nakupu.png: Sklepník koupený, +69 → +100/s. Stejně druhý návrat (shots/slaby_024_t10560_navrat.png: +1.47M, „stačí na: Kostlivec (500K)“) a třetí (shots/slaby_029_t15843_konec.png: +474K, „stačí na: Kuchař (25K)“). Strop nikdo nenarazil (pauzy 80 min), řádek o ztrátě nad stropem ověřit nejde.",
    "proposal": ""
   },
   {
    "code": "O1",
    "name": "Nejdelší mezera mezi novými věcmi (první 2 hodiny)",
    "score": 0,
-   "value": "3784 s",
-   "why": "od 57. do 120. min běžného bota žádná nová věc (Menu bot prochází, nová okna tam už nebyla)",
+   "value": "2975 s",
+   "why": "od 70. do 120. min běžného bota žádná nová věc (Menu bot prochází, nová okna tam už nebyla)",
    "proposal": ""
   },
   {
@@ -150,7 +150,7 @@
    "code": "O3",
    "name": "Nejdelší pauza mezi překvapeními",
    "score": 2,
-   "value": "181 s",
+   "value": "190 s",
    "why": "",
    "proposal": ""
   },
@@ -174,16 +174,16 @@
    "code": "P1",
    "name": "Minuty do první hygieny (běžný bot)",
    "score": 2,
-   "value": "16 min",
+   "value": "15 min",
    "why": "",
    "proposal": ""
   },
   {
    "code": "P2",
    "name": "Zrychlení po hygieně (2. běh dožene výdělek 1. běhu)",
-   "score": 1,
-   "value": "2.08 ×",
-   "why": "1. běh došel na 6108/s za 12 min, 2. běh za 6 min",
+   "score": 2,
+   "value": "4.25 ×",
+   "why": "1. běh došel na 3474/s za 15 min, 2. běh za 4 min",
    "proposal": ""
   },
   {
@@ -191,15 +191,15 @@
    "name": "Rozhodnutí o hygieně je jasné",
    "score": 2,
    "value": "hodnotitel",
-   "why": "shots/bezny_029_t951_okno_hygieny.png a shots/slaby_023_t5630_okno_hygieny.png: co zmizí („zavře hospodu: coins, úrovně a vylepšení začnou od nuly“), co zůstane („zůstane: diamanty · číšníci · sbírka · krígly“), krígly 0 → 5, „×1,04 výdělek navždy“, „+ nová hospoda: Sklepní krčma“, rada „teď je dobrá chvíle“, odmítnutí jedním ťuknutím na „Ještě ne“. Oprava je na snímku vidět. Výhrady, které známku těsně nesnižují: řádky „zůstane“ a „teď je dobrá chvíle“ jsou nejmenší a nejbledší text v okně (tmavě zelená na šedé) a opačný stav „za 5 min: krígly +N“ není na žádném z pěti snímků okna hygieny (boti volají vždy v dobrou chvíli), takže ten ověřit nejde.",
+   "why": "shots/bezny_029_t915_okno_hygieny.png, shots/slaby_028_t10681_okno_hygieny.png, shots/dlouhy_022_t964_okno_hygieny.png: co zmizí („zavře hospodu: coins, úrovně a vylepšení začnou od nuly“), co zůstane („zůstane: diamanty · číšníci · sbírka · krígly“), krígly 0 → 4, „×1,04 výdělek navždy“, „+ nová hospoda: Sklepní krčma“, rada „teď je dobrá chvíle“, odmítnutí jedním ťuknutím na „Ještě ne“. Nově je doložený i opačný stav rady: shots/bezny_039_t1999_okno_hygieny.png „za 5 min: krígly +1“. Výhrady pod čarou: řádek „zůstane“ je nejmenší a nejbledší text okna. Okno bez další hospody („po této hygieně: Pivovar“ / „další novinka: … po N. hygieně“) na žádném snímku není – všechny čtyři snímky okna jsou z 1. a 2. hygieny, třetí a další (t=3524, 6440, 9536; dlouhý t=3159 …) nikdo nevyfotil. Text je v kódu (src/scenes/PubScene.ts ř. 4700), na snímku ho potvrdit neumím.",
    "proposal": ""
   },
   {
    "code": "W1",
    "name": "Slabší hráč: minuty do první hygieny / běžný bot",
    "score": 2,
-   "value": "0.88 ×",
-   "why": "slabý 94 min od instalace (z toho hrál 14 min, zbytek pauzy), běžný 16 min",
+   "value": "1.18 ×",
+   "why": "slabý 178 min od instalace (z toho hrál 18 min, zbytek pauzy), běžný 15 min",
    "proposal": ""
   },
   {
@@ -215,7 +215,7 @@
    "name": "Tři cíle na obrazovce",
    "score": 2,
    "value": "hodnotitel",
-   "why": "Po návodu jsou na hlavní obrazovce všechny tři: krátký = ceny na kartách, zelená = mám na to (shots/novacek_030_t579_t579.png: +1 · 11.1K zelené, ostatní šedé); střední = lišta úkolu vlevo nahoře („Kuchyně na úroveň 10 · 2/10“, shots/novacek_014_t164_first_event_banshee.png; „Kup 3 vylepšení v Obchodě · 0/3“, shots/bezny_038_t2008_t2008.png); dlouhý = pilulka krígl s procenty (12 % → 74 % → 100 % se zeleným rámem, shots/novacek_042_t901_konec.png). Pilulka jen s procenty je schválené rozhodnutí. Chybí jen během návodu do t=122.",
+   "why": "Po návodu jsou na hlavní obrazovce všechny tři: krátký = ceny na kartách, zelená = mám na to (shots/novacek_012_t134_first_station_cellar.png: „+1 · 13“ zelené, ostatní šedé); střední = lišta úkolu vlevo nahoře („Kuchyně na úroveň 10 · 3/10“ tamtéž, „Vyber spropitné od 30 hostů · 23/30“ shots/bezny_028_t601_po_nakupu.png); dlouhý = pilulka krígl s procenty (13 % → 91 % → 100 % v zeleném rámu, shots/novacek_041_t900_konec.png). Pilulka jen s procenty je schválené rozhodnutí. Chybí jen během návodu do t=93. Slabší místo: od t=443 do konce má nováček v liště „Podívej se do menu: Úkoly · 0/1“ (shots/novacek_025_t443_t443.png až shots/novacek_041_t900_konec.png), což je pokyn, ne cíl.",
    "proposal": ""
   },
   {
@@ -223,15 +223,15 @@
    "name": "Háček na konci sezení",
    "score": 1,
    "value": "hodnotitel",
-   "why": "Konce sezení: shots/novacek_042_t901_konec.png (pilulka 100 %, úkol 0/1), shots/bezny_045_t10801_konec.png (úkol 1/10, 78 %, „ŠŤASTNÁ HODINA ×3“), shots/dlouhy_039_t36002_konec.png (4/10, 89 %). Je vidět rozdělaný cíl, ale žádný odpočet ani číslo, kolik přibude, když zavřu. Karta „Až se vrátíš: 1 h pryč: +N coins · strop 8 h“ a silueta další hospody v kódu jsou (src/scenes/PubScene.ts kolem ř. 1473–1497), ale žádný snímek mřížky Menu v záznamu není (boti fotí jen okna uvnitř Menu), takže opravu na snímku potvrdit neumím. Slabší bot odchází v t=480, 5763 a 11044 bez snímku.",
-   "proposal": "Bot ať při každém „leave“ a na konci vyfotí mřížku Menu (*_menu_konec.png); karta zůstane v Menu, jak Petr vybral. Na hlavní obrazovce stačí, aby VIP pruh a várka v pivovaru (když běží) ukázaly čas doběhnutí – ty už tam místo mají."
+   "why": "Karta „Až se vrátíš“ je teď na snímku doložená: shots/bezny_010_t100_menu_mrizka.png („1 h pryč: +13.4K coins · strop 8 h“ a „Další hospoda: Sklepní krčma – otevře se po další hygieně“), shots/slaby_012_t242_menu_mrizka.png (+53.8K), shots/bezny_042_t3613_menu_mrizka.png (+150K, strop 8,1 h). Je ale jen v Menu. Na snímcích konce sezení není číslo, kolik přibude, ani nic, co doběhne: shots/novacek_041_t900_konec.png (pilulka 100 %, úkol 0/1), shots/bezny_044_t10801_konec.png (úkol 0/10, 57 %), shots/dlouhy_046_t36001_konec.png (úkol 1/10, 25 %). Slabší bot odchází v t=480, 5760 a 11043 z hlavní obrazovky a odchod nikdo nevyfotil.",
+   "proposal": "Truhla vpravo nahoře je na hlavní obrazovce pořád: po vybrání do ní místo prázdného kroužku napsat odpočet do další („3:12“), aby při odchodu bylo vidět aspoň jedno, co doběhne; kartu „Až se vrátíš“ nechat v Menu. Bot ať vyfotí hlavní obrazovku při každém „leave“."
   },
   {
    "code": "D3",
    "name": "Zásoba obsahu (kdy přestanou novinky)",
    "score": 1,
-   "value": "8.34 h",
-   "why": "poslední novinka v 501. min, pak už jen opakování do konce záznamu (10.0 h; noví hosté se nepočítají)",
+   "value": "7.58 h",
+   "why": "poslední novinka v 455. min, pak už jen opakování do konce záznamu (10.0 h; noví hosté se nepočítají)",
    "proposal": ""
   },
   {
@@ -239,7 +239,7 @@
    "name": "Velký cíl",
    "score": 2,
    "value": "hodnotitel",
-   "why": "V první hodině hra ukáže, kam se jde, a ten cíl existuje: okno hygieny „+ nová hospoda: Sklepní krčma“ (t=951, shots/bezny_029_t951_okno_hygieny.png), přepínač hospod nahoře (shots/bezny_031_t959_first_station_tap.png), při druhé hygieně „+ nová hospoda: Žabákův podnik“ (t=3187, shots/bezny_042_t3187_okno_hygieny.png), Sbírka se záložkami Sklepní krčma / Žabákův podnik / Sezóna / Návštěvníci a siluetami „???“ už v t=306 (shots/bezny_019_t306_menu_book.png). Chrám s Cthulhu je ve hře (shots/dlouhy_029_t30031_scena_temple.png). Slabina: po třetí hospodě (53. min, MAX_PUBS = 3 v src/core/save.ts) okno hygieny žádný další velký cíl neukáže.",
+   "why": "Už ve 2. minutě hra ukáže, kam se jde: zamčená dlaždice „Krígly – po 1. hygieně“ a silueta „Další hospoda: Sklepní krčma – otevře se po další hygieně“ (shots/bezny_010_t100_menu_mrizka.png), Sbírka se záložkami Sklepní krčma / Žabákův podnik / Sezóna / Návštěvníci a siluetami „???“ (shots/bezny_019_t283_menu_book.png), okno hygieny jmenuje další hospodu (t=915 a t=1999, shots/bezny_039_t1999_okno_hygieny.png „+ nová hospoda: Žabákův podnik“). Po třetí hospodě je cílem zamčená dlaždice „Pivovar – po 4. hygieně a 2B coins výdělku“ (shots/bezny_042_t3613_menu_mrizka.png). Cíle existují: pivovar t=9034, Chrám s Cthulhu t=27272 (shots/dlouhy_031_t27286_scena_temple.png). Slabina: v mřížce po třetí hospodě už řádek „Další hospoda“ nic nenahradil a je vidět jen jedna zamčená dlaždice (schválená varianta A).",
    "proposal": ""
   },
   {
@@ -247,31 +247,31 @@
    "name": "Na první pohled a jedním palcem",
    "score": 1,
    "value": "hodnotitel",
-   "why": "Hádal jsem na třech snímcích průchodu: shots/novacek_005_t17_first_staff.png (text „ťukej na bubliny“, šipka na kartě Pípy, bublina žádná; na shots/bezny_007_t70_first_station_kitchen.png šipka naopak míří na bublinu), shots/novacek_014_t164_first_event_banshee.png (duch a počítadlo 0/12, pokyn nečitelný) a shots/bezny_043_t3416_menu_keeper.png (strom o 8 patrech, tlačítko zpět pod cedulí). Dosah: nákupy, záložky, Vybrat i tlačítka hygieny jsou dole a velké, ale sběr bublin a ťukání při událostech je v y≈180–330 ze 720, zčásti v horní třetině (shots/novacek_003_t3_first_buy.png), křížek oken je asi 38×30 bodů v y≈155 (shots/bezny_021_t398_menu_special.png; okno jde zavřít i záložkou Hospoda dole, to pomáhá) a „Zpět“ v Chrámu je v y≈37 (shots/dlouhy_029_t30031_scena_temple.png). Oproti minulu: při šetření už nesvítí zelené +1 a konec návodu míří na Hospoda (shots/novacek_010_t120_first_upgrade.png).",
-   "proposal": "V krocích 5/8 a 6/8 mířit šipku vždy na bublinu hosta (jako na bezny_007), a když žádná není, nechat na Pípě kroužek „ŤUKNI SEM“ z kroku 1 místo šipky na rám obou karet; v Chrámu přesunout „Zpět“ do spodního panelu vedle textu o víkendu."
+   "why": "Hádal jsem na třech snímcích průchodu: shots/novacek_005_t17_first_staff.png a shots/novacek_008_t65_first_station_kitchen.png (text „Ťukej na bubliny hostů“, šipka na kartě Pípy, bublina žádná, všechna tlačítka šedá; když bublina je, šipka na ni přeskočí – shots/bezny_006_t60_first_level.png) a shots/novacek_041_t900_konec.png (hygiena připravená, ale svítí jen malá pilulka 100 % v y≈78, šipka přitom ukazuje na Úkoly). Dosah: nákupy, záložky, Vybrat i tlačítka hygieny jsou dole a velké. Nahoře zůstává: bublina v kroku 3 návodu v y≈190 (shots/novacek_003_t3_first_buy.png), sběr bublin a ťukání při událostech v y≈150–330, křížek oken 38×30 bodů v y≈155 (shots/bezny_021_t373_menu_special.png) – okno jde zavřít i spodní lištou, proto to není 0.",
+   "proposal": "Šipku na Pípě v kroku 5 nechat (přání z PLAN.md ř. 312), ale dokud na obrazovce není bublina, schovat druhý řádek cedule a nechat jen „NAŠETŘI 60 COINS: 2 / 60“; věta o bublinách se ukáže až s první bublinou spolu se šipkou na ni. Když pilulka dojde na 100 %, přesunout šipku průvodce z Úkolů na záložku Obchod (řádek Zavolat hygienu)."
   },
   {
    "code": "H2",
    "name": "Karty a tlačítka říkají, co chtějí",
    "score": 1,
    "value": "hodnotitel",
-   "why": "Karty stanic říkají název, úroveň, cenu i přírůstek („+3,7/s · ×2 za 8 úr.“) a zelená proti šedé je jasná (shots/novacek_030_t579_t579.png); Obchod teď říká, co manažer dá („Šťastná hodina: výdělek ×3 na 30 s“, shots/bezny_010_t124_menu_obchod.png); zamčená dlaždice říká podmínku. Jiné věci ne: „bar plný – číšníci nestíhají!“ svítí na kartě Pípy od t=126 do konce (shots/bezny_011_t126_first_screen_obchod.png … shots/novacek_042_t901_konec.png) a po třetím číšníkovi (t=156) zmizí tlačítko „Číšník +1 · 400“, takže varování nemá žádnou akci – ta je schovaná v kolečkách číšníků s odznakem „1“ bez popisu. Dál „Učeň“ s tečkami pod úrovní (shots/bezny_045_t10801_konec.png), „body: 16 ?“ (shots/bezny_043_t3416_menu_keeper.png) a šedé „Lepší reklama +0,1 · 10 krígel“ (shots/bezny_021_t398_menu_special.png) neříkají, co chtějí.",
-   "proposal": "Když svítí „bar plný“ a číšníci jsou tři, rozblikat kolečko číšníka s odznakem „1“ a hlášku na kartě nahradit šipkou k němu („↑ číšník má bod“); když žádný bod nemá, hlášku neukazovat vůbec. V PLAN.md je „past číšníci nestíhají“ vedená jako čekající na rozhodnutí."
+   "why": "Oprava je vidět: „bar plný – číšníci nestíhají!“ má pod sebou tlačítko „Číšník +1 400“ (shots/bezny_012_t102_first_screen_obchod.png), které zoranžoví, když na něj mám (shots/slaby_014_t246_first_screen_obchod.png), a po třetím číšníkovi hláška zmizí – není na žádném z 30 snímků nováčka od t=134 do t=900 (shots/novacek_012_t134_first_station_cellar.png … shots/novacek_041_t900_konec.png; minule svítila do konce). Karty říkají název, úroveň, cenu i přírůstek („+1.8/s · ×2 za 12 úr.“), zelená proti šedé je jasná, Obchod říká, co věc dá („Šťastná hodina: výdělek ×3 na 30 s“, shots/bezny_011_t100_menu_obchod.png), zamčená dlaždice říká podmínku. Samy se nepopisují: prázdný oranžově orámovaný pruh u stanice bez obsluhy (Sklep úroveň 1 se šedým „Sklepník 40K“, shots/novacek_012_t134_first_station_cellar.png – co obsluha dá, se ukáže, až když na ni mám, shots/slaby_020_t5289_first_screen_ukoly.png „s obsluhou +31/s“), kolečka číšníků s odznakem „1“, zlatý rám kolem karty Pípy od t=413 (shots/novacek_024_t413_t413.png), odznak „Učeň“ s tečkami u úrovně (shots/slaby_018_t5284_first_event_gold.png) a „Otevřít · 720“ bez údaje, co stanice vydělá.",
+   "proposal": "V prázdném pruhu stanice bez obsluhy ukazovat „s obsluhou +31/s“ vždy, ne až když na ni hráč má (text už existuje, jen se zobrazí dřív), a na zavřené kartě místo „zavřeno“ psát přírůstek „+1.2/s“ stejně jako na otevřené."
   },
   {
    "code": "H3",
    "name": "Čísla jdou přečíst",
    "score": 1,
    "value": "hodnotitel",
-   "why": "Coins, +X/s i ceny přečtu na všech snímcích hlavní obrazovky, zkratky K/M jsou všude stejné a cedule událostí mají tmavý podklad a jdou číst („Rvačka! Hosté odcházejí – ťukej na rváče!“, shots/bezny_013_t166_first_event_brawl.png; „Nájezd žab! Ťukej na ně!“, shots/bezny_028_t822_first_event_frogs.png) – to je proti minulu lepší. Překryvy zůstaly aspoň na třech snímcích: šipka průvodce na záložku Úkoly zakrývá nápis tlačítka „Kostlivec 500K“ (shots/novacek_032_t612_first_event_bat.png), šipka na nákup zakrývá název a úroveň Kuchyně (shots/novacek_015_t171_first_event.png, shots/bezny_020_t308_first_screen_book.png), cedule „Influencerka natočila stížnost.“ leží přes nadpis okna a „← Menu“ (shots/bezny_043_t3416_menu_keeper.png) a cedule „pivo se vaří samo – i offline“ přes „Co vařit:“ (shots/bezny_044_t9358_menu_brew.png), cedule „obsluhuj bubliny hostů – každá úroveň = bod do stromu“ přes první řadu hostů ve Sbírce (shots/slaby_021_t5526_menu_book.png). Výdělek za sekundu je drobný (asi 9 bodů), ale čitelný.",
-   "proposal": "Šipku průvodce na spodní lištu kreslit jen uvnitř výšky lišty (rám záložky už svítí) a šipku na tlačítko nákupu posadit nad kartu, ne přes její název; cedule z hospody nekreslit, dokud je otevřené okno Menu."
+   "why": "Coins, +X/s i ceny přečtu na všech snímcích hlavní obrazovky, zkratky K/M/B jsou všude stejné. Překryvy zůstaly, na víc než dvou snímcích: šipka průvodce na záložku Úkoly zakrývá nápis tlačítka „Kostlivec 500K“ (zbyde „Ko…ec“) na shots/novacek_025_t443_t443.png, shots/novacek_030_t594_t594.png, shots/novacek_031_t609_po_nakupu.png i shots/novacek_041_t900_konec.png; šipka na nákup zakrývá název a úroveň Kuchyně (shots/novacek_018_t232_t232.png, shots/bezny_015_t147_first_station_cellar.png, shots/dlouhy_013_t138_first_event_brawl.png); cedule události leží přes otevřené okno Úkolů („Zlatý sud! +4.15K“ přes text týdenní výzvy, shots/slaby_019_t5285_menu_ukoly.png); cedule průvodce v Pivovaru zakrývá tlačítka Prodat a Vylepšit (shots/bezny_043_t9386_menu_brew.png). První cedulka události je v prvním snímku nečitelně malá (shots/novacek_013_t135_first_event_gold.png, shots/dlouhy_013_t138_first_event_brawl.png). Jméno hosta je v nápisu anglickým klíčem: „Nový host ve Sbírce: skeleton“ (shots/bezny_035_t1315_first_tab_bones.png).",
+   "proposal": "Šipku průvodce na spodní lištu kreslit jen ve výšce lišty (rám záložky už svítí) a šipku na tlačítko nákupu posadit vedle ikony stanice, ne přes název; cedule událostí („Zlatý sud!“) nekreslit, dokud je otevřené okno z Menu – průvodce už na zavřené menu čeká (PLAN.md ř. 232), události ne."
   },
   {
    "code": "H4",
    "name": "Humor a osobnost hospody bez hledání",
    "score": 2,
    "value": "hodnotitel",
-   "why": "Bez čtení pobaví: duch Banshee na pódiu s šipkou na hosta (shots/bezny_027_t416_first_event_banshee.png), zelení žabáci mezi stoly (shots/bezny_028_t822_first_event_frogs.png), rvačka v oblaku prachu (shots/bezny_013_t166_first_event_brawl.png), noční sklepní krčma s příšerami (shots/bezny_034_t1353_first_night.png), Cthulhu nad molem (shots/dlouhy_029_t30031_scena_temple.png). Se čtením navíc Hygienik „Našel v guláši vlas…“ s volbou Podplatit / Riskovat (shots/slaby_013_t247_first_screen_obchod.png) a názvy „Pípa s krví“, „Kostky s kostlivcem“.",
+   "why": "Bez čtení pobaví: Cthulhu nad molem s hostinským (shots/dlouhy_031_t27286_scena_temple.png), noční sklepní krčma s duchy a kostlivcem (shots/bezny_034_t1313_first_night.png, shots/bezny_035_t1315_first_tab_bones.png), zlatý sud kutálející se hospodou (shots/novacek_013_t135_first_event_gold.png, shots/novacek_024_t413_t413.png), rvačka v oblaku prachu (shots/slaby_010_t176_first_event_brawl.png). Se čtením navíc názvy „Pípa s krví“, „Kotel s gulášem“, „Kostky s kostlivcem“, „Sudomorův sklep“ (shots/bezny_031_t923_first_station_tap.png) a popis hospody „Platí tu kostlivci a ztracené duše“ (shots/bezny_030_t917_first_prestige.png). Návštěvníka s volbou v tomhle záznamu žádný snímek nezachytil.",
    "proposal": ""
   },
   {
@@ -279,48 +279,48 @@
    "name": "Sbírka a zvědavost",
    "score": 1,
    "value": "hodnotitel",
-   "why": "Zlepšení je vidět: Sbírka má v záložce Sklepní krčma siluety „???“ (shots/bezny_019_t306_menu_book.png); v záložce Pajzl u Berana je ale všech 12 hostů rovnou barevně, i když jich přišlo 7 (shots/slaby_021_t5526_menu_book.png), takže v první hospodě není co odkrývat a nad novým hostem ve Sklepní krčmě je hvězda (shots/slaby_025_t5650_first_station_tap.png). Na dvojku to nestačí: Sbírku najdu jen přes Menu, cedule k novému hostovi není na žádném snímku, hvězda na slaby_025 nemá popis ani nevede do Sbírky, a prvních 7 hostů Pajzlu přijde v t=14–78 během návodu, kde na snímcích žádná hvězda není (shots/novacek_004_t15_first_guest.png, shots/bezny_004_t14_first_guest.png). Silueta další hospody v Menu je jen v kódu, snímek mřížky Menu chybí. Chci vidět Žabákův podnik, ale ukázal mi ho až řádek v okně hygieny, ne hra sama od sebe.",
-   "proposal": "V záložce Pajzl u Berana kreslit hosty, kteří ještě nepřišli, jako siluetu „???“ stejně jako ve Sklepní krčmě; prvního hosta po konci návodu (t>122) označit hvězdou, která po ťuknutí otevře jeho kartu ve Sbírce. Bot ať vyfotí okamžik „guest“ po návodu a mřížku Menu."
+   "why": "Zlepšení: hra na nového hosta upozorní sama – nápis „Nový host ve Sbírce: skeleton“ a hvězda u hosta (shots/bezny_035_t1315_first_tab_bones.png, t=1314), siluety „???“ jsou ve Sbírce u Sklepní krčmy (shots/bezny_019_t283_menu_book.png) a mřížka Menu ukazuje siluetu další hospody (shots/bezny_010_t100_menu_mrizka.png). Na dvojku to nestačí: nápis má jméno anglickým klíčem a přijde uprostřed sedmi jiných značek první noci; v první hospodě, kde hráč stráví prvních 15 minut, upozornění na snímcích není (hosté t=14–99 přicházejí během návodu, shots/novacek_004_t14_first_guest.png) a Sbírka Pajzlu ukazuje všech 12 hostů barevně se jménem, i když jich přišlo 7 (shots/slaby_022_t5528_menu_book.png, shots/dlouhy_017_t283_menu_book.png) – není co odkrývat. Siluety i zamčené věci tak uvidím až po otevření Menu.",
+   "proposal": "V záložce Pajzl u Berana kreslit hosty, kteří ještě nepřišli, jako siluetu „???“ stejně jako ve Sklepní krčmě; v nápisu „Nový host ve Sbírce“ použít české jméno (guestName vrací u příšer klíč) a první takový nápis ukázat u prvního hosta po konci návodu, ne až v první noci."
   },
   {
    "code": "H6",
    "name": "Otevřel bych hru znovu?",
    "score": 1,
    "value": "hodnotitel",
-   "why": "Podle quit skončí v záznamu dva typy (sběratel kolem 67. min, optimizátor kolem 97. min), netrpělivý a příležitostný vydrží. Na nulu to není, protože důvod otevřít zítra jmenovat umím: denní truhla „série 1/7“ (shots/bezny_021_t398_menu_special.png), denní a týdenní úkoly (shots/bezny_015_t215_menu_ukoly.png), VIP host s odměnou 2 h výdělku (shots/bezny_038_t2008_t2008.png), Chrám „otevře za 0 d 17 h“ (shots/dlouhy_029_t30031_scena_temple.png) a várka Ležáku na 15 min (shots/bezny_044_t9358_menu_brew.png). Na hlavní obrazovce při odchodu ale žádný z nich vidět není (viz D2) a po třetí hospodě chybí další „co se odemkne“.",
-   "proposal": "Po třetí hospodě ukázat v okně hygieny místo řádku „+ nová hospoda“ nejbližší další odemčení (například „+ Pivovar za 2 hygieny“ nebo „Liga za N hygien“), aby každá hygiena měla jmenovaný cíl."
+   "why": "Podle quit skončí v záznamu dva typy (sběratel kolem 80. minuty, optimizátor kolem 100. minuty), netrpělivý a příležitostný vydrží. Na nulu to není, protože důvod otevřít zítra jmenovat umím: denní truhla „série 1/7“ (shots/bezny_021_t373_menu_special.png), „Až se vrátíš: +13.4K“ a silueta Sklepní krčmy (shots/bezny_010_t100_menu_mrizka.png), VIP host „čeká ještě 43 min · odměna 2 h výdělku“ (shots/bezny_035_t1315_first_tab_bones.png), várka Ležáku na 15 min (shots/bezny_043_t9386_menu_brew.png), Chrám „otevře za 0 d 17 h“ (shots/dlouhy_031_t27286_scena_temple.png). Na hlavní obrazovce při odchodu ale žádný z nich není (viz D2) a po třetí hospodě je nejbližší jmenovaný cíl Pivovar až ve 150. minutě.",
+   "proposal": "Mezeru mezi 70. a 150. minutou zaplnit tím, co už ve hře je, bez posunu odemykání (to je rozhodnutí z PLAN.md ř. 380 a 479): hosty 4 a 5 každé hospody pouštět až po milníku stanice (úroveň 50 a 100), aby Sbírka dostala novou siluetu každých asi 10 minut, místo pěti příšer za dvě minuty po otevření (t=931–1050)."
   },
   {
    "code": "M1",
    "name": "Poctivý obchod (cena a obsah předem, žádný omyl)",
    "score": 1,
    "value": "hodnotitel",
-   "why": "Vidět je: „Bez reklam · odměny bez reklam · jednou, navždy · 149 Kč“ (shots/bezny_021_t398_menu_special.png – oprava potvrzena), Štamgastská karta „30 dní · 99 Kč“ se čtyřmi řádky obsahu a tlačítkem „Stát se štamgastem · 99 Kč“ (shots/bezny_023_t398_menu_special_pass.png), ceny v diamantech u Rychlých věcí (shots/bezny_022_t398_menu_special_gems.png), nic náhodného. Hledat nebo chybí: karta Štamgast neříká, jestli se po 30 dnech obnoví (podle src/scenes/PubScene.ts passSub je to jednorázově, věta o obnovení se ukáže jen u předplatného v aplikaci); balíček „Oslava: Sklepní krčma – 500 diamantů · 8 h výdělku · Štamgast 3 dny“ má na snímku místo ceny tlačítko „jen v aplikaci“ (shots/slaby_026_t10815_menu_special.png; cena 79 Kč je jen v docs/play-console.md) – podle písmene kotvy je to placená věc bez ceny, nulu nedávám jen proto, že ve webovém záznamu koupit nejde; tlačítko kampaně je šedé „jen v mobilní aplikaci“ bez ikony videa; podzáložku Diamanty → Koupit (první nákup ×2) nikdo nevyfotil; barvu placeného tlačítka proti nákupu za coins nejde posoudit, všechna jsou šedá.",
-   "proposal": "Boti ať běží s ?fakeshop=1 a vyfotí i Diamanty → Koupit, aby na snímcích byly ceny a aktivní tlačítka; na kartě Štamgast doplnit ke stavu jedno slovo: „30 dní · 99 Kč · jednorázově“."
+   "why": "Vidět je: „Bez reklam · odměny bez reklam · jednou, navždy · 149 Kč“ (shots/bezny_021_t373_menu_special.png), Štamgastská karta „30 dní · 99 Kč“ se čtyřmi řádky obsahu a tlačítkem „Stát se štamgastem · 99 Kč“ (shots/bezny_023_t373_menu_special_pass.png), ceny v diamantech u Rychlých věcí (shots/bezny_022_t373_menu_special_gems.png), nic náhodného, placené tlačítko není v hlavní smyčce. Hledat nebo chybí: karta Štamgast neříká, jestli se po 30 dnech obnoví ani že jde zrušit; tlačítko kampaně s videem má na webu jen „jen v mobilní aplikaci“ bez ikony videa a odměny na tlačítku; podzáložku Diamanty → Koupit s cenami balíčků nikdo nevyfotil (bot fotí jen záložku Rychlé) a balíček po nové hospodě v tomhle záznamu na žádném snímku není (shots/slaby_025_t10561_menu_special.png je z doby před hygienou).",
+   "proposal": "Na kartu Štamgast doplnit ke stavu jedno slovo: „30 dní · 99 Kč · jednorázově“ (nebo „obnovuje se“ u předplatného); boti ať běží s ?fakeshop=1 a vyfotí Diamanty → Koupit a Speciální nabídku hned po první hygieně (značka menu special v t=927)."
   },
   {
    "code": "M2",
    "name": "Chci si to koupit (hodnota nejlepšího balíčku)",
    "score": 1,
    "value": "hodnotitel",
-   "why": "shots/slaby_026_t10815_menu_special.png: „Oslava: Sklepní krčma – 500 diamantů · 8 h výdělku · Štamgast 3 dny – jen jednou · platí ještě 22:32:24“. Tři položky s čísly přečtu jedním pohledem, nabídka přišla po nové hospodě (souvisí) a diamanty i 8 h výdělku už hráč zná ze záložky Diamanty. Cena na snímku není (tlačítko „jen v aplikaci“) a není tam srovnání s běžnou cenou, takže hodnotu si musím spočítat: 79 Kč (docs/play-console.md) za 500 diamantů (MS_GEMS v src/core/offers.ts) proti 550 diamantům za 199 Kč, tedy asi 2,3× víc diamantů za korunu plus 3 dny Štamgasta. Proti prvnímu nákupu ×2 téhož balíčku (1100 za 199 Kč) je to ale jen 1,15×. Vyskakovací podobu nikdo nezachytil (žádná značka offer).",
-   "proposal": "Na kartu balíčku přidat místo řádku „jen jednou“ srovnání s platnou cenou z obchodu („500 diamantů jinde 181 Kč“ → cena balíčku) a ve webovém sestavení psát na tlačítko katalogovou cenu šedě, ne „jen v aplikaci“."
+   "why": "Nejlepší placená věc na snímku je Štamgastská karta (shots/bezny_023_t373_menu_special_pass.png): čtyři položky a cena přečtu jedním pohledem („výdělek ×2 – i offline“, „VIP vrátný: žádný VIP neodejde“, „truhla, kampaň a ×2 bez reklam“, „každý den 20 diamantů“, 99 Kč). Hodnota vychází: 600 diamantů za 30 dní proti asi 274 diamantům za stejných 99 Kč v obchodě (550 za 199 Kč, docs/play-console.md), tedy 2,2× jen na diamantech. Srovnání ale na snímku není, musím si ho spočítat; karta je k vidění v t=373, kdy hráč ještě žádného VIP hosta nezažil (první VIP pruh až po hygieně, shots/bezny_035_t1315_first_tab_bones.png), takže řádek o VIP vrátném mu nic neříká. Balíček „Oslava“ po nové hospodě (MS_GEMS = 500 v src/core/offers.ts, 79 Kč) tentokrát nikdo nevyfotil.",
+   "proposal": "Na kartě Štamgast nahradit řádek „každý den 20 diamantů“ řádkem se srovnáním „600 diamantů za 30 dní (jinde 217 Kč)“ a řádek o VIP vrátném ukazovat až po prvním VIP hostovi."
   },
   {
    "code": "M3",
    "name": "Nátlak (odpočty, opakování, vina)",
    "score": 1,
    "value": "hodnotitel",
-   "why": "Žádná značka offer za 180 min (běžný), 264 min (slabší) ani 600 min (dlouhý): nic nevyskočilo, nic placeného nesvítí na hlavní obrazovce (truhla je zdarma, VIP pruh je odměna zdarma), odpočet „platí ještě 22:32:24“ je jen uvnitř nabídky (shots/slaby_026_t10815_menu_special.png) a podle src/core/offers.ts se neobnoví (msUntil, 24 h); pravidlo jedné nabídky za spuštění je v popDue. Na dvojku chybí důkaz: vyskakovací okno nikdo neviděl, takže velikost křížku, zpoždění a text odmítnutí nejde ověřit; křížek běžných oken je asi 38×30 bodů (shots/bezny_021_t398_menu_special.png), pod 44. Podle kódu (PubScene.ts coinVidChip) se bublina „video +N“ u nákupu, na který nemám, smí ukázat každých 5 minut – na webu ji vidět není. Že ťuk na truhlu ji rovnou otevře, na snímcích není (bot ji otevřel v okně, kde je tlačítko Otevřít).",
-   "proposal": "Bot ať jednou za záznam vyvolá vyskakovací nabídku (po druhé hygieně, jak ji hra sama plánuje) a vyfotí ji i s křížkem; křížek oken zvětšit na 48×48 bodů."
+   "why": "Žádná značka offer za 180 min (běžný), 264 min (slabší) ani 600 min (dlouhý): nic nevyskočilo (M6 = 0/h), nic placeného nesvítí na hlavní obrazovce (truhla s tečkou je zdarma, VIP pruh je odměna zdarma), tečka u Speciální nabídky v Menu patří denní truhle (shots/bezny_010_t100_menu_mrizka.png). Na dvojku chybí důkaz: vyskakovací okno nikdo neviděl, takže jeho křížek, zpoždění a text odmítnutí ověřit nejde; křížek okna Speciální nabídky má asi 38×30 bodů (shots/bezny_021_t373_menu_special.png), pod 44 – zavřít jde i spodní lištou. Pokud má vyskakovací nabídka stejný křížek, je to podle kotvy 0.",
+   "proposal": "Křížek oken zvětšit na 48×48 bodů; bot ať jednou za záznam vyvolá vyskakovací nabídku (po druhé hygieně, jak ji hra sama plánuje v popDue) a vyfotí ji i s křížkem."
   },
   {
    "code": "M4",
    "name": "Hráč zdarma (dojde všude, reklama je volba)",
    "score": 1,
    "value": "hodnotitel",
-   "why": "Boti hráli bez placení a bez videí: P1 = 16 min (2), T4 = 70 s (2), D3 = 8,34 h (1); žádná reklama nenaskočila sama, žádný obsah není jen za peníze, placené věci jen zrychlují (časoskoky, Štamgast ×2, kampaň). Strop je teď ×3 (PAID_CAP = 3 v src/core/special.ts, dřív ×4) – oprava je v kódu, ale kotva pro dvojku chce nejvýš ×2, takže platící hráč má pořád trojnásobné tempo. Denní výzva „0/5 videí → +3 diamanty a 2 h výdělku“ (shots/bezny_021_t398_menu_special.png) je jen přes videa.",
-   "proposal": "Strop ×3 je čerstvé rozhodnutí; pokud má M4 dojít na 2, snížit PAID_CAP na 2 (Štamgast ×2 a kampaň se pak nesčítají), nebo strop nechat a dát hráči zdarma stejný trvalý kus jinou cestou – například +0,1 ke stropu kampaně za každý splněný týdenní úkol."
+   "why": "Boti hráli bez placení a bez videí: P1 = 15 min (2), T4 = 102 s (2), D3 = 7,58 h (1); žádná reklama nenaskočila sama, žádný obsah není jen za peníze, placené věci jen zrychlují (časoskoky, Štamgast ×2, kampaň „výdělek ×1,2 na 4 h, roste až na ×2“, shots/bezny_021_t373_menu_special.png). Strop placeného násobku je ×3 (PAID_CAP = 3 v src/core/special.ts), kotva pro dvojku chce nejvýš ×2. „Výzva dne: 0/5 → +3 diamanty a 2 h výdělku“ na témže snímku jde splnit jen videi.",
+   "proposal": "Strop ×3 je čerstvé rozhodnutí, nevracím ho; cesta k dvojce bez jeho změny: dát hráči zdarma stejný trvalý kus jinudy – například +0,1 ke stropu kampaně za každý splněný týdenní úkol, a Výzvu dne počítat i za vybrané denní úkoly, ne jen za videa."
   },
   {
    "code": "M5",
@@ -343,30 +343,30 @@
    "name": "Zahlcení (záložky, tečky, okna)",
    "score": 1,
    "value": "hodnotitel",
-   "why": "V prvních 10 minutách je teď čisto: jedna tečka (Úkoly), truhla jen se zlatým kroužkem, tlačítko ×1 není, vykřičník na liště úkolu zmizel (shots/novacek_026_t458_first_event_gold.png, shots/novacek_030_t579_t579.png; minule 3–4 značky). Nejvíc jsem viděl dvě tečky naráz (shots/bezny_031_t959_first_station_tap.png, shots/slaby_026_t10815_menu_special.png). Později ale cedule zakrývá věc, na kterou mám ťuknout: „Influencerka natočila stížnost.“ leží přes „← Menu“ a nadpis okna (shots/bezny_043_t3416_menu_keeper.png), cedule PIVNICE se dotýká truhly (shots/novacek_030_t579_t579.png) a po první noci jdou okno „PADLA NOC!“, tři cedule a „NOVÉ V MENU: KOSTNICE“ za 9 s (t=1353–1362) vedle VIP pruhu (shots/bezny_035_t1354_first_tab_bones.png). V okně Hostinský svítí tři tečky na záložkách naráz.",
-   "proposal": "Cedule z hospody (události, průvodce) schovat, dokud je otevřené okno z Menu, a „NOVÉ V MENU: KOSTNICE“ ukázat až ráno po první noci, ne půl vteřiny po „KOSTI SBÍREJ“."
+   "why": "Prvních 10 minut je čisto: nejvýš dvě tečky (Úkoly a truhla, shots/bezny_027_t528_first_event_brawl.png), tři záložky, po návratu jediné okno (shots/slaby_017_t5280_navrat.png). Později tři a víc teček naráz na víc snímcích: Hostinský má tečku na záložkách Výčep, Sklep i Noc a čtvrtou na Obchodě (shots/bezny_040_t2333_menu_keeper.png, shots/dlouhy_026_t2962_menu_keeper.png), třetí návrat má tečku na truhle, Obchodě i Úkolech (shots/slaby_029_t15843_konec.png). První noc jde pět cedulí za 8 s (t=1312 PADLA NOC, t=1314 ŤUKNI NA BUBLINU, t=1316 KOSTI SBÍREJ, t=1318 NOVÉ V MENU: KOSTNICE) a na jednom snímku je sedm značek naráz (shots/bezny_035_t1315_first_tab_bones.png). Cedule události leží přes otevřené okno (shots/slaby_019_t5285_menu_ukoly.png).",
+   "proposal": "„NOVÉ V MENU: KOSTNICE“ ukázat až ráno po první noci (stejná pauza 2,5 min, jakou už mají Krígly po nové hospodě), během průvodce nocí schovat VIP pruh a ceduli „hodina za…“, a v Hostinském dát jednu tečku jen na záložku, kde je nejlevnější dostupný uzel."
   },
   {
    "code": "U2",
    "name": "Kolik textu musím číst",
-   "score": 1,
+   "score": 0,
    "value": "hodnotitel",
-   "why": "Po návodu se dá hlavní obrazovka hrát podle zelené, čísel a šipky a cedule průvodce jsou teď krátké („NAJMI ČÍŠNÍKY – pak tahle hospoda vydělává sama“, shots/bezny_031_t959_first_station_tap.png). Číst musím v návodu: krok 4/8 „ťukej na kartu Pípa, kde svítí ŤUKNI SEM, pak kup tlačítkem +1“ (12 slov, shots/bezny_004_t14_first_guest.png), kroky 5 a 6 mají dvě věty na tři řádky (shots/novacek_005_t17_first_staff.png, shots/novacek_008_t62_first_station_kitchen.png). VIP pruh na hlavní obrazovce „VIP host čeká ještě 38 min · odměna 2 h výdělku“ má 10 slov ve dvou půlkách (shots/bezny_038_t2008_t2008.png) – beru to jako hranu, ne jako větu nad 8 slov. Okna: „Nová hospoda!“ tři věty (shots/bezny_030_t953_first_prestige.png), Kostnice 125 slov (U5, t=2867), Pivovar 9 tlačítek s popisem (shots/bezny_044_t9358_menu_brew.png).",
-   "proposal": "Krok 4/8 zkrátit na nadpis s počítadlem „ŤUKEJ NA PÍPU: 11 / 15“ bez druhého řádku, kroky 5 a 6 na jeden řádek („ťukej na bubliny“), VIP pruh na „★ VIP 38 min · +2 h“."
+   "why": "Dvě podmínky kotvy 0 jsou splněné doslova. (1) Stejná informace dvakrát na hlavní obrazovce: hned po návodu svítí „bar plný – číšníci nestíhají!“ na Pípě a „talíře čekají – číšníci nestíhají!“ na Kuchyni, pod každým stejné tlačítko „Číšník +1 400“ a k tomu kolečko „najmi 400“ – jeden nákup nabízený třikrát (shots/novacek_010_t93_first_tutorial_done.png, shots/bezny_012_t102_first_screen_obchod.png, shots/slaby_011_t186_first_event.png; u slabšího hráče od t=132 do t=262). (2) Věta nad 8 slov mimo návod: pruh „★ VIP host čeká ještě 43 min · odměna 2 h výdělku“ má 10 slov (shots/bezny_035_t1315_first_tab_bones.png, shots/bezny_038_t1701_first_event_frogs.png) a od minula se nezměnil. V návodu k tomu krok 4/8 „ťukej na kartu Pípa, kde svítí ŤUKNI SEM, pak kup tlačítkem +1“ (12 slov, shots/bezny_004_t14_first_guest.png) a kroky 5 a 6 se dvěma větami (shots/novacek_005_t17_first_staff.png). Jinak se po návodu dá hrát podle zelené, čísel a šipky a cedule průvodce jsou krátké. Proti minulé jedničce to není zhoršení hry, ale přísnější čtení kotvy: trojí nabídka číšníka je vidět až teď, když boti fotí stav hned po návodu.",
+   "proposal": "Hlášku a tlačítko „Číšník +1“ nechat jen na kartě Pípy a po dobu, co tam svítí, schovat kolečko „najmi 400“; Kuchyně si nechá běžný pruh. VIP pruh zkrátit na „★ VIP 43 min · +2 h“. Krok 4/8 jen nadpis s počítadlem „ŤUKEJ NA PÍPU: 11 / 15“."
   },
   {
    "code": "U3",
    "name": "Slova na hlavní obrazovce (medián, bez otevřeného okna)",
    "score": 1,
-   "value": "39 slov",
-   "why": "2154 vzorků hlavní obrazovky, medián 39, max 67 slov",
+   "value": "38 slov",
+   "why": "2164 vzorků hlavní obrazovky, medián 38, max 64 slov",
    "proposal": ""
   },
   {
    "code": "U4",
    "name": "Slova na hlavní obrazovce (nejvíc naráz)",
    "score": 1,
-   "value": "67 slov",
+   "value": "64 slov",
    "why": "",
    "proposal": ""
   },
@@ -374,206 +374,194 @@
    "code": "U5",
    "name": "Slova v otevřeném okně menu nebo obchodu (nejvíc naráz)",
    "score": 1,
-   "value": "125 slov",
-   "why": "nejvíc textu: okno bones (125 slov, t=2867)",
+   "value": "121 slov",
+   "why": "nejvíc textu: okno bones (121 slov, t=7642)",
    "proposal": ""
   }
  ],
  "quit_auto": {
-  "impatient": 6.583333333333333,
-  "usual": 29.508333333333333,
+  "impatient": 6.05,
+  "usual": 76.40833333333333,
   "patient": null
  },
  "quit_review": {
   "impatient": {
    "min": null,
-   "why": "První coins t=2, první nákup t=3, obsluha t=16, konec návodu t=122 (člověk asi 3 min), pak 14–28 nákupů za minutu a nejdelší mezera mezi nákupy 62 s (t=2765). Pravidlo 90 s tedy nikde neporuší. Nejslabší místo zůstává 1.–2. minuta: t=18–60 a t=66–118 dvakrát „našetři 60“ při 1,1 a 2,1/s (shots/novacek_007_t51_t51.png, shots/novacek_008_t62_first_station_kitchen.png). S křivkou (6,58 min) se rozcházím: v 6.–8. minutě je 19–28 nákupů za minutu, v t=458 zlatý sud a v t=612 oslava „ÚROVEŇ 25!“ (shots/novacek_032_t612_first_event_bat.png)."
+   "why": "První coins t=2, nákup t=3, obsluha t=16, konec návodu t=93 (člověk asi 140 s). Nejdelší čekání je t=21–64 (43 s na 60 coins při 1,1/s, shots/novacek_007_t51_t51.png) a t=64–92 (28 s na 30 coins; minule 52 s na 60) – pod hranicí 90 s. Pak 27–29 nákupů za minutu, zlatý sud v t=135, 272, 412 a 536, rvačka v t=696. Nejslabší je konec: od t=762 nemá bot ani na jeden nákup (afford=0 ve všech vzorcích do t=887), jen 3 nákupy ve 14. minutě, a pilulka svítí 100 % už od t=727 (shots/novacek_035_t727_t727.png), aniž by hráče k hygieně cokoli dovedlo. S křivkou (6,05 min) se rozcházím: v 6.–9. minutě je 28, 26, 19 a 17 nákupů za minutu a dva zlaté sudy; propad křivky v 10. minutě je jen chybějící nová mechanika, ne čekání."
   },
   "collector": {
-   "min": 67,
-   "why": "Do t=78 přijde 7 hostů, pak až po hygieně t=969–1009 pět příšer ve Sklepní krčmě a v t=3195 žabák. Sbírka má siluety „???“ (shots/bezny_019_t306_menu_book.png), takže je co doplňovat, a události (žáby t=822, noc t=1353) baví. Poslední nová věc k vidění je okno Hostinský v t=3416; pak do t=7200 nic (O1 = 3784 s), pivovar až v t=9013 a třetí hospodou sbírka hospod končí. Deset minut bez novinky vyprší kolem 67. minuty."
+   "min": 80,
+   "why": "Do t=99 přijde 7 hostů Pajzlu, pak je k vidění zlatý sud (t=140), rvačka (t=528), po hygieně t=917 pět příšer za dvě minuty (t=931–1050), noc s kostlivcem (t=1314, shots/bezny_035_t1315_first_tab_bones.png), žáby (t=1701), žabák (t=2007), Hostinský (t=2333), Sběrač (t=3340), netopýr (t=3969) a banshee (t=4225). Postupné události pomohly, minule bylo poslední nové v 57. minutě. Po t=4225 ale do pivovaru v t=9034 nepřijde nic nového (O1 = 2975 s, od 70. do 120. minuty), takže deset minut bez novinky vyprší kolem 80. minuty. Sbírka Pajzlu navíc nemá co odkrývat: všech 12 hostů je barevně (shots/slaby_022_t5528_menu_book.png)."
   },
   "optimizer": {
-   "min": 97,
-   "why": "Vydrží déle než minule: karta ukazuje „+7,4/s · ×2 za 24 úr.“, okno hygieny radí „teď je dobrá chvíle“ a druhý běh dožene první za polovinu času (P2 = 2,08×, t=1320: 6975/s proti 4069/s před hygienou). Po třetí hospodě (t=3189) ale hygiena přestane být rozhodnutí: t=5786 dá 6 krígel (méně než 9 v t=3187), žádnou hospodu, okno slibuje jen ×1,0x a výdělek v t=7200 je 86K/s proti 51K/s v t=3180. Dlouhý bot má po hodinách 4 až 10 výdělek 1,05M → 113K → 133K → 914K → 58K → 255K → 1,35M/s, tedy žádný růst (L1 = 1,00×)."
+   "min": 100,
+   "why": "První hodina rozhodnutí má: okno hygieny radí „teď je dobrá chvíle“ nebo „za 5 min: krígly +1“ (shots/bezny_039_t1999_okno_hygieny.png), druhý běh dožene první za čtvrtinu času (P2 = 4,25×), strom Hostinského nabízí volby „nebo“ (shots/bezny_040_t2333_menu_keeper.png). Po třetí hospodě se to zastaví: hygieny t=3524, 6440 a 9536 dají pokaždé 6 krígel a žádnou hospodu, nejlepší výdělek je v 1. hodině 1,69M/s (t=3518), ve 2. hodině 1,45M/s a ve 3. hodině 1,41M/s (L1 = 1,04×). Běžná úroveň zvedne výdělek o 0,6 % a karta po nákupu ukazuje stejné číslo (shots/novacek_031_t609_po_nakupu.png). Kolem 100. minuty (t≈6000, před čtvrtou hygienou se stejným výsledkem) už není co zlepšovat."
   },
   "casual": {
    "min": null,
-   "why": "Slabší bot po návratu vidí jedno okno s částkou, časem, stropem a radou (t=5280, shots/slaby_017_t5281_navrat.png) a v té samé minutě koupí 8 úrovní a v t=5328 Sklepníka za 40K; návraty dávají 535× až 13860× ceny nákupu a nic ho netrestá. Rizika: po hygieně jdou za 16 s čtyři cedule průvodce (t=5638–5654) a hned žáby (t=5670); druhý návrat t=10563 má okno návratu, rvačku a ceduli „NOVÉ V MENU: KRÍGLY“ v pěti vteřinách (snímek chybí); první sezení končí v t=480 bez čehokoli, co by řeklo, proč přijít znovu."
+   "why": "Slabší bot po každém ze tří návratů vidí jediné okno s částkou, časem, stropem a radou, co koupit (t=5280 shots/slaby_017_t5280_navrat.png, t=10560 shots/slaby_024_t10560_navrat.png, t=15843 shots/slaby_029_t15843_konec.png), a hned kupuje: Sklepník v t=5292 (shots/slaby_021_t5293_po_nakupu.png), Kostlivec v t=10578; návrat dá 919× cenu nákupu, nic ho netrestá. Rizika: první sezení končí v t=480 s pilulkou asi 14 % a bez čehokoli na obrazovce, co by řeklo, proč přijít (odchod nikdo nevyfotil); ve 2.–4. minutě svítí dvě varování „číšníci nestíhají“ se šedým tlačítkem za 400, na které slabší hráč nemá až do t=262 (shots/slaby_011_t186_first_event.png); třetí sezení má za 3 minuty hygienu (t=10681), čtyři cedule průvodce (t=10686–10706), žáby a „NOVÉ V MENU: KRÍGLY“ ve stejné vteřině (t=10841)."
   }
  },
  "top10": [
   {
-   "code": "S5",
-   "why": "t=18–60 a t=66–118 hráč dvakrát za sebou šetří 60 coins při 1,1 a 2,1/s; 54 s bez novinky hned v první až druhé minutě (shots/novacek_007_t51_t51.png).",
-   "proposal": "Krok 6/8 zlevnit: první vylepšení ×3 v návodu za 30 místo 60, nebo během kroků 5 a 6 dávat za bublinu dvojnásobné spropitné.",
-   "hours": 1
+   "code": "U2",
+   "why": "Ve 2. minutě, hned po návodu, svítí dvě varování „číšníci nestíhají“, dvě stejná tlačítka „Číšník +1 400“ a kolečko „najmi 400“, a hráč má 4 coins (shots/novacek_010_t93_first_tutorial_done.png); slabší hráč se na to dívá do t=262. První samostatná obrazovka hry tak vypadá jako problém, se kterým nejde nic dělat.",
+   "proposal": "Varování a tlačítko jen na kartě Pípy, kolečko „najmi 400“ po tu dobu schovat, Kuchyni nechat běžný pruh; VIP pruh zkrátit na „★ VIP 43 min · +2 h“.",
+   "hours": 1.5
   },
   {
    "code": "H1",
-   "why": "V krocích 5 a 6 návodu říká text „ťukej na bubliny“, ale šipka stojí na kartě Pípy a bublina na snímku není; sběr bublin je navíc v horní polovině mimo pohodlný dosah palce.",
-   "proposal": "Šipku mířit na bublinu hosta, a když žádná není, nechat na Pípě kroužek „ŤUKNI SEM“.",
-   "hours": 2
-  },
-  {
-   "code": "H2",
-   "why": "„bar plný – číšníci nestíhají!“ svítí na kartě Pípy od 3. minuty do konce a po třetím číšníkovi k němu není žádné tlačítko (shots/novacek_030_t579_t579.png).",
-   "proposal": "Rozblikat kolečko číšníka s odznakem bodu a hlášku nahradit šipkou k němu; bez volného bodu hlášku skrýt.",
-   "hours": 3
-  },
-  {
-   "code": "T2",
-   "why": "Běžná úroveň zvedne výdělek o medián 0,3 %, první nákup ve hře nezmění nic (+0/s) a změna po nákupu není na snímku vidět.",
-   "proposal": "Po nákupu na 1 s přepsat řádek karty na „+7,4 → +7,8/s“; bot ať fotí těsně po nákupu.",
-   "hours": 3
-  },
-  {
-   "code": "U2",
-   "why": "Bubliny kroků 4–6 návodu mají 11–12 slov a tři řádky; příležitostný hráč je nečte a šipka mu v krocích 5–6 neporadí.",
-   "proposal": "Krok 4 zkrátit na „ŤUKEJ NA PÍPU: 11 / 15“, kroky 5 a 6 na jeden řádek.",
-   "hours": 1
+   "why": "V krocích 5 a 6 návodu (t=17–92) říká text „ťukej na bubliny hostů“, šipka stojí na Pípě a bublina na obrazovce není; všechna tlačítka jsou šedá (shots/novacek_005_t17_first_staff.png). Je to první chvíle, kdy hráč neví, kam ťuknout.",
+   "proposal": "Šipku na Pípě nechat (PLAN.md ř. 312), druhý řádek cedule ukázat až s první bublinou a šipkou na ni; do té doby jen „NAŠETŘI 60 COINS: 2 / 60“.",
+   "hours": 1.5
   },
   {
    "code": "H3",
-   "why": "Šipka průvodce zakrývá nápis tlačítka nebo název karty (shots/novacek_032_t612_first_event_bat.png, shots/novacek_015_t171_first_event.png) a cedule z hospody leží přes hlavičku otevřeného okna (shots/bezny_043_t3416_menu_keeper.png).",
-   "proposal": "Šipku na lištu kreslit jen ve výšce lišty, šipku na nákup nad kartu; cedule při otevřeném okně nekreslit.",
+   "why": "Šipka průvodce zakrývá název stanice nebo nápis tlačítka už od 2. minuty (shots/bezny_015_t147_first_station_cellar.png) a u nováčka visí přes „Kostlivec 500K“ osm minut (t=443–900); cedule události leží přes otevřené okno Úkolů (shots/slaby_019_t5285_menu_ukoly.png).",
+   "proposal": "Šipku na spodní lištu kreslit jen ve výšce lišty, šipku na nákup vedle ikony stanice; cedule událostí nekreslit přes otevřené okno.",
    "hours": 2
   },
   {
+   "code": "T2",
+   "why": "Běžná úroveň zvedne výdělek o medián 0,58 % a nový snímek po nákupu ukazuje, že se na kartě nezmění nic než číslo úrovně: Pípa má od úrovně 103 do 142 pořád „+18/s“, cena přitom vyroste z 5.31K na 74.3K (shots/novacek_031_t609_po_nakupu.png).",
+   "proposal": "Na 1 s po nákupu ukázat v pruhu karty výdělek stanice „teď → potom“ a u Pípy nad úrovní 100 vrátit „×2 za N úr.“.",
+   "hours": 3
+  },
+  {
+   "code": "H2",
+   "why": "Past „číšníci nestíhají“ je opravená, ale stanice bez obsluhy má jen prázdný oranžový pruh a šedé tlačítko za 40K nebo 500K; co obsluha dá, se ukáže, až když na ni hráč má (shots/novacek_012_t134_first_station_cellar.png).",
+   "proposal": "Text „s obsluhou +31/s“ ukazovat v prázdném pruhu vždy; na zavřené kartě místo „zavřeno“ přírůstek stanice.",
+   "hours": 1
+  },
+  {
    "code": "D2",
-   "why": "Na konci sezení není na obrazovce nic, co doběhne, ani číslo, kolik přibude; karta „Až se vrátíš“ je v Menu, ale žádný snímek ji nezachytil, takže první návrat nemá doložený háček.",
-   "proposal": "Bot ať při odchodu fotí mřížku Menu; VIP pruh a várka pivovaru ať ukazují čas doběhnutí.",
+   "why": "Při prvním odchodu (slabší hráč t=480) není na hlavní obrazovce číslo, kolik přibude, ani nic, co doběhne; karta „Až se vrátíš“ existuje, ale jen v Menu (shots/slaby_012_t242_menu_mrizka.png).",
+   "proposal": "Do kroužku vybrané truhly na hlavní obrazovce psát odpočet do další; bot ať fotí hlavní obrazovku při odchodu.",
    "hours": 2
   },
   {
    "code": "O2",
-   "why": "7 nových mechanik v jednom pětiminutovém okně první půlhodiny: po hygieně t=953 nová hospoda, čtyři cedule, krígly, noc a kostnice do t=1362.",
-   "proposal": "První noc nejdřív 10 minut po první hygieně a dlaždici Kostnice ohlásit až ráno.",
-   "hours": 1
+   "why": "Po první hygieně přijde 7 nových mechanik v pěti minutách: nová hospoda a čtyři cedule (t=919–925), Krígly (t=1046), první noc, kosti a Kostnice (t=1312–1318).",
+   "proposal": "Kostnici ohlásit až ráno po první noci a první noc pustit nejdřív 10 minut po hygieně.",
+   "hours": 2
   },
   {
-   "code": "L1",
-   "why": "Medián růstu výdělku za hodinu je 1,00×; dlouhý bot má ve 4. hodině 1,05M/s a v 10. hodině 1,35M/s, hygieny po třetí hospodě dávají po 6 kríglech a okno slibuje ×1,0x. Optimizátor končí kolem 97. minuty.",
-   "proposal": "V simulaci (npm run sim) zvednout zisk krígel za hygienu od třetí hospody tak, aby každá další hygiena zvedla nejlepší výdělek aspoň 1,5×; pozdní cíl pro krígly je odložený, tohle je jen ladění výnosu.",
+   "code": "U1",
+   "why": "První noc: pět cedulí za 8 s a sedm značek na jednom snímku (shots/bezny_035_t1315_first_tab_bones.png); Hostinský svítí čtyřmi tečkami naráz (shots/bezny_040_t2333_menu_keeper.png).",
+   "proposal": "Během průvodce nocí schovat VIP pruh a ceduli „hodina za…“; v Hostinském jedna tečka místo tří.",
+   "hours": 2
+  },
+  {
+   "code": "O1",
+   "why": "Od 70. do 120. minuty nepřijde nic nového (2975 s), pivovar až ve 150. minutě; sběratel končí kolem 80. minuty. Sbírka Pajzlu je navíc celá odkrytá, i když přišlo 7 hostů z 12.",
+   "proposal": "Hosty 4 a 5 každé hospody pouštět až po milnících stanic a v Pajzlu kreslit nepříchozí jako siluety; odemykání menu neměnit.",
    "hours": 4
   },
   {
-   "code": "M1",
-   "why": "Balíček po nové hospodě nemá na snímku cenu, Štamgast neříká, že je jednorázový, a podzáložku s balíčky diamantů nikdo nevyfotil; před vydáním to nejde doložit.",
-   "proposal": "Boti s ?fakeshop=1 a snímek Diamanty → Koupit; na kartu Štamgast slovo „jednorázově“.",
-   "hours": 2
+   "code": "L1",
+   "why": "Medián růstu výdělku za hodinu je 1,04×; běžný bot má nejlepší výdělek 1,69M/s v 1. hodině a 1,41M/s ve 3., hygieny po třetí hospodě dávají pokaždé 6 krígel. Optimizátor končí kolem 100. minuty.",
+   "proposal": "V simulaci (npm run sim) zvednout zisk krígel za hygienu od třetí hospody tak, aby každá další hygiena zvedla nejlepší výdělek aspoň 1,5×; pozdní cíl pro krígly je odložený, tohle je jen ladění výnosu.",
+   "hours": 4
   }
  ],
- "summary": "Start, návrat i okno hygieny drží: první coins za 2 s, kuchyně je teď cítit (+91 %), okno návratu i hygieny řeknou vše potřebné a v prvních deseti minutách svítí jediná tečka. Nejvíc hráčů nejdřív odradí první dvě minuty (dvakrát „našetři 60“, šipka proti textu) a varování „číšníci nestíhají“, se kterým se nedá nic dělat; později plochý výdělek po třetí hospodě (L1 = 1,00×) a hodina bez novinky. První na řadě jsou kroky 5–6 návodu a past u Pípy, pak snímky, které opravy teprve doloží (mřížka Menu, obchod s cenami, vyskakovací nabídka).",
+ "summary": "Start, návrat i okno hygieny drží: první coins za 2 s, čekání na vylepšení ×3 kleslo z 52 na 28 s, past „číšníci nestíhají“ po třetím číšníkovi zmizela, události přicházejí postupně a karta „Až se vrátíš“ i silueta další hospody jsou v Menu doložené. Nejvíc hráčů nejdřív odradí 2. minuta (dvě varování a třikrát stejná nabídka číšníka za 400 při 4 coins) a kroky 5–6 návodu, kde šipka a text říkají každý něco jiného; později nákup úrovně, po kterém se na kartě nic nezmění, a plochá druhá až třetí hodina bez novinky. První na řadě je zdvojené varování po návodu a šipky přes nápisy; okno hygieny bez další hospody a vyskakovací nabídku je potřeba teprve vyfotit, na snímcích nejsou.",
  "walkthrough": [
   {
    "shot": "shots/novacek_001_t0_start.png",
-   "see": "První snímek. Nahoře ztlumeně 6 coins a +0/s, hospoda se stoly a čtyřmi hosty s bublinou a hvězdou. Bublina „krok 1/8 ŤUKNI NA PÍPU – hostinský natočí pivo a vyděláš coins“. Dole čtyři karty: Pípa úroveň 1 (Číšníci 15, +1 za 6), Kuchyně zavřeno (Otevřít · 60), Sklep se sudy (Otevřít · 720), Kostky v rohu (Otevřít · 8.64K). Záložky Hospoda, Obchod, Úkoly, Menu.",
-   "do": "Ťuknu na kartu Pípa: míří na ni žlutá šipka, má zlatý rám, kroužek a nápis ŤUKNI SEM. Je v y≈390–465 ze 720, palcem dosáhnu.",
-   "feel": "láká – jedna šipka, jedno místo, vím hned co dělat"
+   "see": "Nahoře 6 coins a +0/s. Hospoda se čtyřmi hosty s bublinami, přes horní část cedule „krok 1/8 ŤUKNI NA PÍPU – hostinský natočí pivo a vyděláš coins“. Dole čtyři karty: Pípa úroveň 1 (Číšníci 15, +1 za 6), Kuchyně zavřeno (Otevřít · 60), Sklep se sudy (Otevřít · 720), Kostky v rohu (Otevřít · 8.64K). Na Pípě kroužek „ŤUKNI SEM“ a žlutá šipka.",
+   "do": "Ťuknu na kartu Pípa – šipka, kroužek i zlatý rám ukazují na ni. Je v y≈400–470 ze 720, palcem dosáhnu.",
+   "feel": "láká – jediná svítící věc, hned vím, co dělat"
   },
   {
    "shot": "shots/novacek_002_t2_first_coins.png",
-   "see": "První ťuknutí. 7 coins, +0/s. Bublina „krok 2/8 KUP ÚROVEŇ PÍPY – vyšší úroveň = víc coins za každé pivo“. Na kartě Pípy svítí zeleně tlačítko „+1 / 6“, vedle šedé „Číšníci 15“, nad ním „ťukni sem!“ a šipka.",
-   "do": "Ťuknu na zelené +1 za 6: je jediné zelené, má rám a šipku, 6 mám (7 coins). Dole uprostřed, palcem pohodlně; tlačítko je asi 90×40 bodů.",
-   "feel": "láká – první odměna a hned nákup, na který mám"
+   "see": "7 coins, +0/s. Cedule „krok 2/8 KUP ÚROVEŇ PÍPY – vyšší úroveň = víc coins za každé pivo“. Zelené tlačítko „+1 · 6“ se zlatým rámem, šipkou a nápisem „ťukni sem!“; zbytek obrazovky ztmavený.",
+   "do": "Ťuknu na zelené „+1 · 6“: je jediné barevné, mám 7 a stojí 6. Dole, v dosahu palce, ale tlačítko je jen asi 90×45 bodů.",
+   "feel": "láká – první odměna do pár vteřin"
   },
   {
    "shot": "shots/novacek_003_t3_first_buy.png",
-   "see": "První nákup. 1 coins, +0/s (výdělek se po nákupu nezměnil, pořád nula). Bublina „krok 3/8 ŤUKNI NA BUBLINU – host si objednal – dá ti spropitné“ leží přes horní řadu karet, šipka míří na bublinu hosta u baru (y≈190). Žádné číslo ani oslava po nákupu na snímku není.",
-   "do": "Ťuknu na bublinu hosta, na kterou míří šipka. Je v horní třetině obrazovky (y≈190 ze 720) a bublina je malá, asi 30 bodů; jednou rukou se pro ni musím natáhnout.",
-   "feel": "nevím – co mi nákup dal, nepoznám (+0/s před i po), a první sběr je mimo pohodlný dosah palce"
+   "see": "Po nákupu 1 coins, +0/s. Cedule se přesunula dolů přes karty: „krok 3/8 ŤUKNI NA BUBLINU – host si objednal – dá ti spropitné“. Šipka míří na bublinu hosta u baru v y≈190. Jestli se po nákupu něco změnilo na kartě Pípy, nevidím – kartu zakrývá cedule.",
+   "do": "Ťuknu na bublinu pod šipkou. Je v horní třetině obrazovky (y≈190 ze 720) a má asi 25 bodů – jednou rukou musím telefon přehmátnout.",
+   "feel": "láká – vím co, ale cíl je malý a vysoko"
+  },
+  {
+   "shot": "shots/novacek_004_t14_first_guest.png",
+   "see": "15 coins, +0/s. „krok 4/8 NAJMI ČÍŠNÍKY – pak hospoda vydělává sama“. Fialové tlačítko „Číšníci 15“ se šipkou a rámem, vedle zelené „+1 · 6“.",
+   "do": "Ťuknu na fialové „Číšníci 15“ – šipka, mám přesně 15. Dole, dosáhnu.",
+   "feel": "láká – slib, že to pojede samo"
   },
   {
    "shot": "shots/novacek_005_t17_first_staff.png",
-   "see": "První obsluha. 2 coins, +1,1/s. Bublina „krok 5/8 NAŠETŘI 60 COINS: 2 / 60 – Ťukej na bubliny hostů – coins přibudou rychleji. Pak otevři kuchyni.“ Přes hospodu žlutý nápis „Franta a Jarka nastoupili – roznášejí pivo ke stolům“. Vlevo dvě kolečka číšníků s odznakem 1 a kolečko „najmi 400“. Pípa úroveň 2, „+0,5/s · ×2 za 23 úr.“, tlačítka +1 · 6 a Otevřít · 60 jsou šedá. Šipka míří na kartu Pípy.",
-   "do": "Text říká ťukat na bubliny, šipka ale ukazuje na kartu Pípy a žádná bublina na snímku není. Ťukal bych na Pípu (dole, dosáhnu), ale jistý si nejsem. Chybí mi 58 coins při 1,1/s.",
-   "feel": "nevím – šipka a text říkají každý něco jiného a čeká mě skoro minuta šetření"
+   "see": "První obsluha: 2 coins, poprvé +1.1/s. Cedule „krok 5/8 NAŠETŘI 60 COINS: 2 / 60 – Ťukej na bubliny hostů – coins přibudou rychleji. Pak otevři kuchyni.“ Přes hospodu nápis „Franta a Jarka nastoupili – roznášejí pivo ke stolům“. Dvě kolečka číšníků s odznakem 1 a kolečko „najmi 400“. Pípa úroveň 2, „+0.5/s · ×2 za 23 úr.“, tlačítko +1 · 6 šedé; Kuchyně „Otevřít · 60“ šedé. Šipka stojí na kartě Pípy, bublina hosta na obrazovce žádná není.",
+   "do": "Nevím. Text říká ťukat na bubliny, žádnou nevidím; šipka ukazuje na Pípu, kde je všechno šedé. Chybí mi 58 coins při 1,1/s.",
+   "feel": "nevím – text a šipka říkají každý něco jiného a není nač ťuknout"
   },
   {
-   "shot": "shots/novacek_008_t62_first_station_kitchen.png",
-   "see": "2 coins, +2/s (před otevřením kuchyně 1,1/s). Nápis „Kuchař nastoupil!“, kuchyně úroveň 1 má zelenou lištu a „+1,2/s · ×2 za 24 úr.“. Bublina „krok 6/8 NAŠETŘI 60 COINS: 2 / 60 – Ťukej na bubliny hostů. Pak v Obchodě kup vylepšení ×3.“ Tlačítka +1 · 6 a +1 · 69 šedá.",
-   "do": "Zase šetřit 60, šipka zase na Pípu. Ťukám na Pípu a na bubliny; nic jiného si koupit nemůžu. Dole, dosáhnu.",
-   "feel": "nuda – podruhé za sebou stejný úkol „našetři 60“, i když kuchyně je tentokrát cítit (+2/s a nový kuchař)"
+   "shot": "shots/novacek_008_t65_first_station_kitchen.png",
+   "see": "Po otevření kuchyně 4 coins, +2/s. „krok 6/8 NAŠETŘI 30 COINS: 4 / 30 – Ťukej na bubliny hostů. Pak v Obchodě kup vylepšení ×3.“ Nápis „Kuchař nastoupil!“. Kuchyně úroveň 1, „+1.2/s · ×2 za 24 úr.“, +1 · 69. Šipka zase na Pípě, bublina žádná.",
+   "do": "Čekám na 30 coins (asi 13 s), pak asi Obchod – ale šipka na něj neukazuje, to musím vyčíst z textu.",
+   "feel": "nevím – podruhé za sebou „našetři“, i když kratší než minule"
   },
   {
-   "shot": "shots/novacek_010_t120_first_upgrade.png",
-   "see": "Okno Obchodu ztlumené pod bublinou „krok 8/8 HOTOVO! další věci se odemknou časem“. 4 coins, +3,7/s, hláška „Pípa: výdělek ×3!“. V okně řádky Zavolat hygienu (0 / 4 krígel), Manažer: Hostinský Beran – Šťastná hodina: výdělek ×3 na 30 s (25K), Kuchyně ×3 (25K), Pípa ×3 (150K). Šipka míří na záložku Hospoda vlevo dole.",
-   "do": "Ťuknu na Hospoda ve spodní liště: šipka a zlatý rám. Úplně dole vlevo, pro palec pravé ruky kousek daleko, ale tlačítko je velké (asi 95×55).",
-   "feel": "láká – ×3 je vidět na čísle (2 → 3,7/s) a vím, kudy zpět"
+   "shot": "shots/novacek_010_t93_first_tutorial_done.png",
+   "see": "Konec návodu: 4 coins, +3.7/s, poprvé vidím diamanty (0). Cedule „HOTOVO! další věci se odemknou časem“ zakrývá horní pruh. Na Pípě žlutý pruh „bar plný – číšníci nestíhají!“, na Kuchyni zelený „talíře čekají – číšníci nestíhají!“, pod každým šedé „Číšník +1 400“; k tomu kolečko „najmi 400“. Všechna tlačítka šedá.",
+   "do": "Nemám na nic (4 coins, nejlevnější věc 6). Počkám a koupím +1 · 6. Varování se dvěma stejnými tlačítky za 400 mě mate – nevím, jestli potřebuju jedno, nebo dvě.",
+   "feel": "je toho moc – dvě varování a třikrát stejná nabídka za 400 ve chvíli, kdy mám 4 coins"
   },
   {
-   "shot": "shots/novacek_014_t164_first_event_banshee.png",
-   "see": "První událost. 63 coins, +35/s, 2 diamanty. Lišta úkolu „Kuchyně na úroveň 10 · 2/10“, pilulka 12 %. Na koberci stojí duch v rámu, u baru počítadlo „0 / 12“. Nad barem drobný tmavý štítek, který na tomhle snímku nepřečtu (cedule teprve nabíhá). Pípa úroveň 17 „bar plný – číšníci nestíhají!“, zelené +1 · 16; Sklep se sudy úroveň 1 (Sklepník 40K, +1 · 621 šedé).",
-   "do": "Asi ťukat na ducha (počítadlo 0/12), ale z tohohle snímku to nevím; o 6 s později (novacek_015) už svítí „Karaoke hit! +4.48K“. Duch je uprostřed hospody (y≈235), na hraně dosahu.",
-   "feel": "nevím – duch na pódiu pobaví, ale co po mně chce, jsem z obrázku nepoznal"
+   "shot": "shots/novacek_013_t135_first_event_gold.png",
+   "see": "První událost: 103 coins, +31/s, diamanty 2. Lišta úkolu „Kuchyně na úroveň 10 · 3/10“, pilulka 13 %. U levého okraje zlatý sud (y≈280), nad barem drobná cedulka, kterou v téhle velikosti nepřečtu. Pípa +1 · 13 a Kuchyně +1 · 92 zelené. O vteřinu později (shots/novacek_014_t136_first_event.png) už čitelně „Zlatý sud se kutálí!“ a 2.03K coins.",
+   "do": "Ťuknu na zlatý sud – je to jediná nová zlatá věc v hospodě. Je uprostřed výšky u levého okraje, pravým palcem přes celý displej.",
+   "feel": "láká – jedno ťuknutí a z 103 je 2.03K"
   },
   {
-   "shot": "shots/novacek_030_t579_t579.png",
-   "see": "10. minuta. 12.2K coins, +2.48K/s, 21 diamantů. Úkol „Podívej se do menu: Úkoly · 0/1“, pilulka 74 %, truhla se zlatým kroužkem a cedule PIVNICE vpravo nahoře se dotýkají. Pípa úroveň 114 „bar plný – číšníci nestíhají!“, zelené +1 · 11.1K; Kuchyně 42 „+3,7/s · ×2 za 8 úr.“, +1 · 21.2K šedé; Sklep 23 „+7,7/s · ×2 za 2 úr.“, +1 · 14.6K šedé; Kostky 10, Kostlivec 500K, +1 · 29.3K. Jedna červená tečka (Úkoly).",
-   "do": "Ťuknu na zelené +1 · 11.1K u Pípy (jediné zelené) a pak na Úkoly s tečkou. Obojí dole. Co dělat s „bar plný – číšníci nestíhají!“, nevím: číšníky už mám tři a tlačítko „Číšník +1“ zmizelo.",
-   "feel": "láká – čisto, jedna tečka, jeden zelený nákup; ale oranžové varování u Pípy visí od 3. minuty a nedá se s ním nic dělat"
+   "shot": "shots/bezny_010_t100_menu_mrizka.png",
+   "see": "Mřížka Menu ve 2. minutě: 10 coins, +3.7/s. Dlaždice Sbírka (tečka), Speciální nabídka (tečka), Nastavení a zamčená „Krígly – po 1. hygieně“. Pod nimi karta „Až se vrátíš: 1 h pryč: +13.4K coins · strop 8 h“ a silueta „Další hospoda: Sklepní krčma – otevře se po další hygieně“. Cedule HOTOVO! zakrývá horní okraj okna.",
+   "do": "Ťuknu na Sbírku nebo Speciální nabídku, mají červenou tečku. Dlaždice jsou velké, v y≈180–270, na hraně pohodlného dosahu.",
+   "feel": "láká – čtyři dlaždice, jedna zamčená s podmínkou a číslo, kolik mi přibude"
   },
   {
-   "shot": "shots/bezny_021_t398_menu_special.png",
-   "see": "Okno Speciální nabídka, záložky Nabídka / Diamanty / Štamgast. 5.39K coins, +265/s, 19 diamantů. Reklamní kampaň „výdělek ×1,2 na 4 h, každé zhlédnutí +0,02, roste až na ×2“, šedé tlačítko „jen v mobilní aplikaci“, šedé „Lepší reklama +0,1 · 10 krígel“, drobně „Výzva dne: 0/5 → +3 diamanty a 2 h výdělku“. Denní truhla „zdarma každý den · série 1/7 · žolík ✓“ se zeleným Otevřít. Bez reklam „odměny bez reklam · jednou, navždy“ 149 Kč (šedé).",
-   "do": "Ťuknu na zelené Otevřít u truhly – jediné zelené na obrazovce, y≈470, palcem dosáhnu. Zavřu křížkem vpravo nahoře (asi 38×30 bodů, y≈155, malý a vysoko) nebo záložkou Hospoda dole.",
-   "feel": "láká – truhla zdarma je jasná; kampaň nahoře je šedá a drobným písmem, tu přeskočím"
+   "shot": "shots/novacek_031_t609_po_nakupu.png",
+   "see": "Hned po nákupu úrovně Pípy: 14.1K coins, +2.99K/s, pilulka 91 %. Pípa úroveň 127, na kartě „+18/s“, další úroveň 26.9K. Proti snímku před nákupem (shots/novacek_030_t594_t594.png: úroveň 125, „+18/s“, 23.5K, +2.95K/s) se změnilo jen číslo úrovně a cena. Šipka průvodce na záložku Úkoly zakrývá nápis tlačítka „Kostlivec 500K“.",
+   "do": "Podle šipky a tečky na záložku Úkoly (dole, dosáhnu). Jinak nic: mám 14.1K a nejlevnější úroveň stojí 26.9K.",
+   "feel": "nuda – zaplatil jsem a na kartě je pořád +18/s"
   },
   {
-   "shot": "shots/bezny_029_t951_okno_hygieny.png",
-   "see": "Okno hygieny. 2.49M coins, +4.08K/s. „Hygiena! zavře hospodu: coins, úrovně a vylepšení začnou od nuly“, krígly teď 0 → po 5, velké „×1,04 výdělek navždy“, zeleně „+ nová hospoda: Sklepní krčma“, drobně „zůstane: diamanty · číšníci · sbírka · krígly“ a „teď je dobrá chvíle“. Tlačítka „Ještě ne“ (šedé) a „Zavřít hospodu“ (červené), stejně velká.",
-   "do": "Ťuknu na červené Zavřít hospodu: dostanu novou hospodu a okno samo říká, že je dobrá chvíle. Obě tlačítka y≈520, dosáhnu, jsou velká (asi 135×50).",
-   "feel": "láká – nová hospoda je lákadlo; ×1,04 za všechno, co jsem postavil, vypadá hubeně a dva nejdrobnější řádky (zůstane, dobrá chvíle) skoro nepřečtu"
+   "shot": "shots/bezny_029_t915_okno_hygieny.png",
+   "see": "Okno „Hygiena!“ přes hru, v pozadí 9.35K coins. „zavře hospodu: coins, úrovně a vylepšení začnou od nuly“; teď 0 krígel → po 4; velké „×1,04 výdělek navždy“; zeleně „+ nová hospoda: Sklepní krčma“; drobně „zůstane: diamanty · číšníci · sbírka · krígly“ a „teď je dobrá chvíle“. Tlačítka „Ještě ne“ (šedé) a „Zavřít hospodu“ (červené).",
+   "do": "Ťuknu na červené „Zavřít hospodu“ – rada říká, že je dobrá chvíle, a láká mě nová hospoda. Obě tlačítka jsou v y≈520, velká, v dosahu.",
+   "feel": "láká – nová hospoda za jedno ťuknutí a vím, co mi zůstane"
   },
   {
-   "shot": "shots/slaby_017_t5281_navrat.png",
-   "see": "Okno návratu slabšího bota. Nahoře 300K coins, +81/s. „Zatímco jsi byl pryč… obsluha pracovala 1 h 20 min (strop 8 h)“, velké „+296K coins“, „stačí na: Sklepník (40K)“, jedno zelené tlačítko Vybrat. Žádné další okno.",
-   "do": "Ťuknu na Vybrat – jediné tlačítko, zelené, uprostřed (y≈445), dosáhnu. Pak koupím Sklepníka za 40K, okno mi ho jmenuje.",
-   "feel": "láká – jedno okno, velké číslo a rada, co s ním"
+   "shot": "shots/bezny_035_t1315_first_tab_bones.png",
+   "see": "První noc ve Sklepní krčmě: 80.8K coins, nový řádek „+0.92 kostí/s · Noc 0:58 · kostí: 3“. Na hospodě naráz: přepínač hospod, pilulka 47 %, fialový pruh „★ VIP host čeká ještě 43 min · odměna 2 h výdělku“, cedule „hodina za 1:45“, nápis „Nový host ve Sbírce: skeleton“, hvězda u hosta, šipka na bublinu vpravo, tlačítko ×1 a dole přes karty cedule „ŤUKNI NA BUBLINU – příšera si objednala – dá ti kost“.",
+   "do": "Ťuknu na bublinu pod šipkou vpravo (y≈270, pravým palcem dosáhnu). Poznám to jen podle šipky, zbytek obrazovky nestíhám číst.",
+   "feel": "je toho moc – sedm různých nápisů a značek naráz a jméno hosta anglicky malým písmem"
   },
   {
-   "shot": "shots/bezny_034_t1353_first_night.png",
-   "see": "První noc v Sklepní krčmě. 4.3M coins, „+1,5 kostí/s“, „Noc 1:00 · kosti: 1“. Okno „PADLA NOC! příšery platí kostmi, ráno zase coins“ se zeleným Dál. Karty: Pípa s krví 53 (+1 · 1.8K), Kotel s gulášem 31 (+1 · 45.6K), Sudomorův sklep 14 (+1 · 45K), Kostky s kostlivcem 13 (+1 · 423K), všechna zelená. Vpravo tlačítko ×1, tečka na Obchodě.",
-   "do": "Ťuknu na Dál (zelené, y≈207, horní třetina – pro palec vysoko, ale tlačítko je velké). Pak dál kupuju zelené.",
-   "feel": "láká – hospoda ztmavla a platí se kostmi, to je nová věc k vidění"
+   "shot": "shots/slaby_017_t5280_navrat.png",
+   "see": "Okno návratu: „Zatímco jsi byl pryč… obsluha pracovala 1 h 20 min (strop 8 h)“, velké „+332K coins“, „stačí na: Sklepník (40K)“, jedno zelené tlačítko „Vybrat“. V pozadí 340K coins, +69/s. Žádné další okno.",
+   "do": "Ťuknu na „Vybrat“ – jediné tlačítko, velké, v y≈445. Pak koupím Sklepníka, okno mi ho jmenuje i s cenou.",
+   "feel": "láká – dostal jsem hodně a hned vím, co s tím"
   },
   {
-   "shot": "shots/bezny_043_t3416_menu_keeper.png",
-   "see": "Okno Hostinský. 95.6K coins, +8.97K/s. Přes nadpis okna a přes tlačítko „← Menu“ leží cedule „Influencerka natočila stížnost.“ „Hostinský – úroveň 13“, „body: 16 ?“, čtyři záložky Výčep / Sklep / Noc / Mistrovství, tři s červenou tečkou. Strom 8 pater: řádky „výdělek +0,5 %“, dvojice voleb „Zlatá ruka nebo Spropitné samo“, „Dlouhá hodina nebo Uvítací hodina“, „Plný podnos nebo Slavná hospoda“, zámky „15 b. v cestě“, nahoře „Druhý manažer“ a „Koruna 0/3“. Dole „výdělek +0,5 % · úroveň 1/5, cena: 2 b.“ a zelené KOUPIT · 2 b.",
-   "do": "Ťuknu na zelené KOUPIT · 2 b. dole (y≈625, dosáhnu) – je jediné zelené. Proč zrovna tohle a co je dobrá cesta, nevím; zpět se nedostanu přes „← Menu“, protože je pod cedulí.",
-   "feel": "je toho moc – osm pater, čtyři záložky, tři tečky a cedule přes hlavičku"
+   "shot": "shots/novacek_041_t900_konec.png",
+   "see": "Konec 15 minut: 34.6K coins, +3.59K/s, diamanty 21. Úkol „Podívej se do menu: Úkoly · 0/1“, pilulka krígl „100 %“ v zeleném rámu, cedule PIVNICE. Pípa úroveň 142 (+18/s, +1 · 74.3K), Kuchyně 51 (+7.4/s, 74.7K), Sklep 36 (80.5K), Kostky 18 (Kostlivec 500K, 77.9K). Všechna tlačítka šedá, na baru „0/12“. Šipka na záložku Úkoly překrývá „Kostlivec“.",
+   "do": "Na nákup nemám (34.6K proti 74.3K). Zbývá šipka na Úkoly dole, nebo zelená pilulka 100 % vpravo nahoře – ta je v y≈78, mimo dosah palce, a nic mi neřekne, že se na ni má ťuknout.",
+   "feel": "nevím – největší věc (hygiena je připravená) je schovaná v malé pilulce nahoře a nikde není, kolik přibude, když teď zavřu"
   },
   {
-   "shot": "shots/dlouhy_029_t30031_scena_temple.png",
-   "see": "Chrám po 8 hodinách hry. „0 chapadel“, „Chrám je zavřený · otevře za 0 d 17 h“, nahoře tlačítka Zpět a Obchod. Karta „CTHULHU · 1. probuzení · I“, „100 % · 30K HP“, „fáze 1/4 · truhly 0/10 · pečetě R'lyeh: 0 (výdělek +0 %)“, „síla zásahu: 22“. Cthulhu nad vodou, moje postava na molu. Dole „Chrám se otevírá jen o víkendu (sobota a neděle). Chapadla platí jen o víkendu – v pondělí shnijí.“",
-   "do": "Nic se tu dělat nedá, je zavřeno. Odejdu tlačítkem Zpět – je úplně nahoře (y≈37), palcem jedné ruky nedosáhnu.",
-   "feel": "láká – Cthulhu je velký cíl, kvůli kterému bych o víkendu přišel; jediné tlačítko, které teď potřebuju, je ale mimo dosah"
-  },
-  {
-   "shot": "shots/novacek_042_t901_konec.png",
-   "see": "Konec 15 minut nováčka. 242K coins, +3.44K/s, 21 diamantů. Úkol „Podívej se do menu: Úkoly · 0/1“, pilulka krígl „100 %“ se zeleným rámem, truhla s kroužkem, cedule PIVNICE. Pípa 136 (+1 · 49.5K), Kuchyně 50 (+1 · 65K), Sklep 34 (+1 · 61.9K) zeleně, Kostky 17 (Kostlivec 500K šedý, +1 · 89K zelené). Tečka na Úkolech.",
-   "do": "Ťuknu na pilulku 100 % (svítí zeleně, ale je vpravo nahoře, y≈77, mimo dosah) nebo na zelené nákupy dole. Že za pilulkou je nová hospoda, na tomhle snímku nevidím.",
-   "feel": "láká – 100 % říká, že je něco hotové; kolik mi přibude, když teď zavřu, tu nikde není"
-  },
-  {
-   "shot": "shots/slaby_029_t15845_konec.png",
-   "see": "Poslední snímek slabšího bota: třetí návrat. 2.5M coins, +581/s, „Den 7:14 · kosti: 1“, dvě hospody. „Zatímco jsi byl pryč… obsluha pracovala 1 h 20 min (strop 8 h)“, „+2.48M coins“, „stačí na: Sklepník (400K)“, zelené Vybrat. Pod oknem prosvítají dvě tečky (Obchod, Úkoly).",
-   "do": "Vybrat (jediné tlačítko, y≈445), pak Sklepník za 400K, který okno jmenuje.",
-   "feel": "láká – stejně čisté jako první návrat, jedno okno a jasný nákup"
-  },
-  {
-   "shot": "shots/dlouhy_039_t36002_konec.png",
-   "see": "Poslední snímek záznamu (10 hodin). 4.25M coins, +1.35M/s, 99 diamantů, „Den 3:58 · kosti: 1.93K“. Tři hospody v přepínači. Úkol „Kup 10 vylepšení v Obchodě · 4/10“, pilulka 89 %, cedule „ŠŤASTNÁ HODINA ×3“ a „PIVNICE + JÍDELNA · 2 styly: +25 % všude“, tlačítko ×1. Všechny čtyři nákupy šedé: +1 · 5.28M, 7.52M, 9M, 6.34M. Pod úrovněmi „Učeň“ s tečkami. Tečka na Obchodě.",
-   "do": "Počkám pár vteřin na 5.28M (mám 4.25M při 1.35M/s) nebo půjdu do Obchodu s tečkou. Dole, dosáhnu.",
-   "feel": "nuda – po deseti hodinách stejná obrazovka a stejná čtyři tlačítka jako v desáté minutě, jen s většími čísly"
+   "shot": "shots/bezny_044_t10801_konec.png",
+   "see": "Konec 3 hodin, noc ve Sklepní krčmě: 230K coins, „+7.2 kostí/s · Noc 0:49 · kostí: 1.29K“, tři hospody v přepínači, úkol „Kup 10 vylepšení v Obchodě · 0/10“, pilulka 57 %, tlačítko ×1. Karty se zlatým rámem a odznakem „Učeň“: Pípa s krví 127 (269K), Kotel s gulášem 46 (371K), Sudomorův sklep 30 (366K), Kostky s kostlivcem 16 (610K) – vše šedé. Tečka na Obchodě.",
+   "do": "Ťuknu na Obchod (tečka, dole). Na úrovně mi chybí 39K a víc.",
+   "feel": "nuda – stejná obrazovka jako před dvěma hodinami, jen s většími čísly"
   }
  ],
  "warnings": [],
  "curve": [
   {
    "min": 0,
-   "score": 146,
+   "score": 159,
    "what": [
     "first",
     "nová stanice",
@@ -585,9 +573,8 @@
   },
   {
    "min": 5,
-   "score": 124,
+   "score": 130,
    "what": [
-    "first",
     "obsluha",
     "událost zvládnutá",
     "úroveň hostinského"
@@ -595,7 +582,7 @@
   },
   {
    "min": 10,
-   "score": 54,
+   "score": 42,
    "what": [
     "first",
     "událost zvládnutá",
@@ -604,150 +591,161 @@
   },
   {
    "min": 15,
-   "score": 99,
+   "score": 110,
    "what": [
     "first",
     "hygiena",
     "nová stanice",
     "obsluha",
-    "úkol",
+    "vylepšení",
     "úroveň hostinského"
    ]
   },
   {
    "min": 20,
-   "score": 108,
+   "score": 98,
+   "what": [
+    "first",
+    "noc"
+   ]
+  },
+  {
+   "min": 25,
+   "score": 104,
    "what": [
     "first",
     "noc",
     "nová stanice",
     "obsluha",
-    "úspěch"
-   ]
-  },
-  {
-   "min": 25,
-   "score": 78,
-   "what": [
     "úroveň hostinského"
    ]
   },
   {
    "min": 30,
-   "score": 123,
-   "what": [
-    "noc",
-    "nová stanice",
-    "obsluha",
-    "událost zvládnutá",
-    "úroveň hostinského"
-   ]
-  },
-  {
-   "min": 35,
-   "score": 120,
-   "what": [
-    "first",
-    "noc",
-    "událost zvládnutá",
-    "úroveň hostinského"
-   ]
-  },
-  {
-   "min": 40,
-   "score": 108,
-   "what": [
-    "událost zvládnutá",
-    "úspěch"
-   ]
-  },
-  {
-   "min": 45,
-   "score": 60,
-   "what": [
-    "first",
-    "noc",
-    "událost zvládnutá",
-    "úroveň hostinského"
-   ]
-  },
-  {
-   "min": 50,
-   "score": 60,
+   "score": 110,
    "what": [
     "hygiena",
-    "noc",
     "nová stanice",
     "obsluha",
-    "událost zvládnutá"
-   ]
-  },
-  {
-   "min": 55,
-   "score": 105,
-   "what": [
-    "first",
-    "nová stanice",
-    "obsluha"
-   ]
-  },
-  {
-   "min": 60,
-   "score": 127,
-   "what": [
-    "noc",
-    "nová stanice",
-    "obsluha",
-    "událost zvládnutá",
-    "úroveň hostinského",
-    "úspěch"
-   ]
-  },
-  {
-   "min": 65,
-   "score": 116,
-   "what": [
-    "noc",
-    "nová stanice",
-    "obsluha",
-    "událost zvládnutá",
-    "úroveň hostinského"
-   ]
-  },
-  {
-   "min": 70,
-   "score": 90,
-   "what": []
-  },
-  {
-   "min": 75,
-   "score": 79,
-   "what": [
-    "noc",
-    "úspěch"
-   ]
-  },
-  {
-   "min": 80,
-   "score": 79,
-   "what": [
-    "noc"
-   ]
-  },
-  {
-   "min": 85,
-   "score": 98,
-   "what": [
     "událost zvládnutá",
     "vylepšení",
     "úroveň hostinského"
    ]
   },
   {
-   "min": 90,
-   "score": 105,
+   "min": 35,
+   "score": 108,
+   "what": [
+    "first",
+    "noc",
+    "nová stanice",
+    "obsluha",
+    "úkol"
+   ]
+  },
+  {
+   "min": 40,
+   "score": 107,
+   "what": [
+    "nová stanice",
+    "obsluha",
+    "událost zvládnutá",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 45,
+   "score": 110,
    "what": [
     "noc",
+    "událost zvládnutá",
+    "vylepšení",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 50,
+   "score": 109,
+   "what": [
+    "first",
+    "noc",
+    "nová stanice",
+    "obsluha",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 55,
+   "score": 89,
+   "what": [
+    "first",
+    "hygiena",
+    "nová stanice",
+    "událost zvládnutá"
+   ]
+  },
+  {
+   "min": 60,
+   "score": 50,
+   "what": [
+    "noc",
+    "nová stanice",
+    "událost zvládnutá",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 65,
+   "score": 88,
+   "what": [
+    "first",
+    "noc",
+    "nová stanice",
+    "obsluha"
+   ]
+  },
+  {
+   "min": 70,
+   "score": 109,
+   "what": [
+    "first",
+    "nová stanice",
+    "obsluha",
+    "úspěch"
+   ]
+  },
+  {
+   "min": 75,
+   "score": 107,
+   "what": [
+    "noc",
+    "obsluha",
+    "úkol"
+   ]
+  },
+  {
+   "min": 80,
+   "score": 100,
+   "what": [
+    "noc",
+    "nová stanice",
+    "obsluha",
+    "úroveň hostinského",
+    "úspěch"
+   ]
+  },
+  {
+   "min": 85,
+   "score": 66,
+   "what": []
+  },
+  {
+   "min": 90,
+   "score": 82,
+   "what": [
+    "noc",
+    "nová stanice",
+    "obsluha",
     "událost zvládnutá"
    ]
   },
@@ -755,44 +753,42 @@
    "min": 95,
    "score": 102,
    "what": [
-    "hygiena",
-    "nová stanice",
     "obsluha",
+    "událost zvládnutá",
     "vylepšení",
     "úroveň hostinského"
    ]
   },
   {
    "min": 100,
-   "score": 100,
+   "score": 94,
    "what": [
-    "noc",
-    "nová stanice",
-    "obsluha"
+    "noc"
    ]
   },
   {
    "min": 105,
-   "score": 124,
+   "score": 114,
    "what": [
+    "hygiena",
     "noc",
     "nová stanice",
     "obsluha",
-    "událost zvládnutá",
-    "úspěch"
-   ]
-  },
-  {
-   "min": 110,
-   "score": 108,
-   "what": [
     "událost zvládnutá",
     "úroveň hostinského"
    ]
   },
   {
+   "min": 110,
+   "score": 110,
+   "what": [
+    "obsluha",
+    "událost zvládnutá"
+   ]
+  },
+  {
    "min": 115,
-   "score": 107,
+   "score": 105,
    "what": [
     "noc",
     "událost zvládnutá"
@@ -800,69 +796,71 @@
   },
   {
    "min": 120,
-   "score": 112,
-   "what": [
-    "noc",
-    "událost zvládnutá",
-    "vylepšení"
-   ]
-  },
-  {
-   "min": 125,
-   "score": 100,
-   "what": [
-    "nová stanice",
-    "obsluha"
-   ]
-  },
-  {
-   "min": 130,
-   "score": 97,
+   "score": 70,
    "what": [
     "noc",
     "nová stanice",
     "obsluha",
-    "úroveň hostinského",
-    "úspěch"
+    "událost zvládnutá",
+    "vylepšení",
+    "úroveň hostinského"
+   ]
+  },
+  {
+   "min": 125,
+   "score": 98,
+   "what": []
+  },
+  {
+   "min": 130,
+   "score": 73,
+   "what": [
+    "noc",
+    "obsluha"
    ]
   },
   {
    "min": 135,
-   "score": 102,
+   "score": 95,
    "what": [
     "noc",
+    "obsluha",
     "vylepšení"
    ]
   },
   {
    "min": 140,
-   "score": 92,
+   "score": 102,
    "what": [
-    "událost zvládnutá"
-   ]
-  },
-  {
-   "min": 145,
-   "score": 64,
-   "what": [
-    "noc"
-   ]
-  },
-  {
-   "min": 150,
-   "score": 117,
-   "what": [
-    "hygiena",
     "nová stanice",
     "obsluha",
+    "událost zvládnutá",
     "úroveň hostinského"
    ]
   },
   {
-   "min": 155,
-   "score": 84,
+   "min": 145,
+   "score": 89,
+   "what": [
+    "noc",
+    "nová stanice",
+    "událost zvládnutá"
+   ]
+  },
+  {
+   "min": 150,
+   "score": 92,
    "what": [
     "first",
+    "obsluha"
+   ]
+  },
+  {
+   "min": 155,
+   "score": 102,
+   "what": [
+    "first",
+    "hygiena",
     "noc",
     "nová stanice",
     "obsluha"
@@ -870,7 +868,7 @@
   },
   {
    "min": 160,
-   "score": 112,
+   "score": 108,
    "what": [
     "noc",
     "nová stanice",
@@ -880,27 +878,31 @@
   },
   {
    "min": 165,
-   "score": 108,
+   "score": 112,
    "what": [
+    "nová stanice",
     "obsluha",
-    "událost zvládnutá",
-    "vylepšení"
-   ]
-  },
-  {
-   "min": 170,
-   "score": 111,
-   "what": [
-    "noc",
     "událost zvládnutá",
     "úroveň hostinského"
    ]
   },
   {
-   "min": 175,
-   "score": 105,
+   "min": 170,
+   "score": 104,
    "what": [
+    "noc",
     "událost zvládnutá"
+   ]
+  },
+  {
+   "min": 175,
+   "score": 109,
+   "what": [
+    "noc",
+    "nová stanice",
+    "obsluha",
+    "událost zvládnutá",
+    "úroveň hostinského"
    ]
   },
   {
@@ -911,27 +913,27 @@
  ],
  "runs": {
   "novacek": {
-   "seconds": 901,
-   "real_s": 121,
-   "marks": 290,
+   "seconds": 900,
+   "real_s": 108,
+   "marks": 299,
    "errors": []
   },
   "bezny": {
    "seconds": 10801,
-   "real_s": 1002,
-   "marks": 3558,
+   "real_s": 998,
+   "marks": 3426,
    "errors": []
   },
   "slaby": {
-   "seconds": 15845,
-   "real_s": 131,
-   "marks": 248,
+   "seconds": 15843,
+   "real_s": 114,
+   "marks": 275,
    "errors": []
   },
   "dlouhy": {
-   "seconds": 36002,
-   "real_s": 1965,
-   "marks": 11768,
+   "seconds": 36001,
+   "real_s": 2199,
+   "marks": 11593,
    "errors": []
   }
  }

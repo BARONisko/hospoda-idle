@@ -496,7 +496,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (this.d.seen.includes(key)) return;
       this.d.seen.push(key);
       // Zkušebna O1: nový host je malá událost – hvězda nad hlavou a (nejvýš jednou za 90 s) cedule
-      if ((this.d.tut ?? -1) >= 0 || !spr) return;
+      // jen hosté, kteří ve Sbírce opravdu jsou (noční kostlivec tam není – dřív cedule „Nový host ve Sbírce: skeleton“)
+      if ((this.d.tut ?? -1) >= 0 || !spr || this.guestName(key) === key) return;
       const star = this.add.text(spr.x, spr.y - spr.displayHeight - 6, '★', txt(30, PAL.gold)).setOrigin(0.5, 1).setDepth(spr.depth + 1);
       this.events.emit('pubObj', star);
       const follow = () => (spr.active ? star.setPosition(spr.x, spr.y - spr.displayHeight - 6).setDepth(spr.depth + 1) : star.setVisible(false));
