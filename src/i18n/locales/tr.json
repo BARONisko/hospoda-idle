@@ -1702,5 +1702,9 @@
  "odměny bez reklam · jednou, navždy": "reklamsız ödüller · tek sefer, sonsuza dek",
  "Nový host ve Sbírce: {s}": "Koleksiyonda yeni misafir: {s}",
  "po této hygieně: {s}": "bu denetimden sonra: {s}",
- "další novinka: {s} po {n}. hygieně": "sıradaki yenilik: {s} ({n}. denetimden sonra)"
+ "další novinka: {s} po {n}. hygieně": "sıradaki yenilik: {s} ({n}. denetimden sonra)",
+ "★ VIP {m} min · +{h} h výdělku": "★ VIP {m} dk · +{h} sa kazanç",
+ "Pípa točí sama. Pak v Obchodě kup vylepšení ×3.": "Musluk kendi kendine doldurur. Sonra Mağazadan ×3 yükseltmesini al.",
+ "Pípa točí sama. Pak otevři kuchyni.": "Musluk kendi kendine doldurur. Sonra mutfağı aç.",
+ "výdělek {a} → {b}/s": "kazanç {a} → {b}/sn"
 }

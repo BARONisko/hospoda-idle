@@ -1702,5 +1702,9 @@
  "odměny bez reklam · jednou, navždy": "広告なしで報酬 · 一度だけ、永久に",
  "Nový host ve Sbírce: {s}": "コレクションに新しい客: {s}",
  "po této hygieně: {s}": "この検査の後: {s}",
- "další novinka: {s} po {n}. hygieně": "次の新要素: {s}（{n}回目の検査後）"
+ "další novinka: {s} po {n}. hygieně": "次の新要素: {s}（{n}回目の検査後）",
+ "★ VIP {m} min · +{h} h výdělku": "★ VIP {m}分 · +{h}時間分の収入",
+ "Pípa točí sama. Pak v Obchodě kup vylepšení ×3.": "ビールサーバーは自動で注ぐ。次にショップで×3強化を買おう。",
+ "Pípa točí sama. Pak otevři kuchyni.": "ビールサーバーは自動で注ぐ。次にキッチンを開こう。",
+ "výdělek {a} → {b}/s": "収入 {a} → {b}/秒"
 }

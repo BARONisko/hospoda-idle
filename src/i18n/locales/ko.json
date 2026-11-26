@@ -1702,5 +1702,9 @@
  "odměny bez reklam · jednou, navždy": "광고 없이 보상 · 한 번 구매, 영구",
  "Nový host ve Sbírce: {s}": "컬렉션에 새 손님: {s}",
  "po této hygieně: {s}": "이번 위생 검사 후: {s}",
- "další novinka: {s} po {n}. hygieně": "다음 새 기능: {s} ({n}번째 위생 검사 후)"
+ "další novinka: {s} po {n}. hygieně": "다음 새 기능: {s} ({n}번째 위생 검사 후)",
+ "★ VIP {m} min · +{h} h výdělku": "★ VIP {m}분 · +{h}시간 수입",
+ "Pípa točí sama. Pak v Obchodě kup vylepšení ×3.": "탭이 알아서 따릅니다. 그다음 상점에서 ×3 업그레이드를 사세요.",
+ "Pípa točí sama. Pak otevři kuchyni.": "탭이 알아서 따릅니다. 그다음 주방을 여세요.",
+ "výdělek {a} → {b}/s": "수입 {a} → {b}/초"
 }

@@ -266,6 +266,8 @@ interface Card {
   info: Phaser.GameObjects.Text;
   /** T2: do kdy je přírůstek po nákupu zvýrazněný */
   hiUntil?: number;
+  /** T2: text „teď → potom“ po nákupu */
+  hiText?: string;
   buy: Btn;
   staff: Btn;
   tapZone: Phaser.GameObjects.Zone;
@@ -627,7 +629,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         this.gain(n);
         return n;
       },
-      banner: (c, text, top) => this.banner(c, text, top),
+      // Zkušebna H3: cedule událostí ne přes otevřené okno (dřív „Zlatý sud!“ přes Úkoly)
+      banner: (c, text, top) => { if (!this.shopObjs.length) this.banner(c, text, top); },
       fine: (secs, view) => {
         const p = this.d.pubs[view];
         const n = Math.min(this.d.coins, Math.round(Math.max(this.rate(p), this.pay(p, STATIONS[0]) / STATIONS[0].cycle) * secs));
@@ -3895,7 +3898,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     }
     if (this.vipBar) {
       const m = Math.max(1, Math.ceil((v.until - Date.now()) / 60_000));
-      this.vipBar.tx.setText(t('★ VIP host čeká ještě {m} min · odměna {h} h výdělku', { m, h: VIP_H }));
+      this.vipBar.tx.setText(t('★ VIP {m} min · +{h} h výdělku', { m, h: VIP_H })); // Zkušebna U2: dřív 10 slov
       this.vipBar.tx.setScale(Math.min(1, (W - 44) / this.vipBar.tx.width));
     }
   }
@@ -5042,6 +5045,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private tutPoorText(manual: boolean, need: number, done = ''): [string, string] {
     const c = Math.floor(this.d.coins);
     // QA: dřív ~60 s jen čekání → rychleji přes bubliny hostů (šipka na ně)
+    // Zkušebna H1: „ťukej na bubliny“ jen když nějaká bublina opravdu je (dřív text bez bubliny na obrazovce)
+    const bub = !!this.views[0]?.tipTarget();
+    if (!manual && done === 'tile:shop' && !bub) return [t('NAŠETŘI {n} COINS: {c} / {n}', { c, n: need }), t('Pípa točí sama. Pak v Obchodě kup vylepšení ×3.')];
+    if (!manual && done === 'buy:kitchen' && !bub) return [t('NAŠETŘI {n} COINS: {c} / {n}', { c, n: need }), t('Pípa točí sama. Pak otevři kuchyni.')];
     if (!manual && done === 'tile:shop') return [t('NAŠETŘI {n} COINS: {c} / {n}', { c, n: need }), t('Ťukej na bubliny hostů. Pak v Obchodě kup vylepšení ×3.')];
     if (!manual && done === 'buy:kitchen') return [t('NAŠETŘI {n} COINS: {c} / {n}', { c, n: need }), t('Ťukej na bubliny hostů – coins přibudou rychleji. Pak otevři kuchyni.')];
     return manual
@@ -5459,8 +5466,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (gain > 0) {
         const gt = t('+{v}/s', { v: big(gain) }), cx = card.x + card.w / 2, cy = card.y + 10;
         this.time.delayedCall(220, () => popText(this, cx, cy, gt, PAL.mint, 30));
-        card.hiUntil = this.time.now + 1000;
-        this.time.delayedCall(1050, () => this.refresh());
+        card.hiUntil = this.time.now + 1500;
+        card.hiText = t('výdělek {a} → {b}/s', { a: big(r0), b: big(this.rate(p)) });
+        this.time.delayedCall(1550, () => this.refresh());
       }
     }
     if (before && s.lvl >= before) this.milestone(i, def);
@@ -6055,7 +6063,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.wChips.forEach((c, k) => {
       const { x, y } = chipXY(k), R = CHIP_R;
       const has = k < ws.length, next = k === ws.length;
-      const show = !hidden && (has || next);
+      // Zkušebna U2: v prvním kole kolečko „najmi“ až když na číšníka je (jinak ho nabízí tlačítko na kartě)
+      const show = !hidden && (has || (next && (this.d.stats.prestiges > 0 || this.d.coins >= price)));
       c.bg.clear().setVisible(show);
       c.zone.setVisible(show);
       if (show) c.zone.setInteractive();
@@ -7063,7 +7072,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.qPh += 0.12;
     const [x, ty, w, h] = r, up = ty < TOP + TABH;
     u.hl.lineStyle(4, col('gold'), 0.6 + 0.4 * Math.sin(this.qPh * 2)).strokeRoundedRect(x - 6, ty - 6, w + 12, h + 12, 10);
-    u.arrow.setAngle(up ? 180 : 0).setPosition(x + w / 2, up ? ty + h + 44 + Math.sin(this.qPh) * 8 : ty - 30 - Math.sin(this.qPh) * 8);
+    // Zkušebna H3: na spodní lištu jen svítící rámeček (šipka nad lištou zakrývala tlačítka karet, např. „Kostlivec 500K“);
+    // na široké tlačítko šipka u pravého okraje, ne přes název stanice a pruh uprostřed
+    if (ty >= H - NAV_H - 4) { u.arrow.setVisible(false); return; }
+    const ax = !up && w > 120 ? x + w - 30 : x + w / 2;
+    u.arrow.setAngle(up ? 180 : 0).setPosition(ax, up ? ty + h + 44 + Math.sin(this.qPh) * 8 : ty - 30 - Math.sin(this.qPh) * 8);
   }
 
   // ---------- průvodce: novinky ukázat šipkou (velký pokyn + krátké vysvětlení, jako návod) ----------
@@ -7394,7 +7407,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       // plný bar / čekající talíře: místo prázdného místa tlačítko, které číšníkům pomůže (najme dalšího / otevře body)
       const jam = !this.night && s.auto && ((c.def.id === 'kitchen' && this.served(p) && (p.dish?.n ?? 0) + 1 > FOOD_CAP) || (c.def.id === 'tap' && !!p.w?.length && (p.bar?.n ?? 0) + this.beers(p) > BAR_CAP));
       if (jam) c.jamAt = Date.now();
-      const fix = Date.now() - (c.jamAt ?? 0) < 5000 ? this.waiterFix(c.pub) : null;
+      // Zkušebna U2: když nestíhají u Pípy i v Kuchyni, varování a tlačítko jen na Pípě (dřív dvě stejná tlačítka „Číšník +1“)
+      const tapJam = c.def.id !== 'tap' && this.cards.some((k) => k.pub === c.pub && k.def.id === 'tap' && Date.now() - (k.jamAt ?? 0) < 5000);
+      const fix = Date.now() - (c.jamAt ?? 0) < 5000 && !tapJam ? this.waiterFix(c.pub) : null;
       const half = (open && !s.auto) || !!fix;
       // tlačítko +1: přes celou šíři dlaždice, bez obsluhy vpravo vedle tlačítka obsluhy (to je vlevo)
       const full = c.narrow ? PubScene.NBTN : w - 20, hw = (full - 8) / 2, bx0 = c.narrow ? x + w - 10 - full : x + 10;
@@ -7438,7 +7453,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
           c.infoTxt = hire > 0 ? t('s obsluhou +{v}/s', { v: big(hire) })
             : gain > 0 ? [t('+{v}/s', { v: big(gain) }), ms].filter(Boolean).join(' · ') : ms;
         }
-        c.info.setText(c.infoTxt ?? '').setColor((c.hiUntil ?? 0) > this.time.now ? PAL.mint : PAL.white);
+        const hi = (c.hiUntil ?? 0) > this.time.now;
+        c.info.setText((hi && c.hiText) || (c.infoTxt ?? '')).setColor(hi ? PAL.mint : PAL.white);
       } else c.info.setColor(PAL.white);
       c.bar.clear();
       // mistrovství (návrh 2): za úrovní název hodnosti, pod tím 10 teček stupňů v barvě hodnosti

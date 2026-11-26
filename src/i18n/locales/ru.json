@@ -1702,5 +1702,9 @@
  "odměny bez reklam · jednou, navždy": "награды без рекламы · один раз, навсегда",
  "Nový host ve Sbírce: {s}": "Новый гость в Коллекции: {s}",
  "po této hygieně: {s}": "после этой проверки: {s}",
- "další novinka: {s} po {n}. hygieně": "следующая новинка: {s} после {n}-й проверки"
+ "další novinka: {s} po {n}. hygieně": "следующая новинка: {s} после {n}-й проверки",
+ "★ VIP {m} min · +{h} h výdělku": "★ VIP {m} мин · +{h} ч дохода",
+ "Pípa točí sama. Pak v Obchodě kup vylepšení ×3.": "Кран наливает сам. Потом купи улучшение ×3 в Магазине.",
+ "Pípa točí sama. Pak otevři kuchyni.": "Кран наливает сам. Потом открой кухню.",
+ "výdělek {a} → {b}/s": "доход {a} → {b}/с"
 }

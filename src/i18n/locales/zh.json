@@ -1702,5 +1702,9 @@
  "odměny bez reklam · jednou, navždy": "无广告领奖励 · 一次购买，永久有效",
  "Nový host ve Sbírce: {s}": "图鉴新客人：{s}",
  "po této hygieně: {s}": "本次卫生检查后：{s}",
- "další novinka: {s} po {n}. hygieně": "下一个新内容：第 {n} 次卫生检查后的 {s}"
+ "další novinka: {s} po {n}. hygieně": "下一个新内容：第 {n} 次卫生检查后的 {s}",
+ "★ VIP {m} min · +{h} h výdělku": "★ VIP {m} 分钟 · +{h} 小时收入",
+ "Pípa točí sama. Pak v Obchodě kup vylepšení ×3.": "酒头会自己出酒。然后在商店买 ×3 升级。",
+ "Pípa točí sama. Pak otevři kuchyni.": "酒头会自己出酒。然后开放厨房。",
+ "výdělek {a} → {b}/s": "收入 {a} → {b}/秒"
 }

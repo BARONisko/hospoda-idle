@@ -1702,5 +1702,9 @@
  "odměny bez reklam · jednou, navždy": "recompensas sin anuncios · un pago, para siempre",
  "Nový host ve Sbírce: {s}": "Nuevo cliente en la Colección: {s}",
  "po této hygieně: {s}": "tras esta inspección: {s}",
- "další novinka: {s} po {n}. hygieně": "próxima novedad: {s} tras la inspección {n}"
+ "další novinka: {s} po {n}. hygieně": "próxima novedad: {s} tras la inspección {n}",
+ "★ VIP {m} min · +{h} h výdělku": "★ VIP {m} min · +{h} h de ganancias",
+ "Pípa točí sama. Pak v Obchodě kup vylepšení ×3.": "El grifo sirve solo. Luego compra la mejora ×3 en la Tienda.",
+ "Pípa točí sama. Pak otevři kuchyni.": "El grifo sirve solo. Luego abre la cocina.",
+ "výdělek {a} → {b}/s": "ingresos {a} → {b}/s"
 }
