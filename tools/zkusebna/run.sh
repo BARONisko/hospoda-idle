@@ -12,11 +12,13 @@ VITE=$!
 trap 'kill $VITE 2>/dev/null || true' EXIT
 for _ in $(seq 1 40); do curl -s -o /dev/null http://localhost:5178/ && break; sleep 0.5; done
 export ZK_URL=http://localhost:5178/
-node tools/zkusebna/bot.mjs novacek "$RUN" 15 cs &
-node tools/zkusebna/bot.mjs bezny "$RUN" 180 cs &
-node tools/zkusebna/bot.mjs slaby "$RUN" 240 cs &
-node tools/zkusebna/bot.mjs dlouhy "$RUN" 600 cs &
-wait
+BOTS=()
+node tools/zkusebna/bot.mjs novacek "$RUN" 15 cs & BOTS+=($!)
+node tools/zkusebna/bot.mjs bezny "$RUN" 180 cs & BOTS+=($!)
+node tools/zkusebna/bot.mjs slaby "$RUN" 240 cs & BOTS+=($!)
+node tools/zkusebna/bot.mjs dlouhy "$RUN" 600 cs & BOTS+=($!)
+# čekat jen na boty (holé wait by čekalo i na vite preview a nikdy neskončilo)
+wait "${BOTS[@]}"
 python3 tools/zkusebna/human_half.py score "$RUN"
 echo
 echo "Hotovo: $RUN/auto.json a $RUN/review/prompt.md."

@@ -305,6 +305,24 @@ while (T < end) {
   try { st = await read(); } catch { st = null; }
   if (!st) { await step(1); T += 1; continue; }
   await record(st);
+  // Chrám / Šipky otevřené jinudy než z Menu (např. průvodce novinkou tile:temple): podívat se a odejít (dřív bot zůstal v Chrámu do konce)
+  const other = await p.evaluate(() => ['Temple', 'Darts'].find((n) => game.scene.isActive(n)) ?? null);
+  if (other) {
+    const key = other === 'Temple' ? 'temple' : 'darts';
+    if (!seenTab.has(key)) { seenTab.add(key); first('screen:' + key, key); }
+    await shot('scena_' + key, true);
+    await step(3);
+    T += 3;
+    await p.evaluate((n) => {
+      const sc = game.scene.getScene(n);
+      try { if (n === 'Temple') sc.lobby?.(); } catch { /* */ }
+      try { sc.leave?.(); } catch { /* */ }
+      if (game.scene.isActive(n)) { game.scene.stop(n); game.scene.wake('Pub'); game.scene.resume('Pub'); }
+    }, other);
+    await step(0.5);
+    mark(T, 'scene_leave', other);
+    continue;
+  }
   // snímky: pravidelně + při prvních výskytech
   const newFirst = marks.filter((m) => m.kind.startsWith('first:') && !lastFirstShot.has(m.kind));
   for (const m of newFirst) { lastFirstShot.add(m.kind); if (!m.shot) m.shot = await shot(m.kind); }
