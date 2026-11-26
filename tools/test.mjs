@@ -183,9 +183,11 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('mistrovství, hvězdy a hosté dávají jen body do stromu', await S(p, (s) => {
     // statistiky se kešují na snímek – test mění uložení mezi snímky, takže keš zahodit (jinak výsledek závisí na načasování)
     s.tsCache = undefined; s.d.mast = {}; s.d.stars = {}; s.d.loy = {}; const pub = s.d.pubs[0], def = s.cards[0].def; pub.st.tap.auto = true;
+    // jen pípa s obsluhou (kuchyně má od 26. 11. kuchaře už z návodu – její mistrovství by přidalo další body)
+    s.d.pubs.forEach((q) => Object.entries(q.st).forEach(([k, v]) => k !== 'tap' && v && (v.auto = false)));
     const p0 = s.pay(pub, def), c0 = s.cyc(def), b0 = s.skillPoints();
     s.mastAdd(2e6); s.d.stars = { '1_tap': 2 }; s.d.loy = { guest0: 1750 }; s.tsCache = undefined;
-    return s.mast('tap') >= 10 && s.pay(pub, def) === p0 && s.cyc(def) === c0 && s.skillPoints() === b0 + s.mast('tap') + 2 + 2;
+    return s.mast("tap") >= 10 && s.pay(pub, def) === p0 && s.cyc(def) === c0 && s.skillPoints() === b0 + s.mast("tap") + 2 + 2;
   }));
   ok('mistrovství: hodnost a tečky na kartě', await S(p, (s) => { s.refresh(); return s.cards[0].bnum.text === 'Tovaryš' || s.cards[0].bnum.text.length > 2; }));
   // 5g4) věrnost hostů: obsloužení druhu = bod, úroveň 1 po 10, spropitné od něj +1 %

@@ -1678,5 +1678,9 @@
  "spíš ×2 na 3 min, jinak škoda": "büyük ihtimalle 3 dk ×2, yoksa zarar",
  "(strop {h} h)": "(en fazla {h} sa)",
  "stačí na: {s}": "yeter: {s}",
- "Rozjezd! Výdělek ×{m} na {s} s": "Hızlı başlangıç! {s} sn gelir ×{m}"
+ "Rozjezd! Výdělek ×{m} na {s} s": "Hızlı başlangıç! {s} sn gelir ×{m}",
+ "{m} min · +{c}": "{m} dk · +{c}",
+ "{s}: od úrovně pivovaru {n}": "{s}: bira fabrikası {n}. seviyeden",
+ "od úrovně {n}": "{n}. seviyeden",
+ "Nové pivo: {s}!": "Yeni bira: {s}!"
 }

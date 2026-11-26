@@ -1678,5 +1678,9 @@
  "spíš ×2 na 3 min, jinak škoda": "たぶん3分×2、外れると損害",
  "(strop {h} h)": "（上限 {h} 時間）",
  "stačí na: {s}": "買える：{s}",
- "Rozjezd! Výdělek ×{m} na {s} s": "スタートダッシュ！収入×{m}（{s}秒）"
+ "Rozjezd! Výdělek ×{m} na {s} s": "スタートダッシュ！収入×{m}（{s}秒）",
+ "{m} min · +{c}": "{m}分 · +{c}",
+ "{s}: od úrovně pivovaru {n}": "{s}：醸造所レベル{n}から",
+ "od úrovně {n}": "レベル{n}から",
+ "Nové pivo: {s}!": "新しいビール：{s}！"
 }

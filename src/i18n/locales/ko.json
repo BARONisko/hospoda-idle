@@ -1678,5 +1678,9 @@
  "spíš ×2 na 3 min, jinak škoda": "아마 3분 ×2, 아니면 손해",
  "(strop {h} h)": "(최대 {h}시간)",
  "stačí na: {s}": "구매 가능: {s}",
- "Rozjezd! Výdělek ×{m} na {s} s": "출발 부스트! {s}초간 수입 ×{m}"
+ "Rozjezd! Výdělek ×{m} na {s} s": "출발 부스트! {s}초간 수입 ×{m}",
+ "{m} min · +{c}": "{m}분 · +{c}",
+ "{s}: od úrovně pivovaru {n}": "{s}: 양조장 {n}레벨부터",
+ "od úrovně {n}": "{n}레벨부터",
+ "Nové pivo: {s}!": "새 맥주: {s}!"
 }

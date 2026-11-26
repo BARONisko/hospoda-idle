@@ -12,6 +12,8 @@ export interface BrewState {
   at: number;
   /** druh piva */
   kind: BeerKind;
+  /** součet hodnot piv v tanku (každé pivo si pamatuje svůj druh; dřív se prodávalo podle právě zvoleného druhu → Ležák za cenu Speciálu) */
+  sv?: number;
 }
 
 export type BeerKind = 'lager' | 'dark' | 'special';
@@ -21,6 +23,9 @@ export const BEERS: Record<BeerKind, { name: string; time: number; value: number
   dark: { name: t('Polotmavé'), time: 1.6, value: 2 },
   special: { name: t('Speciál'), time: 3, value: 5 },
 };
+
+/** od které úrovně pivovaru jde pivo vařit (Petr 26. 11. podle Fable: postupně, ne všechna hned) */
+export const BEER_LVL: Record<BeerKind, number> = { lager: 1, dark: 3, special: 6 };
 
 export const newBrew = (): BrewState => ({ lvl: 1, inv: 0, stock: 0, at: Date.now(), kind: 'lager' });
 
@@ -35,7 +40,24 @@ export const lvlCost = (b: BrewState) => 2 * b.lvl;
 /** trvalý bonus k výdělku */
 export const brewBonus = (b: BrewState) => 0.009 * (b.lvl - 1);
 /** cena jednoho piva = tolik sekund výdělku */
-export const sellSecs = (b: BrewState) => 300 * (1 + 0.009 * (b.lvl - 1)) * BEERS[b.kind].value;
+/** hodnota tanku: staré uložení bez sv bere piva jako právě zvolený druh */
+const sv = (b: BrewState) => (b.sv ??= b.stock * BEERS[b.kind].value);
+/** průměrná hodnota piva v tanku (×1 Ležák … ×5 Speciál) */
+export const beerValue = (b: BrewState) => (b.stock > 0 ? sv(b) / b.stock : BEERS[b.kind].value);
+/** vzít z tanku n piv (prodej, vylepšení, pivní akce) – hodnota ubude poměrně */
+export const takeBeer = (b: BrewState, n = 1) => {
+  const v = beerValue(b) * n;
+  b.sv = Math.max(0, sv(b) - v);
+  b.stock -= n;
+  if (b.stock <= 0) b.sv = 0;
+};
+/** dát do tanku n piv aktuálního druhu */
+export const addBeer = (b: BrewState, n: number) => {
+  sv(b);
+  b.sv! += n * BEERS[b.kind].value;
+  b.stock += n;
+};
+export const sellSecs = (b: BrewState) => 300 * (1 + 0.009 * (b.lvl - 1)) * beerValue(b);
 
 /** dovaří, co se mezitím uvařilo (i offline); plný tank čeká */
 export function tick(b: BrewState, now = Date.now()) {
@@ -46,7 +68,7 @@ export function tick(b: BrewState, now = Date.now()) {
   }
   const n = Math.floor((now - b.at) / ms);
   if (n > 0) {
-    b.stock = Math.min(tank(b), b.stock + n);
+    addBeer(b, Math.min(tank(b), b.stock + n) - b.stock);
     b.at += n * ms;
     if (b.stock >= tank(b)) b.at = now;
   }

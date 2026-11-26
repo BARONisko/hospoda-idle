@@ -35,7 +35,7 @@ import { TREE, TREE_BY_ID, TREE_BRANCHES, TREE_COLORS, STAR_TEXT, GATE, treeSpen
 import { collHire, collSpdCost, collAmtCost, COLL_AMT_MAX } from '../core/collector';
 import { loyLvl, loyProg, loyNext, LOY_MAX } from '../core/loyalty';
 import { mastStage, mastRank, mastProg, RANKS, RANK_COLORS, MAST_MAX } from '../core/mastery';
-import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
+import { brewCfg, BEERS, BEER_LVL, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick, takeBeer, addBeer } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave, wipe } from '../core/save';
 import { PubView, LOOK, REKO, livery } from '../game/PubView';
 import { RELICS, RELIC_STAR, hasRelic, nextRelic } from '../core/relics';
@@ -561,6 +561,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.drawMode();
     }, 102);
     this.drawMode();
+    // Zkušebna U1: do první hygieny přepínač ×1/×10/MAX schovaný (nový hráč kupuje po jedné, tlačítko jen mátlo)
+    if (this.d.stats.prestiges === 0) {
+      this.modeBtn.visible = false;
+      [this.modeBtn.bg, this.modeBtn.label, this.modeBtn.zone].forEach((o) => o.setVisible(false));
+    }
     this.makeNav();
     this.shopDot = this.add.graphics().setDepth(254);
 
@@ -2354,12 +2359,21 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // druh piva (rozhodnutí: rychle a levně, nebo pomalu a draze)
     add(this.add.text(20, y0 + 208, t('Co vařit:'), txt(20, PAL.gold)).setDepth(D + 2));
     (Object.keys(BEERS) as BeerKind[]).forEach((k, i) => {
+      const lock = b.lvl < BEER_LVL[k];
       const bt = this.btn(10 + i * 175, y0 + 236, 165, 62, () => {
+        if (lock) {
+          sfx.error();
+          return this.banner(this.views[0].cam, t('{s}: od úrovně pivovaru {n}', { s: BEERS[k].name, n: BEER_LVL[k] }));
+        }
         b.kind = k;
         store(this.d);
         this.openShop('brew', false);
       }, D + 2);
-      this.drawBtn(bt, `${BEERS[k].name}\n×${BEERS[k].value} · ${t('čas ×{t}', { t: String(BEERS[k].time).replace('.', ',') })}`, true, b.kind === k ? 'amber' : 'slate');
+      // Fable 26. 11.: místo „×2 · čas ×1,6“ konkrétně, za kolik minut a kolik coins
+      const mins = Math.round(brewMs({ ...b, kind: k }) / 60000);
+      const val = this.visitCtx().income(300 * (1 + 0.009 * (b.lvl - 1)) * BEERS[k].value * (1 + this.ts().beer));
+      if (lock) this.drawBtn(bt, `🔒 ${BEERS[k].name}\n${t('od úrovně {n}', { n: BEER_LVL[k] })}`, false, 'slate');
+      else this.drawBtn(bt, `${BEERS[k].name}\n${t('{m} min · +{c}', { m: mins, c: big(val) })}`, true, b.kind === k ? 'amber' : 'slate');
       bt.label.setScale(Math.min(1, 150 / bt.label.width));
       this.shopObjs.push(bt.bg, bt.label, bt.zone);
     });
@@ -2368,7 +2382,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const sell = this.btn(10, y0 + 310, 255, 70, () => {
       if (b.stock < 1) return sfx.error();
       if (this.d.brewTut === 0 || this.d.brewTut === 1) this.d.brewTut = 2;
-      b.stock--;
+      takeBeer(b);
       this.xp(15);
       this.week('beers');
       this.task('beer', 1);
@@ -2381,14 +2395,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const inv = this.btn(275, y0 + 310, 255, 70, () => {
       if (b.stock < 1) return sfx.error();
       if (this.d.brewTut === 0 || this.d.brewTut === 1) this.d.brewTut = 2;
-      b.stock--;
+      takeBeer(b);
       b.inv++;
       this.week('beers');
       this.task('beer', 1);
       if (b.inv >= lvlCost(b)) {
         b.inv = 0;
         b.lvl++;
-        this.banner(this.views[0].cam, t('Pivovar úroveň {n}!', { n: b.lvl }));
+        const nb = (Object.keys(BEERS) as BeerKind[]).find((k) => BEER_LVL[k] === b.lvl);
+        this.banner(this.views[0].cam, nb ? t('Nové pivo: {s}!', { s: BEERS[nb].name }) : t('Pivovar úroveň {n}!', { n: b.lvl }));
       } else sfx.buy();
       store(this.d);
       this.openShop('brew', false);
@@ -2441,7 +2456,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const can = a.ok && b.stock >= a.cost;
       const bt = this.btn(x, y, bw, 78, () => {
         if (!a.ok || b.stock < a.cost) return sfx.error();
-        b.stock -= a.cost;
+        takeBeer(b, a.cost);
         a.run();
         store(this.d);
         this.openShop('brew', false);
@@ -2461,7 +2476,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const b = this.brew();
     if (this.d.brewTut === undefined) {
       this.d.brewTut = 0;
-      if (b.stock < 1) b.stock = 1; // první pivo zdarma, ať jde prodej hned vyzkoušet
+      if (b.stock < 1) addBeer(b, 1 - b.stock); // první pivo zdarma, ať jde prodej hned vyzkoušet
       store(this.d);
       return this.openShop('brew', false);
     }
@@ -3043,7 +3058,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.chestBg?.clear();
     if (on) this.chestBg?.fillStyle(col('ink'), 0.75).fillCircle(x, y, 31).lineStyle(3, col('gold')).strokeCircle(x, y, 31);
     h.dot.clear();
-    if (on) h.dot.fillStyle(col('ink')).fillCircle(x + 22, y - 22, 11).fillStyle(col('scarlet')).fillCircle(x + 22, y - 22, 8);
+    if (on && !(this.calmDots() && this.navDotOn[1])) h.dot.fillStyle(col('ink')).fillCircle(x + 22, y - 22, 11).fillStyle(col('scarlet')).fillCircle(x + 22, y - 22, 8);
   }
 
   /** záložka Denní truhla (návrh A: kalendář 7 dní) */
@@ -3190,7 +3205,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.d.darts!.have = dartCap(this.d.darts!.up);
       this.banner(this.views[0].cam, t('Toulec je plný!'));
     } else if (id === 'brewnow') {
-      this.d.brew!.stock = tank(this.d.brew!);
+      addBeer(this.d.brew!, tank(this.d.brew!) - this.d.brew!.stock);
       this.d.brew!.at = now;
       this.banner(this.views[0].cam, t('Tank je plný piva!'));
     } else if (id === 'vipnow') {
@@ -5326,16 +5341,33 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     }
   }
 
+  /** návod šetří na kuchyni nebo ×3: ostatní nákupy úrovní jsou zatím šedé (Zkušebna H1: zelené +1 lákalo ke špatnému kroku) */
+  private tutHold(def: StationDef) {
+    const i = this.d.tut ?? -1;
+    if (i < 0) return false;
+    const done = PubScene.TUT[i].done;
+    // bez číšníků návod radí ťukat a kupovat +1 u Pípy – pak nic nezamykat
+    if (!this.d.pubs[0]?.st.tap?.auto) return false;
+    return (done === 'buy:kitchen' && def.id !== 'kitchen') || done === 'tile:shop' || done === 'up';
+  }
+
   private buy(i: number, def: StationDef) {
     const p = this.d.pubs[i];
     const { n, price } = this.offer(p, def);
-    if (this.d.coins < price) return sfx.error();
+    if (this.d.coins < price || this.tutHold(def)) return sfx.error();
     this.d.coins -= price;
     const s = this.st(p, def.id);
     const before = nextMilestone(s.lvl), styleWas = [...pubStyles(p)];
+    const opened = s.lvl === 0;
     s.lvl += n;
     this.d.stats.levels += n;
     this.xp(Math.min(n, 20));
+    // Zkušebna (S5/T2): kuchyně otevřená v návodu má kuchaře hned (dřív nákup za 60 výdělek nezvedl a hráč šetřil znovu)
+    if (opened && i === 0 && def.id === 'kitchen' && (this.d.tut ?? -1) >= 0) {
+      s.auto = true;
+      if (s.prog === 0) s.prog = 0.0001;
+      this.time.delayedCall(500, () => this.views[i] && this.banner(this.views[i].cam, STAFF_LABEL.kitchen[2]));
+    }
     this.task('levels', n);
     this.tut('buy:' + def.id);
     sfx.buy();
@@ -6927,7 +6959,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       u.icon.setPosition(x0 + 22, y + h / 2 + 1);
       // červený vykřičník na úkolníčku
       const ex = x0 + 33, ey = y + 11;
-      u.g.fillStyle(col('ink')).fillCircle(ex, ey, 9).fillStyle(col(done ? 'mint' : 'scarlet')).fillCircle(ex, ey, 7).fillStyle(col('white')).fillRect(ex - 1, ey - 5, 3, 6).fillRect(ex - 1, ey + 2, 3, 2);
+      // Zkušebna U1: vykřičník jen když je co vybrat (dřív svítil červeně pořád)
+      if (done) u.g.fillStyle(col('ink')).fillCircle(ex, ey, 9).fillStyle(col('mint')).fillCircle(ex, ey, 7).fillStyle(col('white')).fillRect(ex - 1, ey - 5, 3, 6).fillRect(ex - 1, ey + 2, 3, 2);
       // tlačítko = celá pilulka (bez vlastního vzhledu)
       Object.assign(u.btn, { x: x0, y, w: pw, h, visible: true, enabled: true });
       u.btn.bg.clear();
@@ -7069,6 +7102,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     this.guideCur = null;
     if (!g) return;
     if (g.id.startsWith('tile:')) this.guideGapUntil = Date.now() + 90_000;
+    // Zkušebna O2: po průvodci novou hospodou (hned po hygieně) další novinka až za 2,5 min – dřív 6 cedulí za 30 s
+    if (g.id.startsWith('pub')) this.guideGapUntil = Date.now() + 150_000;
     this.d.guideQ = (this.d.guideQ ?? []).filter((x) => x !== g.id);
     (this.d.guides ??= []).push(g.id);
     store(this.d);
@@ -7121,7 +7156,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         if (!r) return;
         ph += 0.12;
         const [x, y, w, h] = r, up = y < TOP + TABH;
-        hl.lineStyle(4, col('gold'), 0.6 + 0.4 * Math.sin(ph * 2)).strokeRoundedRect(x - 6, y - 6, w + 12, h + 12, 10);
+        // Zkušebna H3: cíl ve spodní liště (Menu, Obchod…) – jen silný rámeček, šipka by zakryla ceny na kartách nad lištou
+        const nav = y >= H - NAV_H - 4;
+        hl.lineStyle(nav ? 6 : 4, col('gold'), 0.6 + 0.4 * Math.sin(ph * 2)).strokeRoundedRect(x - 6, y - 6, w + 12, h + 12, 10);
+        arrow.setVisible(!nav);
         arrow.setAngle(up ? 180 : 0).setPosition(x + w / 2, up ? y + h + 44 + Math.sin(ph) * 8 : y - 30 - Math.sin(ph) * 8);
       };
       this.guideFollow();
@@ -7164,6 +7202,11 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   signLeft = 0;
   styleSign?: { g: Phaser.GameObjects.Graphics; a: Phaser.GameObjects.Text; b: Phaser.GameObjects.Text };
   /** cedule stylu nahoře v hospodě (název stylu, výhoda, bonus za různé styly) */
+  /** do první hygieny klidnější obrazovka: nejvýš jedna červená tečka */
+  private calmDots() {
+    return this.d.stats.prestiges === 0;
+  }
+
   private drawStyleSign() {
     const p = this.d.pubs[this.views.length > 1 ? this.sel : 0];
     if (!this.styleSign) this.styleSign = { g: this.add.graphics().setDepth(58), a: this.add.text(W / 2, 0, '', txt(24, PAL.gold)).setOrigin(0.5, 0).setDepth(59), b: this.add.text(W / 2, 0, '', txt(15, PAL.bone)).setOrigin(0.5, 0).setDepth(59) };
@@ -7228,7 +7271,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const dot = (nb: Btn) => this.navDots!.fillStyle(col('ink')).fillCircle(nb.x + nb.w / 2 + 26, nb.y + 14, 11).fillStyle(col('scarlet')).fillCircle(nb.x + nb.w / 2 + 26, nb.y + 14, 8);
       // výpočet nejvýš 2× za sekundu (refresh běží často – telefon se nemá hřát)
       const now = Date.now();
-      if (now - this.navDotAt > 500) (this.navDotAt = now), (this.navDotOn = [(this.d.tut ?? -1) < 0 && this.tabAlert('shop'), this.tabAlert('tasks')]);
+      if (now - this.navDotAt > 500) {
+        this.navDotAt = now;
+        this.navDotOn = [(this.d.tut ?? -1) < 0 && this.tabAlert('shop'), this.tabAlert('tasks')];
+        // Zkušebna U1: do první hygieny svítí nejvýš jedna tečka naráz (pořadí Úkoly → truhla → Obchod)
+        if (this.calmDots()) {
+          if (this.navDotOn[1]) this.navDotOn[0] = false;
+          else if (chestReady(this.d.chest)) this.navDotOn[0] = false;
+        }
+      }
       if (this.navDotOn[0]) dot(this.navBtns[1]);
       if (this.navDotOn[1]) dot(this.navBtns[2]);
     }
@@ -7268,7 +7319,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       fs(c.buy.label, half ? 22 : c.narrow ? 24 : 30);
       // přes celou šíři na jeden řádek („+1 · 1.8K“, „Otevřít · 60“), v půlce na dva
       const one = (s2: string) => (half ? s2 : s2.replace('\n', ' · '));
-      this.drawBtn(c.buy, open ? one(`+${n}\n${big(price)}`) : one(t('Otevřít\n{n}', { n: big(price) })), this.d.coins >= price, 'green');
+      this.drawBtn(c.buy, open ? one(`+${n}\n${big(price)}`) : one(t('Otevřít\n{n}', { n: big(price) })), this.d.coins >= price && !this.tutHold(c.def), 'green');
       if (fix) this.drawBtn(c.staff, fix.label, fix.ok, 'amber', half);
       else this.drawBtn(c.staff, `${sl[0]}\n${big(staff)}`, this.d.coins >= staff, 'plum', half);
       // pípa s číšníky: plný bar = číšníci nestíhají

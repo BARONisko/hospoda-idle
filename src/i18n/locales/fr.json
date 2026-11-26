@@ -1678,5 +1678,9 @@
  "spíš ×2 na 3 min, jinak škoda": "plutôt ×2 3 min, sinon dégâts",
  "(strop {h} h)": "(max {h} h)",
  "stačí na: {s}": "de quoi acheter : {s}",
- "Rozjezd! Výdělek ×{m} na {s} s": "Démarrage ! Revenus ×{m} pendant {s} s"
+ "Rozjezd! Výdělek ×{m} na {s} s": "Démarrage ! Revenus ×{m} pendant {s} s",
+ "{m} min · +{c}": "{m} min · +{c}",
+ "{s}: od úrovně pivovaru {n}": "{s} : dès le niveau {n} de la brasserie",
+ "od úrovně {n}": "dès le niveau {n}",
+ "Nové pivo: {s}!": "Nouvelle bière : {s} !"
 }
