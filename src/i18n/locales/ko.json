@@ -1682,5 +1682,22 @@
  "{m} min · +{c}": "{m}분 · +{c}",
  "{s}: od úrovně pivovaru {n}": "{s}: 양조장 {n}레벨부터",
  "od úrovně {n}": "{n}레벨부터",
- "Nové pivo: {s}!": "새 맥주: {s}!"
+ "Nové pivo: {s}!": "새 맥주: {s}!",
+ "zůstane: 💎 · číšníci · sbírka · krígly": "유지: 💎 · 웨이터 · 수집 · 맥주잔",
+ "teď je dobrá chvíle": "지금이 좋은 때",
+ "za 5 min: krígly +{n}": "5분 뒤면 +{n} 맥주잔",
+ "Až se vrátíš": "돌아오면",
+ "1 h pryč: +{n} coins · strop {h} h": "1시간 자리 비움: +{n} coins · 최대 {h}시간",
+ "Další hospoda: {n}": "다음 술집: {n}",
+ "otevře se po další hygieně": "다음 위생 점검 후 개장",
+ "vař pivo pro bonus a coins": "맥주로 보너스와 coins",
+ "ozdoby s trvalým bonusem": "영구 보너스 장식",
+ "házej šipky, vyhraj odměny": "다트 던지고 보상 받기",
+ "talismany z chrámu, vylepšuj kostmi": "신전 부적, 뼈로 강화",
+ "za krígly trvalá vylepšení": "맥주잔으로 영구 강화",
+ "bojuj o talismany a truhly": "부적과 상자를 위해 싸워라",
+ "kostka zlepší vlastnost natrvalo": "주사위로 능력 영구 강화",
+ "ťuká na bubliny za tebe": "대신 말풍선을 탭해요",
+ "{s}: výdělek ×{m} na {n} s": "{s}: {n}초간 수입 ×{m}",
+ "odměny bez reklam · jednou, navždy": "광고 없이 보상 · 한 번 구매, 영구"
 }

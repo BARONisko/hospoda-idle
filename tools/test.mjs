@@ -575,7 +575,7 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
       const xy = await S(p, (s) => { const z = s.chestHud.zone, rc = game.canvas.getBoundingClientRect(), k = rc.width / 540; return [rc.left + (z.x + 32) * k, rc.top + (z.y + 32) * k]; });
       await p.touchscreen.tap(xy[0], xy[1]);
       await p.waitForTimeout(400);
-      ok('truhla: ťuknutí prstem otevře truhlu', await S(p, (s) => s.shopObjs.length > 0 && s.tab === 'chest'));
+      ok('truhla: ťuknutí prstem otevře truhlu (rovnou, Zkušebna M3)', await S(p, (s) => !s.chestHud.zone.visible && s.tab !== 'chest'));
       // blesk (schopnost manažera): nejdřív bez manažera (tlačítko skryté), pak najmout → ťuknutí prstem spustí ×3
       await S(p, (s) => { s.closeShop(); s.d.pubs[0].mgr = false; s.d.pubs[0].boostReady = 0; s.d.pubs[0].boostUntil = 0; });
       await p.waitForTimeout(300);

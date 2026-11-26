@@ -1682,5 +1682,22 @@
  "{m} min · +{c}": "{m}分钟 · +{c}",
  "{s}: od úrovně pivovaru {n}": "{s}：酿酒厂{n}级解锁",
  "od úrovně {n}": "{n}级解锁",
- "Nové pivo: {s}!": "新啤酒：{s}！"
+ "Nové pivo: {s}!": "新啤酒：{s}！",
+ "zůstane: 💎 · číšníci · sbírka · krígly": "保留：💎 · 服务员 · 收藏 · 啤酒杯",
+ "teď je dobrá chvíle": "现在正是时候",
+ "za 5 min: krígly +{n}": "5分钟后：再 +{n} 个啤酒杯",
+ "Až se vrátíš": "等你回来",
+ "1 h pryč: +{n} coins · strop {h} h": "离开1小时：+{n} coins · 上限{h}小时",
+ "Další hospoda: {n}": "下一家酒馆：{n}",
+ "otevře se po další hygieně": "下次卫生检查后开放",
+ "vař pivo pro bonus a coins": "酿酒换加成和coins",
+ "ozdoby s trvalým bonusem": "永久加成的装饰",
+ "házej šipky, vyhraj odměny": "掷飞镖赢奖励",
+ "talismany z chrámu, vylepšuj kostmi": "神殿护符，用骨头升级",
+ "za krígly trvalá vylepšení": "啤酒杯换永久升级",
+ "bojuj o talismany a truhly": "为护符和宝箱而战",
+ "kostka zlepší vlastnost natrvalo": "骰子永久提升一项属性",
+ "ťuká na bubliny za tebe": "替你点客人的气泡",
+ "{s}: výdělek ×{m} na {n} s": "{s}：收入×{m}，持续{n}秒",
+ "odměny bez reklam · jednou, navždy": "无广告领奖励 · 一次购买，永久有效"
 }

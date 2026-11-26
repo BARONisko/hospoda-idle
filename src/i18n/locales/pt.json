@@ -1682,5 +1682,22 @@
  "{m} min · +{c}": "{m} min · +{c}",
  "{s}: od úrovně pivovaru {n}": "{s}: a partir do nível {n} da cervejaria",
  "od úrovně {n}": "a partir do nível {n}",
- "Nové pivo: {s}!": "Nova cerveja: {s}!"
+ "Nové pivo: {s}!": "Nova cerveja: {s}!",
+ "zůstane: 💎 · číšníci · sbírka · krígly": "fica: 💎 · garçons · coleção · canecas",
+ "teď je dobrá chvíle": "agora é uma boa hora",
+ "za 5 min: krígly +{n}": "em 5 min: +{n} canecas",
+ "Až se vrátíš": "Quando você voltar",
+ "1 h pryč: +{n} coins · strop {h} h": "1 h fora: +{n} coins · máx. {h} h",
+ "Další hospoda: {n}": "Próximo bar: {n}",
+ "otevře se po další hygieně": "abre após a próxima vigilância sanitária",
+ "vař pivo pro bonus a coins": "cerveja para bônus e coins",
+ "ozdoby s trvalým bonusem": "enfeites com bônus permanente",
+ "házej šipky, vyhraj odměny": "jogue dardos, ganhe prêmios",
+ "talismany z chrámu, vylepšuj kostmi": "talismãs do templo, melhore com ossos",
+ "za krígly trvalá vylepšení": "canecas compram melhorias permanentes",
+ "bojuj o talismany a truhly": "lute por talismãs e baús",
+ "kostka zlepší vlastnost natrvalo": "um dado melhora algo para sempre",
+ "ťuká na bubliny za tebe": "toca as bolhas por você",
+ "{s}: výdělek ×{m} na {n} s": "{s}: renda ×{m} por {n} s",
+ "odměny bez reklam · jednou, navždy": "recompensas sem anúncios · uma vez, para sempre"
 }

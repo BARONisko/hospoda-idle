@@ -1682,5 +1682,22 @@
  "{m} min · +{c}": "{m}分 · +{c}",
  "{s}: od úrovně pivovaru {n}": "{s}：醸造所レベル{n}から",
  "od úrovně {n}": "レベル{n}から",
- "Nové pivo: {s}!": "新しいビール：{s}！"
+ "Nové pivo: {s}!": "新しいビール：{s}！",
+ "zůstane: 💎 · číšníci · sbírka · krígly": "残る：💎・ウェイター・コレクション・ジョッキ",
+ "teď je dobrá chvíle": "今がいいタイミング",
+ "za 5 min: krígly +{n}": "5分後なら +{n} ジョッキ",
+ "Až se vrátíš": "戻ってきたら",
+ "1 h pryč: +{n} coins · strop {h} h": "1時間離れると：+{n} coins・上限{h}時間",
+ "Další hospoda: {n}": "次の酒場：{n}",
+ "otevře se po další hygieně": "次の衛生検査後に開店",
+ "vař pivo pro bonus a coins": "ビールでボーナスとcoins",
+ "ozdoby s trvalým bonusem": "永続ボーナスの飾り",
+ "házej šipky, vyhraj odměny": "ダーツで報酬",
+ "talismany z chrámu, vylepšuj kostmi": "神殿のお守り、骨で強化",
+ "za krígly trvalá vylepšení": "ジョッキで永続強化",
+ "bojuj o talismany a truhly": "お守りと宝箱をかけて戦え",
+ "kostka zlepší vlastnost natrvalo": "サイコロで能力を永久強化",
+ "ťuká na bubliny za tebe": "代わりに吹き出しをタップ",
+ "{s}: výdělek ×{m} na {n} s": "{s}：収入×{m}（{n}秒）",
+ "odměny bez reklam · jednou, navždy": "広告なしで報酬 · 一度だけ、永久に"
 }

@@ -264,6 +264,8 @@ interface Card {
   lvl: Phaser.GameObjects.Text;
   bar: Phaser.GameObjects.Graphics;
   info: Phaser.GameObjects.Text;
+  /** T2: do kdy je přírůstek po nákupu zvýrazněný */
+  hiUntil?: number;
   buy: Btn;
   staff: Btn;
   tapZone: Phaser.GameObjects.Zone;
@@ -1078,10 +1080,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       .setOrigin(0.5)
       .setStroke(PAL.ink, 8)
       .setDepth(450);
+    // Zkušebna H3: horní nápis (pokyn k události) na tmavém podkladu a déle – dřív splýval s barem a zmizel za 2 s
+    if (top) tx.setBackgroundColor('rgba(20,16,28,0.82)').setPadding(14, 6, 14, 6);
     tx.setScale(Math.min(1, (W - 24) / tx.width));
     this.tweens.add({ targets: tx, scale: { from: 0.4 * tx.scale, to: tx.scale }, duration: 260, ease: 'Back.out' });
     // horní nápis mizí dolů (nahoru by vjel do lišty úkolu – posudek nováčka)
-    this.tweens.add({ targets: tx, y: tx.y + (top ? 30 : -40), alpha: 0, delay: 1300, duration: 600, onComplete: () => tx.destroy() });
+    this.tweens.add({ targets: tx, y: tx.y + (top ? 30 : -40), alpha: 0, delay: top ? 2800 : 1300, duration: 600, onComplete: () => tx.destroy() });
   }
 
   // ---------- obchod s vylepšeními ----------
@@ -1107,7 +1111,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       .filter((p) => !p.mgr && (p.st.kitchen?.lvl ?? 0) > 0)
       .map((p) => ({
         title: t('Manažer: {n}', { n: MANAGERS[p.act].name }),
-        sub: sub(p.act, t('schopnost: {s}', { s: MANAGERS[p.act].skill })),
+        // Zkušebna H2: místo jména schopnosti číslo, co dělá
+        sub: sub(p.act, t('{s}: výdělek ×{m} na {n} s', { s: MANAGERS[p.act].skill, m: BOOST_MULT, n: Math.round(this.boostLen(p) / 1000) })),
         cost: mgrCost(p.act),
         buy: () => this.hireMgr(p),
       }));
@@ -1450,6 +1455,32 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       b2.setScale(Math.min(1, (W - 140) / b2.width));
       this.shopObjs.push(g, img, lk, a, b2);
       void tab; void sub;
+    }
+    // Zkušebna D2/H6 (Petr vybral B): pod dlaždicemi karta „Až se vrátíš“ s číslem a další hospoda se siluetou hosta
+    {
+      const rows = Math.ceil(tiles.length / 3);
+      const y = y0 + 64 + rows * (th + 8) + 6 + (soon.length ? 96 + 10 : 0);
+      const capH = String(Math.round(this.offCap() / 360) / 10).replace('.', ',');
+      const back = t('1 h pryč: +{n} coins · strop {h} h', { n: big(this.totalRate() * 3600), h: capH });
+      const nextPub = this.d.pubs.length < MAX_PUBS ? PUB_NAMES[this.d.pubs.length + 1] : '';
+      const g = this.add.graphics().setDepth(D + 2);
+      const h = nextPub ? 128 : 70;
+      g.fillStyle(col('ink'), 0.75).fillRoundedRect(10, y, W - 20, h, 12).lineStyle(3, col('slate')).strokeRoundedRect(10, y, W - 20, h, 12);
+      this.shopObjs.push(g, this.add.image(46, y + 35, 'obj', 'coin').setScale(4).setDepth(D + 4));
+      const line = (yy: number, str: string, size: number, c: string) => {
+        const o = this.add.text(80, yy, str, txt(size, c)).setDepth(D + 4);
+        o.setScale(Math.min(1, (W - 104) / o.width));
+        this.shopObjs.push(o);
+      };
+      line(y + 10, t('Až se vrátíš'), 20, PAL.gold);
+      line(y + 38, back, 18, PAL.bone);
+      if (nextPub) {
+        // silueta hosta z další hospody (duch / žabák) – zvědavost, co tam je
+        const key = this.d.pubs.length + 1 === 2 ? 'banshee' : 'zabak';
+        this.shopObjs.push(this.add.sprite(46, y + 96, key, 0).setScale(2.5).setDepth(D + 4).setTintFill(col('slate')));
+        line(y + 74, t('Další hospoda: {n}', { n: nextPub }), 20, PAL.mint);
+        line(y + 100, t('otevře se po další hygieně'), 16, PAL.fog);
+      }
     }
     tiles.forEach(([tab, sub, label, atlas, frame], i) => {
       const x = 10 + (i % 3) * (tw + 10), y = y0 + 64 + Math.floor(i / 3) * (th + 8);
@@ -3046,7 +3077,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       zone.on('pointerdown', () => {
         if (!zone.visible) return;
         sfx.init();
-        this.openShop('chest', false);
+        void this.chestOpen(false); // M3: ťuk na truhlu ji rovnou otevře (odměna na hlavní obrazovce)
       });
       this.tweens.add({ targets: img, angle: { from: -6, to: 6 }, yoyo: true, repeat: -1, duration: 500, ease: 'Sine.inOut' });
       this.chestHud = { img, dot, zone };
@@ -3671,7 +3702,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     y += 102;
     this.card(y, 74, 'ink', D);
     add(this.add.text(26, y + 8, t('Bez reklam'), txt(22, PAL.bone)).setDepth(D + 2));
-    add(this.add.text(26, y + 42, this.d.noAds ? t('koupeno – odměny bez reklam') : t('všechny odměny bez reklamy'), txt(16, PAL.fog)).setDepth(D + 2));
+    add(this.add.text(26, y + 42, this.d.noAds ? t('koupeno – odměny bez reklam') : t('odměny bez reklam · jednou, navždy'), txt(16, PAL.fog)).setDepth(D + 2));
     const na = this.btn(W - 150, y + 13, 128, 48, () => void this.iapBuy('noads'), D + 3);
     this.drawBtn(na, this.d.noAds ? '✓' : iap.price('noads'), !this.d.noAds && iap.available, 'amber');
     this.shopObjs.push(na.bg, na.label, na.zone);
@@ -4631,6 +4662,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     tx(cy + 132, '×' + ((1 + nw) / (1 + cur)).toFixed(2).replace('.', ','), 64, PAL.gold);
     tx(cy + 206, t('výdělek navždy'), 22, PAL.bone);
     if (next) tx(cy + 240, t('+ nová hospoda: {n}', { n: next }), 24, PAL.mint);
+    // Zkušebna P3 (Petr vybral C): co zůstane a jestli se vyplatí počkat 5 min
+    const k5 = this.kriglyNow(this.d.run + this.totalRate() * 300) - k;
+    const keep = t('zůstane: 💎 · číšníci · sbírka · krígly');
+    const wait = k5 >= 1 ? t('za 5 min: krígly +{n}', { n: k5 }) : t('teď je dobrá chvíle');
+    const ly = cy + (next ? 276 : 246);
+    tx(ly, keep, 18, PAL.mint);
+    tx(ly + 26, wait, 18, k5 >= 1 ? PAL.sand : PAL.mint);
     const close = () => {
       objs.forEach((o) => o.destroy());
       this.awayObjs = []; // jinak zůstane hospoda zablokovaná
@@ -4843,7 +4881,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     else if (step.done === 'tile:shop' && need > 0) [tx, ty] = [tapX, tapTop];
     else if (step.done === 'tile:shop') [tx, ty] = [shopTile[0] + shopTile[2] / 2, shopTile[1]];
     else if (step.done === 'up' && upB) [tx, ty] = [upB.x + upB.w / 2, upB.y];
-    else if (step.done === 'close') [tx, ty] = [W - 36, menuY0 + 10];
+    // H1: konec návodu míří na „Hospoda“ ve spodní liště (velký cíl pro palec), ne na malý křížek nahoře
+    else if (step.done === 'close') [tx, ty] = [this.navBtns[0].x + this.navBtns[0].w / 2, this.navBtns[0].y + 4];
     else [tx, ty] = [this.shopBtn.x + this.shopBtn.w / 2, this.shopBtn.y + 4];
     const D = 420;
     // ztmavení okolí: světlý zůstane jen cíl (u hosta ne – ten se hýbe)
@@ -4852,7 +4891,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       let [hx, hy] = step.done === 'menu' ? [this.shopBtn.x + 4, this.shopBtn.y + 4] : [tx - hw / 2, ty - 6];
       let [w2, h2] = step.done === 'menu' ? [this.shopBtn.w - 8, this.shopBtn.h - 8] : [hw, hh];
       if (step.done === 'tile:shop') [hx, hy, w2, h2] = [shopTile[0] - 4, shopTile[1] - 4, shopTile[2] + 8, shopTile[3] + 8];
-      if (step.done === 'close') [hx, hy, w2, h2] = [W - 68, menuY0 + 4, 64, 54];
+      if (step.done === 'close') { const nb0 = this.navBtns[0]; [hx, hy, w2, h2] = [nb0.x + 4, nb0.y + 4, nb0.w - 8, nb0.h - 8]; }
       // nákup / kostlivec: rámeček přesně kolem tlačítka
       if (step.done === 'buy:tap' || step.done === 'buy:kitchen') {
         const b = card(step.done.slice(4)).buy;
@@ -5359,6 +5398,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const s = this.st(p, def.id);
     const before = nextMilestone(s.lvl), styleWas = [...pubStyles(p)];
     const opened = s.lvl === 0;
+    const r0 = this.rate(p);
     s.lvl += n;
     this.d.stats.levels += n;
     this.xp(Math.min(n, 20));
@@ -5376,6 +5416,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       flashRect(this, card.x, card.y, card.w, card.h);
       popText(this, card.buy.x + card.buy.w / 2, card.buy.y - 6, t('+{n} úr.', { n }), PAL.mint);
       confetti(this, card.buy.x + card.buy.w / 2, card.buy.y + 10, 10, 459, 0.45);
+      // Zkušebna T2: nákup je cítit – skutečný přírůstek výdělku vyletí z pruhu a pruh na 1 s zezelená
+      const gain = this.rate(p) - r0;
+      if (gain > 0) {
+        const gt = t('+{v}/s', { v: big(gain) }), cx = card.x + card.w / 2, cy = card.y + 10;
+        this.time.delayedCall(220, () => popText(this, cx, cy, gt, PAL.mint, 30));
+        card.hiUntil = this.time.now + 1000;
+        this.time.delayedCall(1050, () => this.refresh());
+      }
     }
     if (before && s.lvl >= before) this.milestone(i, def);
     const styleNow = pubStyles(p).find((id) => !styleWas.includes(id));
@@ -5394,7 +5442,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (!ws.length) return null;
     if (ws.length < WAITER_MAX) {
       const price = this.wHirePrice(p);
-      return { label: `${t('Číšník')}\n${big(price)}`, ok: this.d.coins >= price };
+      // Zkušebna H2: tlačítko říká, co přidá (+1 číšník)
+      return { label: `${t('Číšník')} +1\n${big(price)}`, ok: this.d.coins >= price };
     }
     return ws.some((w) => freePoints(w) > 0) ? { label: `${t('Číšníci')}\n${t('vylepšit')}`, ok: true } : null;
   }
@@ -5812,8 +5861,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   /** krígly za hygienu teď (se Zlatou modlou +25 %) */
-  private kriglyNow() {
-    return Math.floor(kriglyFor(this.d.run, this.d.pubs.length) * (this.has('idol') ? 1.25 : 1) * (1 + this.ts().krigly + kKrigly(this.kl('krigly'))));
+  private kriglyNow(run = this.d.run) {
+    return Math.floor(kriglyFor(run, this.d.pubs.length) * (this.has('idol') ? 1.25 : 1) * (1 + this.ts().krigly + kKrigly(this.kl('krigly'))));
   }
 
   shopSub: 'up' | 'decor' | 'bones' = 'up';
@@ -7028,18 +7077,19 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       ];
     const key = id.slice(5);
     const row = PubScene.TILES.find(([tb, sub]) => (sub && tb === 'shop' ? sub : tb) === key);
+    // Zkušebna U2: novinky v menu jedním krátkým řádkem (do 6 slov)
     const about: Record<string, string> = {
-      brew: t('vař pivo: hotové pivo dává bonus k výdělku nebo ho prodáš za coins'),
-      decor: t('drahé ozdoby hospody – každá dává trvalý bonus, zůstane i po hygieně'),
-      darts: t('házej šipky na terč – body dávají odměny, šipky přibývají samy'),
+      brew: t('vař pivo pro bonus a coins'),
+      decor: t('ozdoby s trvalým bonusem'),
+      darts: t('házej šipky, vyhraj odměny'),
       daynight: t('nastavení dne a noci'),
       keeper: t('za body kupuj dovednosti'),
-      talis: t('talismany z chrámu – nasaď je a vylepšuj kostmi'),
-      krigl: t('za krígly z hygieny tu kupuješ trvalá vylepšení'),
-      temple: t('bojuj v chrámu – získáš talismany, krígly a truhly'),
+      talis: t('talismany z chrámu, vylepšuj kostmi'),
+      krigl: t('za krígly trvalá vylepšení'),
+      temple: t('bojuj o talismany a truhly'),
       league: t('vydělej za týden víc než soupeř'),
-      bones: t('za kosti hoď kostkou – náhodně zlepší jednu vlastnost natrvalo'),
-      coll: t('sběrač ťuká na bubliny hostů za tebe – kup ho za kosti'),
+      bones: t('kostka zlepší vlastnost natrvalo'),
+      coll: t('ťuká na bubliny za tebe'),
       special: t('každý den truhla zdarma'),
     };
     if (!row) return [];
@@ -7349,7 +7399,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
           c.infoTxt = hire > 0 ? t('s obsluhou +{v}/s', { v: big(hire) })
             : gain > 0 ? [t('+{v}/s', { v: big(gain) }), ms].filter(Boolean).join(' · ') : ms;
         }
-        c.info.setText(c.infoTxt ?? '').setColor(PAL.white);
+        c.info.setText(c.infoTxt ?? '').setColor((c.hiUntil ?? 0) > this.time.now ? PAL.mint : PAL.white);
       } else c.info.setColor(PAL.white);
       c.bar.clear();
       // mistrovství (návrh 2): za úrovní název hodnosti, pod tím 10 teček stupňů v barvě hodnosti

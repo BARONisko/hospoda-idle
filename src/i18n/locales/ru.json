@@ -1682,5 +1682,22 @@
  "{m} min · +{c}": "{m} мин · +{c}",
  "{s}: od úrovně pivovaru {n}": "{s}: с {n} уровня пивоварни",
  "od úrovně {n}": "с уровня {n}",
- "Nové pivo: {s}!": "Новое пиво: {s}!"
+ "Nové pivo: {s}!": "Новое пиво: {s}!",
+ "zůstane: 💎 · číšníci · sbírka · krígly": "останется: 💎 · официанты · коллекция · кружки",
+ "teď je dobrá chvíle": "сейчас подходящий момент",
+ "za 5 min: krígly +{n}": "через 5 мин: +{n} кружек",
+ "Až se vrátíš": "Когда вернёшься",
+ "1 h pryč: +{n} coins · strop {h} h": "1 ч отсутствия: +{n} coins · максимум {h} ч",
+ "Další hospoda: {n}": "Следующий паб: {n}",
+ "otevře se po další hygieně": "откроется после следующего визита санэпидема",
+ "vař pivo pro bonus a coins": "вари пиво ради бонуса и coins",
+ "ozdoby s trvalým bonusem": "украшения с вечным бонусом",
+ "házej šipky, vyhraj odměny": "бросай дротики, получай награды",
+ "talismany z chrámu, vylepšuj kostmi": "талисманы из храма, улучшай костями",
+ "za krígly trvalá vylepšení": "кружки покупают вечные улучшения",
+ "bojuj o talismany a truhly": "сражайся за талисманы и сундуки",
+ "kostka zlepší vlastnost natrvalo": "кубик навсегда улучшит свойство",
+ "ťuká na bubliny za tebe": "жмёт на пузыри гостей за тебя",
+ "{s}: výdělek ×{m} na {n} s": "{s}: доход ×{m} на {n} с",
+ "odměny bez reklam · jednou, navždy": "награды без рекламы · один раз, навсегда"
 }

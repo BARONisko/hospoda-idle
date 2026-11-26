@@ -246,6 +246,29 @@ async function menuVisit(maxTaps) {
   let f = null;
   const w = (await read()).words;
   if (!seenTab.has(k)) { seenTab.add(k); first('screen:' + k, k); f = await shot('menu_' + k, true); }
+  // Chrám a Šipky jsou vlastní scény: vyfotit a odejít tlačítkem Zpět (dřív dlouhý bot zůstal v Chrámu 2 h)
+  const other = await p.evaluate(() => ['Temple', 'Darts'].find((n) => game.scene.isActive(n)) ?? null);
+  if (other) {
+    if (!f) f = await shot('scena_' + other.toLowerCase(), true);
+    await p.evaluate((n) => {
+      const sc = game.scene.getScene(n);
+      try { if (n === 'Temple') sc.lobby?.(); } catch { /* */ }
+      try { sc.leave?.(); } catch { /* */ }
+      if (game.scene.isActive(n)) { game.scene.stop(n); game.scene.wake('Pub'); game.scene.resume('Pub'); }
+    }, other);
+    await step(0.5);
+    mark(T, 'menu', `${k} scene=${other} words=${w}`, f);
+    return;
+  }
+  // Speciální nabídka: projít i záložky Diamanty a Štamgast (balíčky, předplatné) a každou jednou vyfotit; nic se nekupuje
+  if (k === 'special') {
+    for (const sub of ['gems', 'pass']) {
+      await p.evaluate((sb) => { const sc = game.scene.getScene('Pub'); sc.spSub = sb; sc.openShop('special', false); }, sub);
+      await step(0.3);
+      if (!seenTab.has('special_' + sub)) { seenTab.add('special_' + sub); first('screen:special_' + sub, sub); await shot('menu_special_' + sub, true); }
+    }
+    await p.evaluate(() => { game.scene.getScene('Pub').spSub = 'offer'; });
+  }
   let bought = 0;
   if (k !== 'special' && k !== 'league') {
     for (let i = 0; i < maxTaps; i++) {

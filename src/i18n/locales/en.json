@@ -1682,5 +1682,22 @@
  "{m} min · +{c}": "{m} min · +{c}",
  "{s}: od úrovně pivovaru {n}": "{s}: from brewery level {n}",
  "od úrovně {n}": "from level {n}",
- "Nové pivo: {s}!": "New beer: {s}!"
+ "Nové pivo: {s}!": "New beer: {s}!",
+ "zůstane: 💎 · číšníci · sbírka · krígly": "you keep: 💎 · waiters · collection · tankards",
+ "teď je dobrá chvíle": "now is a good time",
+ "za 5 min: krígly +{n}": "in 5 min: +{n} more tankards",
+ "Až se vrátíš": "When you come back",
+ "1 h pryč: +{n} coins · strop {h} h": "1 h away: +{n} coins · cap {h} h",
+ "Další hospoda: {n}": "Next pub: {n}",
+ "otevře se po další hygieně": "opens after your next health inspection",
+ "vař pivo pro bonus a coins": "brew beer for a bonus and coins",
+ "ozdoby s trvalým bonusem": "decorations with a lasting bonus",
+ "házej šipky, vyhraj odměny": "throw darts, win rewards",
+ "talismany z chrámu, vylepšuj kostmi": "temple talismans, upgrade with bones",
+ "za krígly trvalá vylepšení": "tankards buy lasting upgrades",
+ "bojuj o talismany a truhly": "fight for talismans and chests",
+ "kostka zlepší vlastnost natrvalo": "a die roll improves a stat forever",
+ "ťuká na bubliny za tebe": "taps guest bubbles for you",
+ "{s}: výdělek ×{m} na {n} s": "{s}: income ×{m} for {n} s",
+ "odměny bez reklam · jednou, navždy": "rewards without ads · one-time, forever"
 }

@@ -1682,5 +1682,22 @@
  "{m} min · +{c}": "{m} dk · +{c}",
  "{s}: od úrovně pivovaru {n}": "{s}: bira fabrikası {n}. seviyeden",
  "od úrovně {n}": "{n}. seviyeden",
- "Nové pivo: {s}!": "Yeni bira: {s}!"
+ "Nové pivo: {s}!": "Yeni bira: {s}!",
+ "zůstane: 💎 · číšníci · sbírka · krígly": "kalır: 💎 · garsonlar · koleksiyon · kupalar",
+ "teď je dobrá chvíle": "şimdi tam zamanı",
+ "za 5 min: krígly +{n}": "5 dk sonra: +{n} kupa daha",
+ "Až se vrátíš": "Döndüğünde",
+ "1 h pryč: +{n} coins · strop {h} h": "1 sa uzakta: +{n} coins · en fazla {h} sa",
+ "Další hospoda: {n}": "Sonraki meyhane: {n}",
+ "otevře se po další hygieně": "bir sonraki sağlık denetiminden sonra açılır",
+ "vař pivo pro bonus a coins": "bonus ve coins için bira yap",
+ "ozdoby s trvalým bonusem": "kalıcı bonuslu süsler",
+ "házej šipky, vyhraj odměny": "dart at, ödül kazan",
+ "talismany z chrámu, vylepšuj kostmi": "tapınak tılsımları, kemikle geliştir",
+ "za krígly trvalá vylepšení": "kupalarla kalıcı geliştirmeler",
+ "bojuj o talismany a truhly": "tılsım ve sandıklar için savaş",
+ "kostka zlepší vlastnost natrvalo": "zar bir özelliği kalıcı geliştirir",
+ "ťuká na bubliny za tebe": "misafir balonlarına senin yerine dokunur",
+ "{s}: výdělek ×{m} na {n} s": "{s}: {n} sn gelir ×{m}",
+ "odměny bez reklam · jednou, navždy": "reklamsız ödüller · tek sefer, sonsuza dek"
 }
