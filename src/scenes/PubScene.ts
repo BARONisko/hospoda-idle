@@ -28,7 +28,7 @@ import type { TempleHost } from './TempleScene';
 import { newDarts, tickDarts, dartStats, DartsState, DART_UPS, migrateDarts, autoOn, dartCap, dartMs } from '../core/darts';
 import { notify, NOTE, Note } from '../core/notify';
 import { pg, showBoards, signIn as pgSignIn, saveNow as pgSaveNow } from '../core/playgames';
-import { chestReady, chestDay, openChest, jokerFree, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, GEM_PERM, GEM_LOOK, CHRONICLE_BONUS, VIP_GEMS, GOLD_GEMS, GEMS_FREE, PRESTIGE_GEMS_DAY, RESPEC_GEMS, passOn, passBuy, PASS_MULT, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
+import { chestReady, chestDay, openChest, jokerFree, CHEST_REW, ChestRew, GOLD_KRIGLE, GOLD_KRIGLE_F, newAdv, adPower, adMult, adWatch, adOverlap, adLvlCost, AD_LVL_MAX, AD_BASE, AD_TOP, AD_H, newVip, vipTick, vipServe, VIP_H, dayKey, GEM_COST, GemItem, GEM_PERM, GEM_LOOK, CHRONICLE_BONUS, VIP_GEMS, GOLD_GEMS, GEMS_FREE, PRESTIGE_GEMS_DAY, RESPEC_GEMS, passOn, passBuy, PASS_MULT, paidMult, PAID_CAP, PASS_GEMS, PASS_DAYS, multSecs, vipCfg, VIP_EVERY } from '../core/special';
 import { templeState, isWeekend, ROUNDS_PER_DAY, sealBonus, TempleState, weekendKey, ALTAR_PER, weekendLeft } from '../core/temple';
 import { TALISMANS, STAT_NAMES, talisCost, stats, OSSUARY, rollCost, OLD_OSS_PER, TEMPLE_STATS, StatId } from '../core/talisman';
 import { TREE, TREE_BY_ID, TREE_BRANCHES, TREE_COLORS, STAR_TEXT, GATE, treeSpent, treeCan, treeWhy, branchSpent, floorNodes, hasStar, treeStats, oldTreeStats, xpNeed, oldXpNeed, lvlFromTotal, respecCost, type StarId, type TreeNode } from '../core/skilltree';
@@ -492,8 +492,22 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       store(this.d);
     });
     this.events.off('guestSeen');
-    this.events.on('guestSeen', (key: string) => {
-      if (!this.d.seen.includes(key)) this.d.seen.push(key);
+    this.events.on('guestSeen', (key: string, spr?: Phaser.GameObjects.Sprite, view?: unknown) => {
+      if (this.d.seen.includes(key)) return;
+      this.d.seen.push(key);
+      // Zkušebna O1: nový host je malá událost – hvězda nad hlavou a (nejvýš jednou za 90 s) cedule
+      if ((this.d.tut ?? -1) >= 0 || !spr) return;
+      const star = this.add.text(spr.x, spr.y - spr.displayHeight - 6, '★', txt(30, PAL.gold)).setOrigin(0.5, 1).setDepth(spr.depth + 1);
+      this.events.emit('pubObj', star);
+      const follow = () => (spr.active ? star.setPosition(spr.x, spr.y - spr.displayHeight - 6).setDepth(spr.depth + 1) : star.setVisible(false));
+      this.events.on('update', follow);
+      this.tweens.add({ targets: star, scale: { from: 0.8, to: 1.2 }, yoyo: true, repeat: 5, duration: 450 });
+      this.time.delayedCall(6000, () => (this.events.off('update', follow), star.destroy()));
+      const vi = this.views.findIndex((v) => v === view);
+      if (this.time.now - this.newGuestAt > 90_000 && vi >= 0 && (this.d.rushU ?? 0) - RUSH_S * 1000 + 60_000 < Date.now()) {
+        this.newGuestAt = this.time.now;
+        this.banner(this.views[vi].cam, t('Nový host ve Sbírce: {s}', { s: this.guestName(key) }));
+      }
     });
     // uvízlí v průvodci nové hospody bez peněz (před opravou dávala hygiena 0 coins) → dorovnat na rozjezd
     const lastPub = this.d.pubs[this.d.pubs.length - 1];
@@ -769,8 +783,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const rate = this.d.pubs.reduce((a, p) => a + this.rate(p), 0);
     // reklamní kampaň platí jen po dobu, kdy běžela
     // reklamní kampaň a Štamgast platí jen po dobu, kdy běžely
-    const base = rate / adMult(this.d.adv) / (passOn(this.d.pass) ? PASS_MULT : 1);
-    const g = Math.floor(base * multSecs(leftAt, leftAt + secs * 1000, [[this.d.adv?.until ?? 0, adPower(this.d.adv)], [this.d.pass?.until ?? 0, PASS_MULT]]));
+    const base = rate / paidMult(this.d.adv, this.d.pass);
+    const g = Math.floor(base * multSecs(leftAt, leftAt + secs * 1000, [[this.d.adv?.until ?? 0, adPower(this.d.adv)], [this.d.pass?.until ?? 0, PASS_MULT]], PAID_CAP));
     // hodiny vrácené dozadu čas odchodu neposunou (jinak přetáčení hodin = opakovaný offline výdělek)
     if (!(this.d.at > Date.now() && this.d.at - Date.now() < 86_400_000)) this.d.at = Date.now();
     this.mastAdd(secs);
@@ -1693,7 +1707,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (cupMult(d.league) > 1) mul.push([t('Ligový pohár'), cupMult(d.league)]);
     if (season) mul.push([SEASONS[season].name, 1 + SEASON_BONUS]);
     if (adMult(d.adv) > 1) mul.push([t('Reklamní kampaň'), adMult(d.adv)]);
-    if (passOn(d.pass)) mul.push([t('Štamgast'), PASS_MULT]);
+    if (passOn(d.pass)) mul.push([t('Štamgast'), paidMult(d.adv, d.pass) / adMult(d.adv)]);
     if (this.evBoostUntil > Date.now()) mul.push([t('Upíří hodina'), 2]);
     // vlastnosti „výdělek“ (sčítají se, viz ts())
     const tal = stats(d.talis).income, tree = treeStats(d.skills, stats({}), d.skOld).income;
@@ -3974,6 +3988,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return [...new Set([...[1, 2, 3].flatMap((a) => GUESTS[a]), ...Object.values(SEASONS).map((x) => x.guest)])];
   }
 
+  newGuestAt = -1e9;
   private guestName(key: string) {
     return GUEST_NAMES[key] ?? Object.values(SEASONS).find((x) => x.guest === key)?.guestName ?? key;
   }
@@ -5531,7 +5546,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.kAll()) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu'), this.d.cthOld ?? 0) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + sealBonus(this.d.temple?.boss ?? 0, this.d.temple?.old)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * cupMult(this.d.league) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act) * ((p.adx?.[def.id] ?? 0) > Date.now() ? 2 : 1) * ((this.d.rushU ?? 0) > Date.now() ? this.d.rushM ?? 5 : 1);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.kAll()) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu'), this.d.cthOld ?? 0) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + sealBonus(this.d.temple?.boss ?? 0, this.d.temple?.old)) * paidMult(this.d.adv, this.d.pass) * cupMult(this.d.league) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act) * ((p.adx?.[def.id] ?? 0) > Date.now() ? 2 : 1) * ((this.d.rushU ?? 0) > Date.now() ? this.d.rushM ?? 5 : 1);
   }
 
   // ---------- obchod s krígly ----------

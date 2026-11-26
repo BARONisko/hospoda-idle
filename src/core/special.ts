@@ -185,17 +185,20 @@ export const PASS_DAYS = 30;
 export const PASS_MULT = 2;
 export const PASS_GEMS = 20;
 export const passOn = (p: PassState | undefined, now = Date.now()) => !!p && p.until > now;
+/** Zkušebna M4: Štamgast a Reklamní kampaň se násobí, ale dohromady nejvýš ×3 (dřív až ×4 proti hráči bez placení) */
+export const PAID_CAP = 3;
+export const paidMult = (a: AdvState | undefined, p: PassState | undefined, now = Date.now()) => Math.min(PAID_CAP, adMult(a, now) * (passOn(p, now) ? PASS_MULT : 1));
 /** koupě / prodloužení o 30 dní */
 export function passBuy(p: PassState | undefined, now = Date.now()): PassState {
   return { ...p, until: Math.max(now, p?.until ?? 0) + PASS_DAYS * 86400_000 };
 }
 
 /** součet násobku výdělku přes interval [from, to] (ms) v sekundách: segs = [platí do, násobek] */
-export function multSecs(from: number, to: number, segs: [number, number][]) {
+export function multSecs(from: number, to: number, segs: [number, number][], cap = Infinity) {
   const pts = [...new Set([from, to, ...segs.map(([u]) => u).filter((u) => u > from && u < to)])].sort((a, b) => a - b);
   let sum = 0;
   for (let i = 0; i + 1 < pts.length; i++) {
-    const m = segs.reduce((a, [u, k]) => (pts[i] < u ? a * k : a), 1);
+    const m = Math.min(cap, segs.reduce((a, [u, k]) => (pts[i] < u ? a * k : a), 1));
     sum += ((pts[i + 1] - pts[i]) / 1000) * m;
   }
   return sum;

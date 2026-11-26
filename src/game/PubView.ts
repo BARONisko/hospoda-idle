@@ -740,10 +740,10 @@ export class PubView {
     const seat = this.rnd.pick(free);
     seat.taken = true;
     const key = this.night ? this.rnd.pick(NIGHT_GUESTS) : season && this.rnd.frac() < 0.15 ? SEASONS[season].guest : this.rnd.pick(GUESTS[this.pub.act]);
-    this.s.events.emit('guestSeen', key);
     const spr = this.s.add.sprite(this.ox + DOOR.x, DOOR.y, key, 4).setOrigin(0.5, 1).setDepth(DOOR.y);
     this.objs.push(spr);
     this.s.events.emit('pubObj', spr);
+    this.s.events.emit('guestSeen', key, spr, this);
     const path = [
       { x: DOOR.x, y: seat.aisle },
       { x: seat.x, y: seat.aisle },

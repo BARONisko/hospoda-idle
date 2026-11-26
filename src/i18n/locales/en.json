@@ -1699,5 +1699,6 @@
  "kostka zlepší vlastnost natrvalo": "a die roll improves a stat forever",
  "ťuká na bubliny za tebe": "taps guest bubbles for you",
  "{s}: výdělek ×{m} na {n} s": "{s}: income ×{m} for {n} s",
- "odměny bez reklam · jednou, navždy": "rewards without ads · one-time, forever"
+ "odměny bez reklam · jednou, navždy": "rewards without ads · one-time, forever",
+ "Nový host ve Sbírce: {s}": "New guest in the Collection: {s}"
 }
