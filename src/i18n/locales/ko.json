@@ -1677,5 +1677,6 @@
  "půl na půl: +{n}, nebo ocet": "반반: +{n} 또는 식초",
  "spíš ×2 na 3 min, jinak škoda": "아마 3분 ×2, 아니면 손해",
  "(strop {h} h)": "(최대 {h}시간)",
- "stačí na: {s}": "구매 가능: {s}"
+ "stačí na: {s}": "구매 가능: {s}",
+ "Rozjezd! Výdělek ×{m} na {s} s": "출발 부스트! {s}초간 수입 ×{m}"
 }

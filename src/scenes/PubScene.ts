@@ -51,6 +51,9 @@ const rkStars = (n: number) => '★'.repeat(n) + '☆'.repeat((n >= 5 ? 10 : 5) 
 const W = 540;
 /** kolik talířů z kuchyně může čekat na číšníky */
 const FOOD_CAP = 6;
+/** rozjezd po hygieně: výdělek ×RUSH_MULT na RUSH_S sekund */
+const RUSH_S = 120;
+const RUSH_MULT = 3;
 /** obsluha stanic: tlačítko, po najmutí, hláška */
 const STAFF_LABEL: Record<string, [string, string, string]> = {
   tap: [t('Číšníci'), t('číšníci'), t('Číšníci nastoupili!')],
@@ -4707,7 +4710,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       }
     // „Zásobárna“: start s 2 % výdělku minulého kola; „Rozjezd“: 90 s výdělek ×5
     this.d.coins = Math.max(startCoins(this.kl('start')), this.restartNeed(), this.star('pantry') ? Math.floor(lastRun * 0.02) : 0);
-    this.d.rushU = this.star('rush') ? Date.now() + 90_000 : undefined;
+    // Rozjezd po každé hygieně (Zkušebna 26. 11.: 1. hygiena dala jen +3,6 %, 2. kolo bylo 1,06× rychlejší):
+    // 2 min ×3, s hvězdou „Rozjezd“ 90 s ×5 jako dřív
+    const rush = this.star('rush');
+    this.d.rushU = Date.now() + (rush ? 90_000 : RUSH_S * 1000);
+    this.d.rushM = rush ? 5 : RUSH_MULT;
+    this.d.rushNew = true;
     store(this.d);
     sfx.fanfare();
     this.awayObjs = [];
@@ -5442,7 +5450,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** výdělek stanice za cyklus (úroveň, milníky, hospoda, vylepšení) */
   private pay(p: PubState, def: StationDef) {
     const lvl = p.st[def.id]?.lvl ?? 0;
-    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.kAll()) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu'), this.d.cthOld ?? 0) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + sealBonus(this.d.temple?.boss ?? 0, this.d.temple?.old)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * cupMult(this.d.league) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act) * ((p.adx?.[def.id] ?? 0) > Date.now() ? 2 : 1) * ((this.d.rushU ?? 0) > Date.now() ? 5 : 1);
+    return payout(def, Math.max(1, lvl)) * actMult(p.act) * upMult(this.d.up, p.act, def.id) * (this.boosted(p) ? BOOST_MULT : 1) * (1 + KRIGL_BONUS * this.kAll()) * (this.evBoostUntil > Date.now() ? 2 : 1) * kCthulhu(this.kl('cthulhu'), this.d.cthOld ?? 0) * (season ? 1 + SEASON_BONUS : 1) * (1 + (this.has('portrait') ? 0.1 : 0) + (this.has('fireplace') ? 0.25 : 0)) * (this.ev ? this.ev.brawlMult(this.d.pubs.indexOf(p)) : 1) * (1 + (this.d.brew ? brewBonus(this.d.brew) : 0)) * (1 + this.ts().income) * (1 + sealBonus(this.d.temple?.boss ?? 0, this.d.temple?.old)) * adMult(this.d.adv) * (passOn(this.d.pass) ? PASS_MULT : 1) * cupMult(this.d.league) * styleSupplyMult(this.d.pubs, p, def.id) * starMult(this.d.stars, p.act) * ((p.adx?.[def.id] ?? 0) > Date.now() ? 2 : 1) * ((this.d.rushU ?? 0) > Date.now() ? this.d.rushM ?? 5 : 1);
   }
 
   // ---------- obchod s krígly ----------
@@ -6199,6 +6207,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.guideStart();
     }
     if (this.d.pubIntro && !this.awayObjs.length) this.pubIntro(this.d.pubIntro);
+    if (this.d.rushNew && (this.d.rushU ?? 0) > Date.now()) {
+      this.d.rushNew = false;
+      this.banner(this.cameras.main, t('Rozjezd! Výdělek ×{m} na {s} s', { m: this.d.rushM ?? 5, s: Math.round(((this.d.rushU ?? 0) - Date.now()) / 1000) }));
+    }
     if ((this.menuT -= dt) <= 0) {
       this.menuT = 2;
       this.menuUnlocks();

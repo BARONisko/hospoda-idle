@@ -1677,5 +1677,6 @@
  "půl na půl: +{n}, nebo ocet": "50/50: +{n} oder Essig",
  "spíš ×2 na 3 min, jinak škoda": "eher ×2 für 3 Min., sonst Schaden",
  "(strop {h} h)": "(max. {h} Std.)",
- "stačí na: {s}": "reicht für: {s}"
+ "stačí na: {s}": "reicht für: {s}",
+ "Rozjezd! Výdělek ×{m} na {s} s": "Schnellstart! Einkommen ×{m} für {s} s"
 }

@@ -1677,5 +1677,6 @@
  "půl na půl: +{n}, nebo ocet": "50/50 : +{n} ou vinaigre",
  "spíš ×2 na 3 min, jinak škoda": "plutôt ×2 3 min, sinon dégâts",
  "(strop {h} h)": "(max {h} h)",
- "stačí na: {s}": "de quoi acheter : {s}"
+ "stačí na: {s}": "de quoi acheter : {s}",
+ "Rozjezd! Výdělek ×{m} na {s} s": "Démarrage ! Revenus ×{m} pendant {s} s"
 }

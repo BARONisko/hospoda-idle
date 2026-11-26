@@ -127,6 +127,9 @@ export interface Save {
   skNew?: boolean;
   /** Rozjezd: do kdy po hygieně běží výdělek ×5; Kostka zdarma: den (YYYY-MM-DD) posledního hodu zdarma */
   rushU?: number;
+  /** násobek rozjezdu po hygieně (3, s hvězdou Rozjezd 5); rushNew = ještě neukázaný nápis */
+  rushM?: number;
+  rushNew?: boolean;
   frDay?: string;
   /** 25. 11. 2026 (pravidlo pod 1 %): Zlatý výčep a pečetě Chrámu po 0,9 % – úrovně výčepu za starých pravidel (zůstávají); pečetě v temple.old */
   cthOld?: number;

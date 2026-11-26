@@ -1677,5 +1677,6 @@
  "půl na půl: +{n}, nebo ocet": "pół na pół: +{n} albo ocet",
  "spíš ×2 na 3 min, jinak škoda": "raczej ×2 na 3 min, inaczej szkody",
  "(strop {h} h)": "(limit {h} h)",
- "stačí na: {s}": "wystarczy na: {s}"
+ "stačí na: {s}": "wystarczy na: {s}",
+ "Rozjezd! Výdělek ×{m} na {s} s": "Rozpęd! Zarobek ×{m} przez {s} s"
 }

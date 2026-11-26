@@ -1677,5 +1677,6 @@
  "půl na půl: +{n}, nebo ocet": "50/50: +{n} or vinegar",
  "spíš ×2 na 3 min, jinak škoda": "likely ×2 for 3 min, else damage",
  "(strop {h} h)": "(cap {h} h)",
- "stačí na: {s}": "enough for: {s}"
+ "stačí na: {s}": "enough for: {s}",
+ "Rozjezd! Výdělek ×{m} na {s} s": "Head start! Income ×{m} for {s} s"
 }

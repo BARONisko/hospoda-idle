@@ -1677,5 +1677,6 @@
  "půl na půl: +{n}, nebo ocet": "yarı yarıya: +{n} ya da sirke",
  "spíš ×2 na 3 min, jinak škoda": "büyük ihtimalle 3 dk ×2, yoksa zarar",
  "(strop {h} h)": "(en fazla {h} sa)",
- "stačí na: {s}": "yeter: {s}"
+ "stačí na: {s}": "yeter: {s}",
+ "Rozjezd! Výdělek ×{m} na {s} s": "Hızlı başlangıç! {s} sn gelir ×{m}"
 }

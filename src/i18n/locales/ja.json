@@ -1677,5 +1677,6 @@
  "půl na půl: +{n}, nebo ocet": "五分五分：+{n} か酢",
  "spíš ×2 na 3 min, jinak škoda": "たぶん3分×2、外れると損害",
  "(strop {h} h)": "（上限 {h} 時間）",
- "stačí na: {s}": "買える：{s}"
+ "stačí na: {s}": "買える：{s}",
+ "Rozjezd! Výdělek ×{m} na {s} s": "スタートダッシュ！収入×{m}（{s}秒）"
 }
