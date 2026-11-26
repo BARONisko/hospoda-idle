@@ -1352,9 +1352,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** pořadí odemykání dlaždic (pro „nejbližší zamčenou“) */
   private static TILE_RANK: Record<string, number> = { krigl: 1, bones: 1.2, daynight: 1.2, keeper: 2, coll: 2.5, brew: 3, talis: 4, temple: 6, decor: 10, darts: 15, league: 20 };
 
-  private menuGrid(y0: number, D: number) {
-    this.shopObjs.push(this.add.text(20, y0 + 16, t('Menu'), txt(30, PAL.gold)).setDepth(D + 2));
-    const tw = (W - 40) / 3, th = this.tileH;
+  /** dlaždice menu v pořadí, jak se kreslí (odemčené napřed) + pruh „Brzy“ (návrh c); podle toho míří i šipka průvodce */
+  private menuTiles() {
     const mode = this.menuMode;
     const keyOf = ([tab, sub]: (typeof PubScene.TILES)[number]) => (sub && tab === 'shop' ? sub : tab) as string;
     let tiles = PubScene.TILES;
@@ -1365,6 +1364,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       tiles = mode === 'a' ? [...open, ...locked.slice(0, 1)] : mode === 'b' ? [...open, ...locked] : open;
       if (mode === 'c') soon = locked;
     }
+    return { tiles, soon, keyOf };
+  }
+
+  private menuGrid(y0: number, D: number) {
+    this.shopObjs.push(this.add.text(20, y0 + 16, t('Menu'), txt(30, PAL.gold)).setDepth(D + 2));
+    const tw = (W - 40) / 3, th = this.tileH;
+    const mode = this.menuMode;
+    const { tiles, soon, keyOf } = this.menuTiles();
     if (soon.length) {
       // c: pod odemčenými dlaždicemi jeden pruh s nejbližší novinkou
       const [tab, sub, label, atlas, frame] = soon[0];
@@ -6834,7 +6841,10 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const menuBtn = () => [this.shopBtn.x, this.shopBtn.y, this.shopBtn.w, this.shopBtn.h];
     const tile = (key: string) => () => {
       if (!this.shopObjs.length || this.tab !== 'home') return null;
-      const k = PubScene.TILES.findIndex(([tb, sub]) => (sub && tb === 'shop' ? sub : tb) === key);
+      // pořadí jako v menuGrid (odemčené napřed) – dřív index v celém TILES = šipka mířila na jinou dlaždici a průvodce se zasekl
+      const { tiles, keyOf } = this.menuTiles();
+      const k = tiles.findIndex((r) => keyOf(r) === key);
+      if (k < 0) return null;
       const y0 = MENU_Y0, tw = (W - 40) / 3;
       return [10 + (k % 3) * (tw + 10), y0 + 64 + Math.floor(k / 3) * 126, tw, 118];
     };

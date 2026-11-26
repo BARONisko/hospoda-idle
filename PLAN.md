@@ -524,3 +524,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
 - Nastavení pročištěno (25. 11. 2026): „Zvuk výdělku“ (varianty A/B/C) jen ve skrytém vývojářském režimu – 7× ťuknout na číslo
   verze v Nastavení (u verze pak „· dev“); hráč má vždy A melodii. Návod „Jak to funguje“ doplněn: témata Sezónní pass,
   Kniha hostinského a Rekonstrukce, věta o páté stanici a o Google Play Hrách (cloud, žebříčky).
+- Oprava (26. 11. 2026): průvodce „Nové v menu“ ukazoval šipkou na špatnou dlaždici (index v celém TILES, ale menu kreslí
+  odemčené napřed) → ťuknutí nic neudělalo a průvodce se zasekl. Teď menuTiles() sdílí pořadí s menuGrid; test na to.
