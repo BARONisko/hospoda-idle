@@ -1648,5 +1648,22 @@
  "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "Вместе с Лигой открывается Книга трактирщика: главы заданий, которые ты найдёшь в Заданиях и на полосе над трактиром. Каждое выполненное задание добавляет в трактир предмет обстановки, а иногда и подарок. После целой главы наступает реконструкция – дополнительная санинспекция, которая не стирает кружки и даёт звезду: новый вид трактира, пятую станцию, более долгую кассу и другие награды до ★10.",
  "Sezónní pass": "Сезонный пропуск",
  "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "Каждый сезон длится 4 недели и имеет 30 ступеней. Очки пропуска даются за ежедневные задания, ежедневный сундук, недельное испытание и санинспекцию. На каждой ступени есть награда в бесплатной линии; Золотую линию с бо́льшими наградами можно купить. Пропуск находится в Заданиях.",
- "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "В приложении можно войти в Google Play Игры – тогда прогресс сохраняется и в облаке, а ты соревнуешься в онлайн-рейтингах (кружки, уровень трактирщика, Храм)."
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "В приложении можно войти в Google Play Игры – тогда прогресс сохраняется и в облаке, а ты соревнуешься в онлайн-рейтингах (кружки, уровень трактирщика, Храм).",
+ "Zvonek z hlubin": "Колокол из бездны",
+ "události o 10 % častěji": "события на 10 % чаще",
+ "Ledová dýmka": "Ледяная трубка",
+ "kasa offline o 1 h déle": "касса офлайн на 1 ч дольше",
+ "Bezedný sud": "Бездонная бочка",
+ "odměny z událostí +20 %": "награды за события +20 %",
+ "Kabát mnoha kapes": "Плащ с тысячей карманов",
+ "rvačky o 15 % kratší": "драки на 15 % короче",
+ "Svatební dar! +{n}": "Свадебный подарок! +{n}",
+ "Svatba v hospodě! Ťukej na dary!": "Свадьба в пивной! Жми на подарки!",
+ "Zlatý host! +{n} coins a +{g} 💎": "Золотой гость! +{n} coins и +{g} 💎",
+ "Nová zlatá hvězda ve Sbírce": "Новая золотая звезда в Коллекции",
+ "Relikvie: {r} ({d})": "Реликвия: {r} ({d})",
+ "Relikviář": "Реликварий",
+ "{a} / {b} relikvií z Chrámu": "{a} / {b} реликвий из Храма",
+ "Každý poražený Cthulhu zanechá další relikvii.": "Каждый побеждённый Ктулху оставляет ещё одну реликвию.",
+ "poraz Cthulhu v Chrámu": "победи Ктулху в Храме"
 }

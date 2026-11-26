@@ -1648,5 +1648,22 @@
  "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "Con la Liga se abre el Libro del tabernero: capítulos de tareas que encontrarás en Tareas y en la barra sobre la taberna. Cada tarea cumplida añade un mueble a la taberna y a veces un regalo. Tras un capítulo entero llega la Reforma: una inspección extra que no borra tus jarras y da una estrella: nuevo aspecto de la taberna, una quinta estación, una caja más larga y más premios hasta ★10.",
  "Sezónní pass": "Pase de temporada",
  "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "Cada temporada dura 4 semanas y tiene 30 niveles. Ganas puntos del pase con las tareas diarias, el cofre diario, el desafío semanal y las inspecciones. Cada nivel tiene un premio en la fila gratuita; la Fila dorada con premios mayores se puede comprar. El pase está en Tareas.",
- "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "En la app puedes iniciar sesión en Google Play Juegos: tu progreso se guarda también en la nube y compites en clasificaciones en línea (jarras, nivel de tabernero, Templo)."
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "En la app puedes iniciar sesión en Google Play Juegos: tu progreso se guarda también en la nube y compites en clasificaciones en línea (jarras, nivel de tabernero, Templo).",
+ "Zvonek z hlubin": "Campana del abismo",
+ "události o 10 % častěji": "eventos un 10 % más a menudo",
+ "Ledová dýmka": "Pipa de hielo",
+ "kasa offline o 1 h déle": "caja offline 1 h más",
+ "Bezedný sud": "Barril sin fondo",
+ "odměny z událostí +20 %": "premios de eventos +20 %",
+ "Kabát mnoha kapes": "Abrigo de muchos bolsillos",
+ "rvačky o 15 % kratší": "peleas un 15 % más cortas",
+ "Svatební dar! +{n}": "¡Regalo de boda! +{n}",
+ "Svatba v hospodě! Ťukej na dary!": "¡Boda en la taberna! ¡Toca los regalos!",
+ "Zlatý host! +{n} coins a +{g} 💎": "¡Cliente dorado! +{n} coins y +{g} 💎",
+ "Nová zlatá hvězda ve Sbírce": "Nueva estrella dorada en la Colección",
+ "Relikvie: {r} ({d})": "Reliquia: {r} ({d})",
+ "Relikviář": "Relicario",
+ "{a} / {b} relikvií z Chrámu": "{a} / {b} reliquias del Templo",
+ "Každý poražený Cthulhu zanechá další relikvii.": "Cada Cthulhu derrotado deja otra reliquia.",
+ "poraz Cthulhu v Chrámu": "derrota a Cthulhu en el Templo"
 }

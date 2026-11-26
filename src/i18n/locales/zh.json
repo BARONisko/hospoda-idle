@@ -1648,5 +1648,22 @@
  "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "联赛开放时，店主之书也随之开启：一章章任务，可在任务和酒馆上方的横条中找到。每完成一个任务，酒馆就会多一件陈设，有时还有礼物。完成整章后即可翻修——一次不清除酒杯的额外检查，并获得一颗星：酒馆新外观、第五个工位、更长的收银时间，以及直到★10的更多奖励。",
  "Sezónní pass": "赛季通行证",
  "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "每个赛季持续4周，共30级。通过每日任务、每日宝箱、每周挑战和检查获得通行证积分。每一级在免费线上都有奖励；奖励更丰厚的黄金线可以购买。通行证在任务中。",
- "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "在应用中可以登录 Google Play 游戏——进度也会保存到云端，并可在在线排行榜（酒杯、店主等级、神殿）中竞争。"
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "在应用中可以登录 Google Play 游戏——进度也会保存到云端，并可在在线排行榜（酒杯、店主等级、神殿）中竞争。",
+ "Zvonek z hlubin": "深渊之铃",
+ "události o 10 % častěji": "事件频率+10%",
+ "Ledová dýmka": "冰烟斗",
+ "kasa offline o 1 h déle": "离线收银延长1小时",
+ "Bezedný sud": "无底酒桶",
+ "odměny z událostí +20 %": "事件奖励+20%",
+ "Kabát mnoha kapes": "多口袋大衣",
+ "rvačky o 15 % kratší": "斗殴缩短15%",
+ "Svatební dar! +{n}": "婚礼礼物！+{n}",
+ "Svatba v hospodě! Ťukej na dary!": "酒馆婚礼！点击礼物！",
+ "Zlatý host! +{n} coins a +{g} 💎": "金色客人！+{n} coins 和 +{g} 💎",
+ "Nová zlatá hvězda ve Sbírce": "收藏中新增金星",
+ "Relikvie: {r} ({d})": "圣物：{r}（{d}）",
+ "Relikviář": "圣物匣",
+ "{a} / {b} relikvií z Chrámu": "神殿圣物 {a} / {b}",
+ "Každý poražený Cthulhu zanechá další relikvii.": "每击败一次克苏鲁就留下一件圣物。",
+ "poraz Cthulhu v Chrámu": "在神殿击败克苏鲁"
 }

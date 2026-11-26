@@ -38,9 +38,10 @@ import { mastStage, mastRank, mastProg, RANKS, RANK_COLORS, MAST_MAX } from '../
 import { brewCfg, BEERS, BeerKind, newBrew, brewMs, tank, lvlCost, brewBonus, sellSecs, tick } from '../core/brewery';
 import { Save, PubState, load, store, newPub, Act, MAX_PUBS, exportSave, importSave, wipe } from '../core/save';
 import { PubView, LOOK, REKO, livery } from '../game/PubView';
+import { RELICS, RELIC_STAR, hasRelic, nextRelic } from '../core/relics';
 import { spassAdd, SPassKind, spassSync, spassIdx, spassEnd, spassTier, spassRew, spassCan, spassClaim, SPassRew, SPASS_TIERS, SPASS_TIER_PTS, SPASS_PTS, spassName } from '../core/spass';
 import { RekoState, REKO_HYG, REKO_OFFLINE_H, REKO_STARS, REKO_GOLD, newReko, rekoCount, rekoMax, nextTask, rekoReady, chapter, taskProg, taskDone, rekoStar, RekoTask } from '../core/reko';
-import { PubEvents, EventKind, EVENT_KINDS } from '../game/events';
+import { PubEvents, EventKind, EVENT_KINDS, EVENT_EXTRA } from '../game/events';
 import { GUESTS } from '../game/PubView';
 import { QUESTS, QCtx, QuestDef, currentQuest, questDone } from '../core/quests';
 import { ACHIEVEMENTS, GUEST_NAMES, TaskKind, newDaily, taskText, today, WeekKind, newWeekly, weekId, weekNum, weekText, GOLD_WEEK_X, GOLD_WEEK_GEMS } from '../core/goals';
@@ -469,6 +470,19 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     }
     this.events.off('guestArrive');
     this.events.on('guestArrive', () => (this.d.gxp = (this.d.gxp ?? 0) + 1 + this.ts().gxp));
+    this.events.off('goldGuest');
+    this.events.on('goldGuest', (key: string, act: number) => {
+      const view = Math.max(0, this.d.pubs.findIndex((p) => p.act === act));
+      // odměna = 5 min výdělku hospody + 3 💎
+      const c = Math.max(10, Math.round(this.rate(this.d.pubs[view]) * 300));
+      this.gain(c);
+      const first = !(this.d.goldG ??= []).includes(key);
+      if (first) this.d.goldG.push(key);
+      this.d.gems = (this.d.gems ?? 0) + 3;
+      sfx.fanfare();
+      this.banner(this.views[view].cam, t('Zlatý host! +{n} coins a +{g} 💎', { n: big(c), g: 3 }) + (first ? '\n' + t('Nová zlatá hvězda ve Sbírce') : ''));
+      store(this.d);
+    });
     this.events.off('guestSeen');
     this.events.on('guestSeen', (key: string) => {
       if (!this.d.seen.includes(key)) this.d.seen.push(key);
@@ -581,7 +595,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       views: this.views,
       reward: (secs, view) => {
         const p = this.d.pubs[view];
-        const n = Math.max(10, Math.round(Math.max(this.rate(p), this.pay(p, STATIONS[0]) / STATIONS[0].cycle) * secs * (this.has('piano') ? 2 : 1) * (1 + this.ts().events)));
+        const n = Math.max(10, Math.round(Math.max(this.rate(p), this.pay(p, STATIONS[0]) / STATIONS[0].cycle) * secs * (this.has('piano') ? 2 : 1) * (1 + this.ts().events) * (hasRelic(this.d.relics, 'bottomlessKeg') ? 1.2 : 1)));
         this.gain(n);
         return n;
       },
@@ -593,6 +607,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         return n;
       },
       boostAll: (ms) => (this.evBoostUntil = Date.now() + ms),
+      extraKinds: () => ((this.d.reko?.star ?? 0) >= 6 ? ['wedding'] : []),
       onEvent: (k, ok) => {
         if (!ok) return;
         this.tryDrop(k === 'brawl' ? 0.06 : 0.04);
@@ -614,7 +629,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       },
     });
     const evq = new URLSearchParams(location.search).get('ev') as EventKind | null;
-    if (evq && EVENT_KINDS.includes(evq)) this.time.delayedCall(800, () => this.ev.start(evq, 0));
+    if (evq && [...EVENT_KINDS, ...EVENT_EXTRA].includes(evq)) this.time.delayedCall(800, () => this.ev.start(evq, 0));
     this.applyKup();
     this.night = this.nightNow();
     this.views.forEach((v) => v.setNight(this.night));
@@ -1172,7 +1187,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   }
 
   brawlCut() {
-    return Math.min(0.7, this.ts().brawl);
+    return Math.min(0.7, this.ts().brawl + (hasRelic(this.d.relics, 'coatOfMany') ? 0.15 : 0));
   }
 
   templeStats() {
@@ -1183,7 +1198,17 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return Math.max(5, Math.round(this.d.krigle * 0.03));
   }
 
-  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal' | 'stat' | 'darts' | 'gems', n: number): string {
+  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal' | 'stat' | 'darts' | 'gems' | 'relic', n: number): string {
+    if (kind === 'relic') {
+      // ★8: poražený Cthulhu zanechá relikvii (dokud nejsou všechny 4)
+      const r = (this.d.reko?.star ?? 0) >= RELIC_STAR ? nextRelic(this.d.relics) : null;
+      if (!r) return '';
+      (this.d.relics ??= []).push(r.id);
+      REKO.relics = this.d.relics;
+      this.tsCache = undefined;
+      this.views.forEach((v) => v.rekoRefresh(true));
+      return t('Relikvie: {r} ({d})', { r: r.name(), d: r.desc() });
+    }
     if (kind === 'gems') {
       this.d.gems = (this.d.gems ?? 0) + n;
       return t('+{n} 💎', { n });
@@ -2639,7 +2664,16 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       this.shopObjs.push(b.bg, b.label, b.zone);
       y2 += RH;
     }
-    if (this.achClaimable()) head(y2, t('Splněný úspěch čeká ve Sbírce → Úspěchy'));
+    // ★8: Relikviář (návrh C)
+    if ((R?.star ?? 0) >= RELIC_STAR) {
+      this.row(y2, RH, D, t('Relikviář'), t('{a} / {b} relikvií z Chrámu', { a: this.d.relics?.length ?? 0, b: RELICS.length }), 'ink', PAL.sky);
+      const b = this.btn(W - 172, y2 + 10, 150, 54, () => this.relicWin(), D + 2);
+      this.drawBtn(b, t('Otevřít'), true, 'slate');
+      this.shopObjs.push(b.bg, b.label, b.zone);
+      y2 += RH;
+    }
+    // pozdní hra (pass + Relikviář): řádek s úspěchem jen když se vejde nad spodní lištu
+    if (this.achClaimable() && y2 + 30 < MB) head(y2, t('Splněný úspěch čeká ve Sbírce → Úspěchy'));
   }
 
   // ---------- nastavení ----------
@@ -3080,6 +3114,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** koupený vzhled hospody → PubView (jen vzhled) */
   private lookSync() {
     REKO.R = this.d.reko;
+    REKO.relics = this.d.relics;
     LOOK.tap = this.owns('lookTap');
     LOOK.tables = this.owns('lookTables');
     LOOK.livery = this.owns('lookLivery');
@@ -3914,6 +3949,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (!seen && sez) add(this.add.text(x + cw / 2, y + 140, SEASON_WHEN[key] ?? '', txt(15, PAL.fog)).setOrigin(0.5).setDepth(D + 2));
       nm.setScale(Math.min(1, (cw - 8) / nm.width));
       if (!seen) return;
+      // ★9: zlatá hvězda = tenhle host už přišel jako zlatý
+      if (this.d.goldG?.includes(key)) add(this.add.text(x + cw - 8, y + 6, '★', txt(24, PAL.gold)).setOrigin(1, 0).setDepth(D + 3));
       this.loyDots(g, x + cw / 2 - 28, y + 132, L.l, 14, 5);
       g.fillStyle(col('dusk')).fillRoundedRect(x + 10, y + 148, cw - 20, 10, 4).fillStyle(col('gold')).fillRoundedRect(x + 10, y + 148, Math.max(6, (cw - 20) * loyProg(L.n)), 10, 4);
     });
@@ -5402,7 +5439,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private offCap() {
     // delší offline za diamanty: +2 h za každý stupeň (nad běžný strop)
     const gemH = 2 * ['off1', 'off2', 'off3'].filter((id) => this.owns(id)).length;
-    return gemH * 3600 + Math.min(OFFLINE_MAX_H * 3600, OFFLINE_CAP + (kOffline(this.kl('offline')) + (this.has('cuckoo') ? 4 : 0)) * 3600 + this.ts().offline * 3600) + (hasStyle(this.d.pubs, 'cellar') ? 3600 : 0) + ((this.d.reko?.star ?? 0) >= 4 ? REKO_OFFLINE_H * 3600 : 0);
+    return gemH * 3600 + Math.min(OFFLINE_MAX_H * 3600, OFFLINE_CAP + (kOffline(this.kl('offline')) + (this.has('cuckoo') ? 4 : 0)) * 3600 + this.ts().offline * 3600) + (hasStyle(this.d.pubs, 'cellar') ? 3600 : 0) + ((this.d.reko?.star ?? 0) >= 4 ? REKO_OFFLINE_H * 3600 : 0) + (hasRelic(this.d.relics, 'icePipe') ? 3600 : 0);
   }
 
   /** úroveň vylepšení za kosti */
@@ -5771,7 +5808,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** promítne vylepšení z krígel do systémů */
   private nightTuned = false;
   private applyKup() {
-    this.ev.freq = kEvents(this.kl('events')) / (1 + this.ts().evfreq) / (hasStyle(this.d.pubs, 'dice') ? 1.25 : 1);
+    this.ev.freq = kEvents(this.kl('events')) / (1 + this.ts().evfreq) / (hasStyle(this.d.pubs, 'dice') ? 1.25 : 1) / (hasRelic(this.d.relics, 'doorBell') ? 1.1 : 1);
     brewCfg.speed = 1 + this.ts().brew;
     brewCfg.tank = Math.floor(this.ts().tank);
     brewCfg.tankMul = this.star('bigtank') ? 2 : 1;
@@ -6349,6 +6386,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (this.d.stats.prestiges < REKO_HYG || this.tileLock('league')) return undefined;
     this.d.reko = newReko(this.d);
     REKO.R = this.d.reko;
+    REKO.relics = this.d.relics;
     return this.d.reko;
   }
 
@@ -6381,6 +6419,41 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (pi >= 0 && this.views.length > 1 && pi !== this.sel && !this.shopObjs.length) this.selectPub?.(pi);
     if (rekoReady(R)) this.time.delayedCall(1800, () => this.banner(this.views[0].cam, t('Kapitola hotová: můžeš zavolat Rekonstrukci ★{n}!', { n: R.star + 1 })));
     store(this.d);
+  }
+
+  /** ★8 Relikviář: 4 relikvie z Chrámu a jejich efekty */
+  relicWin() {
+    this.closeShop();
+    const D = 520, RH = 96;
+    const objs: Phaser.GameObjects.GameObject[] = [];
+    const close = () => {
+      objs.forEach((o) => o.destroy());
+      this.awayObjs = [];
+    };
+    objs.push(this.add.rectangle(0, 0, W, H, 0x000000, 0.75).setOrigin(0).setDepth(D).setInteractive().on('pointerdown', () => 0));
+    const bx = 20, bw = W - 40, bh = 200 + RELICS.length * RH, by = (H - bh) / 2;
+    const g = this.add.graphics().setDepth(D + 1);
+    g.fillStyle(col('ink')).fillRoundedRect(bx, by + 6, bw, bh, 16);
+    g.fillStyle(col('dusk')).fillRoundedRect(bx, by, bw, bh, 16);
+    g.lineStyle(4, col('gold')).strokeRoundedRect(bx, by, bw, bh, 16);
+    objs.push(g);
+    objs.push(this.add.text(W / 2, by + 16, t('Relikviář'), txt(34, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 2));
+    objs.push(this.add.text(W / 2, by + 60, t('Každý poražený Cthulhu zanechá další relikvii.'), txt(17, PAL.fog)).setOrigin(0.5, 0).setDepth(D + 2).setWordWrapWidth(bw - 40).setAlign('center'));
+    RELICS.forEach((r, i) => {
+      const y = by + 100 + i * RH, own = hasRelic(this.d.relics, r.id);
+      g.fillStyle(col(own ? 'pine' : 'ink'), 0.7).fillRoundedRect(bx + 12, y, bw - 24, RH - 10, 10);
+      const ic = this.add.image(bx + 56, y + (RH - 10) / 2, 'obj', 'relic_' + r.id).setScale(4).setDepth(D + 2);
+      if (!own) ic.setTint(0x222222);
+      objs.push(ic);
+      objs.push(this.add.text(bx + 100, y + 14, own ? r.name() : '???', txt(22, own ? PAL.bone : PAL.fog)).setDepth(D + 2));
+      objs.push(this.add.text(bx + 100, y + 48, own ? r.desc() : t('poraz Cthulhu v Chrámu'), txt(17, own ? PAL.mint : PAL.fog)).setDepth(D + 2));
+    });
+    const cb = this.btn(W / 2 - 90, by + bh - 78, 180, 60, () => close(), D + 3);
+    this.drawBtn(cb, t('Zavřít'), true, 'slate');
+    objs.push(cb.bg, cb.label, cb.zone);
+    this.awayObjs = objs;
+    this.awayClose = close;
+    sfx.click();
   }
 
   private spPage = -1;
@@ -6610,9 +6683,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** kosti přibyly (jakkoli: noc, šipky, truhla…) → čítač úkolu „Nasbírej kosti“ */
   private rkBones = -1;
+  private goldT = 0;
   private rekoTick() {
     const R = this.d.reko;
     if (!R) return;
+    // ★7: zlaté stanice od hodnosti Mistr (kontrola jednou za ~2 s, objekty obsluhy přibývají)
+    if (R.star >= 7 && ++this.goldT % 120 === 1) {
+      const ids = STATIONS.map((d) => d.id).filter((id) => mastRank(mastStage(this.d.mast?.[id] ?? 0)).rank >= 2);
+      this.views.forEach((v) => v.setGold(ids));
+    }
     const b = this.d.bones ?? 0;
     if (this.rkBones >= 0 && b > this.rkBones) rekoCount(R, 'bones', b - this.rkBones);
     this.rkBones = b;

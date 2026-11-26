@@ -140,6 +140,10 @@ export interface Save {
   reko?: import('./reko').RekoState;
   /** sezónní pass (src/core/spass.ts) */
   spass?: import('./spass').SPassState;
+  /** ★8: relikvie z Chrámu (src/core/relics.ts) */
+  relics?: string[];
+  /** ★9: druhy hostů, které už přišly jako zlatý host (hvězda ve Sbírce) */
+  goldG?: string[];
   /** po Rekonstrukci ukázat oslavu nové hvězdy */
   rekoMsg?: number;
   /** týdenní liga */

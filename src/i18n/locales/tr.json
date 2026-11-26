@@ -1648,5 +1648,22 @@
  "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "Lig ile birlikte Meyhanecinin Kitabı açılır: Görevler'de ve meyhanenin üstündeki şeritte bulacağın görev bölümleri. Tamamlanan her görev meyhaneye bir eşya, bazen de hediye ekler. Bir bölümün tamamından sonra Yenileme gelir – kupalarını silmeyen ek bir denetim ve bir yıldız: yeni meyhane görünümü, beşinci istasyon, daha uzun kasa ve ★10'a kadar başka ödüller.",
  "Sezónní pass": "Sezon kartı",
  "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "Her sezon 4 hafta sürer ve 30 kademesi vardır. Kart puanlarını günlük görevler, günlük sandık, haftalık meydan okuma ve denetimlerden kazanırsın. Her kademenin ücretsiz sırada bir ödülü var; daha büyük ödüllü Altın sırayı satın alabilirsin. Kartı Görevler'de bulursun.",
- "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "Uygulamada Google Play Oyunlar'a giriş yapabilirsin – ilerlemen buluta da kaydedilir ve çevrimiçi sıralamalarda (kupalar, meyhaneci seviyesi, Tapınak) yarışırsın."
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "Uygulamada Google Play Oyunlar'a giriş yapabilirsin – ilerlemen buluta da kaydedilir ve çevrimiçi sıralamalarda (kupalar, meyhaneci seviyesi, Tapınak) yarışırsın.",
+ "Zvonek z hlubin": "Derinliklerin Çanı",
+ "události o 10 % častěji": "olaylar %10 daha sık",
+ "Ledová dýmka": "Buz Pipo",
+ "kasa offline o 1 h déle": "çevrimdışı kasa 1 sa daha uzun",
+ "Bezedný sud": "Dipsiz Fıçı",
+ "odměny z událostí +20 %": "olay ödülleri +%20",
+ "Kabát mnoha kapes": "Çok Cepli Palto",
+ "rvačky o 15 % kratší": "kavgalar %15 daha kısa",
+ "Svatební dar! +{n}": "Düğün hediyesi! +{n}",
+ "Svatba v hospodě! Ťukej na dary!": "Meyhanede düğün! Hediyelere dokun!",
+ "Zlatý host! +{n} coins a +{g} 💎": "Altın misafir! +{n} coins ve +{g} 💎",
+ "Nová zlatá hvězda ve Sbírce": "Koleksiyonda yeni altın yıldız",
+ "Relikvie: {r} ({d})": "Kutsal emanet: {r} ({d})",
+ "Relikviář": "Emanetler",
+ "{a} / {b} relikvií z Chrámu": "Tapınaktan {a} / {b} emanet",
+ "Každý poražený Cthulhu zanechá další relikvii.": "Yenilen her Cthulhu bir emanet daha bırakır.",
+ "poraz Cthulhu v Chrámu": "Tapınakta Cthulhu’yu yen"
 }

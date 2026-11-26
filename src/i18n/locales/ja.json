@@ -1648,5 +1648,22 @@
  "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "リーグと一緒に店主の本が開きます。タスクと酒場の上のバーにあるタスクの章です。タスクを達成するたびに酒場に家具が1つ増え、ときどき贈り物ももらえます。章をすべて終えると改装ができます。ジョッキが消えない追加の検査で、星がもらえます：酒場の新しい見た目、5つ目のステーション、長いレジ、そして★10までのさまざまな報酬。",
  "Sezónní pass": "シーズンパス",
  "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "各シーズンは4週間で、30段階あります。パスのポイントはデイリータスク、デイリー宝箱、週間チャレンジ、検査でもらえます。各段階には無料ラインの報酬があり、より大きな報酬のゴールドラインは購入できます。パスはタスクにあります。",
- "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "アプリではGoogle Play ゲームにログインできます。進行状況がクラウドにも保存され、オンラインランキング（ジョッキ、店主レベル、神殿）で競えます。"
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "アプリではGoogle Play ゲームにログインできます。進行状況がクラウドにも保存され、オンラインランキング（ジョッキ、店主レベル、神殿）で競えます。",
+ "Zvonek z hlubin": "深淵の鐘",
+ "události o 10 % častěji": "イベントが10%多く発生",
+ "Ledová dýmka": "氷のパイプ",
+ "kasa offline o 1 h déle": "オフラインのレジが1時間延長",
+ "Bezedný sud": "底なし樽",
+ "odměny z událostí +20 %": "イベント報酬+20%",
+ "Kabát mnoha kapes": "ポケットだらけのコート",
+ "rvačky o 15 % kratší": "ケンカが15%短く",
+ "Svatební dar! +{n}": "結婚祝い！+{n}",
+ "Svatba v hospodě! Ťukej na dary!": "パブで結婚式！プレゼントをタップ！",
+ "Zlatý host! +{n} coins a +{g} 💎": "金色の客！+{n}コインと+{g} 💎",
+ "Nová zlatá hvězda ve Sbírce": "コレクションに新しい金の星",
+ "Relikvie: {r} ({d})": "聖遺物：{r}（{d}）",
+ "Relikviář": "聖遺物箱",
+ "{a} / {b} relikvií z Chrámu": "神殿の聖遺物 {a} / {b}",
+ "Každý poražený Cthulhu zanechá další relikvii.": "クトゥルフを倒すたびに聖遺物が1つ残る。",
+ "poraz Cthulhu v Chrámu": "神殿でクトゥルフを倒す"
 }

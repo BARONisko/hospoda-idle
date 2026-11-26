@@ -1648,5 +1648,22 @@
  "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "The League also opens the Landlord's Book: chapters of tasks you'll find in Tasks and in the bar above the pub. Every finished task adds a piece of furnishing to the pub and sometimes a gift. After a whole chapter comes a Renovation – an extra inspection that keeps your tankards and gives a star: a new pub look, a fifth station, a longer register and more rewards up to ★10.",
  "Sezónní pass": "Season pass",
  "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "Each season lasts 4 weeks and has 30 tiers. You earn pass points for daily tasks, the daily chest, the weekly challenge and inspections. Every tier has a reward on the free track; you can buy the Gold track with bigger rewards. You'll find the pass in Tasks.",
- "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "In the app you can sign in to Google Play Games – your progress is then also saved to the cloud and you compete on online leaderboards (tankards, landlord level, Temple)."
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "In the app you can sign in to Google Play Games – your progress is then also saved to the cloud and you compete on online leaderboards (tankards, landlord level, Temple).",
+ "Zvonek z hlubin": "Bell from the Deep",
+ "události o 10 % častěji": "events 10% more often",
+ "Ledová dýmka": "Ice Pipe",
+ "kasa offline o 1 h déle": "offline till open 1 h longer",
+ "Bezedný sud": "Bottomless Keg",
+ "odměny z událostí +20 %": "event rewards +20%",
+ "Kabát mnoha kapes": "Coat of Many Pockets",
+ "rvačky o 15 % kratší": "brawls 15% shorter",
+ "Svatební dar! +{n}": "Wedding gift! +{n}",
+ "Svatba v hospodě! Ťukej na dary!": "A wedding in the pub! Tap the gifts!",
+ "Zlatý host! +{n} coins a +{g} 💎": "Golden guest! +{n} coins and +{g} 💎",
+ "Nová zlatá hvězda ve Sbírce": "New gold star in the Collection",
+ "Relikvie: {r} ({d})": "Relic: {r} ({d})",
+ "Relikviář": "Reliquary",
+ "{a} / {b} relikvií z Chrámu": "{a} / {b} relics from the Temple",
+ "Každý poražený Cthulhu zanechá další relikvii.": "Every defeated Cthulhu leaves another relic.",
+ "poraz Cthulhu v Chrámu": "defeat Cthulhu in the Temple"
 }

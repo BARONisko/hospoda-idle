@@ -268,8 +268,32 @@ function gloves(): PixelCanvas {
   return p.outline('ink');
 }
 
+/** ★10 trůn hostinského (návrh A, za barem): vysoké opěradlo z rudého sametu, zlatý rám a koruna */
+function throne(): PixelCanvas {
+  const p = new PixelCanvas(24, 34);
+  // opěradlo
+  p.rect(5, 6, 14, 18, 'maroon');
+  p.rect(7, 8, 10, 14, 'red');
+  for (let y = 9; y < 22; y += 3) for (let x = 8; x < 16; x += 3) p.set(x + (y % 2), y, 'scarlet');
+  // zlatý rám a koruna nahoře
+  p.rect(3, 4, 18, 2, 'gold');
+  p.vline(3, 4, 30, 'gold');
+  p.vline(20, 4, 30, 'gold');
+  p.vline(4, 6, 30, 'amber');
+  p.vline(19, 6, 30, 'amber');
+  for (const x of [6, 11, 16]) (p.rect(x, 1, 2, 3, 'gold'), p.set(x, 0, 'amber'));
+  p.set(12, 2, 'red');
+  // sedák a nohy
+  p.rect(3, 24, 18, 4, 'red');
+  p.hline(3, 20, 24, 'scarlet');
+  p.hline(3, 20, 28, 'gold');
+  p.rect(4, 29, 2, 5, 'amber');
+  p.rect(18, 29, 2, 5, 'amber');
+  return p.outline('ink');
+}
+
 export function buildRekoArt(): Record<string, PixelCanvas> {
-  const o: Record<string, PixelCanvas> = { rkGloves: gloves() };
+  const o: Record<string, PixelCanvas> = { rkGloves: gloves(), rkThrone: throne() };
   for (const l of ['a', 'b', 'c'] as const) {
     o[`rk${l}_table`] = table(l);
     const c = chair(l);

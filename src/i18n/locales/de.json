@@ -1648,5 +1648,22 @@
  "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "Mit der Liga öffnet sich das Buch des Wirts: Kapitel mit Aufgaben, die du unter Aufgaben und in der Leiste über der Kneipe findest. Jede erledigte Aufgabe bringt ein Stück Einrichtung in die Kneipe und manchmal ein Geschenk. Nach einem ganzen Kapitel kommt die Renovierung – eine zusätzliche Hygiene, die deine Krüge nicht löscht und einen Stern bringt: neues Aussehen der Kneipe, eine fünfte Station, eine längere Kasse und weitere Belohnungen bis ★10.",
  "Sezónní pass": "Saisonpass",
  "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "Jede Saison dauert 4 Wochen und hat 30 Stufen. Punkte für den Pass bekommst du für tägliche Aufgaben, die tägliche Truhe, die Wochenherausforderung und die Hygiene. Jede Stufe hat eine Belohnung in der kostenlosen Reihe; die Goldene Reihe mit größeren Belohnungen kannst du kaufen. Den Pass findest du unter Aufgaben.",
- "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "In der App kannst du dich bei Google Play Spiele anmelden – dein Fortschritt wird dann auch in der Cloud gespeichert und du trittst in Online-Bestenlisten an (Krüge, Wirtsstufe, Tempel)."
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "In der App kannst du dich bei Google Play Spiele anmelden – dein Fortschritt wird dann auch in der Cloud gespeichert und du trittst in Online-Bestenlisten an (Krüge, Wirtsstufe, Tempel).",
+ "Zvonek z hlubin": "Glocke aus der Tiefe",
+ "události o 10 % častěji": "Ereignisse 10 % öfter",
+ "Ledová dýmka": "Eispfeife",
+ "kasa offline o 1 h déle": "Kasse offline 1 h länger",
+ "Bezedný sud": "Bodenloses Fass",
+ "odměny z událostí +20 %": "Ereignisbelohnungen +20 %",
+ "Kabát mnoha kapes": "Mantel der vielen Taschen",
+ "rvačky o 15 % kratší": "Schlägereien 15 % kürzer",
+ "Svatební dar! +{n}": "Hochzeitsgeschenk! +{n}",
+ "Svatba v hospodě! Ťukej na dary!": "Hochzeit in der Kneipe! Tippe auf die Geschenke!",
+ "Zlatý host! +{n} coins a +{g} 💎": "Goldener Gast! +{n} Coins und +{g} 💎",
+ "Nová zlatá hvězda ve Sbírce": "Neuer Goldstern in der Sammlung",
+ "Relikvie: {r} ({d})": "Reliquie: {r} ({d})",
+ "Relikviář": "Reliquiar",
+ "{a} / {b} relikvií z Chrámu": "{a} / {b} Reliquien aus dem Tempel",
+ "Každý poražený Cthulhu zanechá další relikvii.": "Jeder besiegte Cthulhu hinterlässt eine weitere Reliquie.",
+ "poraz Cthulhu v Chrámu": "besiege Cthulhu im Tempel"
 }

@@ -16,7 +16,7 @@ const T = 16;
 /** vzhled hospody za diamanty (jen vzhled; nastavuje scéna podle koupených položek) */
 export const LOOK = { tap: false, tables: false, livery: false };
 /** Rekonstrukce ★ (Kniha hostinského): hvězdy a vyzvednuté úkoly – nastavuje scéna */
-export const REKO: { R?: RekoState } = {};
+export const REKO: { R?: RekoState; relics?: string[] } = {};
 const rkSwap = (k: string) => rekoItems(REKO.R).some((x) => x.item.swap === k);
 /** livreje: za diamanty nebo za úkol Rekonstrukce */
 export const livery = () => LOOK.livery || rkSwap('livery');
@@ -52,6 +52,8 @@ interface Seat {
 
 interface Guest {
   spr: Phaser.GameObjects.Sprite;
+  /** ★9: vzácný zlatý host (1 z 200) */
+  gold?: boolean;
   path: { x: number; y: number }[];
   seat?: Seat;
   sitT: number;
@@ -137,6 +139,40 @@ export class PubView {
   private bg!: Phaser.GameObjects.Image;
   private rk: Record<string, Phaser.GameObjects.Image[]> = {};
 
+  /** ★7 Rekonstrukce: zlaté stanice (návrh C) – stanice s hodností Mistr a výš září zlatě a občas zajiskří */
+  private goldIds: string[] = [];
+  private goldTimer?: Phaser.Time.TimerEvent;
+  private goldObjs(id: string): (Phaser.GameObjects.Image | Phaser.GameObjects.Sprite)[] {
+    const l: (Phaser.GameObjects.Image | Phaser.GameObjects.Sprite)[] = [...(id === 'tap' ? this.taps : []), ...(this.props[id] ?? [])];
+    if (this.staff[id]) l.push(this.staff[id]);
+    return l;
+  }
+  setGold(ids: string[]) {
+    for (const id of new Set([...this.goldIds, ...ids]))
+      for (const o of this.goldObjs(id)) {
+        const on = ids.includes(id), has = !!o.getData('gold');
+        if (on === has || !o.active) continue;
+        o.setData('gold', on);
+        if (on) o.postFX?.addGlow(0xffd23f, 2, 0, false, 0.1, 6);
+        else o.postFX?.clear();
+      }
+    this.goldIds = ids;
+    if (ids.length && !this.goldTimer)
+      this.goldTimer = this.s.time.addEvent({
+        delay: 1400,
+        loop: true,
+        callback: () => {
+          const l = this.goldIds.flatMap((id) => this.goldObjs(id)).filter((o) => o.active && o.visible);
+          if (!l.length) return;
+          const o = Phaser.Utils.Array.GetRandom(l);
+          const sp = this.s.add.image(o.x + Phaser.Math.Between(-6, 6), o.y - o.displayHeight * Math.random(), 'obj', 'gStar').setDepth(5000).setScale(0.6);
+          this.objs.push(sp);
+          this.s.events.emit('pubObj', sp);
+          this.s.tweens.add({ targets: sp, scale: 0, angle: 90, duration: 700, onComplete: () => sp.destroy() });
+        },
+      });
+  }
+
   /** Rekonstrukce: nový vzhled Pajzlu (★1) a kousky za splněné úkoly Knihy hostinského */
   rekoRefresh(pop = false) {
     const R = REKO.R;
@@ -157,6 +193,33 @@ export class PubView {
         return o;
       };
       this.rk[key] = it.lamps ? [2.5, 5, 7.5].map((x) => put(x * T, 3 * T + 4, 6 * T)) : [put(it.x, it.y, it.wall ? -800 : it.y)];
+    }
+    // ★10: trůn hostinského za barem v Pajzlu (návrh A)
+    if (R && R.star >= 10 && this.pub.act === 1) {
+      want.add('throne');
+      if (!this.rk.throne) {
+        const o = this.s.add.image(this.ox + 4.6 * T, 5 * T + 4, 'obj', 'rkThrone').setOrigin(0.5, 1).setDepth(5 * T + 3);
+        this.objs.push(o);
+        this.s.events.emit('pubObj', o);
+        if (pop) this.s.tweens.add({ targets: o, scale: { from: 2, to: 1 }, duration: 600, ease: 'Back.out' });
+        this.rk.throne = [o];
+      }
+    }
+    // ★8: police s relikviemi ve Sklepní krčmě (návrh A)
+    const rel = R && R.star >= 8 && this.pub.act === 2 ? REKO.relics ?? [] : [];
+    if (rel.length) {
+      const sx = 13.9 * T, sy = 3.4 * T;
+      const one = (key: string, frame: string, x: number, y: number, depth: number) => {
+        want.add(key);
+        if (this.rk[key]) return;
+        const o = this.s.add.image(this.ox + x, y, 'obj', frame).setOrigin(0.5, 1).setDepth(depth);
+        this.objs.push(o);
+        this.s.events.emit('pubObj', o);
+        if (pop) this.s.tweens.add({ targets: o, scale: { from: 2, to: 1 }, duration: 600, ease: 'Back.out' });
+        this.rk[key] = [o];
+      };
+      one('relicShelf', 'witchShelf', sx, sy, -790);
+      rel.forEach((id, i) => one('relic:' + id, 'relic_' + id, sx - 11 + i * 7.5, sy - 9, -780));
     }
     // jiný vzhled (A/B/C) → staré kousky pryč
     for (const k of Object.keys(this.rk)) if (!want.has(k)) (this.rk[k].forEach((o) => o.destroy()), delete this.rk[k]);
@@ -424,6 +487,10 @@ export class PubView {
     this.last = g;
     // věrnost hostů: druh obslouženého hosta (PubScene.tipReward přičte bod)
     this.lastKey = g.spr.texture.key;
+    if (g.gold) {
+      g.gold = false;
+      this.s.events.emit('goldGuest', g.spr.texture.key, this.pub.act);
+    }
     if (g.order) {
       const o = g.order;
       g.order = undefined;
@@ -682,7 +749,10 @@ export class PubView {
       { x: seat.x, y: seat.aisle },
       { x: seat.x, y: seat.y },
     ];
-    this.guests.push({ spr, path, seat, sitT: this.rnd.realInRange(8, 20), leaving: false, t: 0, tipped: false });
+    // ★9 Rekonstrukce: 1 z 200 hostů je zlatý (návrh A) – ťuk na jeho bublinu dá velkou odměnu a hvězdu ve Sbírce
+    const gold = (REKO.R?.star ?? 0) >= 9 && this.rnd.frac() < 1 / 200;
+    if (gold) spr.setTint(0xffe27a).postFX?.addGlow(0xffd23f, 2, 0, false, 0.1, 6);
+    this.guests.push({ spr, path, seat, sitT: this.rnd.realInRange(8, 20), leaving: false, t: 0, tipped: false, gold });
   }
 
   private walk(g: Guest, dt: number) {

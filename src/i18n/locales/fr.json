@@ -1648,5 +1648,22 @@
  "S Ligou se otevře Kniha hostinského: kapitoly úkolů, které najdeš v Úkolech a v liště nad hospodou. Každý splněný úkol přidá do hospody kousek vybavení a někdy dárek. Po celé kapitole přijde Rekonstrukce – hygiena navíc, která krígly nemaže a dá hvězdu: nový vzhled hospody, pátou stanici, delší kasu a další odměny až do ★10.": "Avec la Ligue s'ouvre le Livre du tavernier : des chapitres de tâches que tu trouveras dans Tâches et dans la barre au-dessus de la taverne. Chaque tâche accomplie ajoute un élément de mobilier à la taverne et parfois un cadeau. Après un chapitre entier vient la Rénovation : une inspection en plus qui garde tes chopes et donne une étoile : nouveau look de la taverne, cinquième poste, caisse plus longue et d'autres récompenses jusqu'à ★10.",
  "Sezónní pass": "Pass saisonnier",
  "Každá sezóna trvá 4 týdny a má 30 stupňů. Body do passu dostaneš za denní úkoly, denní truhlu, týdenní výzvu a hygienu. Každý stupeň má odměnu v řadě zdarma; Zlatou řadu s většími odměnami si můžeš koupit. Pass najdeš v Úkolech.": "Chaque saison dure 4 semaines et compte 30 paliers. Tu gagnes des points de pass avec les tâches quotidiennes, le coffre quotidien, le défi hebdomadaire et les inspections. Chaque palier a une récompense sur la ligne gratuite ; la Ligne dorée aux plus grosses récompenses s'achète. Le pass se trouve dans Tâches.",
- "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "Dans l'application, tu peux te connecter à Google Play Jeux : ta progression est alors aussi sauvegardée dans le cloud et tu participes aux classements en ligne (chopes, niveau du tavernier, Temple)."
+ "V aplikaci se můžeš přihlásit do Google Play Her – postup se pak ukládá i do cloudu a soutěžíš v online žebříčcích (krígly, úroveň hostinského, Chrám).": "Dans l'application, tu peux te connecter à Google Play Jeux : ta progression est alors aussi sauvegardée dans le cloud et tu participes aux classements en ligne (chopes, niveau du tavernier, Temple).",
+ "Zvonek z hlubin": "Cloche des abysses",
+ "události o 10 % častěji": "événements 10 % plus fréquents",
+ "Ledová dýmka": "Pipe de glace",
+ "kasa offline o 1 h déle": "caisse hors ligne 1 h de plus",
+ "Bezedný sud": "Tonneau sans fond",
+ "odměny z událostí +20 %": "récompenses d’événements +20 %",
+ "Kabát mnoha kapes": "Manteau aux mille poches",
+ "rvačky o 15 % kratší": "bagarres 15 % plus courtes",
+ "Svatební dar! +{n}": "Cadeau de mariage ! +{n}",
+ "Svatba v hospodě! Ťukej na dary!": "Un mariage au bistrot ! Touche les cadeaux !",
+ "Zlatý host! +{n} coins a +{g} 💎": "Client doré ! +{n} coins et +{g} 💎",
+ "Nová zlatá hvězda ve Sbírce": "Nouvelle étoile dorée dans la Collection",
+ "Relikvie: {r} ({d})": "Relique : {r} ({d})",
+ "Relikviář": "Reliquaire",
+ "{a} / {b} relikvií z Chrámu": "{a} / {b} reliques du Temple",
+ "Každý poražený Cthulhu zanechá další relikvii.": "Chaque Cthulhu vaincu laisse une nouvelle relique.",
+ "poraz Cthulhu v Chrámu": "bats Cthulhu au Temple"
 }

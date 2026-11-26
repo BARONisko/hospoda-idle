@@ -29,7 +29,7 @@ export interface TempleHost {
   templeIncome(): number;
   templeStats(): Record<StatId, number>;
   /** odměny do hlavní hry; vrací text pro hlášku */
-  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal' | 'stat' | 'darts' | 'gems', n: number): string;
+  templeReward(kind: 'talis' | 'krigle' | 'bones' | 'seal' | 'stat' | 'darts' | 'gems' | 'relic', n: number): string;
   templeSave(): void;
   /** začalo kolo (denní úkol) */
   templeRound?(): void;
@@ -282,7 +282,8 @@ export class TempleScene extends Phaser.Scene {
     const gm = this.host.templeReward('gems', GEMS_FREE.boss * Math.min(d, DIFFS));
     // první vítězství = milník (nabídka na 24 h, vyskočí až podle pravidla jedné nabídky)
     if (this.T.boss === 1) this.host.msStart('boss1');
-    let msg = t('CTHULHU PORAŽEN!') + '\n' + seal + '\n' + tal + '\n' + kr + '\n' + dp + '\n' + gm;
+    const rl = this.host.templeReward('relic', 1);
+    let msg = t('CTHULHU PORAŽEN!') + '\n' + seal + '\n' + tal + '\n' + kr + '\n' + dp + '\n' + gm + (rl ? '\n' + rl : '');
     if ((this.T.maxD ?? 1) <= d) {
       this.T.maxD = d + 1;
       msg += '\n' + t('Odemčena obtížnost {d}!', { d: diffName(d + 1) });

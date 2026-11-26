@@ -390,6 +390,16 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     s.awayClose(); SP.SP.start = SP.SPASS_START;
     return (before && pts && win && r && r.gems > 0 && locked && g0 >= 0) || JSON.stringify({ before, pts, win, r, locked });
   }).then((r) => (r !== true && console.log(r), r)) === true);
+  ok('★6–★10: svatba (událost), relikvie z Chrámu, zlaté stanice, trůn', await S(p, (s) => {
+    const R = s.d.reko; R.star = 10;
+    s.ev.start('wedding', 0); const wed = s.ev.active?.kind === 'wedding' && s.ev.active.targets.length === 1;
+    for (let i = 0; i < 5; i++) s.ev.active?.targets[0].hit(); const wedDone = !s.ev.active;
+    s.d.relics = []; const r1 = s.templeReward('relic', 1); const rel = s.d.relics.length === 1 && r1.length > 0;
+    s.views.forEach((v) => v.rekoRefresh()); const throne = !!s.views[0].rk.throne;
+    s.views[0].setGold(['tap']); const gold = s.views[0].taps.every((o) => o.getData('gold'));
+    s.relicWin(); const win = s.awayObjs.length > 10; s.awayClose();
+    return (wed && wedDone && rel && throne && gold && win) || JSON.stringify({ wed, wedDone, rel, throne, gold, win });
+  }).then((r) => (r !== true && console.log(r), r)) === true);
   ok('bez chyb v konzoli (Rekonstrukce)', p.errors.length === 0);
   if (p.errors.length) console.log(p.errors);
   await p.close();

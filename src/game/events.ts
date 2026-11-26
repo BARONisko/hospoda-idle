@@ -8,8 +8,10 @@ import { sfx } from '../core/sfx';
 import { big } from '../core/num';
 import type { PubView } from './PubView';
 
-export type EventKind = 'gold' | 'frogs' | 'bat' | 'banshee' | 'brawl';
+export type EventKind = 'gold' | 'frogs' | 'bat' | 'banshee' | 'brawl' | 'wedding';
 export const EVENT_KINDS: EventKind[] = ['gold', 'frogs', 'bat', 'banshee', 'brawl'];
+/** ★6 Rekonstrukce: svatba v hospodě (návrh A, tanec novomanželů) */
+export const EVENT_EXTRA: EventKind[] = ['wedding'];
 
 /** co událost potřebuje od scény */
 export interface EventHost {
@@ -25,6 +27,8 @@ export interface EventHost {
   onEvent?(kind: EventKind, ok: boolean): void;
   /** stat „rvačka kratší“ (0–0,7) */
   brawlCut?(): number;
+  /** události navíc (★6 svatba), losují se mezi ostatními */
+  extraKinds?(): EventKind[];
 }
 
 interface Target {
@@ -60,7 +64,7 @@ export class PubEvents {
       return;
     }
     this.next -= dt;
-    if (this.next <= 0) this.start(Phaser.Utils.Array.GetRandom(EVENT_KINDS));
+    if (this.next <= 0) this.start(Phaser.Utils.Array.GetRandom([...EVENT_KINDS, ...(this.host.extraKinds?.() ?? [])]));
   }
 
   /** ťuknutí do hospody (souřadnice světa); true = trefa */
@@ -178,6 +182,55 @@ export class PubEvents {
       };
       targets.push({ spr: cloud, hit }, { spr: f1, hit }, { spr: f2, hit });
       this.host.banner(v.cam, t('Rvačka! Hosté odcházejí – ťukej na rváče!'), true);
+    } else if (kind === 'wedding') {
+      // svatba: novomanželé tančí uprostřed sálu, nad nimi dar – 5 darů za sebou (každý ťuk = výdělek), pak velký dar
+      a.dur = 20;
+      const need = 5;
+      const cx = v.ox + 8.5 * 16, cy = Phaser.Math.Clamp(11.2 * 16, y0 + 50, y1 - 6);
+      const ring = add(this.s.add.ellipse(cx, cy - 1, 44, 12, 0xffd23f, 0.35).setDepth(3998));
+      this.s.tweens.add({ targets: ring, alpha: 0.15, yoyo: true, repeat: -1, duration: 600 });
+      const pool = v.guestKeys();
+      const bride = add(this.s.add.sprite(cx - 7, cy, Phaser.Utils.Array.GetRandom(pool), 0).setOrigin(0.5, 1).setDepth(4000));
+      const groom = add(this.s.add.sprite(cx + 7, cy, Phaser.Utils.Array.GetRandom(pool), 0).setOrigin(0.5, 1).setDepth(4000).setFlipX(true));
+      // závoj a motýlek (kreslené, jedou s postavami)
+      const veil = add(this.s.add.graphics().setDepth(4001));
+      veil.fillStyle(0xffffff, 1).fillRect(-4, -23, 8, 3).fillRect(-5, -20, 2, 10).fillRect(3, -20, 2, 10);
+      const tie = add(this.s.add.graphics().setDepth(4001));
+      tie.fillStyle(0x111111, 1).fillRect(-3, -13, 6, 3);
+      const sync = () => (veil.setPosition(bride.x, bride.y), tie.setPosition(groom.x, groom.y));
+      sync();
+      this.s.tweens.add({ targets: [bride, groom], y: cy - 2, yoyo: true, repeat: -1, duration: 260, onUpdate: sync });
+      this.s.tweens.add({ targets: bride, x: cx - 4, yoyo: true, repeat: -1, duration: 520, ease: 'Sine.inOut', onUpdate: sync });
+      this.s.tweens.add({ targets: groom, x: cx + 4, yoyo: true, repeat: -1, duration: 520, ease: 'Sine.inOut', onUpdate: sync });
+      const hearts = this.s.time.addEvent({
+        delay: 450,
+        loop: true,
+        callback: () => {
+          const h = add(this.s.add.image(cx + Phaser.Math.Between(-24, 24), cy - 18, 'obj', 'loveHeart').setDepth(4002));
+          this.s.tweens.add({ targets: h, y: h.y - 22, alpha: 0, duration: 1200, onComplete: () => h.destroy() });
+        },
+      });
+      a.off.push(() => hearts.remove());
+      const gift = add(this.s.add.image(cx, cy - 34, 'obj', 'chest').setDepth(4003).setScale(1.2));
+      this.s.tweens.add({ targets: gift, y: cy - 38, yoyo: true, repeat: -1, duration: 400, ease: 'Sine.inOut' });
+      const cnt = add(this.s.add.text(cx, cy - 54, `0 / ${need}`, txt(12, PAL.gold)).setOrigin(0.5).setDepth(4004).setResolution(3).setStroke(PAL.ink, 4));
+      targets.push({
+        spr: gift,
+        hit: () => {
+          a.hits++;
+          cnt.setText(`${a.hits} / ${need}`);
+          const n = this.host.reward(15, view);
+          this.pop(gift.x, gift.y - 10, '+' + big(n));
+          sfx.tip();
+          gift.setPosition(cx + Phaser.Math.Between(-20, 20), cy - 34);
+          if (a.hits >= need) {
+            const m = this.host.reward(90, view);
+            this.host.banner(v.cam, t('Svatební dar! +{n}', { n: big(m) }));
+            this.end(true);
+          }
+        },
+      });
+      this.host.banner(v.cam, t('Svatba v hospodě! Ťukej na dary!'), true);
     } else {
       a.dur = 9;
       const need = 12;
