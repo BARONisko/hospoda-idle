@@ -43,3 +43,17 @@ Zdroj: posudek pozdní hry a pomůcka „Výběr návrhů hospody“. Ceny a č�
 ## Drobnosti
 - j05 **Rada u kostí**: na kartě Kosti řádek „Teď se nejvíc vyplatí: …“.
 - j07 **Vzácní hosté do Sbírky**: 1 z 200 hostů zlatý nebo v kostýmu, 20 vzácných variant.
+
+## Marketing – nápady na později (26. 11. 2026)
+Plán vydání: https://claude.ai/artifact/4XroEodE739GNtNZSRrJaY. Tyhle body mají menší přínos, nechané na později.
+- **Předregistrace v Google Play** s odměnou (např. 100 💎) – jen pro další hru nebo velkou novou verzi, teď by zdržela vydání.
+- **Discord hráčů** – založit až při ~500 aktivních hráčích, do té doby stačí recenze a Reddit.
+- **Tlačítko „Komunita“ v Nastavení** (Discord/Reddit) – až bude komunita.
+- **Odměna za pozvání kamaráda** (kód ve hře, oba dostanou 💎).
+- **Google Play Indie Games Festival / Accelerator** – hlídat termíny přihlášek.
+- **Game Access (Brno)** a další herní akce – stánek nebo přednáška o sólo vývoji.
+- **iOS verze** – rozšíření publika, ale Apple účet stojí 99 USD/rok a vyžaduje Mac.
+- **Steam / itch.io verze pro PC** – idle hry se tam prodávají, ale chce úpravu na šířku.
+- **Placené zmínky u větších youtuberů** – až když reklama ukáže, že se hráč zaplatí.
+- **Lokalizované snímky obchodu** pro DE, PL, ES, PT-BR (texty na snímcích v jazyce země).
+- **Křížová propagace** s jinými indie vývojáři idle her (výměna banneru ve hře).
