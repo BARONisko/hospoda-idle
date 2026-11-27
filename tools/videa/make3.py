@@ -17,15 +17,15 @@ def endcard(n, dur):
     subprocess.run(['ffmpeg','-v','error','-y','-f','lavfi','-i','nullsrc=s=16x16','-loop','1','-i',ICON,'-filter_complex',fc,'-map','[v]','-t',str(dur),'-c:v','libx264','-crf','16','-preset','slow','-pix_fmt','yuv420p',out],check=True)
     return out
 P=(162,130,216,384)
-segs=[seg('d1','empty',2.0,2.0,(0,0,540,960),2,['i inherited the','worst pub in town']),
-      seg('d2','day',3.0,1.6,(0,0,540,960),2,['90 days later']),
+segs=[seg('d1','empty',2.0,2.0,(0,0,540,960),2,['i inherited the','worst pub in town'],y=860),
+      seg('d2','day',3.0,1.6,(0,0,540,960),2,['90 days later'],y=860),
       seg('d3','gold',3.6,0.8,(200,130,216,384),5),
       seg('d4','brawl',5.6,0.8,P,5),
       seg('d5','day',12.6,0.8,P,5),
       seg('d6','temple',1.5,0.8,(162,290,216,384),5),
       seg('d7','away',2.0,2.8,(0,0,540,960),2,['it made this','while i slept'],y=320),
-      endcard('d8',2.4)]
+      endcard('d8',1.5)]
 # text okna výdělku: nad oknem (okno začíná ~y 200 v 540 → 400 v 1080) – posunout titulek výš
 lst=f'{V}/seg3/d.txt'; open(lst,'w').write(''.join(f"file '{s}'\n" for s in segs))
 subprocess.run(['ffmpeg','-v','error','-y','-f','concat','-safe','0','-i',lst,'-c','copy',f'{V}/seg3/d_v.mp4'],check=True)
-subprocess.run(['ffmpeg','-v','error','-y','-i',f'{V}/seg3/d_v.mp4','-i',f'{V}/music/polka2.wav','-filter_complex','[1:a]atrim=0:12,volume=0.6[a]','-map','0:v','-map','[a]','-c:v','copy','-c:a','aac','-b:a','192k','-shortest','-movflags','+faststart',f'{V}/out3/D-proměna.mp4'],check=True)
+subprocess.run(['ffmpeg','-v','error','-y','-i',f'{V}/seg3/d_v.mp4','-i',f'{V}/music/polka2.wav','-filter_complex','[1:a]atrim=0:11.1,volume=0.6[a]','-map','0:v','-map','[a]','-c:v','copy','-c:a','aac','-b:a','192k','-shortest','-movflags','+faststart',f'{V}/out3/D-proměna.mp4'],check=True)
