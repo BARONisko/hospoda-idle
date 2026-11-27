@@ -5,6 +5,8 @@ const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-124
 const setup = async (p, U, late = true) => {
   await p.goto(U);
   await p.evaluate(() => { localStorage.clear(); localStorage.setItem('pubidle_lang', 'en'); });
+  if (late === 'empty') { await p.goto(U); await p.waitForTimeout(2500);
+    await p.evaluate(() => { const s = game.scene.getScene('Pub'), d = s.d; d.tut = -1; d.guideQ = []; d.ntfAsk = true; d.at = Date.now(); localStorage.setItem('pubidle_save_v1', JSON.stringify(d)); }); return; }
   if (late) {
   await p.goto(U); await p.waitForTimeout(2500);
   await p.evaluate(() => { const s = game.scene.getScene('Pub'), d = s.d; d.tut = -1; d.nightInfo = true; d.guideQ = []; d.guides = ['night', 'pub2', 'pub3']; d.brewTut = -1; d.ntfAsk = true; d.pubIntro = undefined;
@@ -36,6 +38,7 @@ const S = (p, js) => p.evaluate(`(()=>{const s=game.scene.getScene('Pub'),d=s.d;
 const taps = async (p, n, x = 200, y = 250, dt = 120) => { for (let i = 0; i < n; i++) { await p.mouse.click((x + (i % 5) * 15 - 30) * 4 / 3, (y + (i % 3) * 20) * 4 / 3); await p.waitForTimeout(dt); } };
 const only = process.argv[2];
 const J = {
+  empty: () => rec('empty', '?night=0', async (p) => { await p.waitForTimeout(6000); }, 'empty'),
   fresh: () => rec('fresh', '', async (p) => { await p.waitForTimeout(4000); for (let i = 0; i < 40; i++) { await p.mouse.click(120, 567); await p.waitForTimeout(110); if (i % 8 == 7) { await p.mouse.click(120, 649); await p.mouse.click(120, 649); await p.mouse.click(120, 649); } } await p.waitForTimeout(3000); }, false),
   day: () => rec('day', '?night=0&talis=1', async (p) => { await S(p, 's.closeShop?.();s.selectPub(0)'); await p.waitForTimeout(5000); await taps(p, 20, 200, 230); await S(p, 's.selectPub(1)'); await p.waitForTimeout(4000); await S(p, 's.selectPub(2)'); await p.waitForTimeout(4000); }),
   night: () => rec('night', '?night=1&talis=1', async (p) => { await S(p, 's.closeShop?.();s.selectPub(1)'); await p.waitForTimeout(7000); await taps(p, 15, 200, 230); await S(p, 's.selectPub(0)'); await p.waitForTimeout(5000); }),
