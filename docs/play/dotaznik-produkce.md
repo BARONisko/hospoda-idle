@@ -44,3 +44,15 @@ Odpovědi jsou anglicky, ke zkopírování. Co je v [hranatých závorkách], up
 
 **What did you do differently this time?** (jen pokud jde o opakovanou žádost)
 > I collected structured feedback from a wider group of testers, prioritised the features they asked for, improved the store listing for discoverability and added in-app links to rating, sharing and the privacy policy.
+
+---
+
+## Skutečně odeslané odpovědi (27. 11. 2026, 3:26 SEČ – limit 300 znaků na pole)
+1. Recruit: I used a paid testing service (Testers Community) to recruit testers with many different Android devices and versions. I did not invite friends or family. · Easy
+2. Engagement: Testers played regularly during the 14-day test on many devices and Android versions: they completed the tutorial, upgraded stations, hired staff and progressed through the early game. No crashes or functional bugs were reported.
+3. Feedback: Collected via the testing service's written report, an ASO audit of the store listing and direct messages. No crashes or bugs. Requests: a longer, better structured store description, rating the app from inside the game, sharing the game, and an in-app privacy policy link.
+4. Audience: Casual mobile players aged 13+ who enjoy idle, incremental and tycoon games with a humorous fantasy theme. Designed for short sessions and one-handed play in portrait mode; it also works offline.
+5. Value: A relaxed idle pub tycoon: grow a dive bar into a legendary pub and unlock fantasy locations. The pub keeps earning while you are away, so it fits short breaks. Long-term progression (prestige, skill tree, collections), side activities, optional rewarded ads only, 12 languages.
+6. Installs: 0–10 000
+7. Changes: Added Rate, Share and Privacy policy buttons in Settings, rewrote the store listing in all 12 languages and translated every new text. I also ran automated playtests and fixed tutorial clarity, overlapping UI, reward and balance issues.
+8. Ready: The 14-day closed test had no crashes or functional bugs. I implemented all tester requests, ran automated game tests and playtest bots, checked layouts in 12 languages and tested purchases on a real device. Privacy policy, Data safety, content rating and ads settings are complete.
