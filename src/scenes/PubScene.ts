@@ -6988,7 +6988,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (q0?.id === 'hyg1' && !this.d.stats.prestiges && !this.hygPointed && !this.guideCur && (this.d.tut ?? -1) < 0) {
       this.hygPointed = true;
       this.qPoint = 'hyg1';
-      this.banner(this.views[0].cam, t('Hygiena je připravená! Krígly = výdělek navždy'), true);
+      this.banner(this.views[0].cam, t('Hygiena je připravená!')); // uprostřed hospody – nahoře překrývala lištu úkolu, krígl a truhlu (Petr 27. 11.)
     }
     // lišta úkolu nad hospodou zpět (přání uživatele: „v čem pokračovat“ bylo dobré); je i v záložce Úkoly
     this.qVis = !!q0 && !this.guideCur && Date.now() >= this.tutFinaleUntil && !this.awayObjs.length;
