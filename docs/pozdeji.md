@@ -63,3 +63,8 @@ Plán vydání: https://claude.ai/artifact/4XroEodE739GNtNZSRrJaY. Tyhle body ma
 - Projet 3 velikosti displeje (úzký 360×640, běžný 405×720, dlouhý 412×915) a všech 11 jazyků (nejdelší de/ru/fr).
 - Spustit i během běhu botů (každých N ťuků) a výsledek dát jako kritérium U6 „překryvy“.
 - Podnět: cedule „Hygiena je připravená!“ nahoře překrývala lištu úkolu, krígl a truhlu a Zkušebna to nezachytila.
+- **Hotovo 27. 11. v noci:** kontroly K6 (texty × 12 jazyků × 9 obrazovek) a K12 (72 cedulí nahoře i uprostřed proti liště úkolu, truhle a tlačítkům), 3 displeje K11. Zbývá: kontrola i během běhu botů (každých N ťuků) a okna/šipky, nejen cedule.
+
+## Ekonomika: kosti v sezónním passu (27. 11. 2026, nález při kontrole odměn – čeká na Petra)
+- Pass dává 300 + 40 × stupeň kostí (zlatá řada ×3), truhla 5–10 kostí, první sběrač stojí 500. Kosti se 25. 11. dělily stem, pass asi ne.
+- Návrh: pass kosti ÷ 10 (30 + 4 × stupeň) nebo podle nočního výdělku jako truhla. Bez souhlasu neměnit.
