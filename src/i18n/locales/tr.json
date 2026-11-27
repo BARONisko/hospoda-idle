@@ -1706,5 +1706,7 @@
  "★ VIP {m} min · +{h} h výdělku": "★ VIP {m} dk · +{h} sa kazanç",
  "Pípa točí sama. Pak v Obchodě kup vylepšení ×3.": "Musluk kendi kendine doldurur. Sonra Mağazadan ×3 yükseltmesini al.",
  "Pípa točí sama. Pak otevři kuchyni.": "Musluk kendi kendine doldurur. Sonra mutfağı aç.",
- "výdělek {a} → {b}/s": "kazanç {a} → {b}/sn"
+ "výdělek {a} → {b}/s": "kazanç {a} → {b}/sn",
+ "jednorázově na {d} dní – sama se neobnovuje": "{d} gün için tek seferlik – yenilenmez",
+ "Hygiena je připravená! Krígly = výdělek navždy": "Denetim hazır! Kupalar = kalıcı kazanç"
 }

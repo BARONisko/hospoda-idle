@@ -1706,5 +1706,7 @@
  "★ VIP {m} min · +{h} h výdělku": "★ VIP {m} min · +{h} h de gains",
  "Pípa točí sama. Pak v Obchodě kup vylepšení ×3.": "La pompe sert toute seule. Puis achète l’amélioration ×3 dans la Boutique.",
  "Pípa točí sama. Pak otevři kuchyni.": "La pompe sert toute seule. Puis ouvre la cuisine.",
- "výdělek {a} → {b}/s": "gains {a} → {b}/s"
+ "výdělek {a} → {b}/s": "gains {a} → {b}/s",
+ "jednorázově na {d} dní – sama se neobnovuje": "achat unique pour {d} jours – sans renouvellement",
+ "Hygiena je připravená! Krígly = výdělek navždy": "L’inspection est prête ! Chopes = gains pour toujours"
 }

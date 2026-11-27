@@ -1706,5 +1706,7 @@
  "★ VIP {m} min · +{h} h výdělku": "★ VIP {m} 分钟 · +{h} 小时收入",
  "Pípa točí sama. Pak v Obchodě kup vylepšení ×3.": "酒头会自己出酒。然后在商店买 ×3 升级。",
  "Pípa točí sama. Pak otevři kuchyni.": "酒头会自己出酒。然后开放厨房。",
- "výdělek {a} → {b}/s": "收入 {a} → {b}/秒"
+ "výdělek {a} → {b}/s": "收入 {a} → {b}/秒",
+ "jednorázově na {d} dní – sama se neobnovuje": "一次性 {d} 天 – 不会自动续订",
+ "Hygiena je připravená! Krígly = výdělek navždy": "卫生检查准备好了！啤酒杯 = 永久收入"
 }

@@ -89,6 +89,11 @@ export const QUESTS: QuestDef[] = [
 /** první nesplněný úkol, který se teď dá dělat */
 export function currentQuest(d: Save, c: QCtx): QuestDef | null {
   const done = d.q ?? [];
+  // Zkušebna S5/H1 (5. běh): jakmile jde zavolat první hygienu, úkol hygieny přeskočí frontu (dřív lišta posílala do Úkolů a 100 % byla jen malá pilulka v rohu)
+  if (!d.stats.prestiges && !done.includes('hyg1')) {
+    const [k, need] = c.krigly();
+    if (k >= need) return QUESTS.find((q) => q.id === 'hyg1') ?? null;
+  }
   return QUESTS.find((q) => !done.includes(q.id) && (!q.avail || q.avail(d, c))) ?? null;
 }
 

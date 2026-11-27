@@ -1706,5 +1706,7 @@
  "★ VIP {m} min · +{h} h výdělku": "★ VIP {m}分 · +{h}時間分の収入",
  "Pípa točí sama. Pak v Obchodě kup vylepšení ×3.": "ビールサーバーは自動で注ぐ。次にショップで×3強化を買おう。",
  "Pípa točí sama. Pak otevři kuchyni.": "ビールサーバーは自動で注ぐ。次にキッチンを開こう。",
- "výdělek {a} → {b}/s": "収入 {a} → {b}/秒"
+ "výdělek {a} → {b}/s": "収入 {a} → {b}/秒",
+ "jednorázově na {d} dní – sama se neobnovuje": "{d}日間の買い切り – 自動更新なし",
+ "Hygiena je připravená! Krígly = výdělek navždy": "衛生検査の準備OK！ジョッキ＝永久に収入アップ"
 }

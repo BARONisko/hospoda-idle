@@ -3860,13 +3860,16 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const b = this.btn(30, y + 302, W - 60, 70, () => void this.iapBuy('pass'), D + 3);
       this.drawBtn(b, once, iap.available, 'green');
       this.shopObjs.push(b.bg, b.label, b.zone);
+      // Zkušebna M1: jasně říct, že jednorázová karta se sama neobnovuje
+      const on1 = add(this.add.text(W / 2, y + 388, t('jednorázově na {d} dní – sama se neobnovuje', { d: PASS_DAYS }), txt(16, PAL.bone)).setOrigin(0.5).setDepth(D + 2));
+      on1.setScale(Math.min(1, (W - 50) / on1.width));
     }
     if (on) {
       const got = (this.d.pass!.claim ?? '') >= dayKey();
       const c = this.btn(30, y + 428, W - 60, 60, () => this.passClaim(), D + 3);
       this.drawBtn(c, got ? t('Dnešní diamanty vyzvednuty ✓') : t('Vyzvednout {n} 💎', { n: PASS_GEMS }), !got, 'amber');
       this.shopObjs.push(c.bg, c.label, c.zone);
-    } else if (!iap.available) add(this.add.text(W / 2, y + 430, t('nákup jen v mobilní aplikaci'), txt(18, PAL.fog)).setOrigin(0.5).setDepth(D + 2));
+    } else if (!iap.available) add(this.add.text(W / 2, y + 448, t('nákup jen v mobilní aplikaci'), txt(18, PAL.fog)).setOrigin(0.5).setDepth(D + 2));
   }
 
   // VIP host (návrh C): reflektor, hvězda, pruh nahoře s odpočtem; ťuknutím obsloužit
@@ -6540,6 +6543,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   qKey = '';
   /** šipka UKAŽ míří na cíl úkolu (id úkolu) */
   qPoint: string | null = null;
+  hygPointed = false;
   qPh = 0;
   qOffNow = -1;
   /** lišta úkolu je teď vidět */
@@ -6980,6 +6984,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   private qTick() {
     // posun věcí nahoře jen tehdy, když je lišta úkolu opravdu vidět (dřív i skrytá odsunula Šťastnou hodinu doprostřed)
     const q0 = this.qCur();
+    // Zkušebna S5/H1 (5. běh): první hygiena je připravená → jednou sama ukázat cestu (rámeček/šipka) a cedule
+    if (q0?.id === 'hyg1' && !this.d.stats.prestiges && !this.hygPointed && !this.guideCur && (this.d.tut ?? -1) < 0) {
+      this.hygPointed = true;
+      this.qPoint = 'hyg1';
+      this.banner(this.views[0].cam, t('Hygiena je připravená! Krígly = výdělek navždy'), true);
+    }
     // lišta úkolu nad hospodou zpět (přání uživatele: „v čem pokračovat“ bylo dobré); je i v záložce Úkoly
     this.qVis = !!q0 && !this.guideCur && Date.now() >= this.tutFinaleUntil && !this.awayObjs.length;
     const off = this.qOff();
@@ -7409,7 +7419,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (jam) c.jamAt = Date.now();
       // Zkušebna U2: když nestíhají u Pípy i v Kuchyni, varování a tlačítko jen na Pípě (dřív dvě stejná tlačítka „Číšník +1“)
       const tapJam = c.def.id !== 'tap' && this.cards.some((k) => k.pub === c.pub && k.def.id === 'tap' && Date.now() - (k.jamAt ?? 0) < 5000);
-      const fix = Date.now() - (c.jamAt ?? 0) < 5000 && !tapJam ? this.waiterFix(c.pub) : null;
+      let fix = Date.now() - (c.jamAt ?? 0) < 5000 && !tapJam ? this.waiterFix(c.pub) : null;
+      // Zkušebna H1 (5. běh): v prvním kole varování a tlačítko „Číšník +1“ až když má hráč aspoň polovinu ceny (dřív hned po návodu se 4 coins)
+      if (fix && this.d.stats.prestiges === 0 && !fix.ok && this.d.coins < this.wHirePrice(p) / 2) fix = null;
       const half = (open && !s.auto) || !!fix;
       // tlačítko +1: přes celou šíři dlaždice, bez obsluhy vpravo vedle tlačítka obsluhy (to je vlevo)
       const full = c.narrow ? PubScene.NBTN : w - 20, hw = (full - 8) / 2, bx0 = c.narrow ? x + w - 10 - full : x + 10;

@@ -1706,5 +1706,7 @@
  "★ VIP {m} min · +{h} h výdělku": "★ VIP {m} min · +{h} h earnings",
  "Pípa točí sama. Pak v Obchodě kup vylepšení ×3.": "The tap pours by itself. Then buy the ×3 upgrade in the Shop.",
  "Pípa točí sama. Pak otevři kuchyni.": "The tap pours by itself. Then open the kitchen.",
- "výdělek {a} → {b}/s": "income {a} → {b}/s"
+ "výdělek {a} → {b}/s": "income {a} → {b}/s",
+ "jednorázově na {d} dní – sama se neobnovuje": "one-time for {d} days – does not renew",
+ "Hygiena je připravená! Krígly = výdělek navždy": "Inspection is ready! Tankards = earnings forever"
 }

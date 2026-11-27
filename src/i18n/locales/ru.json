@@ -1706,5 +1706,7 @@
  "★ VIP {m} min · +{h} h výdělku": "★ VIP {m} мин · +{h} ч дохода",
  "Pípa točí sama. Pak v Obchodě kup vylepšení ×3.": "Кран наливает сам. Потом купи улучшение ×3 в Магазине.",
  "Pípa točí sama. Pak otevři kuchyni.": "Кран наливает сам. Потом открой кухню.",
- "výdělek {a} → {b}/s": "доход {a} → {b}/с"
+ "výdělek {a} → {b}/s": "доход {a} → {b}/с",
+ "jednorázově na {d} dní – sama se neobnovuje": "разово на {d} дней – не продлевается",
+ "Hygiena je připravená! Krígly = výdělek navždy": "Проверка готова! Кружки = доход навсегда"
 }
