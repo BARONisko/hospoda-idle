@@ -155,7 +155,9 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   for (let k = 0; k < 2; k++) await S(p, (s) => s.shopObjs.filter((o) => o.type === 'Zone' && o.x === 275).at(-1).emit('pointerdown'));
   ok('pivovar: 2 piva vložena → úroveň 2', await S(p, (s) => s.brew().lvl === 2));
   // 5f) talismany
-  await S(p, (s) => { const r = Math.random; Math.random = () => 0; s.tryDrop(0.5); Math.random = r; });
+  await S(p, (s) => { const r = Math.random; Math.random = () => 0; s.d.nightInfo = false; s.d.talis = {}; s.tryDrop(0.5); Math.random = r; });
+  ok('talisman: před Kostnicí nepadá (Zkušebna K1)', await S(p, (s) => !Object.keys(s.d.talis ?? {}).length));
+  await S(p, (s) => { const r = Math.random; Math.random = () => 0; s.d.nightInfo = true; s.tryDrop(0.5); Math.random = r; });
   ok('talisman: nález', await S(p, (s) => Object.values(s.d.talis ?? {}).some((x) => x >= 1)));
   await S(p, (s) => { s.d.bones = 1e9; s.openShop('talis', false); s.shopObjs.filter((o) => o.type === 'Zone').at(-1).emit('pointerdown'); });
   ok('talisman: vylepšení za kosti', await S(p, (s) => Object.values(s.d.talis).some((x) => x >= 2)));

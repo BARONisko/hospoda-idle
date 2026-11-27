@@ -14,3 +14,6 @@ Petr šel spát a chtěl, abych bral doporučené varianty a ráno napsal, mezi 
 | 8 | Horní cedule zakrývaly truhlu a lištu úkolu | a) užší a pod lištou · b) jen kratší texty | **a)** | platí pro všech 72 cedulí a 12 jazyků naráz. |
 | 9 | Kdy kontrola výkonu „slabý telefon“ projde | a) procesor 4× pomalejší ≥ 20 snímků/s · b) 6× ≥ 24 | **a)** | tenhle stroj v cloudu je sám pomalý; 6× pomalejší dával 11 snímků/s i u prázdné hospody, to by byl planý poplach. |
 | 10 | Kosti v passu (300 + 40 × stupeň) jsou mnohem víc než v truhle (5–10) | a) nechat a zapsat · b) snížit | **a) nechat a zapsat** | změna ekonomiky jen po tvém souhlasu (pravidlo projektu); zapsáno do docs/pozdeji.md. |
+| 11 | Talismany padaly před Kostnicí (blokátor od Fable) | a) až s Kostnicí, týdenní výzva do té doby coins/krígly · b) talismany prohlížet i mimo Kostnici | **a)** | stejná třída chyby jako kosti z truhly, nejmenší zásah. |
+| 12 | Cedule HOTOVO! po návodu zakrývala truhlu a visela i přes Obchod | a) uprostřed hospody, 2,6 s, zmizí na ťuk · b) jen kratší | **a)** | Fable U1; lišta úkolu a truhla zůstanou vidět. |
+| 13 | Dlouhý bot „zasekl“ u „Otevřít · 50“ | a) neopravovat · b) zkoumat dál | **a)** | podle záznamu za 4 s koupil, byla to chvilková rvačka (událost), ne chyba hry. |

@@ -10,9 +10,9 @@ Legenda: **auto** = Zkušebna kontroluje sama (ano/ne), **boti** = čísla z bot
 ## 1. Logika a pravidla hry
 | | Kontrola | Kdo |
 |---|---|---|
-| K1 | Odměny (truhla všech 7 dní ×1 i ×2, pass obě řady, Chrám, offline) dávají jen kosti/šipky/krígly, které jsou odemčené; texty odměn je nezmiňují | auto |
+| K1 | Odměny (truhla všech 7 dní ×1 i ×2, pass obě řady, Chrám, offline) dávají jen kosti/šipky/krígly/talismany, které jsou odemčené (talisman až s Kostnicí); texty odměn je nezmiňují | auto |
 | K1b | Každé místo v kódu, které přidává kosti/krígly/šipky, hlídá odemčení (kontrola zdrojáku – nový zdroj odměn bez hlídání ji shodí) | auto |
-| K2 | Začátečník na 9 hlavních obrazovkách nevidí zmínky o zamčených věcech (kosti, šipky, Chrám, Liga, pivovar, krígly) | auto |
+| K2 | Začátečník na 9 hlavních obrazovkách nevidí zmínky o zamčených věcech (kosti, talismany, šipky, Chrám, Liga, pivovar, krígly) | auto |
 | K3 | Cena na kartě = cena, kterou nákup strhne; nákup ×1 přidá právě 1 úroveň | auto |
 | K4 | Uložení a načtení (i po zavření do pozadí uprostřed hry) nic neztratí; poškozené uložení hru neshodí | auto |
 | K5 | Offline výdělek odpovídá času a stropu kasy (½ h, 2 h, 30 h) | auto |

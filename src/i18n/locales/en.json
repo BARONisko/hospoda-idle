@@ -1711,5 +1711,7 @@
  "Hygiena je připravená!": "Inspection is ready!",
  "odměna: talisman + coins": "reward: talisman + coins",
  "odměna: {g} 💎 + coins": "reward: {g} 💎 + coins",
- "plná hospoda, VIP host, truhla": "full pub, VIP guest, chest"
+ "plná hospoda, VIP host, truhla": "full pub, VIP guest, chest",
+ "odměna: 5 krígel": "reward: 5 tankards",
+ "odměna: coins": "reward: coins"
 }

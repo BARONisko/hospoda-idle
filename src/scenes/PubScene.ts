@@ -2362,6 +2362,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** vzácný nález talismanu (nový = úroveň 1, už ho máš = +1 úroveň zdarma) */
   private tryDrop(chance: number) {
+    if (!this.rewOpen('talis')) return;
     if (Math.random() >= chance * (1 + this.ts().luck)) return;
     const d = Phaser.Utils.Array.GetRandom(TALISMANS.filter((x) => !x.temple));
     const tl = (this.d.talis ??= {});
@@ -2714,7 +2715,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     {
       const w = this.weekly();
       const done = w.prog >= w.goal;
-      this.row(y0 - 4, RH, D, t('Týdenní výzva: {s}', { s: weekText(w.kind, w.goal) }), w.claimed ? t('hotovo – další v pondělí') : `${w.prog} / ${w.goal} · ${this.rewOpen('krigle') ? t('odměna: talisman + 5 krígel') : t('odměna: talisman + coins')}`, 'plum', PAL.sand);
+      this.row(y0 - 4, RH, D, t('Týdenní výzva: {s}', { s: weekText(w.kind, w.goal) }), w.claimed ? t('hotovo – další v pondělí') : `${w.prog} / ${w.goal} · ${this.rewOpen('talis') ? (this.rewOpen('krigle') ? t('odměna: talisman + 5 krígel') : t('odměna: talisman + coins')) : this.rewOpen('krigle') ? t('odměna: 5 krígel') : t('odměna: coins')}`, 'plum', PAL.sand);
       const b = this.btn(W - 172, y0 + 6, 150, 54, () => {
         if (w.claimed || w.prog < w.goal) return sfx.error();
         w.claimed = true;
@@ -3034,8 +3035,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
 
   /** smí odměna (truhla, pass, úkoly, Chrám…) dát tuhle věc? Jen z odemčených částí hry
    *  (hlášení Petra 27. 11.: kosti z truhly, když ještě nebyla Kostnice) */
-  rewOpen(kind: 'bones' | 'darts' | 'krigle'): boolean {
-    return !this.tileLock(kind === 'krigle' ? 'krigl' : kind);
+  rewOpen(kind: 'bones' | 'darts' | 'krigle' | 'talis'): boolean {
+    // talismany se prohlížejí a vylepšují v Kostnici (posudek Fable 27. 11.: dřív padaly i před ní)
+    return !this.tileLock(kind === 'krigle' ? 'krigl' : kind === 'talis' ? 'bones' : kind);
   }
 
   /** odměna passu: zamčené kosti/krígly → hodiny výdělku v coins */
@@ -4902,8 +4904,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** do kdy svítí cedule HOTOVO! (průvodce novinkami počká) */
   tutFinaleUntil = 0;
   private tutFinale() {
-    this.tutFinaleUntil = Date.now() + 4000;
-    const step = PubScene.TUT[PubScene.TUT.length - 1], D = 430, by = TOP + 16;
+    this.tutFinaleUntil = Date.now() + 3000;
+    // posudek Fable 27. 11.: dřív nahoře přes truhlu a viselo i přes Obchod a Menu → uprostřed výhledu hospody, kratší, zmizí na ťuk
+    const step = PubScene.TUT[PubScene.TUT.length - 1], D = 430, by = TOP + VIEW_H / 2 - 60;
     const hd = this.add.text(W / 2, by + 6, step.head, txt(46, PAL.gold)).setOrigin(0.5, 0).setDepth(D + 1);
     const tx = this.add.text(W / 2, by + 58, step.text, { fontFamily: 'Arial, Helvetica, sans-serif', fontStyle: 'bold', fontSize: '22px', color: PAL.white, align: 'center', wordWrap: { width: W - 90 } }).setOrigin(0.5, 0).setDepth(D + 1);
     const bh = 58 + Math.max(tx.height, 30) + 22;
@@ -4913,7 +4916,17 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const objs = [g, hd, tx];
     confetti(this, W / 2, by + bh, 50, D + 2, 0.8);
     sfx.levelUp();
-    this.tweens.add({ targets: objs, alpha: 0, delay: 3500, duration: 500, onComplete: () => objs.forEach((o) => o.destroy()) });
+    let gone = false;
+    const hide = () => {
+      if (gone) return;
+      gone = true;
+      this.tutFinaleUntil = 0;
+      this.input.off('pointerdown', hide);
+      this.tweens.killTweensOf(objs);
+      this.tweens.add({ targets: objs, alpha: 0, duration: 200, onComplete: () => objs.forEach((o) => o.destroy()) });
+    };
+    this.time.delayedCall(400, () => !gone && this.input.on('pointerdown', hide));
+    this.time.delayedCall(2600, hide);
   }
 
   private tutShow(textOnly = false) {

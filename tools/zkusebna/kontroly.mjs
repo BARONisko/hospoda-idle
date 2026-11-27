@@ -55,14 +55,14 @@ if (want('K1')) {
   const p = await page();
   const out = await S(p, (s) => {
     const bad = [];
-    const snap = () => ({ bones: s.d.bones ?? 0, krigle: s.d.krigle ?? 0, darts: s.d.darts ? JSON.stringify(s.d.darts) : '' });
-    const locked = () => ['bones', 'darts', 'krigle'].filter((k) => !s.rewOpen(k));
+    const snap = () => ({ bones: s.d.bones ?? 0, krigle: s.d.krigle ?? 0, darts: s.d.darts ? JSON.stringify(s.d.darts) : '', talis: JSON.stringify(s.d.talis ?? {}) });
+    const locked = () => ['bones', 'darts', 'krigle', 'talis'].filter((k) => !s.rewOpen(k));
     const check = (what, fn) => {
       const L = locked();
       const a = snap();
       try { fn(); } catch (e) { bad.push(`${what}: chyba ${e.message}`); return; }
       const z = snap();
-      for (const k of L) if (a[k] !== z[k]) bad.push(`${what} dal ${k} (zamčené: ${s.tileLock(k === 'krigle' ? 'krigl' : k)})`);
+      for (const k of L) if (a[k] !== z[k]) bad.push(`${what} dal ${k} (zamčené: ${s.tileLock(k === 'krigle' ? 'krigl' : k === 'talis' ? 'bones' : k)})`);
     };
     const states = [
       ['nová hra', () => {}],
@@ -85,6 +85,8 @@ if (want('K1')) {
       }
       // Chrám (odměny za bosse, truhly, obchod)
       if (!s.tileLock('temple')) for (const k of ['bones', 'darts', 'krigle']) check(`${name}: Chrám ${k}`, () => s.templeReward(k, 3));
+      // talisman (události, návštěvy, liga, týdenní výzva – všechny jdou přes tryDrop)
+      check(`${name}: nález talismanu`, () => s.tryDrop(1));
       // offline výdělek (část noci)
       check(`${name}: offline 10 h`, () => { s.d.at = Date.now() - 10 * 3600e3; s.offline(); s.awayClose?.(); });
     }
@@ -99,13 +101,16 @@ if (want('K1')) {
     const ctx = src.slice(Math.max(0, i - 25), i + 1).join('\n');
     if (!/rewOpen|this\.night\b|nightsOn|tileLock|prestiges >= ?\d|hyg >= ?\d|bonesPerSec\(\)|isNight|kind === /.test(ctx)) loose.push(`PubScene.ts:${i + 1} ${l.trim().slice(0, 80)}`);
   });
-  res('K1', 'Odměny dávají jen věci z odemčených částí hry', out.length === 0, out);
+  // talismany: jediný vstup tryDrop musí hlídat Kostnici
+  const td = fs.readFileSync('src/scenes/PubScene.ts', 'utf8').match(/private tryDrop\([^)]*\) \{[^}]*/);
+  if (!td || !/rewOpen\('talis'\)/.test(td[0])) loose.push('tryDrop nehlídá rewOpen(\'talis\')');
+  res('K1', 'Odměny dávají jen věci z odemčených částí hry (kosti, šipky, krígly, talismany)', out.length === 0, out);
   res('K1b', 'Každé místo v kódu, které přidává kosti/krígly/šipky, hlídá odemčení (nebo má ověřenou značku zk-ok)', loose.length === 0, loose);
   await p.close();
 }
 
 // ---------- K2: nic zamčeného není vidět ani koupit ----------
-const LOCK_WORDS = { bones: /kost(?!k|el|ý|i v rohu)|kostí|Kostnic/i, darts: /šipk|šipek/i, temple: /Chrám/i, league: /Lig[ay]\b/i, brew: /Pivovar/i, krigl: /krígl|krígel/i };
+const LOCK_WORDS = { bones: /kost(?!k|el|ý|i v rohu)|kostí|Kostnic|talisman/i, darts: /šipk|šipek/i, temple: /Chrám/i, league: /Lig[ay]\b/i, brew: /Pivovar/i, krigl: /krígl|krígel/i };
 const SCREENS = [
   ['hospoda', (s) => s.closeShop?.()],
   ['menu', (s) => s.openShop('home', false)],
