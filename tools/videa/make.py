@@ -19,7 +19,7 @@ def seg(n, clip, ss, dur, lines=(), zoom=1.0, push=0.0, speed=1.0, y0=330, ytxt=
     if lines: vf+=txt(lines, y0)
     subprocess.run(['ffmpeg','-v','error','-y','-ss',str(ss),'-i',f'{V}/cfr/{clip}.mp4','-t',str(dur*speed),'-vf',','.join(vf),'-t',str(dur),'-an','-c:v','libx264','-crf','17','-preset','fast','-pix_fmt','yuv420p',out],check=True)
     return out
-def endcard(n, dur=2.6, l1='P.U.B. IDLE', l2='Coming soon to Google Play'):
+def endcard(n, dur=2.6, l1='P.U.B. IDLE', l2='Free on Google Play'):
     out=f'{V}/seg/{n}.mp4'
     fc=(f"[0:v]setpts=PTS-STARTPTS,scale=1080:1920,boxblur=18:2,eq=brightness=-0.25,fps=30[bg];"
         f"[1:v]scale=440:440[ic];[bg][ic]overlay=(W-w)/2:520,"
@@ -63,5 +63,5 @@ if 'spanek' in which:
        seg('s4','gold',2.0,1.3,['Golden barrel!'],zoom=1.4,push=0.1),
        seg('s5','day',12.0,1.3,['All pubs earn at once'],zoom=1.35),
        seg('s6','temple',4.0,1.6,['Fight Cthulhu','on weekends'],y0=1000),
-       endcard('s7')]
+       endcard('s7', l2='Pour the first beer')]
     join('3-spanek', s, M)
