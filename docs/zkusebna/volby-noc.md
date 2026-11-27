@@ -17,3 +17,4 @@ Petr šel spát a chtěl, abych bral doporučené varianty a ráno napsal, mezi 
 | 11 | Talismany padaly před Kostnicí (blokátor od Fable) | a) až s Kostnicí, týdenní výzva do té doby coins/krígly · b) talismany prohlížet i mimo Kostnici | **a)** | stejná třída chyby jako kosti z truhly, nejmenší zásah. |
 | 12 | Cedule HOTOVO! po návodu zakrývala truhlu a visela i přes Obchod | a) uprostřed hospody, 2,6 s, zmizí na ťuk · b) jen kratší | **a)** | Fable U1; lišta úkolu a truhla zůstanou vidět. |
 | 13 | Dlouhý bot „zasekl“ u „Otevřít · 50“ | a) neopravovat · b) zkoumat dál | **a)** | podle záznamu za 4 s koupil, byla to chvilková rvačka (událost), ne chyba hry. |
+| 14 | Žádost o produkci po „ano“ od Fable | a) neposílat, jen připravit – dotazník vyplňuješ ty · b) odeslat sám | **a)** | žádost obsahuje dotazník, který podle dohody vyplňuješ ty (odpovědi v docs/play/dotaznik-produkce.md); 1.0.21 je v interním testu a připravená. |
