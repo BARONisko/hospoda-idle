@@ -409,6 +409,13 @@ def cmd_score(run):
         for k in ("0", "1", "2"):
             L.append(f"- **{k}**: {c['anchors'][k]}")
         L.append("")
+    kp = os.path.join(run, "kontroly.json")
+    if os.path.exists(kp):
+        K = load(kp)
+        L += [f"## Automatické kontroly pravidel: {K['passed']} z {K['total']} prošlo", "", "Snímky kontrol jsou v `kontroly/` (K2 obrazovky začátečníka, K6 jazyky, K8 postavy, K11 tři displeje, K12 cedule) – projdi je taky.", ""]
+        for r in K["results"]:
+            L.append(f"- {'✓' if r['ok'] else '✗'} {r['code']} {r['name']}" + (f" – {'; '.join(r['detail'][:4])}" if r["detail"] else ""))
+        L.append("")
     L += ["## Spočítaná čísla (nepřebírej je jako známky, slouží jako kontext)", "", "| Kód | Kritérium | Hodnota | Dobře | Špatně | Známka | Poznámka |", "|---|---|---|---|---|---|---|"]
     for r in table:
         L.append(f"| {r['code']} | {r['name']} | {fmt(r['value'], r['unit'])} | {r['good']} | {r['bad']} | {fmt(r['score'])} | {r['note']} |")
@@ -461,6 +468,9 @@ def cmd_merge(run):
         for s in re.findall(r"shots/([\w.-]+\.png)", ev):
             if s in shots:
                 return True
+        for s2 in re.findall(r"kontroly/([\w.-]+\.png)", ev):
+            if os.path.exists(os.path.join(run, "kontroly", s2)):
+                return True
         for t in re.findall(r"t=(\d+)", ev):
             if int(t) <= longest:
                 return True
@@ -507,6 +517,13 @@ def cmd_merge(run):
         L.append("")
     if warn:
         L += ["## Kontrola hodnotitele", ""] + [f"- {w}" for w in warn] + [""]
+    kp = os.path.join(run, "kontroly.json")
+    if os.path.exists(kp):
+        K = load(kp)
+        out["kontroly"] = {"passed": K["passed"], "total": K["total"], "failed": [r["code"] + " " + r["name"] for r in K["results"] if not r["ok"]]}
+        L += [f"## Automatické kontroly: {K['passed']} z {K['total']} prošlo" + (" – build NE, dokud neprojdou všechny" if K["passed"] < K["total"] else ""), ""]
+        L += [f"- ✗ {r['code']} {r['name']}: {'; '.join(r['detail'][:4])}" for r in K["results"] if not r["ok"]] + [""]
+        dump(os.path.join(run, "lidska_cast.json"), out)
     L += ["## Známky", "", "| Kód | Kritérium | Známka | Hodnota | Proč | Návrh |", "|---|---|---|---|---|---|"]
     for r in allrows:
         L.append(f"| {r['code']} | {r['name']} | {fmt(r['score'])} | {r['value']} | {str(r['why']).replace('|', '/')} | {str(r['proposal']).replace('|', '/')} |")

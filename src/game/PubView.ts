@@ -642,7 +642,8 @@ export class PubView {
     const speed = Math.max(len(there), 1) / walk;
     this.tripEnd[i]?.();
     this.s.tweens.killTweensOf(spr);
-    spr.setPosition(this.ox + home.x, home.y);
+    // přerušené „poskočení“ po najmutí (1,6 → 1) nechávalo číšníka natrvalo větší než hosty (hlášení Petra 27. 11.)
+    spr.setScale(1).setPosition(this.ox + home.x, home.y);
     // podnos s pivy nad hlavou
     const tray = this.s.add.rectangle(spr.x, spr.y - 17, 16, 2, 0xc8c8d0).setStrokeStyle(1, 0x1a1a24);
     const item = food ? FOOD[this.pub.act] : 'mug';

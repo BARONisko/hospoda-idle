@@ -1708,5 +1708,8 @@
  "Pípa točí sama. Pak otevři kuchyni.": "The tap pours by itself. Then open the kitchen.",
  "výdělek {a} → {b}/s": "income {a} → {b}/s",
  "jednorázově na {d} dní – sama se neobnovuje": "one-time for {d} days – does not renew",
- "Hygiena je připravená!": "Inspection is ready!"
+ "Hygiena je připravená!": "Inspection is ready!",
+ "odměna: talisman + coins": "reward: talisman + coins",
+ "odměna: {g} 💎 + coins": "reward: {g} 💎 + coins",
+ "plná hospoda, VIP host, truhla": "full pub, VIP guest, chest"
 }

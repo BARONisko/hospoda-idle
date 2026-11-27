@@ -437,6 +437,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (!this.d.kup2) {
       const k = this.d.kup ?? {};
       const back = (n: number, f: (l: number) => number) => Array.from({ length: n }, (_, l) => f(l)).reduce((a, b) => a + b, 0);
+      // zk-ok: převod starého uložení (vrácení krígel)
       this.d.krigle += back(k.offline ?? 0, (l) => Math.ceil(10 * 2 ** l)) + back(k.tips ?? 0, (l) => Math.ceil(20 * 2 ** l));
       delete k.offline;
       delete k.tips;
@@ -445,6 +446,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // Zlatý výčep (dřív Cthulhu ×10): starým hráčům vrátit krígly za Cthulhu podle starých cen (300·6^l) a úroveň vynulovat
     if (!this.d.kup3) {
       const n = this.d.kup?.cthulhu ?? 0;
+      // zk-ok: převod starého uložení
       for (let l = 0; l < n; l++) this.d.krigle += Math.ceil(300 * 6 ** l);
       if (this.d.kup) delete this.d.kup.cthulhu;
       this.d.kup3 = true;
@@ -809,7 +811,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (raw >= 300 && this.star('welcome')) for (const p of this.d.pubs) if (p.mgr && !this.boosted(p)) p.boostReady = 0;
     if (secs < OFFLINE_MIN || g < 1) return;
     // část času byla noc: místo coins kosti
-    const ns = this.nightsOn() ? nightShare() : 0;
+    // kosti jen když už je Kostnice (jinak celý čas v coins)
+    const ns = this.nightsOn() && this.rewOpen('bones') ? nightShare() : 0;
     const coins = Math.floor(g * (1 - ns));
     const bones = secs * ns * this.bonesPerSec(true);
     // liga: o kolik soupeř mezitím přidal (jen když je to pořád stejný týden)
@@ -1110,13 +1113,15 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     // a dlouhý text se zalomí a zmenší, aby nepřetekl mimo obrazovku
     const tx = this.add
       // nahoře pod lištou úkolu (dřív ležel přes ni)
-      .text(W / 2, top ? this.pubTop() + 62 + this.qOff() : TOP + VIEW_H / 2, text, { ...txt(30, PAL.gold), align: 'center', wordWrap: { width: W - 40 } })
-      .setOrigin(0.5)
+      .text(W / 2, top ? this.pubTop() + 40 + this.qOff() : TOP + VIEW_H / 2, text, { ...txt(30, PAL.gold), align: 'center', wordWrap: { width: top ? W - 180 : W - 40 } })
+      // horní: roste dolů (víc řádků dřív přerostlo nahoru přes lištu úkolu – Zkušebna K12)
+      .setOrigin(0.5, top ? 0 : 0.5)
       .setStroke(PAL.ink, 8)
       .setDepth(450);
     // Zkušebna H3: horní nápis (pokyn k události) na tmavém podkladu a déle – dřív splýval s barem a zmizel za 2 s
     if (top) tx.setBackgroundColor('rgba(20,16,28,0.82)').setPadding(14, 6, 14, 6);
-    tx.setScale(Math.min(1, (W - 24) / tx.width));
+    // horní nápis užší: po stranách je truhla a cedule stylu (Zkušebna K12 – dřív je zakrýval)
+    tx.setScale(Math.min(1, (top ? W - 152 : W - 24) / tx.width));
     this.tweens.add({ targets: tx, scale: { from: 0.4 * tx.scale, to: tx.scale }, duration: 260, ease: 'Back.out' });
     // horní nápis mizí dolů (nahoru by vjel do lišty úkolu – posudek nováčka)
     this.tweens.add({ targets: tx, y: tx.y + (top ? 30 : -40), alpha: 0, delay: top ? 2800 : 1300, duration: 600, onComplete: () => tx.destroy() });
@@ -1185,6 +1190,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
   /** šipky → kosti a hostinský: každá dohraná hra +3 kosti a +5 XP */
   dartsLeg(n: number) {
     this.task('darts', n);
+    // zk-ok: šipky (30. hygiena) jsou až po Kostnici
     this.d.bones = (this.d.bones ?? 0) + 3 * n;
     this.xp(5 * n);
   }
@@ -1296,6 +1302,12 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     if (kind === 'bones') {
       this.d.bones = (this.d.bones ?? 0) + n;
       return t('+{n} kostí', { n: big(n) });
+    }
+    if (kind === 'darts' && !this.rewOpen('darts')) {
+      // Chrám (11. hygiena) je dřív než šipky (30.) – místo šipek kosti
+      const b = 5 * n;
+      this.d.bones = (this.d.bones ?? 0) + b;
+      return t('+{n} kostí', { n: big(b) });
     }
     if (kind === 'darts') {
       // chrám → šipky: body na vylepšení terče
@@ -1830,6 +1842,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         if (win) {
           const R = this.rk();
           if (R) (rekoCount(R, 'lg'), tier >= 3 && rekoCount(R, 'lg3'));
+          // zk-ok: Liga (40. hygiena) – krígly už jsou
           this.d.krigle += k;
           this.d.gems = (this.d.gems ?? 0) + gm;
           // liga → šipky: +3 body
@@ -2701,12 +2714,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     {
       const w = this.weekly();
       const done = w.prog >= w.goal;
-      this.row(y0 - 4, RH, D, t('Týdenní výzva: {s}', { s: weekText(w.kind, w.goal) }), w.claimed ? t('hotovo – další v pondělí') : `${w.prog} / ${w.goal} · ${t('odměna: talisman + 5 krígel')}`, 'plum', PAL.sand);
+      this.row(y0 - 4, RH, D, t('Týdenní výzva: {s}', { s: weekText(w.kind, w.goal) }), w.claimed ? t('hotovo – další v pondělí') : `${w.prog} / ${w.goal} · ${this.rewOpen('krigle') ? t('odměna: talisman + 5 krígel') : t('odměna: talisman + coins')}`, 'plum', PAL.sand);
       const b = this.btn(W - 172, y0 + 6, 150, 54, () => {
         if (w.claimed || w.prog < w.goal) return sfx.error();
         w.claimed = true;
         this.spPts('weekly');
-        this.d.krigle += 5;
+        if (this.rewOpen('krigle')) this.d.krigle += 5;
+        else this.gain(this.hoursIncome(4));
         const R = this.rk();
         if (R) rekoCount(R, 'weekly');
         this.tryDrop(1);
@@ -2719,12 +2733,13 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       if (w.claimed) {
         y0 += RH + 4;
         const gg = w.goal * GOLD_WEEK_X, gp = w.gp ?? w.goal, gd = gp >= gg;
-        this.row(y0 - 4, RH, D, t('Zlatá výzva: {s}', { s: weekText(w.kind, gg) }), w.gc ? t('hotovo – další v pondělí') : `${gp} / ${gg} · ${t('odměna: {g} 💎 + kosti', { g: GOLD_WEEK_GEMS })}`, 'plum', PAL.gold);
+        this.row(y0 - 4, RH, D, t('Zlatá výzva: {s}', { s: weekText(w.kind, gg) }), w.gc ? t('hotovo – další v pondělí') : `${gp} / ${gg} · ${this.rewOpen('bones') ? t('odměna: {g} 💎 + kosti', { g: GOLD_WEEK_GEMS }) : t('odměna: {g} 💎 + coins', { g: GOLD_WEEK_GEMS })}`, 'plum', PAL.gold);
         const b2 = this.btn(W - 172, y0 + 6, 150, 54, () => {
           if (w.gc || (w.gp ?? w.goal) < gg) return sfx.error();
           w.gc = true;
           this.d.gems = (this.d.gems ?? 0) + GOLD_WEEK_GEMS;
-          this.d.bones = (this.d.bones ?? 0) + Math.max(50, Math.round(this.bonesPerSec() * 3600 * 2));
+          if (this.rewOpen('bones')) this.d.bones = (this.d.bones ?? 0) + Math.max(50, Math.round(this.bonesPerSec() * 3600 * 2));
+          else this.gain(this.hoursIncome(4));
           sfx.fanfare();
           store(this.d);
           this.openShop('tasks', false);
@@ -2932,7 +2947,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     rows.forEach(([title, val, fn], i) => {
       i += vols.length + 1;
       const y = y0 + i * RH;
-      this.row(y, RH, D, title, title === t('Upozornění') ? t('plná hospoda, VIP host, truhla, chrám') : title === t('Statistiky') ? t('anonymní – pomáhají hru vylepšovat') : title === t('Začít znovu') ? t('celá hra od začátku, i s návodem') : title === t('Zvuk výdělku') ? t('cinkání stanic – ťukni = přepni a poslechni') : '', 'ink', PAL.bone, Math.min(RH < 70 ? 240 : 300, W - 232 - 34)); // text nesmí pod tlačítko (od W − 232)
+      this.row(y, RH, D, title, title === t('Upozornění') ? (this.tileLock('temple') ? t('plná hospoda, VIP host, truhla') : t('plná hospoda, VIP host, truhla, chrám')) : title === t('Statistiky') ? t('anonymní – pomáhají hru vylepšovat') : title === t('Začít znovu') ? t('celá hra od začátku, i s návodem') : title === t('Zvuk výdělku') ? t('cinkání stanic – ťukni = přepni a poslechni') : '', 'ink', PAL.bone, Math.min(RH < 70 ? 240 : 300, W - 232 - 34)); // text nesmí pod tlačítko (od W − 232)
       const bs = Math.min(60, RH - 14);
       const b = this.btn(W - 232, y + (RH - 8 - bs) / 2, 210, bs, () => {
         fn();
@@ -3017,6 +3032,29 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     return n === 1 ? t('{n} krígl', { n }) : n < 5 ? t('{n} krígly', { n }) : t('{n} krígel', { n });
   }
 
+  /** smí odměna (truhla, pass, úkoly, Chrám…) dát tuhle věc? Jen z odemčených částí hry
+   *  (hlášení Petra 27. 11.: kosti z truhly, když ještě nebyla Kostnice) */
+  rewOpen(kind: 'bones' | 'darts' | 'krigle'): boolean {
+    return !this.tileLock(kind === 'krigle' ? 'krigl' : kind);
+  }
+
+  /** odměna passu: zamčené kosti/krígly → hodiny výdělku v coins */
+  spRewFix(r: SPassRew): SPassRew {
+    const o = { ...r };
+    if (o.bones && !this.rewOpen('bones')) (o.coinsH = (o.coinsH ?? 0) + Math.max(2, Math.round(o.bones / 100))), delete o.bones;
+    if (o.krigle && !this.rewOpen('krigle')) (o.coinsH = (o.coinsH ?? 0) + 4 * o.krigle), delete o.krigle;
+    return o;
+  }
+
+  /** odměna truhly pro den i (0–6): zamčené věci nahradí coins (hodiny výdělku) */
+  chestRewAt(i: number): ChestRew {
+    const r = CHEST_REW[i];
+    if (r.k === 'bones' && !this.rewOpen('bones')) return { k: 'coins', h: r.n >= 10 ? 10 : 6 };
+    if (r.k === 'darts' && !this.rewOpen('darts')) return { k: 'coins', h: 6 };
+    if (r.k === 'krigle' && !this.rewOpen('krigle')) return { k: 'coins', h: 12 };
+    return r;
+  }
+
   /** množství odměny truhly podle postupu (kosti z nočního výdělku, šipky z toulce, krígly z vlastněných) */
   private chestN(r: ChestRew): number {
     if (r.k === 'bones') return Math.max(r.n, Math.round(this.bonesPerSec() * 3600 * (r.h ?? 0)));
@@ -3033,7 +3071,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       case 'bones': return t('{n} kostí', { n: big(this.chestN(r) * x) });
       case 'darts': return t('{n} šipek', { n: big(this.chestN(r) * x) });
       case 'krigle': return this.krigleTxt(this.chestN(r) * x);
-      case 'gold': return t('+{p} bod pro číšníka + {k} + {g} 💎', { p: x, k: this.krigleTxt(this.chestN(r) * x), g: GOLD_GEMS * x });
+      case 'gold': return t('+{p} bod pro číšníka + {k} + {g} 💎', { p: x, k: this.rewOpen('krigle') ? this.krigleTxt(this.chestN(r) * x) : t('{n} coins', { n: big(this.hoursIncome(8 * x)) }), g: GOLD_GEMS * x });
     }
   }
 
@@ -3050,8 +3088,9 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     else if (r.k === 'darts') this.dartsData().have += n;
     else if (r.k === 'krigle') this.d.krigle += n;
     else {
-      // zlatá truhla: bod číšníkovi s nejméně body (bez číšníků 8 h výdělku) + krígly
-      this.d.krigle += n;
+      // zlatá truhla: bod číšníkovi s nejméně body (bez číšníků 8 h výdělku) + krígly (před 1. hygienou coins)
+      if (this.rewOpen('krigle')) this.d.krigle += n;
+      else this.gain(this.hoursIncome(8 * x));
       this.d.gems = (this.d.gems ?? 0) + GOLD_GEMS * x;
       for (let i = 0; i < x; i++) {
         const ws = this.d.pubs.flatMap((p) => p.w ?? []).filter((w) => wEarned(w) < MAX_POINTS);
@@ -3074,7 +3113,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const { st, day } = openChest(this.d.chest);
     this.d.chest = st;
     this.spPts('chest');
-    const txt1 = this.chestGive(CHEST_REW[day - 1], x2 ? 2 : 1);
+    const txt1 = this.chestGive(this.chestRewAt(day - 1), x2 ? 2 : 1);
     store(this.d);
     this.tsCache = undefined;
     const x = W / 2, y = 420, D = 470;
@@ -3141,7 +3180,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       g.fillStyle(col(today ? 'amber' : done ? 'green' : 'ink')).fillRoundedRect(x, y, tw, th, 10);
       add(this.add.text(x + tw / 2, y + 16, t('{n}. den', { n: i + 1 }), txt(20, PAL.white)).setOrigin(0.5).setDepth(D + 2));
       add(this.add.image(x + tw / 2, y + 60, 'obj', 'chest').setScale(2.5).setDepth(D + 2).setAlpha(done ? 0.5 : 1));
-      const lb = add(this.add.text(x + tw / 2, y + 104, done ? '✓' : this.chestRewText(CHEST_REW[i]), txt(done ? 26 : 18, done ? PAL.white : PAL.bone)).setOrigin(0.5).setAlign('center').setDepth(D + 2));
+      const lb = add(this.add.text(x + tw / 2, y + 104, done ? '✓' : this.chestRewText(this.chestRewAt(i)), txt(done ? 26 : 18, done ? PAL.white : PAL.bone)).setOrigin(0.5).setAlign('center').setDepth(D + 2));
       lb.setWordWrapWidth(tw - 12);
       lb.setScale(Math.min(1, (tw - 10) / lb.width, 44 / lb.height));
     }
@@ -3152,7 +3191,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     g.fillStyle(col(gold ? 'amber' : gDone ? 'green' : 'ink')).fillRoundedRect(10, gy, W - 20, 92, 10);
     add(this.add.image(66, gy + 50, 'obj', 'chest').setScale(3.6).setTint(col('gold')).setDepth(D + 2));
     add(this.add.text(122, gy + 16, t('7. den: ZLATÁ TRUHLA'), txt(24, PAL.gold)).setDepth(D + 2));
-    const gl = add(this.add.text(122, gy + 52, this.chestRewText(CHEST_REW[6]), txt(19, PAL.bone)).setDepth(D + 2));
+    const gl = add(this.add.text(122, gy + 52, this.chestRewText(this.chestRewAt(6)), txt(19, PAL.bone)).setDepth(D + 2));
     gl.setScale(Math.min(1, (W - 140) / gl.width));
     const by = gy + 112;
     if (ready) {
@@ -3711,6 +3750,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     }, D + 3);
     this.drawBtn(up, a.lvl >= AD_LVL_MAX ? t('Lepší reklama: max') : t('Lepší reklama +{v} · {k}', { v: xf(0.1), k: this.krigleTxt(cost) }), a.lvl < AD_LVL_MAX && this.d.krigle >= cost, 'amber');
     this.shopObjs.push(watch.bg, watch.label, watch.zone, up.bg, up.label, up.zone);
+    // za krígly až po 1. hygieně (Zkušebna K2: dřív nabízelo krígly, které hráč ještě nezná)
+    if (this.tileLock('krigl')) (up.bg.setVisible(false), up.label.setVisible(false), up.zone.disableInteractive());
     // denní video výzva: 5 odměn za video denně = bonus
     {
       const v = vcNow(this.d.offers), ready = vcReady(this.d.offers);
@@ -3768,7 +3809,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const lookIcon: Partial<Record<GemItem, [string, string, number]>> = { lookTap: ['obj', 'luxTap', 2.5], lookTables: ['obj', 'luxTable', 1.6], lookLivery: ['waiter_lux', '0', 2.2] };
     if (this.gemPage === 3) return this.gemPacks(y + 84, D);
     const ids: GemItem[] = this.gemPage === 2 ? GEM_LOOK : this.gemPage === 0
-      ? ['hhnow', 'quiver', 'brewnow', 'vipnow', 'skip4', 'skip24']
+      ? (['hhnow', 'quiver', 'brewnow', 'vipnow', 'skip4', 'skip24'] as GemItem[]).filter((g) => !(g === 'quiver' && this.tileLock('darts')) && !(g === 'hhnow' && !this.d.pubs.some((p) => p.mgr)) && !(g === 'brewnow' && this.tileLock('brew')))
       : ['chestbot', (['off1', 'off2', 'off3'] as GemItem[]).find((o) => !this.owns(o)) ?? 'off3', 'vipdoor', 'autohh', 'chronicle'];
     let yy = y + 84;
     for (const id of ids) {
@@ -4098,7 +4139,8 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       const b = this.btn(W - 172, y + 6, 150, RH - 18, () => {
         if (!a.done(this.d) || this.d.ach.includes(a.id)) return sfx.error();
         this.d.ach.push(a.id);
-        this.d.krigle += 1;
+        if (this.rewOpen('krigle')) this.d.krigle += 1;
+        else this.gain(this.hoursIncome(1));
         sfx.fanfare();
         store(this.d);
         this.openShop('book', false);
@@ -4756,6 +4798,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
       }
     const n = Math.min(MAX_PUBS, this.d.pubs.length + 1);
     if (n > this.d.pubs.length) (this.d.pubIntro = n), ((this.d.guideQ ??= []).push('pub' + n));
+    // zk-ok: hygiena je zdroj krígel (sama je odemyká)
     this.d.krigle += k;
     if (this.hygGemsLeft() > 0) {
       this.d.hygG!.n++;
@@ -6589,7 +6632,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const n = this.qReward();
     this.d.coins += n;
     this.d.gems = (this.d.gems ?? 0) + GEMS_FREE.quest + (k.gift?.gems ?? 0);
-    if (k.gift?.bones) this.d.bones = (this.d.bones ?? 0) + k.gift.bones;
+    if (k.gift?.bones && this.rewOpen('bones')) this.d.bones = (this.d.bones ?? 0) + k.gift.bones;
     meter.track('reko_task', { id: k.id, star: R.star });
     this.views.forEach((v) => v.rekoRefresh(true));
     sfx.fanfare();
@@ -6685,7 +6728,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
     const ln = this.add.graphics().setDepth(D + 1);
     ln.fillStyle(col('ink')).fillRect(mid - 3, top, 6, PER * RH - 10);
     objs.push(ln);
-    const rewTxt = (r: SPassRew) => (r.gems ? `💎 ${r.gems}` : r.bones ? `🦴 ${big(r.bones)}` : `🍺 ${t('+{k} krígel', { k: r.krigle ?? 0 })}`) + (r.gems && r.krigle ? `\n🍺 ${t('+{k} krígel', { k: r.krigle })}` : '');
+    const rewTxt = (r: SPassRew) => (r.gems ? `💎 ${r.gems}` : r.bones ? `🦴 ${big(r.bones)}` : r.coinsH ? `🪙 ${big(this.hoursIncome(r.coinsH))}` : `🍺 ${t('+{k} krígel', { k: r.krigle ?? 0 })}`) + (r.gems && r.krigle ? `\n🍺 ${t('+{k} krígel', { k: r.krigle })}` : '');
     for (let i = 0; i < PER; i++) {
       const n = pg * PER + i + 1;
       if (n > SPASS_TIERS) break;
@@ -6698,7 +6741,7 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         box.fillStyle(col(gold ? 'rust' : 'slate'), got ? 0.45 : 1).fillRoundedRect(x, y, cw, RH - 10, 10);
         box.lineStyle(can ? 4 : 2, col(can ? 'mint' : gold ? 'gold' : 'fog'), can ? 1 : 0.6).strokeRoundedRect(x, y, cw, RH - 10, 10);
         objs.push(box);
-        const rt = T(x + cw / 2, y + (RH - 10) / 2, rewTxt(spassRew(n, gold)), 20, PAL.bone, 0.5, 0.5).setAlign('center');
+        const rt = T(x + cw / 2, y + (RH - 10) / 2, rewTxt(this.spRewFix(spassRew(n, gold))), 20, PAL.bone, 0.5, 0.5).setAlign('center');
         rt.setScale(Math.min(1, (cw - 20) / rt.width));
         if (got) T(x + cw - 10, y + 6, '✓', 20, PAL.mint, 1, 0);
         else if (lock) T(x + cw - 8, y + 4, '🔒', 16, PAL.white, 1, 0);
@@ -6706,11 +6749,14 @@ export class PubScene extends Phaser.Scene implements TempleHost {
         const z = this.add.zone(x, y, cw, RH - 10).setOrigin(0).setDepth(D + 3).setInteractive();
         z.on('pointerdown', () => {
           if (lock) return void this.iapBuy('season');
-          const r = spassClaim(sp, n, gold);
-          if (!r) return sfx.error();
+          const r0 = spassClaim(sp, n, gold);
+          if (!r0) return sfx.error();
+          const r = this.spRewFix(r0);
           this.d.gems = (this.d.gems ?? 0) + (r.gems ?? 0);
+          // zk-ok: pass: r prošlo spRewFix (zamčené → coins)
           this.d.bones = (this.d.bones ?? 0) + (r.bones ?? 0);
           this.d.krigle += r.krigle ?? 0;
+          if (r.coinsH) this.gain(this.hoursIncome(r.coinsH));
           meter.track('spass_claim', { n, gold });
           store(this.d);
           sfx.coin(1);

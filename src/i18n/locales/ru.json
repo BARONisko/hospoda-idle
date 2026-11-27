@@ -1708,5 +1708,8 @@
  "Pípa točí sama. Pak otevři kuchyni.": "Кран наливает сам. Потом открой кухню.",
  "výdělek {a} → {b}/s": "доход {a} → {b}/с",
  "jednorázově na {d} dní – sama se neobnovuje": "разово на {d} дней – не продлевается",
- "Hygiena je připravená!": "Проверка готова!"
+ "Hygiena je připravená!": "Проверка готова!",
+ "odměna: talisman + coins": "награда: талисман + coins",
+ "odměna: {g} 💎 + coins": "награда: {g} 💎 + coins",
+ "plná hospoda, VIP host, truhla": "полный трактир, VIP-гость, сундук"
 }

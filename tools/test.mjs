@@ -373,6 +373,7 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
     return (c && c.narrow && c.y + c.h <= 960 - 84 && opened && earns && s.views[0].cam.height < 444) || JSON.stringify({ c: !!c, opened, earns });
   }).then((r) => (r !== true && console.log(r), r)) === true);
   ok('★6: úkol bez kousku dá kosti a 💎, kapitola ★6 v Knize', await S(p, async (s) => {
+    s.d.nightInfo = true; // kosti jen s odemčenou Kostnicí (Zkušebna K1)
     const RK = await import('/src/core/reko.ts'); const R = s.d.reko;
     R.star = 5; R.done = RK.REKO_TASKS.filter((k) => k.star <= 5).map((k) => k.id); R.c = {};
     const b0 = s.d.bones ?? 0, g0 = s.d.gems ?? 0;
@@ -639,8 +640,10 @@ const S = (p, fn, arg) => p.evaluate(`(${fn})(game.scene.getScene('Pub'), ${JSON
   ok('truhla: záložka se otevře', await S(p, (s) => s.shopObjs.length > 20));
   await p.evaluate(() => game.scene.getScene('Pub').chestOpen(false));
   ok('truhla: 1. den otevřen, ikona zmizí', await S(p, (s) => s.d.chest.day === 1 && !s.chestHud.img.visible));
-  await S(p, (s) => { const y = new Date(); y.setDate(y.getDate() - 1); s.d.chest = { day: 6, last: `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, '0')}-${String(y.getDate()).padStart(2, '0')}` }; window.k0 = s.d.krigle; });
+  await S(p, (s) => { const y = new Date(); y.setDate(y.getDate() - 1); s.d.chest = { day: 6, last: `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, '0')}-${String(y.getDate()).padStart(2, '0')}` }; window.k0 = s.d.krigle; s.d.stats.prestiges = Math.max(1, s.d.stats.prestiges); s.d.earned = Math.max(s.d.earned, 1e15); });
   await p.evaluate(() => game.scene.getScene('Pub').chestOpen(true));
+  await S(p, (s) => { s.d.stats.prestiges = 0; window.k1 = s.d.krigle; window.c1 = s.d.coins; s.chestGive(s.chestRewAt(5), 1); s.chestGive(s.chestRewAt(1), 1); });
+  ok('truhla: před 1. hygienou a první nocí místo krígel a kostí coins (Zkušebna K1)', await S(p, (s) => s.d.krigle === window.k1 && s.d.coins > window.c1));
   ok('truhla: 7. den zlatá ×2 = 6 krígel a body číšníkům', await S(p, (s) => s.d.chest.day === 7 && s.d.krigle - window.k0 === 6 && s.d.pubs[0].w.every((w) => w.xp >= 40000)));
   await S(p, (s) => { s.openShop('special', false); window.p0 = s.pay(s.d.pubs[0], s.cards[0].def); });
   await p.evaluate(() => game.scene.getScene('Pub').adWatchNow());

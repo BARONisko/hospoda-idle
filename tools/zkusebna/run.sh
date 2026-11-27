@@ -19,6 +19,9 @@ node tools/zkusebna/bot.mjs slaby "$RUN" 240 cs & BOTS+=($!)
 node tools/zkusebna/bot.mjs dlouhy "$RUN" 600 cs & BOTS+=($!)
 # čekat jen na boty (holé wait by čekalo i na vite preview a nikdy neskončilo)
 wait "${BOTS[@]}"
+# automatické kontroly pravidel (docs/zkusebna/checklist.md) – ano/ne, nepočítají se do bodů, ale build jen když všechny prošly
+node tools/zkusebna/kontroly.mjs "$RUN" > "$RUN/kontroly.log" 2>&1 || true
+tail -1 "$RUN/kontroly.log"
 python3 tools/zkusebna/human_half.py score "$RUN"
 echo
 echo "Hotovo: $RUN/auto.json a $RUN/review/prompt.md."

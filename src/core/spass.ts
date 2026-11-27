@@ -25,7 +25,8 @@ export interface SPassState {
   gold?: boolean;
 }
 
-export type SPassRew = { gems?: number; bones?: number; krigle?: number };
+/** coinsH = hodiny výdělku místo kostí/krígel, které hráč ještě nemá odemčené */
+export type SPassRew = { gems?: number; bones?: number; krigle?: number; coinsH?: number };
 
 /** číslo sezóny podle data (−1 = ještě nezačala) */
 export const spassIdx = (now = Date.now()) => (now < SP.start ? -1 : Math.floor((now - SP.start) / SPASS_LEN));

@@ -1708,5 +1708,8 @@
  "Pípa točí sama. Pak otevři kuchyni.": "ビールサーバーは自動で注ぐ。次にキッチンを開こう。",
  "výdělek {a} → {b}/s": "収入 {a} → {b}/秒",
  "jednorázově na {d} dní – sama se neobnovuje": "{d}日間の買い切り – 自動更新なし",
- "Hygiena je připravená!": "衛生検査の準備OK！"
+ "Hygiena je připravená!": "衛生検査の準備OK！",
+ "odměna: talisman + coins": "報酬:お守り + coins",
+ "odměna: {g} 💎 + coins": "報酬: {g} 💎 + coins",
+ "plná hospoda, VIP host, truhla": "満杯の酒場、VIP客、宝箱"
 }
