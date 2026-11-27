@@ -57,3 +57,9 @@ Plán vydání: https://claude.ai/artifact/4XroEodE739GNtNZSRrJaY. Tyhle body ma
 - **Placené zmínky u větších youtuberů** – až když reklama ukáže, že se hráč zaplatí.
 - **Lokalizované snímky obchodu** pro DE, PL, ES, PT-BR (texty na snímcích v jazyce země).
 - **Křížová propagace** s jinými indie vývojáři idle her (výměna banneru ve hře).
+
+## Zkušebna: automatická kontrola překryvů (27. 11. 2026, Petr – odloženo kvůli vydání)
+- Každá cedule, okno, šipka a popisek porovnat s lištou úkolu, kríglem, truhlou, tlačítky a okraji obrazovky.
+- Projet 3 velikosti displeje (úzký 360×640, běžný 405×720, dlouhý 412×915) a všech 11 jazyků (nejdelší de/ru/fr).
+- Spustit i během běhu botů (každých N ťuků) a výsledek dát jako kritérium U6 „překryvy“.
+- Podnět: cedule „Hygiena je připravená!“ nahoře překrývala lištu úkolu, krígl a truhlu a Zkušebna to nezachytila.
