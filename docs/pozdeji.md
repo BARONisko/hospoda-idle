@@ -67,4 +67,4 @@ Plán vydání: https://claude.ai/artifact/4XroEodE739GNtNZSRrJaY. Tyhle body ma
 
 ## Ekonomika: kosti v sezónním passu (27. 11. 2026, nález při kontrole odměn – čeká na Petra)
 - Pass dává 300 + 40 × stupeň kostí (zlatá řada ×3), truhla 5–10 kostí, první sběrač stojí 500. Kosti se 25. 11. dělily stem, pass asi ne.
-- Návrh: pass kosti ÷ 10 (30 + 4 × stupeň) nebo podle nočního výdělku jako truhla. Bez souhlasu neměnit.
+- Přepočet 27. 11. ráno: běžný hráč má 500–1 000 kostí za hodinu hraní (boti), truhla roste s nočním výdělkem → stupeň passu ≈ 1–2 h noci, přiměřené. Doporučení: nechat. Bez souhlasu neměnit.
