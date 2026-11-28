@@ -68,3 +68,11 @@ Plán vydání: https://claude.ai/artifact/4XroEodE739GNtNZSRrJaY. Tyhle body ma
 ## Ekonomika: kosti v sezónním passu (27. 11. 2026, nález při kontrole odměn – čeká na Petra)
 - Pass dává 300 + 40 × stupeň kostí (zlatá řada ×3), truhla 5–10 kostí, první sběrač stojí 500. Kosti se 25. 11. dělily stem, pass asi ne.
 - Přepočet 27. 11. ráno: běžný hráč má 500–1 000 kostí za hodinu hraní (boti), truhla roste s nočním výdělkem → stupeň passu ≈ 1–2 h noci, přiměřené. Doporučení: nechat. Bez souhlasu neměnit.
+
+## Nová ikona obchodu (28. 11. 2026, posudek Fable – čeká na Petrův výběr)
+- Současná ikona (krígl + „P.U.B.“) je čitelná, ale bez obličeje a zaměnitelná s ostatními pivními hrami; text v kruhu se ořízne.
+- Návrhy (pixel art, bez textu) v docs/navrhy-ui/ikona-2/, skript tools/ikona/kresli.py:
+  - **A – Hospodský** (mrkající hospodský s půllitrem, tyrkysová) – Fable doporučuje jako první A/B test.
+  - **B – Cthulhu štamgast** (velké oči, tváře, půllitr v chapadlech, oranžová) – druhý test proti vítězi.
+  - **C – Přípitek upíra a trpaslíka** (fialová) – při 48 px nejméně čitelný.
+- Testovat přes Play Console → Store listing experiments 50/50, aspoň 7 dní. Nevybrané nechat tady.
