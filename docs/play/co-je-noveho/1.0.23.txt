@@ -1,0 +1,50 @@
+Formát pro Play Console (Co je nového v této verzi) – vložit celý blok, jazyky podle značek.
+
+<en-US>
+• New app icon
+• Smoother gameplay on older and slower phones
+</en-US>
+<cs-CZ>
+• Nová ikona hry
+• Plynulejší chod na starších a slabších telefonech
+</cs-CZ>
+<de-DE>
+• Neues App-Symbol
+• Flüssigeres Spiel auf älteren und langsameren Handys
+</de-DE>
+<es-ES>
+• Nuevo icono de la app
+• Juego más fluido en móviles antiguos y lentos
+</es-ES>
+<fr-FR>
+• Nouvelle icône
+• Jeu plus fluide sur les téléphones anciens ou lents
+</fr-FR>
+<pl-PL>
+• Nowa ikona gry
+• Płynniejsza gra na starszych i słabszych telefonach
+</pl-PL>
+<pt-BR>
+• Novo ícone do app
+• Jogo mais fluido em celulares antigos e mais lentos
+</pt-BR>
+<ru-RU>
+• Новая иконка игры
+• Более плавная игра на старых и слабых телефонах
+</ru-RU>
+<tr-TR>
+• Yeni uygulama simgesi
+• Eski ve yavaş telefonlarda daha akıcı oyun
+</tr-TR>
+<ja-JP>
+• 新しいアプリアイコン
+• 古い・低スペックのスマホでの動作がよりなめらかに
+</ja-JP>
+<ko-KR>
+• 새 앱 아이콘
+• 오래되거나 느린 휴대폰에서 더 부드러운 플레이
+</ko-KR>
+<zh-CN>
+• 全新应用图标
+• 在旧款和低配手机上运行更流畅
+</zh-CN>

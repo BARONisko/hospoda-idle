@@ -111,6 +111,35 @@ guard(Phaser.Game.prototype, 'step');
   };
 }
 
+// Výkon (Zkušebna K10, slabý telefon): Phaser rozkládá každý oblouk (kruh, strokeRoundedRect, slice…) v každém snímku
+// na 100 bodů bez ohledu na velikost → kruh o poloměru 6 px = 400 bodů pro earcut. Místo toho úsečky dlouhé ~2 px
+// (odchylka od kruhu pod 0,05 px = na displeji stejné), body se zapíšou rovnou jako lineTo se stejným chováním jako ARC.
+{
+  const G = Phaser.GameObjects.Graphics.prototype as unknown as {
+    arc: (x: number, y: number, r: number, a0: number, a1: number, acw?: boolean, over?: number) => Phaser.GameObjects.Graphics;
+    commandBuffer: number[];
+  };
+  const LINE_TO = 4; // Phaser 3.80 graphics/Commands.js (LINE_TO), modul se nevyváží
+  const PI2 = Math.PI * 2;
+  G.arc = function (this: typeof G, x, y, radius, startAngle, endAngle, anticlockwise = false, overshoot = 0) {
+    let sweep = endAngle - startAngle;
+    if (anticlockwise) {
+      if (sweep < -PI2) sweep = -PI2;
+      else if (sweep > 0) sweep = -PI2 + (sweep % PI2);
+    } else if (sweep > PI2) sweep = PI2;
+    else if (sweep < 0) sweep = PI2 + (sweep % PI2);
+    const n = Math.max(4, Math.min(100, Math.ceil((Math.abs(sweep) * Math.abs(radius)) / 2)));
+    const step = 1 / n, cb = this.commandBuffer;
+    for (let i = 0; i < 1 + overshoot - 1e-9; i += step) {
+      const a = sweep * i + startAngle;
+      cb.push(LINE_TO, x + Math.cos(a) * radius, y + Math.sin(a) * radius);
+    }
+    const a = sweep + startAngle;
+    cb.push(LINE_TO, x + Math.cos(a) * radius, y + Math.sin(a) * radius);
+    return this as unknown as Phaser.GameObjects.Graphics;
+  };
+}
+
 // Mobil na výšku: logické rozlišení 540×960 (9:16), roztažení na displej se zachováním poměru.
 // mobilní aplikace: po přeinstalaci / na novém telefonu obnovit hru ze zálohy Androidu – dřív, než se hra načte
 await initBackup();
@@ -127,7 +156,9 @@ const game = new Phaser.Game({
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   input: { activePointers: 2 },
   // idle hra nepotřebuje 60–120 snímků/s: strop 30 = méně práce pro procesor i grafiku (telefon se nehřeje)
-  fps: { target: 30, limit: 30 },
+  // limit 32, ne 30: Phaser kreslí, až uplyne 1000/limit ms; dva snímky 60Hz displeje dají 33,32 ms < 33,33 ms
+  // → kreslil se jen každý třetí (20 snímků/s místo 30). Se 32 (31,25 ms) se kreslí každý druhý = 30/s (i na 90/120 Hz).
+  fps: { target: 30, limit: 32 },
   render: { powerPreference: 'low-power' },
   scene: [BootScene, PubScene, TempleScene, DartsScene],
 });
