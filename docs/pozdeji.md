@@ -76,3 +76,13 @@ Plán vydání: https://claude.ai/artifact/4XroEodE739GNtNZSRrJaY. Tyhle body ma
   - **B – Cthulhu štamgast** (velké oči, tváře, půllitr v chapadlech, oranžová) – druhý test proti vítězi.
   - **C – Přípitek upíra a trpaslíka** (fialová) – při 48 px nejméně čitelný.
 - Testovat přes Play Console → Store listing experiments 50/50, aspoň 7 dní. Nevybrané nechat tady.
+
+## Diamanty: nabídka a tlak na nákup (28. 11. 2026, posudek – čeká na Petra, nic nezměněno)
+- Za 💎 je 16 položek v obchodě (6 rychlých, 7 trvalých, 3 vzhledy) + 3 v lize + přerozdělení bodů. Trvalé + vzhled ≈ 5 250 💎.
+- Neplatící aktivní hráč dostane zhruba 20–30 💎/den (hygiena 3×2, VIP, úkoly, návštěvníci do 10, zlatý host, video výzva)
+  + ~60–100 týdně (liga 30 × liga, zlatá truhla 10, týdenní zlatá 20) + odměny Rekonstrukce 20–50. Kronika (+10 %) za ~6–8 týdnů.
+- Tlak nízký: 1 vyskakovací okno za spuštění, „Málo 💎“ jen cedule bez přesměrování do obchodu, liga je proti botům, placené násobky strop ×3.
+- **Riziko pay-to-win:** časoskok 24 h (90 💎) nemá denní limit a jeho výdělek jde do kola → víc krígel → globální žebříček „krígly“ v Google Play.
+  Hráč s 999 Kč (3 500 💎 ≈ 38 časoskoků) přeskočí měsíce. Návrhy: (a) časoskoky max 2×/den, nebo (b) krígly z časoskoku nepočítat do žebříčku.
+- **Málo pro platící po nákupu všeho trvalého:** jen 3 vzhledy. Návrh: víc kosmetiky (vzhled každé stanice, cedule, oblečení hostinského, sezónní výzdoba) – peníze bez tlaku na slabšího hráče.
+- Drobnost: na stránce Rychlé chybí u časoskoku zmínka, že se nepočítá do ligy (aby hráč věděl, že ligu nekupuje).
