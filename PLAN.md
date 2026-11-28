@@ -526,3 +526,5 @@ Ladění: ?pubs=2|3 (přidá hospody), ?mock=a|b|c (staré návrhy rozložení).
   Kniha hostinského a Rekonstrukce, věta o páté stanici a o Google Play Hrách (cloud, žebříčky).
 - Oprava (26. 11. 2026): průvodce „Nové v menu“ ukazoval šipkou na špatnou dlaždici (index v celém TILES, ale menu kreslí
   odemčené napřed) → ťuknutí nic neudělalo a průvodce se zasekl. Teď menuTiles() sdílí pořadí s menuGrid; test na to.
+- 28. 11. 2026: nová ikona A (mrkající hospodský s půllitrem, tyrkysová) podle posudku Fable – Play 512 (docs/play/ikona-512.png),
+  public/icon.png, Android mipmap-* (adaptivní: pozadí + popředí z tools/ikona/kresli.py launcher). Stará ikona docs/navrhy-ui/ikona/puvodni-krigl-512.png.

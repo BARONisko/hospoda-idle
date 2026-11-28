@@ -4,6 +4,7 @@ import math, sys
 SPR='tools/_tmp/spr/'  # sprity: node tools/sprity.mjs tools/_tmp/spr cthulhu/10 (vite na portu 5177)
 OUT='docs/navrhy-ui/ikona-2/'
 N=64
+LAYERS=False
 INK=(38,26,36,255)
 def hx(h,a=255): h=h.lstrip('#'); return (int(h[0:2],16),int(h[2:4],16),int(h[4:6],16),a)
 
@@ -62,6 +63,7 @@ def coin(c,x,y):
 
 def finish(layers,bg,name,shadow=True):
     out=bg.copy()
+    if LAYERS: bg.resize((512,512),Image.NEAREST).save(OUT+name+'-pozadi.png'); out=Image.new('RGBA',(N,N),(0,0,0,0))
     for L in layers:
         L=getattr(L,'im',L); L2=outline(L)
         if shadow:
@@ -69,7 +71,10 @@ def finish(layers,bg,name,shadow=True):
             sh.paste(Image.new('RGBA',(N,N),(30,14,10,110)),(1,1),a)
             out.alpha_composite(sh)
         out.alpha_composite(L2)
-    big=out.resize((512,512),Image.NEAREST); big.convert('RGB').save(OUT+name+'.png'); return big
+    big=out.resize((512,512),Image.NEAREST)
+    if LAYERS: big.save(OUT+name+'-popredi.png')
+    else: big.convert('RGB').save(OUT+name+'.png')
+    return big
 
 # ---------------- A: hospodský ----------------
 def A():
@@ -137,8 +142,6 @@ def B():
     out.resize((512,512),Image.NEAREST).convert('RGB').save(OUT+'B-cthulhu-raw.png')
     return out
 
-if __name__=='__main__':
-    A(); B()
 
 def B2():
     G=57
@@ -253,5 +256,13 @@ def B4():
     out.alpha_composite(fx.im)
     out.resize((512,512),Image.NEAREST).convert('RGB').save(OUT+'B-cthulhu.png')
 
+
+def launcher():
+    """vrstvy ikony A pro Android (adaptivní ikona) do tools/_tmp"""
+    global LAYERS, OUT
+    LAYERS=True; o=OUT; OUT='tools/_tmp/'; A(); LAYERS=False; OUT=o
+
 if __name__=='__main__':
-    A(); B4(); Cc()
+    import sys
+    if 'launcher' in sys.argv: launcher()
+    else: A(); B4(); Cc()
